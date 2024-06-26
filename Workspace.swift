@@ -5,4 +5,10 @@
 //  Created by 한지석 on 6/25/24.
 //
 
-import Foundation
+import ProjectDescription
+
+let appName = "undefined"
+let workspace = Workspace(
+  name: appName,
+  projects: ["*"]
+)
