@@ -6,4 +6,7 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 
-import Foundation
+import UIKit
+
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate { }

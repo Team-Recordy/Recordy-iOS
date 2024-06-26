@@ -8,6 +8,25 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
+let infoPlist: [String: Plist.Value] = [
+  "CFBundleShortVersionString": "1.0.0",
+  "CFBundleVersion": "1",
+  "CFBundleDisplayName": "Recordy",
+  "UIMainStoryboardFile": "",
+  "UILaunchStoryboardName": "LaunchScreen.storyboard",
+  "UIApplicationSceneManifest": [
+    "UIApplicationSupportsMultipleScenes": false,
+    "UISceneConfigurations": [
+      "UIWindowSceneSessionRoleApplication": [
+        [
+          "UISceneConfigurationName": "Default Configuration",
+          "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate"
+        ],
+      ]
+    ]
+  ]
+]
+
 private let moduleName = "App"
 
 let project = Project.makeModule(
@@ -15,7 +34,7 @@ let project = Project.makeModule(
   destinations: [.iPhone],
   product: .app,
   bundleId: "app.recordy",
-  infoPlist: .default,
+  infoPlist: .extendingDefault(with: infoPlist),
   resources: ["Resources/**"],
   dependencies: []
 )
