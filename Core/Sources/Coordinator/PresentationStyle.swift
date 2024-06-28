@@ -6,4 +6,9 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 
-import Foundation
+import UIKit
+
+enum PresentationStyle {
+    case push(navigationController: UINavigationController)
+    case none
+}
