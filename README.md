@@ -11,12 +11,14 @@
 
 
 ## 3. Library
-### 아키텍처(우선순위)
-  1-1. MVVM - Coordinator
-  1-2. 모듈화 적용
-  1-3. Clean Architecture 기반
 
-### 라이브러리 사용
+```
+아키텍처(우선순위)
+1. MVVM - Coordinator
+2. 모듈화 적용
+3. Clean Architecture 기반
+
+라이브러리 사용
 1. 프로젝트 관리 도구: Tuist
   - 프로젝트 충돌 방지
   - 모듈화 적용 
@@ -31,6 +33,7 @@
 4. Reactive: RxSwift
   - 반응형 프로그래밍을 편하게 하기 위함
   - MVVM을 보다 편하게 구현할 수 있음
+```
     
 ## 4. Coding Convention
 ```
@@ -48,6 +51,10 @@
 
 
 ## 5. Git Flow 전략
+<img width="753" alt="스크린샷 2024-06-26 오후 12 14 34" src="https://github.com/Team-Recordy/Recordy-iOS/assets/49385546/7a098200-d152-4207-a6ef-b7a845e3f766">
+<br>
+(Master == Main, Hotfix 미사용)
+
 ```
 /// 항상 develop 브랜치가 최신 상태인지 확인해주세요 !
 /// 작업 브랜치에서 작업 중에 develop 브랜치의 최신 상태가 변경되었다면?
@@ -59,7 +66,7 @@
 5. PR & merge
 ```
 
-커밋 메시지
+### 커밋 메시지
 ```
 일반적인 커밋 : `feat: 버튼 작동 시 특정 이벤트 발생하는 기능 구현(#33)`
 최신 작업 상황 반영 : `merge: develop into #33
