@@ -1,9 +1,8 @@
 ---
 name: Issue template
 about: 레코디 이쓔 발생~!
-title: ''
-labels: "✈️ ASAP, \U0001F41C Bug, ⚙️ Chore, \U0001F3A5 Feature, ⚒️ Fix, ✏️ Refactoring,
-  \U0001F34E Release"
+title: "[Feat] 기능 이름"
+labels: "⚙️ Chore"
 assignees: ''
 
 ---
