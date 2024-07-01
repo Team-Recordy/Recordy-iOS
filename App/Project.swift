@@ -36,5 +36,10 @@ let project = Project.makeModule(
   bundleId: "app.recordy",
   infoPlist: .extendingDefault(with: infoPlist),
   resources: ["Resources/**"],
-  dependencies: []
+  dependencies: [
+    .Project.Common,
+    .Project.Core,
+    .Project.Data,
+    .Project.Presentation
+  ]
 )
