@@ -11,4 +11,29 @@ public extension TargetDependency {
   enum Project {}
 }
 
-public extension TargetDependency.Project {}
+public extension TargetDependency.Project {
+  static let Common = TargetDependency.project(
+    target: "Common",
+    path: .relativeToRoot(
+      "Common"
+    )
+  )
+  static let Core = TargetDependency.project(
+    target: "Core",
+    path: .relativeToRoot(
+      "Core"
+    )
+  )
+  static let Data = TargetDependency.project(
+    target: "Data",
+    path: .relativeToRoot(
+      "Data"
+    )
+  )
+  static let Presentation = TargetDependency.project(
+    target: "Presentation",
+    path: .relativeToRoot(
+      "Presentation"
+    )
+  )
+}

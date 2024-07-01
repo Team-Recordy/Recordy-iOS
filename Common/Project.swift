@@ -13,7 +13,7 @@ private let moduleName = "Common"
 let project = Project.makeModule(
   name: moduleName,
   destinations: [.iPhone],
-  product: .dynamicLibrary,
+  product: .framework,
   bundleId: moduleName,
   resources: ["Resources/**"],
   dependencies: []
