@@ -14,5 +14,6 @@ let project = Project.makeModule(
   name: moduleName,
   destinations: [.iPhone],
   product: .staticFramework,
-  bundleId: moduleName
+  bundleId: moduleName,
+  dependencies: []
 )

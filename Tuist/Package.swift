@@ -2,21 +2,20 @@
 import PackageDescription
 
 #if TUIST
-    import ProjectDescription
+import ProjectDescription
 
-    let packageSettings = PackageSettings(
-        // Customize the product types for specific package product
-        // Default is .staticFramework
-        // productTypes: ["Alamofire": .framework,] 
-        productTypes: [:]
-    )
+let packageSettings = PackageSettings(
+  productTypes: [
+    "SnapKit": .framework,
+    "Then": .framework
+  ]
+)
 #endif
 
 let package = Package(
-    name: "Recordy-iOS",
-    dependencies: [
-        // Add your own dependencies here:
-        // .package(url: "https://github.com/Alamofire/Alamofire", from: "5.0.0"),
-        // You can read more about dependencies here: https://docs.tuist.io/documentation/tuist/dependencies
-    ]
+  name: "Recordy-iOS",
+  dependencies: [
+    .package(url: "https://github.com/SnapKit/SnapKit", from: "5.0.1"),
+    .package(url: "https://github.com/devxoul/Then", from: "2.0.0"),
+  ]
 )

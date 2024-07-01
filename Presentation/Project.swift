@@ -17,6 +17,8 @@ let project = Project.makeModule(
   bundleId: moduleName,
   dependencies: [
     .Project.Core,
-    .Project.Common
+    .Project.Common,
+    .external(name: "SnapKit", condition: .none),
+    .external(name: "Then", condition: .none)
   ]
 )
