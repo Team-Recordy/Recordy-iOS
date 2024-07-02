@@ -21,7 +21,8 @@ extension Project {
     resources: ResourceFileElements? = nil,
     entitlements: Entitlements? = nil,
     dependencies: [TargetDependency] = [],
-    target: Target? = nil
+    target: Target? = nil,
+    settings: Settings? = nil
   ) -> Project {
 
     let target = Target.target(
@@ -35,7 +36,8 @@ extension Project {
       resources: resources,
       entitlements: entitlements,
       scripts: [],
-      dependencies: dependencies
+      dependencies: dependencies,
+      settings: settings
     )
 
     return Project(
