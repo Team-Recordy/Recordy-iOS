@@ -24,7 +24,8 @@ let infoPlist: [String: Plist.Value] = [
         ],
       ]
     ]
-  ]
+  ],
+  "NSPhotoLibraryUsageDescription": "앱에서 사진 라이브러리에 접근하려면 권한이 필요합니다."
 ]
 
 private let moduleName = "App"
