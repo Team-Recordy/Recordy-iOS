@@ -6,4 +6,11 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 
-import Foundation
+import UIKit
+
+extension UIView {
+  public func cornerRadius(_ cgFloat: CGFloat) {
+    self.layer.masksToBounds = true
+    self.layer.cornerRadius = cgFloat
+  }
+}

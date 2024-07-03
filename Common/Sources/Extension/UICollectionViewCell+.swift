@@ -6,4 +6,10 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 
-import Foundation
+import UIKit
+
+extension UICollectionViewCell {
+    public static var cellIdentifier: String {
+        return String(describing: self)
+    }
+}
