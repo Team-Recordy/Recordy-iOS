@@ -2,167 +2,78 @@
 //  UploadVideoViewController.swift
 //  Presentation
 //
-//  Created by 한지석 on 7/2/24.
+//  Created by 한지석 on 7/5/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 
 import UIKit
 
 import Common
-import Photos
-import PhotosUI
 
+import RxSwift
+import RxCocoa
 import SnapKit
 import Then
-import RxSwift
-import RxRelay
 
-public class UploadVideoViewController: UIViewController {
+class UploadVideoViewController: UIViewController {
 
-  private let warningLabel = UILabel().then {
-    $0.text = "ⓘ 최대 1분의 1080p 영상을 올려주세요."
-    $0.textColor = CommonAsset.recordyGrey03.color
-    $0.font = RecordyFont.caption.font
+  private let videoLabel = UILabel().then {
+    $0.text = "영상"
+    $0.font = RecordyFont.title1.font
+    $0.textColor = .white
   }
-  private let nextButton = UIButton().then {
-    $0.setTitle("다음", for: .normal)
-    $0.titleLabel?.font = RecordyFont.button1.font
-    $0.setTitleColor(.white, for: .normal)
-    $0.backgroundColor = .black
-    $0.cornerRadius(12)
+  private let videoThumbnailImageView = UIImageView().then {
+    $0.cornerRadius(16)
+    $0.contentMode = .scaleAspectFit
   }
-  var collectionView: UICollectionView? = nil
-  var assets: [PHAsset] = []
-  var viewModel = UploadVideoViewModel()
 
+  private let viewModel: UploadVideoViewModel
   private let disposeBag = DisposeBag()
-  private let fetchVideosRelay = PublishRelay<Void>()
-  private let selectedVideoRelay = PublishRelay<IndexPath>()
 
-  public override func viewDidLoad() {
+  init(viewModel: UploadVideoViewModel) {
+    self.viewModel = viewModel
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  override func viewDidLoad() {
     super.viewDidLoad()
-    setUpCollectionView()
     setStyle()
     setUI()
-    setAutoLayout()
+    setAutolayout()
     bind()
   }
 
   private func setStyle() {
-    self.title = "영상 선택"
+    self.view.backgroundColor = .gray
   }
 
   private func setUI() {
-    self.view.addSubview(self.warningLabel)
-    self.view.addSubview(self.collectionView!)
-    self.view.addSubview(self.nextButton)
+    self.view.addSubview(videoLabel)
+    self.view.addSubview(videoThumbnailImageView)
   }
 
-  private func setAutoLayout() {
-    self.nextButton.snp.makeConstraints {
-      $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-14.adaptiveHeight)
-      $0.horizontalEdges.equalToSuperview().inset(20.adaptiveWidth)
-      $0.height.equalTo(54.adaptiveHeight)
+  private func setAutolayout() {
+    self.videoLabel.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide).offset(70.adaptiveHeight)
+      $0.leading.equalToSuperview().inset(20.adaptiveWidth)
     }
-    self.warningLabel.snp.makeConstraints {
-      $0.top.equalTo(view.safeAreaLayoutGuide).offset(9.adaptiveHeight)
-      $0.centerX.equalToSuperview()
+    self.videoThumbnailImageView.snp.makeConstraints {
+      $0.top.equalTo(videoLabel.snp.bottom).offset(12.adaptiveHeight)
+      $0.leading.equalToSuperview().inset(20.adaptiveWidth)
+      $0.width.equalTo(180.adaptiveWidth)
+      $0.height.equalTo(284.adaptiveHeight)
     }
-    self.collectionView!.snp.makeConstraints {
-      $0.top.equalTo(warningLabel.snp.bottom).offset(22.adaptiveHeight)
-      $0.bottom.horizontalEdges.equalToSuperview()
-    }
-  }
-
-  private func setUpCollectionView() {
-    let layout = UICollectionViewFlowLayout()
-    self.collectionView = UICollectionView(
-      frame: .zero,
-      collectionViewLayout: layout
-    )
-    self.collectionView!.register(
-      VideoCell.self,
-      forCellWithReuseIdentifier: VideoCell.cellIdentifier
-    )
-    self.collectionView!.rx.setDelegate(self).disposed(by: disposeBag)
   }
 
   func bind() {
-    let input = UploadVideoViewModel.Input(
-      fetchVideos: fetchVideosRelay,
-      selectedVideo: selectedVideoRelay
-    )
-    let output = viewModel.transform(input: input)
+    let output = viewModel.transform(input: UploadVideoViewModel.Input())
 
-    output.asset
-      .drive(
-        collectionView!.rx.items(
-          cellIdentifier: VideoCell.cellIdentifier,
-          cellType: VideoCell.self
-        )
-      ) { (row, asset, cell) in
-        cell.bind(asset: asset)
-        cell.setSelected(
-          self.viewModel.isSelected(
-            indexPath: IndexPath(
-              row: row,
-              section: 0
-            )
-          )
-        )
-      }
+    output.thumbnailImage
+      .drive(videoThumbnailImageView.rx.image)
       .disposed(by: disposeBag)
-
-    output.fetchStatus
-      .drive(onNext: { success in
-        if !success {
-          print("Permission denied")
-        }
-      })
-      .disposed(by: disposeBag)
-
-    collectionView!.rx.itemSelected
-      .bind(to: selectedVideoRelay)
-      .disposed(by: disposeBag)
-
-
-    output.selectedIndexPath
-      .drive { [weak self] indexPath in
-        self?.collectionView!.reloadData()
-      }
-      .disposed(by: disposeBag)
-
-    fetchVideosRelay.accept(())
-  }
-}
-
-extension UploadVideoViewController: UICollectionViewDelegateFlowLayout {
-  public func collectionView(
-    _ collectionView: UICollectionView,
-    layout collectionViewLayout: UICollectionViewLayout,
-    sizeForItemAt indexPath: IndexPath
-  ) -> CGSize {
-    let padding: CGFloat = 4
-    let width: CGFloat = (UIScreen.main.bounds.width - padding * 4) / 4
-    return CGSize(
-      width: width,
-      height: width
-    )
-  }
-
-  public func collectionView(
-    _ collectionView: UICollectionView,
-    layout collectionViewLayout: UICollectionViewLayout,
-    minimumLineSpacingForSectionAt section: Int
-  ) -> CGFloat {
-    return 4
-  }
-
-  public func collectionView(
-    _ collectionView: UICollectionView,
-    layout collectionViewLayout: UICollectionViewLayout,
-    minimumInteritemSpacingForSectionAt section: Int
-  ) -> CGFloat {
-    return 4
   }
 }
