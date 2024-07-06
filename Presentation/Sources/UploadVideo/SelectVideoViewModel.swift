@@ -1,5 +1,5 @@
 //
-//  UploadVideoViewModel.swift
+//  SelectVideoViewModel.swift
 //  Presentation
 //
 //  Created by 한지석 on 7/3/24.
@@ -13,7 +13,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class UploadVideoViewModel {
+final class SelectVideoViewModel {
 
   /// Relay VS Subject
   /// Relay - 에러처리가 필요 없을 경우, UI 이벤트에 적합
@@ -33,9 +33,9 @@ final class UploadVideoViewModel {
 
   private let disposeBag = DisposeBag()
 
-  private let assetsRelay = BehaviorRelay<[PHAsset]>(value: [])
+  let assetsRelay = BehaviorRelay<[PHAsset]>(value: [])
   private let fetchStatusRelay = PublishRelay<Bool>()
-  private let selectedIndexPathRelay = BehaviorRelay<IndexPath?>(value: nil)
+  let selectedIndexPathRelay = BehaviorRelay<IndexPath?>(value: nil)
 
   func transform(input: Input) -> Output {
     input.fetchVideos

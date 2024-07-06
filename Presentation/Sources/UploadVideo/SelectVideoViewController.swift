@@ -33,7 +33,7 @@ public class SelectVideoViewController: UIViewController {
   }
   var collectionView: UICollectionView? = nil
   var assets: [PHAsset] = []
-  var viewModel = UploadVideoViewModel()
+  var viewModel = SelectVideoViewModel()
 
   private let disposeBag = DisposeBag()
   private let fetchVideosRelay = PublishRelay<Void>()
@@ -56,6 +56,11 @@ public class SelectVideoViewController: UIViewController {
     self.view.addSubview(self.warningLabel)
     self.view.addSubview(self.collectionView!)
     self.view.addSubview(self.nextButton)
+    nextButton.addTarget(
+      self,
+      action: #selector(nextButtonTapped),
+      for: .touchUpInside
+    )
   }
 
   private func setAutoLayout() {
@@ -88,7 +93,7 @@ public class SelectVideoViewController: UIViewController {
   }
 
   func bind() {
-    let input = UploadVideoViewModel.Input(
+    let input = SelectVideoViewModel.Input(
       fetchVideos: fetchVideosRelay,
       selectedVideo: selectedVideoRelay
     )
@@ -134,9 +139,24 @@ public class SelectVideoViewController: UIViewController {
 
     fetchVideosRelay.accept(())
   }
+  
+  @objc private func nextButtonTapped() {
+    guard let indexPath = viewModel.selectedIndexPathRelay.value
+    else { return }
+    let asset = viewModel.assetsRelay.value[indexPath.row]
+    let uploadVideoViewModel = UploadVideoViewModel(asset: asset)
+    let uploadViewController = UploadVideoViewController(
+      viewModel: uploadVideoViewModel
+    )
+    self.navigationController?.pushViewController(
+      uploadViewController,
+      animated: true
+    )
+  }
+
 }
 
-extension UploadVideoViewController: UICollectionViewDelegateFlowLayout {
+extension SelectVideoViewController: UICollectionViewDelegateFlowLayout {
   public func collectionView(
     _ collectionView: UICollectionView,
     layout collectionViewLayout: UICollectionViewLayout,
