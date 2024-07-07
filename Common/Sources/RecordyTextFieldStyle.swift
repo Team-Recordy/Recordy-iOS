@@ -6,4 +6,24 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 
-import Foundation
+import UIKit
+
+struct RecordyTextFieldStyle {
+  let borderColor: CommonColors?
+  let borderWidth: CGFloat?
+  
+  static let unselected = RecordyTextFieldStyle(
+    borderColor: nil,
+    borderWidth: nil
+  )
+  
+  static let selected = RecordyTextFieldStyle(
+    borderColor: CommonAsset.recordyMain,
+    borderWidth: 1
+  )
+  
+  static let error = RecordyTextFieldStyle(
+    borderColor: CommonAsset.recordyAlert,
+    borderWidth: 1
+  )
+}

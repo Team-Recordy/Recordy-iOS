@@ -11,34 +11,58 @@ import UIKit
 extension UITextField {
   func setPlaceholder(
     placeholder: String,
-    placeholderColor: UIColor,
-    font: UIFont
+    placeholderColor: CommonColors,
+    font: RecordyFont
   ) {
     attributedPlaceholder = NSAttributedString(
       string: placeholder,
-      attributes: [.foregroundColor: placeholderColor, .font: font]
+      attributes: [
+        .foregroundColor: placeholderColor,
+        .font: font
+      ]
     )
-    self.font = font
+    self.font = font.font
   }
   
   func setLayer(
-    borderColor: UIColor = .clear,
-    borderWidth: CGFloat = 0,
-    cornerRadius: CGFloat = 0
-  ){
-    layer.borderColor = borderColor.cgColor
-    layer.borderWidth = borderWidth
+    borderColor: CommonColors? = nil,
+    borderWidth: CGFloat? = nil,
+    cornerRadius: CGFloat
+  ) {
+    if let borderColor = borderColor {
+      layer.borderColor = borderColor.color.cgColor
+    }
+    if let borderWidth = borderWidth {
+      layer.borderWidth = borderWidth
+    }
     layer.cornerRadius = cornerRadius
   }
   
   func addPadding(left: CGFloat? = nil, right: CGFloat? = nil) {
-    if let left {
-      leftView = UIView(frame: CGRect(x: 0, y: 0, width: left, height: 0))
-      leftViewMode = .always
+    if let leftPadding = left {
+      let leftView = UIView(
+        frame: CGRect(
+          x: 0,
+          y: 0,
+          width: leftPadding,
+          height: self.frame.height
+        )
+      )
+      self.leftView = leftView
+      self.leftViewMode = .always
     }
-    if let right {
-      rightView = UIView(frame: CGRect(x: 0, y: 0, width: right, height: 0))
-      rightViewMode = .always
+    
+    if let rightPadding = right {
+      let rightView = UIView(
+        frame: CGRect(
+          x: 0,
+          y: 0,
+          width: rightPadding,
+          height: self.frame.height
+        )
+      )
+      self.rightView = rightView
+      self.rightViewMode = .always
     }
   }
 }
