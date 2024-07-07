@@ -1,5 +1,5 @@
 //
-//  VideoViewController.swift
+//  VideoFeedViewController.swift
 //  Presentation
 //
 //  Created by 한지석 on 7/6/24.
@@ -7,20 +7,38 @@
 //
 
 import UIKit
+import AVKit
 
 import RxSwift
 import RxCocoa
 import SnapKit
 import Then
 
-class VideoFeedViewController: UIViewController {
+public class VideoFeedViewController: UIViewController {
 
   private var collectionView: UICollectionView? = nil
 
+  private var viewModel = VideoFeedViewModel()
   private let disposeBag = DisposeBag()
+  private let fetchVideoRelay = PublishRelay<Void>()
+  private let currentIndexRelay = PublishRelay<Int>()
 
-  override func viewDidLoad() {
+  public override func viewDidLoad() {
     super.viewDidLoad()
+    setUpCollectionView()
+    setUI()
+    setAutolayout()
+    bind()
+  }
+
+  private func setUI() {
+    self.view.addSubview(collectionView!)
+  }
+
+  private func setAutolayout() {
+    self.collectionView!.snp.makeConstraints {
+      $0.verticalEdges.horizontalEdges.equalToSuperview()
+    }
   }
 
   private func setUpCollectionView() {
@@ -36,34 +54,81 @@ class VideoFeedViewController: UIViewController {
     self.collectionView!.contentInsetAdjustmentBehavior = .never
     self.collectionView!.isPagingEnabled = true
     self.collectionView!.register(
-      VideoCell.self,
-      forCellWithReuseIdentifier: VideoCell.cellIdentifier
+      FeedCell.self,
+      forCellWithReuseIdentifier: FeedCell.cellIdentifier
     )
-    //    self.collectionView!.rx.setDelegate(self).disposed(by: disposeBag)
-    self.collectionView!.delegate = self
-    self.collectionView!.dataSource = self
-  }
-}
-
-extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    0
+    self.collectionView!.rx.setDelegate(self).disposed(by: disposeBag)
   }
 
-  func collectionView(
-    _ collectionView: UICollectionView,
-    cellForItemAt indexPath: IndexPath
-  ) -> UICollectionViewCell {
-    let cell = collectionView.dequeueReusableCell(
-      withReuseIdentifier: VideoCell.cellIdentifier,
-      for: indexPath
-    ) as! VideoCell
-    return cell
+  func bind() {
+    let input = VideoFeedViewModel.Input(
+      fetchVideos: fetchVideoRelay,
+      currentIndex: currentIndexRelay
+    )
+    let output = viewModel.transform(input: input)
+
+    output.videoList
+      .drive(
+        collectionView!.rx.items(
+          cellIdentifier: FeedCell.cellIdentifier,
+          cellType: FeedCell.self
+        )
+      ) { (row, url, cell) in
+        cell.bind(
+          url: url,
+          bounds: self.collectionView!.frame
+        )
+        cell.avQueuePlayer?.play()
+      }
+      .disposed(by: disposeBag)
+
+    collectionView?.rx.willDisplayCell
+      .subscribe(onNext: { [weak self] cell, indexPath in
+        guard let self = self else { return }
+        if indexPath.row == self.viewModel.videoListRelay.value.count - 3 {
+          input.fetchVideos.accept(())
+        }
+        self.currentIndexRelay.accept(indexPath.row)
+        print(viewModel.videoListRelay.value[indexPath.row])
+      })
+      .disposed(by: disposeBag)
+
+    collectionView!.rx.didEndDisplayingCell
+      .subscribe { cell, indexPath in
+        let cell = cell as! FeedCell
+        cell.avQueuePlayer?.pause()
+      }
+      .disposed(by: disposeBag)
+
+    collectionView?.rx.willBeginDragging
+        .subscribe(onNext: { [weak self] in
+            guard let self = self else { return }
+            self.collectionView?.visibleCells.forEach { cell in
+                if let feedCell = cell as? FeedCell {
+                    feedCell.avQueuePlayer?.pause()
+                }
+            }
+        })
+        .disposed(by: disposeBag)
+
+    collectionView?.rx.didEndDecelerating
+        .subscribe(onNext: { [weak self] in
+            guard let self = self else { return }
+            self.collectionView?.visibleCells.forEach { cell in
+                if let feedCell = cell as? FeedCell {
+                    feedCell.avQueuePlayer?.seek(to: CMTime.zero)
+                    feedCell.avQueuePlayer?.play()
+                }
+            }
+        })
+        .disposed(by: disposeBag)
+
+    fetchVideoRelay.accept(())
   }
 }
 
 extension VideoFeedViewController: UICollectionViewDelegateFlowLayout {
-  func collectionView(
+  public func collectionView(
     _ collectionView: UICollectionView,
     layout collectionViewLayout: UICollectionViewLayout,
     sizeForItemAt indexPath: IndexPath
