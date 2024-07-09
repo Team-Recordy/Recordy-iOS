@@ -7,3 +7,22 @@
 //
 
 import Foundation
+
+extension String {
+  func heightWithConstrainedWidth() -> CGFloat {
+    let constraintRect = CGSize(
+      width: CGFloat(220),
+      height: .greatestFiniteMagnitude
+    )
+    let boundingBox = self.boundingRect(
+      with: constraintRect,
+      options: [
+        .usesLineFragmentOrigin,
+        .usesFontLeading
+      ],
+      attributes: [NSAttributedString.Key.font: RecordyFont.body2Long.font],
+      context: nil
+    )
+    return boundingBox.height
+  }
+}
