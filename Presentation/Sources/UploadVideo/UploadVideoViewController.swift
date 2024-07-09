@@ -52,17 +52,17 @@ class UploadVideoViewController: UIViewController {
   }
 
   private func setUI() {
-    self.view.addSubview(videoLabel)
+    self.view.addSubview(warningLabel)
     self.view.addSubview(videoThumbnailImageView)
   }
 
   private func setAutolayout() {
-    self.videoLabel.snp.makeConstraints {
+    self.warningLabel.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide).offset(70.adaptiveHeight)
       $0.leading.equalToSuperview().inset(20.adaptiveWidth)
     }
     self.videoThumbnailImageView.snp.makeConstraints {
-      $0.top.equalTo(videoLabel.snp.bottom).offset(12.adaptiveHeight)
+      $0.top.equalTo(warningLabel.snp.bottom).offset(12.adaptiveHeight)
       $0.leading.equalToSuperview().inset(20.adaptiveWidth)
       $0.width.equalTo(180.adaptiveWidth)
       $0.height.equalTo(284.adaptiveHeight)
