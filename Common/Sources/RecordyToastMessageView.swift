@@ -53,7 +53,7 @@ final class RecordyToastMessageView: UIView {
 private extension RecordyToastMessageView {
   func setupStyle() {
     self.backgroundColor = CommonAsset.recordySub01.color
-    self.layer.cornerRadius = 8
+    self.cornerRadius(8)
   }
   
   func setupHierarchy() {
