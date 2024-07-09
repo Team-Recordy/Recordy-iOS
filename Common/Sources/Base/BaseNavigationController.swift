@@ -21,7 +21,7 @@ public class BaseNavigationController: UINavigationController {
     navigationBar.standardAppearance = appearance
     navigationBar.scrollEdgeAppearance = appearance
     navigationBar.titleTextAttributes = [
-      NSAttributedString.Key.foregroundColor: CommonAsset.recordyWhite,
+//      NSAttributedString.Key.foregroundColor: CommonAsset.recordyWhite,
       NSAttributedString.Key.font: RecordyFont.title2
     ]
     navigationItem.backButtonDisplayMode = .minimal
