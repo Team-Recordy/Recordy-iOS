@@ -7,17 +7,28 @@
 //
 
 import UIKit
+
 import SnapKit
 import Then
 
+protocol RecordyProgressViewDelegate: AnyObject {
+  func didUpdatePage(currentPage: Int, totalPages: Int)
+}
+
 final class RecordyProgressView: UIView {
+  
+  weak var delegate: RecordyProgressViewDelegate?
+  private var totalPages: Int = 0
+  private var currentPage: Int = 0
   
   var ratio: CGFloat = 0.0 {
     didSet {
       self.isHidden = !self.ratio.isLess(than: 1.0)
       
       self.progressBarView.snp.remakeConstraints {
-        $0.top.bottom.equalToSuperview()
+        $0.leading.equalToSuperview()
+        $0.top.equalToSuperview().offset(-1)
+        $0.bottom.equalToSuperview().offset(1)
         $0.width.equalToSuperview().multipliedBy(self.ratio)
       }
       
@@ -35,12 +46,11 @@ final class RecordyProgressView: UIView {
     $0.backgroundColor = CommonAsset.recordyMain.color
   }
   
-  init(frame: CGRect = .zero, ratio: CGFloat = 0.0) {
-    self.ratio = ratio
+  override init(frame: CGRect = .zero) {
     super.init(frame: frame)
+    self.ratio = 1.0 / CGFloat(totalPages)
     setStyle()
     setUI()
-    setAutoLayout()
   }
   
   required init?(coder: NSCoder) {
@@ -50,16 +60,33 @@ final class RecordyProgressView: UIView {
   func setStyle() {
     self.isUserInteractionEnabled = false
     self.backgroundColor = CommonAsset.recordySub01.color
+    self.layer.cornerRadius = 4
+    self.clipsToBounds = true
   }
   
   func setUI() {
     self.addSubview(progressBarView)
+    progressBarView.layer.cornerRadius = 6
+    progressBarView.clipsToBounds = true
   }
   
-  func setAutoLayout() {
-    progressBarView.snp.makeConstraints {
-      $0.top.bottom.equalToSuperview()
-      $0.width.equalToSuperview().multipliedBy(ratio)
+  func updateProgress(currentPage: Int, totalPages: Int) {
+    let newRatio = CGFloat(currentPage + 1) / CGFloat(totalPages)
+    self.ratio = newRatio
+  }
+  
+  @objc func nextButtonTapped() {
+    currentPage += 1
+    if currentPage >= totalPages {
+      currentPage = 0
     }
+    updateProgress(
+      currentPage: currentPage,
+      totalPages: totalPages
+    )
+    delegate?.didUpdatePage(
+      currentPage: currentPage,
+      totalPages: totalPages
+    )
   }
 }
