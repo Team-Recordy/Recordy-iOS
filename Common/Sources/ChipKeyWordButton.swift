@@ -16,7 +16,7 @@ enum ChipState {
 }
 
 class ChipKeyWordButton: UIButton {
-  var chipstate: ChipState = .deactive{
+  var chipstate: ChipState = .deactive {
     didSet {
       updateChipAppearance()
     }
@@ -27,11 +27,11 @@ class ChipKeyWordButton: UIButton {
     setUI()
   }
   
-  
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  private func setUI(){
+  
+  private func setUI() {
     self.cornerRadius(15)
     titleLabel?.font = RecordyFont.body2.font
     updateChipAppearance()
@@ -41,13 +41,19 @@ class ChipKeyWordButton: UIButton {
     switch chipstate {
     case .active:
       backgroundColor = CommonAsset.recordyGrey08.color
-      setTitleColor(CommonAsset.recordyMain.color, for: .normal)
+      setTitleColor(
+        CommonAsset.recordyMain.color,
+        for: .normal
+      )
       layer.borderColor = CommonAsset.recordyMain.color.cgColor
       layer.borderWidth = 1
 
     case .deactive:
       backgroundColor = CommonAsset.recordyGrey08.color
-      setTitleColor(CommonAsset.recordyGrey04.color, for: .normal)
+      setTitleColor(
+        CommonAsset.recordyGrey04.color,
+        for: .normal
+      )
     }
   }
 }

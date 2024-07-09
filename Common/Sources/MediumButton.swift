@@ -22,7 +22,8 @@ class MediumButton: UIButton {
       mediumButtonAppearance()
     }
   }
-  override init(frame: CGRect){
+  
+  override init(frame: CGRect) {
     super.init(frame: frame)
     setUI()
   }
@@ -31,7 +32,7 @@ class MediumButton: UIButton {
     fatalError("init(coder:) has not been implemented")
   }
   
-  private func setUI(){
+  private func setUI() {
     layer.cornerRadius = 8
     titleLabel?.font = RecordyFont.button2.font
     mediumButtonAppearance()
@@ -41,10 +42,16 @@ class MediumButton: UIButton {
     switch mediumState {
     case .active:
       backgroundColor = CommonAsset.recordyMain.color
-      setTitleColor(CommonAsset.recordyGrey09.color, for: .normal)
+      setTitleColor(
+        CommonAsset.recordyGrey09.color,
+        for: .normal
+      )
     case .deactive:
       backgroundColor = CommonAsset.recordyGrey08.color
-      setTitleColor(CommonAsset.recordyGrey01.color, for: .normal)
+      setTitleColor(
+        CommonAsset.recordyGrey01.color,
+        for: .normal
+      )
     }
   }
 }

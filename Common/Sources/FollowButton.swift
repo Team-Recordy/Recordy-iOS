@@ -16,12 +16,14 @@ enum FollowState{
 }
 
 class FollowButton: UIButton {
-  var followState: FollowState = .follow{
+  
+  var followState: FollowState = .follow {
     didSet{
       updateFollowState()
     }
   }
-  override init(frame: CGRect){
+  
+  override init(frame: CGRect) {
     super.init(frame: frame)
     setUI()
   }
@@ -35,14 +37,21 @@ class FollowButton: UIButton {
     titleLabel?.font = RecordyFont.button2.font
     updateFollowState()
   }
+  
   private func updateFollowState(){
     switch followState{
     case .follow:
       backgroundColor = .white
-      setTitleColor(CommonAsset.recordyGrey08.color, for: .normal)
+      setTitleColor(
+        CommonAsset.recordyGrey08.color,
+        for: .normal
+      )
     case .following:
       backgroundColor = CommonAsset.recordyGrey08.color
-      setTitleColor(.white, for: .normal)
+      setTitleColor(
+        .white,
+        for: .normal
+      )
     }
   }
 }
