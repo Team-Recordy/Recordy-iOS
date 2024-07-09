@@ -11,12 +11,17 @@ import UIKit
 final class RecordyTextField: UITextField {
   
   var style: RecordyTextFieldStyle {
-    didSet {setStyle(style)}
+    didSet { setStyle(style) }
   }
   
-  init(frame: CGRect = .zero, style: RecordyTextFieldStyle = .unselected) {
+  init(
+    frame: CGRect = .zero,
+    style: RecordyTextFieldStyle = .unselected,
+    placeholder: String
+  ) {
     self.style = style
     super.init(frame: frame)
+    self.placeholder = placeholder
     setStyle(style)
   }
   
@@ -32,7 +37,7 @@ final class RecordyTextField: UITextField {
     )
   
     self.setPlaceholder(
-      placeholder: "",
+      placeholder: self.placeholder ?? "",
       placeholderColor: CommonAsset.recordyGrey04,
       font: .body2
     )

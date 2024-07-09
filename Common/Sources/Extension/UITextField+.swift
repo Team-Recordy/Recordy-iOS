@@ -17,8 +17,8 @@ extension UITextField {
     attributedPlaceholder = NSAttributedString(
       string: placeholder,
       attributes: [
-        .foregroundColor: placeholderColor,
-        .font: font
+        .foregroundColor: placeholderColor.color,
+        .font: font.font
       ]
     )
     self.font = font.font
