@@ -23,12 +23,10 @@ class AgreeButton: UIButton {
     }
   }
   
-  private let checkImageView: UIImageView = {
-    let imageView = UIImageView()
-    imageView.contentMode = .scaleAspectFit
-    return imageView
-  }()
-  
+  private let checkImageView = UIImageView().then {
+    $0.contentMode = .scaleAspectFit
+  }
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     setUI()
