@@ -16,63 +16,77 @@ import RxCocoa
 class VideoFeedViewModel {
 
   struct Input {
-    let fetchVideos: PublishRelay<Void>
-    let currentIndex: PublishRelay<Int>
+    let fetchVideos = PublishRelay<Void>()
+    let currentIndex = PublishRelay<Int>()
+    let bookmarkTapped = PublishRelay<Int>()
   }
 
   struct Output {
-    let videoList: Driver<[URL]>
-    let currentVideo: Driver<URL?>
+    let feedList = BehaviorRelay<[Feed]>(value: [])
+    let currentFeed = BehaviorRelay<Feed?>(value: nil)
   }
 
   private let disposeBag = DisposeBag()
-  let videoListRelay = BehaviorRelay<[URL]>(value: [])
-  private let currentVideoRelay = BehaviorRelay<URL?>(value: nil)
+  let input = Input()
+  let output = Output()
 
-  func transform(input: Input) -> Output {
-    input.fetchVideos
+  init() {
+    self.bind()
+  }
+
+  func bind() {
+    self.input.fetchVideos
       .subscribe { [weak self] _ in
-        self?.getVideos()
+        guard let self = self else { return }
+        self.getVideos()
       }.disposed(by: disposeBag)
 
-    input.currentIndex
+    self.input.currentIndex
       .subscribe { [weak self] index in
         guard let self = self,
               let index = index.element
         else { return }
-        let currentVideo = self.videoListRelay.value[index]
-        self.currentVideoRelay.accept(currentVideo)
+        let currentFeed = self.output.feedList.value[index]
+        self.output.currentFeed.accept(currentFeed)
       }.disposed(by: disposeBag)
-    
-    return Output(
-      videoList: videoListRelay.asDriver(),
-      currentVideo: currentVideoRelay.asDriver()
-    )
+
+    self.input.bookmarkTapped
+      .subscribe { [weak self] index in
+        guard let self = self else { return }
+        self.bookmarkButtonTapped(index)
+      }.disposed(by: disposeBag)
+
+    self.input.fetchVideos.accept(())
   }
 
   private func getVideos() {
-    let videos: [URL] = [
-      URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4")!,
-      URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4")!,
-      URL(string: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4")!
-    ]
-
+    let feeds: [Feed] = Feed.mockdata
     let dispatchGroup = DispatchGroup()
-    var cachedVideos: [URL] = []
+    var cachedFeeds: [Feed] = []
 
-    for video in videos {
+    for feed in feeds {
       dispatchGroup.enter()
-      VideoCacheManager.shared.downloadAndCacheURL(url: video) { url in
-        if let url = url {
-          cachedVideos.append(url)
+      VideoCacheManager
+        .shared
+        .downloadAndCacheURL(url: feed.videoLink) { url in
+          guard url != nil else {
+            dispatchGroup.leave()
+            return
+          }
+          cachedFeeds.append(feed)
+          dispatchGroup.leave()
         }
-        dispatchGroup.leave()
-      }
     }
-
+    
     dispatchGroup.notify(queue: .main) { [weak self] in
       guard let self = self else { return }
-      self.videoListRelay.accept(self.videoListRelay.value + cachedVideos)
+      self.output.feedList.accept(self.output.feedList.value + cachedFeeds)
     }
+  }
+
+  private func bookmarkButtonTapped(_ index: Int) {
+    var feeds = self.output.feedList.value
+    feeds[index].isBookmarked.toggle()
+    self.output.feedList.accept(feeds)
   }
 }
