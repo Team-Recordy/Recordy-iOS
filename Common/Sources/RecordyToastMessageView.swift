@@ -7,7 +7,73 @@
 //
 
 import UIKit
+import SnapKit
 
-private let toastImage = UIImageView().then {
+enum RecordyToastStatus {
+  case complete, warning
   
+  var icon: UIImage {
+    switch self {
+    case .complete:
+      return CommonAsset.toastCheck.image
+      
+    case .warning:
+      return CommonAsset.toastAlert.image
+    }
+  }
 }
+
+final class RecordyToastMessageView: UIView {
+  
+  private let toastImage = UIImageView()
+  
+  private let toastLabel = UILabel().then {
+    $0.textColor = CommonAsset.recordyGrey01.color
+    $0.font = RecordyFont.body2Long.font
+  }
+  
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    setupStyle()
+    setupHierarchy()
+    setupLayout()
+  }
+  
+  @available(*, unavailable)
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  func setMessage(text: String, status: RecordyToastStatus) {
+    toastLabel.text = text
+    toastImage.image = status.icon
+  }
+}
+
+private extension RecordyToastMessageView {
+  func setupStyle() {
+    self.backgroundColor = CommonAsset.recordySub01.color
+    self.layer.cornerRadius = 8
+  }
+  
+  func setupHierarchy() {
+    addSubviews(
+      toastImage,
+      toastLabel
+    )
+  }
+  
+  func setupLayout() {
+    toastImage.snp.makeConstraints {
+      $0.centerY.equalToSuperview()
+      $0.leading.equalToSuperview().inset(16)
+      $0.width.height.equalTo(24.adaptiveWidth)
+    }
+    
+    toastLabel.snp.makeConstraints {
+      $0.centerY.equalToSuperview()
+      $0.leading.equalTo(toastImage.snp.trailing).offset(4)
+    }
+  }
+}
+

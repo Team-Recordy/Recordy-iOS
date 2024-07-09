@@ -22,7 +22,7 @@ public class UploadVideoViewController: UIViewController {
   private let warningLabel = UILabel().then {
     $0.text = "ⓘ 최대 1분의 1080p 영상을 올려주세요."
     $0.textColor = CommonAsset.recordyGrey03.color
-    $0.font = RecordyFont.caption.font
+    $0.font = RecordyFont.caption1.font
   }
   private let nextButton = UIButton().then {
     $0.setTitle("다음", for: .normal)
