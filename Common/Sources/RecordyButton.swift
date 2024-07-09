@@ -49,4 +49,3 @@ class RecordyButton: UIButton {
     }
   }
 }
-
