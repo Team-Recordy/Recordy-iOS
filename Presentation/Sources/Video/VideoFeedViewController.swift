@@ -20,8 +20,6 @@ public class VideoFeedViewController: UIViewController {
 
   private var viewModel = VideoFeedViewModel()
   private let disposeBag = DisposeBag()
-  private let fetchVideoRelay = PublishRelay<Void>()
-  private let currentIndexRelay = PublishRelay<Int>()
 
   public override func viewDidLoad() {
     super.viewDidLoad()
@@ -61,35 +59,33 @@ public class VideoFeedViewController: UIViewController {
   }
 
   func bind() {
-    let input = VideoFeedViewModel.Input(
-      fetchVideos: fetchVideoRelay,
-      currentIndex: currentIndexRelay
-    )
-    let output = viewModel.transform(input: input)
-
-    output.videoList
+    viewModel.output.feedList
+      .asDriver()
       .drive(
         collectionView!.rx.items(
           cellIdentifier: FeedCell.cellIdentifier,
           cellType: FeedCell.self
         )
-      ) { (row, url, cell) in
+      ) { (row, feed, cell) in
         cell.bind(
-          url: url,
+          feed: feed,
           bounds: self.collectionView!.frame
         )
         cell.avQueuePlayer?.play()
+        cell.bookmarkTappedRelay
+          .map { row }
+          .bind(to: self.viewModel.input.bookmarkTapped)
+          .disposed(by: cell.disposeBag)
       }
       .disposed(by: disposeBag)
 
     collectionView?.rx.willDisplayCell
       .subscribe(onNext: { [weak self] cell, indexPath in
         guard let self = self else { return }
-        if indexPath.row == self.viewModel.videoListRelay.value.count - 3 {
-          input.fetchVideos.accept(())
+        if indexPath.row == self.viewModel.output.feedList.value.count - 3 {
+          viewModel.input.fetchVideos.accept(())
         }
-        self.currentIndexRelay.accept(indexPath.row)
-        print(viewModel.videoListRelay.value[indexPath.row])
+        self.viewModel.input.currentIndex.accept(indexPath.row)
       })
       .disposed(by: disposeBag)
 
@@ -122,8 +118,6 @@ public class VideoFeedViewController: UIViewController {
             }
         })
         .disposed(by: disposeBag)
-
-    fetchVideoRelay.accept(())
   }
 }
 
