@@ -9,6 +9,8 @@
 import UIKit
 import AVKit
 
+import Common
+
 import RxSwift
 import RxCocoa
 import SnapKit
@@ -17,6 +19,7 @@ import Then
 public class VideoFeedViewController: UIViewController {
 
   private var collectionView: UICollectionView? = nil
+  private let recordyToggle = RecordyToggle()
 
   private var viewModel = VideoFeedViewModel()
   private let disposeBag = DisposeBag()
@@ -31,11 +34,19 @@ public class VideoFeedViewController: UIViewController {
 
   private func setUI() {
     self.view.addSubview(collectionView!)
+    self.view.addSubview(recordyToggle)
+    self.view.bringSubviewToFront(recordyToggle)
   }
 
   private func setAutolayout() {
     self.collectionView!.snp.makeConstraints {
-      $0.verticalEdges.horizontalEdges.equalToSuperview()
+      $0.edges.equalToSuperview()
+    }
+    self.recordyToggle.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide).inset(12.adaptiveHeight)
+      $0.centerX.equalToSuperview()
+      $0.width.equalTo(124)
+      $0.height.equalTo(32)
     }
   }
 

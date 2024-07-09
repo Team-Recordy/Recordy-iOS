@@ -74,7 +74,7 @@ class FeedCell: UICollectionViewCell {
     addPlayer(for: feed.videoLink, bounds: bounds)
     self.feedView.locationLabel.text = feed.location
     self.feedView.nicknameLabel.text = feed.nickname
-    self.feedView.descriptionLabel.text = feed.description
+    self.feedView.descriptionTextView.text = feed.description
     self.feedView.bookmarkButton.setImage(
       feed.isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image,
       for: .normal
@@ -84,6 +84,10 @@ class FeedCell: UICollectionViewCell {
       self,
       action: #selector(bookmarkButtonTapped),
       for: .touchUpInside
+    )
+    self.feedView.descriptionTextView.attributedText = UITextView.setLineSpacing(
+      5,
+      text: feed.description
     )
   }
 }
