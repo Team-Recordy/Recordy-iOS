@@ -71,11 +71,11 @@ extension RecordyFont {
     case .button2:
       UIFont.pretendard(type: CommonFontFamily.Pretendard.medium, size: 14)
     case .number1:
-      UIFont.pretendard(type: CommonFontFamily.CocogoosePro.thin, size: 42)
+      UIFont.pretendard(type: CommonFontFamily.Pretendard.thin, size: 42)
     case .number2:
-      UIFont.pretendard(type: CommonFontFamily.CocogoosePro.thin, size: 32)
+      UIFont.pretendard(type: CommonFontFamily.Pretendard.thin, size: 32)
     case .number3:
-      UIFont.pretendard(type: CommonFontFamily.CocogoosePro.thin, size: 20)
+      UIFont.pretendard(type: CommonFontFamily.Pretendard.thin, size: 20)
     case .keyword1:
       UIFont.pretendard(type: CommonFontFamily.Pretendard.medium, size: 17)
     case .keyword2:

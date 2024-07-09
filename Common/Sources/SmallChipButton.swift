@@ -39,7 +39,7 @@ class SmallChipButton: UIButton {
   
   private func setUI(){
     self.cornerRadius(15)
-    titleLabel?.font = RecordyFont.caption.font
+    titleLabel?.font = RecordyFont.caption1.font
     updateSmallChipAppearnace()
   }
   
