@@ -14,8 +14,10 @@ import Core
 import SnapKit
 
 class VideoCell: UICollectionViewCell {
-  private let previewImageView: UIImageView = UIImageView()
-  
+  private let previewImageView = UIImageView().then {
+    $0.contentMode = .scaleToFill
+  }
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     setUI()
