@@ -36,7 +36,8 @@ let infoPlist: [String: Plist.Value] = [
     "kakaolink",
     "kakao$(KAKAO_NATIVE_APP_KEY)"
   ],
-  "KAKAO_NATIVE_APP_KEY": "$(KAKAO_NATIVE_APP_KEY)"
+  "KAKAO_NATIVE_APP_KEY": "$(KAKAO_NATIVE_APP_KEY)",
+  "NSPhotoLibraryUsageDescription": "앱에서 사진 라이브러리에 접근하려면 권한이 필요합니다."
 ]
 
 private let settings = Settings.settings(configurations: [
