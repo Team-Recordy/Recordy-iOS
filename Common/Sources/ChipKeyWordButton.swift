@@ -11,7 +11,7 @@ import SnapKit
 import Then
 
 enum ChipState {
-  case activate
+  case active
   case deactive
 }
 
@@ -32,14 +32,14 @@ class ChipKeyWordButton: UIButton {
     fatalError("init(coder:) has not been implemented")
   }
   private func setUI(){
-    layer.cornerRadius = 30
+    self.cornerRadius(15)
     titleLabel?.font = RecordyFont.body2.font
     updateChipAppearance()
   }
   
   private func updateChipAppearance() {
     switch chipstate {
-    case .activate:
+    case .active:
       backgroundColor = CommonAsset.recordyGrey08.color
       setTitleColor(CommonAsset.recordyMain.color, for: .normal)
       layer.borderColor = CommonAsset.recordyMain.color.cgColor
