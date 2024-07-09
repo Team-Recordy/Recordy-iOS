@@ -12,6 +12,12 @@ let infoPlist: [String: Plist.Value] = [
   "CFBundleShortVersionString": "1.0.0",
   "CFBundleVersion": "1",
   "CFBundleDisplayName": "Recordy",
+  "CFBundleURLTypes": [
+    [
+      "CFBundleTypeRole": "Editor",
+      "CFBundleURLSchemes": ["kakao$(KAKAO_NATIVE_APP_KEY)"]
+    ],
+  ],
   "UIMainStoryboardFile": "",
   "UILaunchStoryboardName": "LaunchScreen.storyboard",
   "UIApplicationSceneManifest": [
@@ -24,8 +30,21 @@ let infoPlist: [String: Plist.Value] = [
         ],
       ]
     ]
-  ]
+  ],
+  "LSApplicationQueriesSchemes": [
+    "kakaokompassauth",
+    "kakaolink",
+    "kakao$(KAKAO_NATIVE_APP_KEY)"
+  ],
+  "KAKAO_NATIVE_APP_KEY": "$(KAKAO_NATIVE_APP_KEY)",
+  "NSPhotoLibraryUsageDescription": "앱에서 사진 라이브러리에 접근하려면 권한이 필요합니다."
 ]
+
+private let settings = Settings.settings(configurations: [
+  .debug(name: "Debug", xcconfig:
+      .relativeToRoot("App/Config/Secrets.xcconfig")),
+  .release(name: "Release", xcconfig: .relativeToRoot("App/Config/Secrets.xcconfig")),
+])
 
 private let moduleName = "App"
 
@@ -36,10 +55,15 @@ let project = Project.makeModule(
   bundleId: "app.recordy",
   infoPlist: .extendingDefault(with: infoPlist),
   resources: ["Resources/**"],
+  entitlements: .file(path: "App.entitlements"),
   dependencies: [
     .Project.Common,
     .Project.Core,
     .Project.Data,
-    .Project.Presentation
-  ]
+    .Project.Presentation,
+    .external(name: "KakaoSDKAuth", condition: .none),
+    .external(name: "KakaoSDKCommon", condition: .none),
+    .external(name: "KakaoSDKUser", condition: .none)
+  ],
+  settings: settings
 )

@@ -14,5 +14,10 @@ let project = Project.makeModule(
   name: moduleName,
   destinations: [.iPhone],
   product: .staticFramework,
-  bundleId: moduleName
+  bundleId: moduleName,
+  dependencies: [
+    .external(name: "KakaoSDKAuth", condition: .none),
+    .external(name: "KakaoSDKCommon", condition: .none),
+    .external(name: "KakaoSDKUser", condition: .none)
+  ]
 )
