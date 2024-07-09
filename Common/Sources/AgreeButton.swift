@@ -46,15 +46,15 @@ class AgreeButton: UIButton {
     addSubview(checkImageView)
     bringSubviewToFront(checkImageView)
     
-    checkImageView.snp.makeConstraints { make in
-      make.leading.equalToSuperview().offset(20)
-      make.centerY.equalToSuperview()
-      make.width.height.equalTo(24)
+    checkImageView.snp.makeConstraints {
+      $0.leading.equalToSuperview().offset(20)
+      $0.centerY.equalToSuperview()
+      $0.width.height.equalTo(24)
     }
     
-    titleLabel?.snp.makeConstraints { make in
-      make.leading.equalTo(checkImageView.snp.trailing).offset(16)
-      make.centerY.equalToSuperview()
+    titleLabel?.snp.makeConstraints {
+      $0.leading.equalTo(checkImageView.snp.trailing).offset(16)
+      $0.centerY.equalToSuperview()
     }
     
     updateButtonAppearance()
