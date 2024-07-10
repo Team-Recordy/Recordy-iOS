@@ -12,12 +12,12 @@ import Then
 
 enum MediumState {
   case active
-  case deactive
+  case inactive
 }
 
 class MediumButton: UIButton {
   
-  var mediumState: MediumState = .deactive {
+  var mediumState: MediumState = .inactive {
     didSet {
       mediumButtonAppearance()
     }
@@ -46,7 +46,7 @@ class MediumButton: UIButton {
         CommonAsset.recordyGrey09.color,
         for: .normal
       )
-    case .deactive:
+    case .inactive:
       backgroundColor = CommonAsset.recordyGrey08.color
       setTitleColor(
         CommonAsset.recordyGrey01.color,

@@ -12,11 +12,11 @@ import Then
 
 enum ChipState {
   case active
-  case deactive
+  case inactive
 }
 
 class ChipKeyWordButton: UIButton {
-  var chipstate: ChipState = .deactive {
+  var chipstate: ChipState = .inactive {
     didSet {
       updateChipAppearance()
     }
@@ -48,7 +48,7 @@ class ChipKeyWordButton: UIButton {
       layer.borderColor = CommonAsset.recordyMain.color.cgColor
       layer.borderWidth = 1
 
-    case .deactive:
+    case .inactive:
       backgroundColor = CommonAsset.recordyGrey08.color
       setTitleColor(
         CommonAsset.recordyGrey04.color,
