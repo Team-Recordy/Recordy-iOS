@@ -12,12 +12,12 @@ import Then
 
 enum ButtonState {
   case active
-  case deactive
+  case inactive
 }
 
 class RecordyButton: UIButton {
   
-  var buttonState: ButtonState = .deactive {
+  var buttonState: ButtonState = .inactive {
     didSet {
       updateButtonAppearance()
     }
@@ -43,7 +43,7 @@ class RecordyButton: UIButton {
     case .active:
       backgroundColor = CommonAsset.recordyMain.color
       setTitleColor(CommonAsset.recordyGrey09.color, for: .normal)
-    case .deactive:
+    case .inactive:
       backgroundColor = CommonAsset.recordyGrey08.color
       setTitleColor(CommonAsset.recordyGrey04.color, for: .normal)
     }
