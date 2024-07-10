@@ -19,12 +19,15 @@ public final class PhotoKitManager {
     options.isSynchronous = true
     options.isNetworkAccessAllowed = true
     options.deliveryMode = .highQualityFormat
-    
+    options.resizeMode = .exact
+
+    let targetSize = CGSize(width: size.width * 3, height: size.height * 3)
+
     var thumbnail: UIImage?
     manager.requestImage(
       for: asset,
-      targetSize: size,
-      contentMode: .aspectFill,
+      targetSize: targetSize,
+      contentMode: .aspectFit,
       options: options
     ) { (image, info) in
       guard let thumbnailUnwrapped = image else {return}
