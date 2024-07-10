@@ -156,16 +156,3 @@ private extension ProfileSegmentControllView {
     }
   }
 }
-
-//extension ProfileSegmentControllView: ComponentType {
-//  func interface(input: Input) -> Output {
-//    self.didTap = input.didTap
-//    return Output()
-//  }
-//  
-//  struct Input {
-//    let didTap: (_ controlType: ControlType?) -> Void
-//  }
-//  
-//  struct Output {}
-//}
