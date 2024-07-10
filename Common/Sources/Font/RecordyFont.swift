@@ -41,47 +41,48 @@ extension RecordyFont {
   public var font: UIFont {
     switch self {
     case .headline:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.bold, size: 26)
+      UIFont(font: CommonFontFamily.Pretendard.bold, size: 26)!
+//      UIFont.pretendard(type: CommonFontFamily.Pretendard.bold, size: 26)
     case .title1:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.bold, size: 22)
+      UIFont(font: CommonFontFamily.Pretendard.bold, size: 22)!
     case .title2:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.bold, size: 20)
+      UIFont(font: CommonFontFamily.Pretendard.bold, size: 20)!
     case .title3:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.bold, size: 18)
+      UIFont(font: CommonFontFamily.Pretendard.bold, size: 18)!
     case .subtitle:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.bold, size: 16)
+      UIFont(font: CommonFontFamily.Pretendard.bold, size: 16)!
     case .body1:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.medium, size: 16)
+      UIFont(font: CommonFontFamily.Pretendard.medium, size: 16)!
     case .body1Regular:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.regular, size: 16)
+      UIFont(font: CommonFontFamily.Pretendard.regular, size: 16)!
     case .body2:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.medium, size: 14)
+      UIFont(font: CommonFontFamily.Pretendard.medium, size: 14)!
     case .body2Bold:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.bold, size: 14)
+      UIFont(font: CommonFontFamily.Pretendard.bold, size: 14)!
     case .body2Long:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.medium, size: 14)
+      UIFont(font: CommonFontFamily.Pretendard.medium, size: 14)!
     case .caption1:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.medium, size: 12)
+      UIFont(font: CommonFontFamily.Pretendard.medium, size: 12)!
     case .caption1Underline:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.medium, size: 12)
+      UIFont(font: CommonFontFamily.Pretendard.medium, size: 12)!
     case .caption2:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.medium, size: 12)
+      UIFont(font: CommonFontFamily.Pretendard.medium, size: 12)!
     case .button1:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.semiBold, size: 16)
+      UIFont(font: CommonFontFamily.Pretendard.semiBold, size: 16)!
     case .button2:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.medium, size: 14)
+      UIFont(font: CommonFontFamily.Pretendard.medium, size: 14)!
     case .number1:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.thin, size: 42)
+      UIFont(font: CommonFontFamily.Pretendard.thin, size: 42)!
     case .number2:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.thin, size: 32)
+      UIFont(font: CommonFontFamily.Pretendard.thin, size: 32)!
     case .number3:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.thin, size: 20)
+      UIFont(font: CommonFontFamily.Pretendard.thin, size: 20)!
     case .keyword1:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.medium, size: 17)
+      UIFont(font: CommonFontFamily.Pretendard.medium, size: 17)!
     case .keyword2:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.regular, size: 14)
+      UIFont(font: CommonFontFamily.Pretendard.regular, size: 14)!
     case .keyword3:
-      UIFont.pretendard(type: CommonFontFamily.Pretendard.regular, size: 12)
+      UIFont(font: CommonFontFamily.Pretendard.regular, size: 12)!
     }
   }
 }
