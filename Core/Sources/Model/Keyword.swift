@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum Keyword {
+public enum Keyword: CaseIterable {
   case exotic
   case quiet
   case trendy
@@ -51,6 +51,17 @@ public enum Keyword {
       "무서운"
     case .intense:
       "강렬한"
+    }
+  }
+
+  public var width: CGFloat {
+    switch self {
+    case .exotic, .trendy, .sensuous, .fanAttracting, .classic:
+      return 62
+    case .quiet, .cute, .fun, .cozy, .neat, .scary, .intense:
+      return 52
+    case .concentration:
+      return 86
     }
   }
 }
