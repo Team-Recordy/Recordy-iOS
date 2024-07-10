@@ -12,12 +12,12 @@ import Then
 
 enum AgreementButtonState {
   case active
-  case deactive
+  case inactive
 }
 
 class AgreeButton: UIButton {
   
-  var buttonState: AgreementButtonState = .deactive {
+  var buttonState: AgreementButtonState = .inactive {
     didSet {
       updateButtonAppearance()
     }
@@ -63,7 +63,7 @@ class AgreeButton: UIButton {
     case .active:
       backgroundColor = CommonAsset.recordyGrey09.color
       checkImageView.image = CommonAsset.activateCheck.image
-    case .deactive:
+    case .inactive:
       backgroundColor = CommonAsset.recordyGrey09.color
       checkImageView.image = CommonAsset.deactivateCheck.image
     }

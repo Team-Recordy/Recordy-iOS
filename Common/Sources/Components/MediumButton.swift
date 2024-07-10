@@ -1,5 +1,5 @@
 //
-//  ChipKeyWordButton.swift
+//  MediumButton.swift
 //  Common
 //
 //  Created by 송여경 on 7/9/24.
@@ -10,15 +10,16 @@ import UIKit
 import SnapKit
 import Then
 
-enum ChipState {
+enum MediumState {
   case active
-  case deactive
+  case inactive
 }
 
-class ChipKeyWordButton: UIButton {
-  var chipstate: ChipState = .deactive {
+class MediumButton: UIButton {
+  
+  var mediumState: MediumState = .inactive {
     didSet {
-      updateChipAppearance()
+      mediumButtonAppearance()
     }
   }
   
@@ -32,26 +33,23 @@ class ChipKeyWordButton: UIButton {
   }
   
   private func setUI() {
-    self.cornerRadius(15)
-    titleLabel?.font = RecordyFont.body2.font
-    updateChipAppearance()
+    layer.cornerRadius = 8
+    titleLabel?.font = RecordyFont.button2.font
+    mediumButtonAppearance()
   }
   
-  private func updateChipAppearance() {
-    switch chipstate {
+  private func mediumButtonAppearance(){
+    switch mediumState {
     case .active:
-      backgroundColor = CommonAsset.recordyGrey08.color
+      backgroundColor = CommonAsset.recordyMain.color
       setTitleColor(
-        CommonAsset.recordyMain.color,
+        CommonAsset.recordyGrey09.color,
         for: .normal
       )
-      layer.borderColor = CommonAsset.recordyMain.color.cgColor
-      layer.borderWidth = 1
-
-    case .deactive:
+    case .inactive:
       backgroundColor = CommonAsset.recordyGrey08.color
       setTitleColor(
-        CommonAsset.recordyGrey04.color,
+        CommonAsset.recordyGrey01.color,
         for: .normal
       )
     }
