@@ -8,9 +8,9 @@
 
 import UIKit
 
-final class Divider: UIView {
-  
-  init(color: UIColor) {
+public final class Divider: UIView {
+
+  public init(color: UIColor) {
     super.init(frame: .zero)
     self.backgroundColor = color
     
