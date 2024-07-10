@@ -59,7 +59,6 @@ let project = Project.makeModule(
   dependencies: [
     .Project.Common,
     .Project.Core,
-    .Project.Data,
     .Project.Presentation,
     .external(name: "KakaoSDKAuth", condition: .none),
     .external(name: "KakaoSDKCommon", condition: .none),
