@@ -10,14 +10,14 @@ import UIKit
 import SnapKit
 import Then
 
-enum SmallChipState{
+enum SmallChipState {
   case active
-  case deactive
+  case inactive
 }
 
 class SmallChipButton: UIButton {
   
-  var smallchipstate: SmallChipState = .deactive {
+  var smallchipstate: SmallChipState = .inactive {
     didSet{
       updateSmallChipAppearnace()
     }
@@ -55,7 +55,7 @@ class SmallChipButton: UIButton {
       )
       addCloseImageView()
       
-    case .deactive:
+    case .inactive:
       backgroundColor = CommonAsset.recordyGrey09.color
       setTitleColor(
         CommonAsset.recordyGrey03.color,
