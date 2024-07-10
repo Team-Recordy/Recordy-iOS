@@ -11,7 +11,6 @@ import UIKit
 import SnapKit
 import Then
 
-
 class RecordyTextView: UIView {
 
   let textView = UITextView().then {
@@ -21,7 +20,7 @@ class RecordyTextView: UIView {
     $0.isScrollEnabled = false
     let horizontalPadding = 14.adaptiveWidth
     let verticalPadding = 14.adaptiveHeight
-    $0.contentInset = UIEdgeInsets(
+    $0.textContainerInset = UIEdgeInsets(
       top: verticalPadding,
       left: horizontalPadding,
       bottom: verticalPadding,
