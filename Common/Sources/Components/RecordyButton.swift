@@ -15,7 +15,7 @@ enum ButtonState {
   case inactive
 }
 
-class RecordyButton: UIButton {
+public class RecordyButton: UIButton {
   
   var buttonState: ButtonState = .inactive {
     didSet {
@@ -23,7 +23,7 @@ class RecordyButton: UIButton {
     }
   }
 
-  override init(frame: CGRect) {
+  public override init(frame: CGRect) {
     super.init(frame: frame)
     setUI()
   }

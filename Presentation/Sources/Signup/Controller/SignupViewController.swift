@@ -8,7 +8,13 @@
 
 import UIKit
 
-final class SignupViewController: UIViewController {
+public final class SignupViewController: UIViewController {
+  
+  var rootView = TermsView()
+  
+  public override func loadView() {
+    self.view = rootView
+  }
   
   public override func viewDidLoad() {
     super.viewDidLoad()
@@ -18,7 +24,6 @@ final class SignupViewController: UIViewController {
   }
   
   func setStyle() {
-    
   }
   
   func setUI() {

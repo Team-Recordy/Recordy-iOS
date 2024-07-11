@@ -6,4 +6,128 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 
-import Foundation
+import UIKit
+
+import SnapKit
+import Then
+
+import Common
+
+final class TermsView: UIView {
+  
+  let termImage = UIImageView()
+  let termText = UILabel()
+  
+  let agreeToAllButton = AgreeToAllButton()
+  
+  let termButton1 = TermButton()
+  let termButton2 = TermButton()
+  let termButton3 = TermButton()
+  
+  let moreButton1 = MoreButton()
+  let moreButton2 = MoreButton()
+  let moreButton3 = MoreButton()
+  
+  let nextButton = RecordyButton()
+  
+  public override init(frame: CGRect) {
+    super.init(frame: frame)
+    setStyle()
+    setUI()
+    setAutoLayout()
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  func setStyle() {
+    self.backgroundColor = CommonAsset.recordyBG.color
+    
+    termImage.do {
+      $0.image = CommonAsset.signupImage.image
+      $0.contentMode = .scaleAspectFit
+    }
+    // TODO: - Font 간격 조정 필요
+    termText.do {
+      $0.text = "유영하러 오신 것을\n환영합니다!"
+      $0.font = RecordyFont.title1.font
+      $0.textColor = CommonAsset.recordyGrey01.color
+      $0.numberOfLines = 0
+    }
+    
+    termButton1.agreeLabel.do {
+      $0.text = "(필수) 서비스 이용약관 동의"
+    }
+    
+    termButton2.agreeLabel.do {
+      $0.text = "(필수) 개인정보 수집·이용 동의"
+    }
+    
+    termButton3.agreeLabel.do {
+      $0.text = "(필수) 만 14세 이상입니다"
+    }
+    
+    nextButton.do {
+      $0.setTitle("다음", for: .normal)
+    }
+  }
+  
+  func setUI() {
+    self.addSubviews(
+      termImage,
+      termText,
+      agreeToAllButton,
+      termButton1,
+      termButton2,
+      termButton3,
+      nextButton
+    )
+  }
+  
+  func setAutoLayout() {
+    
+    termImage.snp.makeConstraints {
+      $0.top.equalToSuperview().offset(148)
+      $0.leading.equalToSuperview().offset(20)
+      $0.height.equalTo(92.adaptiveHeight)
+      $0.width.equalTo(92.adaptiveWidth)
+    }
+    
+    termText.snp.makeConstraints {
+      $0.top.equalTo(termImage.snp.bottom).offset(8)
+      $0.leading.equalToSuperview().offset(20)
+    }
+    
+    agreeToAllButton.snp.makeConstraints {
+      $0.top.equalTo(termText.snp.bottom).offset(32)
+      $0.horizontalEdges.equalToSuperview().inset(20)
+      $0.height.equalTo(48)
+    }
+    
+    termButton1.snp.makeConstraints {
+      $0.top.equalTo(agreeToAllButton.snp.bottom).offset(8)
+      $0.horizontalEdges.equalToSuperview().inset(20)
+      $0.height.equalTo(40)
+    }
+    
+    termButton2.snp.makeConstraints {
+      $0.top.equalTo(termButton1.snp.bottom)
+      $0.horizontalEdges.equalToSuperview().inset(20)
+      $0.height.equalTo(40)
+    }
+
+    termButton3.snp.makeConstraints {
+      $0.top.equalTo(termButton2.snp.bottom)
+      $0.horizontalEdges.equalToSuperview().inset(20)
+      $0.height.equalTo(40)
+    }
+    
+    nextButton.snp.makeConstraints {
+      $0.horizontalEdges.equalToSuperview().inset(20)
+      $0.bottom.equalTo(safeAreaLayoutGuide).inset(14)
+      $0.height.equalTo(54.adaptiveHeight)
+    }
+  }
+}
+
