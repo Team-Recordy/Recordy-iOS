@@ -18,6 +18,9 @@ let project = Project.makeModule(
   dependencies: [
     .external(name: "KakaoSDKAuth", condition: .none),
     .external(name: "KakaoSDKCommon", condition: .none),
-    .external(name: "KakaoSDKUser", condition: .none)
+    .external(name: "KakaoSDKUser", condition: .none),
+    .external(name: "Moya", condition: .none),
+    .external(name: "RxSwift", condition: .none),
+    .external(name: "RxMoya", condition: .none)
   ]
 )
