@@ -18,6 +18,7 @@ let package = Package(
     .package(url: "https://github.com/SnapKit/SnapKit", from: "5.0.1"),
     .package(url: "https://github.com/devxoul/Then", from: "2.0.0"),
     .package(url: "https://github.com/kakao/kakao-ios-sdk", branch: "master"),
-    .package(url: "https://github.com/ReactiveX/RxSwift.git", from: "6.0.0")
+    .package(url: "https://github.com/ReactiveX/RxSwift.git", from: "6.0.0"),
+    .package(url: "https://github.com/Moya/Moya.git", .upToNextMajor(from: "15.0.0"))
   ]
 )
