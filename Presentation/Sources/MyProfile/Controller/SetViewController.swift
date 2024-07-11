@@ -15,9 +15,7 @@ import Common
 
 public class SetViewController: UIViewController {
   
-  let otherTableView: CustomTableView = {
-    let footerView = UIView()
-    footerView.backgroundColor = CommonAsset.recordyGrey09.color
+  let helpTableView: CustomTableView = {
     
     return CustomTableView(
       list: [
@@ -27,13 +25,21 @@ public class SetViewController: UIViewController {
         "문의"
       ],
       headerTitle: "도움말",
-      footerView: footerView
+      footerView: nil,
+      cellArrowImages: [
+        CommonAsset.indicator.image,
+        CommonAsset.indicator.image,
+        CommonAsset.indicator.image,
+        CommonAsset.indicator.image
+      ]
     )
   }()
   
-  let helpTableView: CustomTableView = {
+  let divider = UIView()
+  
+  let extraTableView: CustomTableView = {
     let footerLabel = UILabel()
-      footerLabel.do {
+    footerLabel.do {
       $0.textColor = CommonAsset.recordyGrey04.color
       $0.font = RecordyFont.caption2.font
       $0.text = "앱 버전 1.1.1"
@@ -43,7 +49,7 @@ public class SetViewController: UIViewController {
     
     footerView.addSubview(footerLabel)
     footerLabel.snp.makeConstraints {
-      $0.top.equalTo(footerView.snp.top).inset(4)
+      $0.top.equalTo(footerView.snp.top).offset(4)
       $0.leading.equalToSuperview().inset(20)
     }
     
@@ -54,7 +60,12 @@ public class SetViewController: UIViewController {
         "탈퇴하기"
       ],
       headerTitle: "기타",
-      footerView: footerView
+      footerView: footerView,
+      cellArrowImages: [
+        CommonAsset.indicator.image,
+        CommonAsset.indicator.image,
+        CommonAsset.indicator.image
+      ]
     )
   }()
   
@@ -67,20 +78,28 @@ public class SetViewController: UIViewController {
   }
   
   private func setUI() {
-    view.addSubview(otherTableView)
+    divider.backgroundColor = CommonAsset.recordyGrey09.color
     view.addSubview(helpTableView)
+    view.addSubview(divider)
+    view.addSubview(extraTableView)
   }
   
   private func setAutoLayout() {
-    otherTableView.snp.makeConstraints {
+    helpTableView.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide)
       $0.leading.trailing.equalToSuperview()
-      $0.height.equalTo(300)
+      $0.height.equalTo(256.adaptiveHeight)
     }
-
-    helpTableView.snp.makeConstraints {
-      $0.top.equalTo(otherTableView.snp.bottom)
+    
+    divider.snp.makeConstraints {
+      $0.top.equalTo(helpTableView.snp.bottom).offset(12.adaptiveHeight)
+      $0.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(8.adaptiveHeight)
+    }
+    
+    extraTableView.snp.makeConstraints {
+      $0.top.equalTo(divider.snp.bottom)
       $0.leading.trailing.bottom.equalToSuperview()
     }
-  }
+  } 
 }
