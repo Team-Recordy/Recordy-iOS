@@ -6,8 +6,10 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 import UIKit
+
 import SnapKit
 import Then
+
 import Common
 
 public class ProfileInfoView: UIView {
