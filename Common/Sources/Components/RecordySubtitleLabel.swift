@@ -8,14 +8,26 @@
 
 import UIKit
 
-class RecordySubtitleLabel: UILabel {
+public class RecordySubtitleLabel: UILabel {
 
-    /*
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
-        // Drawing code
-    }
-    */
+  let subtitle: String
 
+  public init(
+    subtitle: String,
+    frame: CGRect = .zero
+  ) {
+    self.subtitle = subtitle
+    super.init(frame: frame)
+    setStyle()
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  func setStyle() {
+    self.text = subtitle
+    self.font = RecordyFont.subtitle.font
+    self.textColor = CommonAsset.recordyWhite.color
+  }
 }

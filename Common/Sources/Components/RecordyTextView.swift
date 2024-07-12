@@ -11,9 +11,9 @@ import UIKit
 import SnapKit
 import Then
 
-class RecordyTextView: UIView {
+public class RecordyTextView: UIView {
 
-  let textView = UITextView().then {
+  public let textView = UITextView().then {
     $0.font = RecordyFont.body2.font
     $0.textColor = CommonAsset.recordyGrey01.color
     $0.backgroundColor = CommonAsset.recordyGrey08.color
@@ -27,7 +27,7 @@ class RecordyTextView: UIView {
       right: horizontalPadding
     )
   }
-  let textCountLabel = UILabel().then {
+  public let textCountLabel = UILabel().then {
     $0.font = RecordyFont.caption2.font
     $0.textColor = CommonAsset.recordyGrey04.color
   }
@@ -35,7 +35,7 @@ class RecordyTextView: UIView {
   private let minHeight = 148.adaptiveHeight
   private let maxHeight = 408.adaptiveHeight
 
-  override init(frame: CGRect) {
+  public override init(frame: CGRect) {
     super.init(frame: frame)
     textView.delegate = self
     setStyle()
@@ -69,7 +69,7 @@ class RecordyTextView: UIView {
 }
 
 extension RecordyTextView: UITextViewDelegate {
-  func textViewDidChange(_ textView: UITextView) {
+  public func textViewDidChange(_ textView: UITextView) {
     let currentSize = self.textView.sizeThatFits(
       CGSize(
         width: self.textView.frame.width,
@@ -80,13 +80,13 @@ extension RecordyTextView: UITextViewDelegate {
     self.textView.isScrollEnabled = newHeight == maxHeight
   }
 
-  func textViewDidBeginEditing(_ textView: UITextView) {
+  public func textViewDidBeginEditing(_ textView: UITextView) {
     self.textView.layer.borderColor = CommonAsset.recordyMain.color.cgColor
     self.textView.layer.borderWidth = 1
     self.textCountLabel.textColor = CommonAsset.recordyMain.color
   }
 
-  func textViewDidEndEditing(_ textView: UITextView) {
+  public func textViewDidEndEditing(_ textView: UITextView) {
     self.textView.layer.borderColor = UIColor.clear.cgColor
     self.textView.layer.borderWidth = 0
     self.textCountLabel.textColor = CommonAsset.recordyGrey04.color

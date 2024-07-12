@@ -8,13 +8,13 @@
 
 import UIKit
 
-final class RecordyTextField: UITextField {
-  
+public final class RecordyTextField: UITextField {
+
   var style: RecordyTextFieldStyle {
     didSet { setStyle(style) }
   }
   
-  init(
+  public init(
     frame: CGRect = .zero,
     style: RecordyTextFieldStyle = .unselected,
     placeholder: String

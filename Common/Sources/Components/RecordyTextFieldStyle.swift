@@ -8,21 +8,21 @@
 
 import UIKit
 
-struct RecordyTextFieldStyle {
+public struct RecordyTextFieldStyle {
   let borderColor: CommonColors?
   let borderWidth: CGFloat?
   
-  static let unselected = RecordyTextFieldStyle(
+  public static let unselected = RecordyTextFieldStyle(
     borderColor: nil,
     borderWidth: nil
   )
   
-  static let selected = RecordyTextFieldStyle(
+  public static let selected = RecordyTextFieldStyle(
     borderColor: CommonAsset.recordyMain,
     borderWidth: 1
   )
   
-  static let error = RecordyTextFieldStyle(
+  public static let error = RecordyTextFieldStyle(
     borderColor: CommonAsset.recordyAlert,
     borderWidth: 1
   )
