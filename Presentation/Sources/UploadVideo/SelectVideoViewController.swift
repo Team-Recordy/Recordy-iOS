@@ -23,6 +23,7 @@ protocol SelectVideoDelegate: AnyObject {
 
 public class SelectVideoViewController: UIViewController {
 
+  private let gradientView = RecordyGradientView()
   private let warningLabel = UILabel().then {
     $0.text = "ⓘ 최대 1분의 1080p 영상을 올려주세요."
     $0.textColor = CommonAsset.recordyGrey03.color
@@ -52,11 +53,16 @@ public class SelectVideoViewController: UIViewController {
   }
 
   private func setUI() {
+    self.view.addSubview(self.gradientView)
     self.view.addSubview(self.warningLabel)
     self.view.addSubview(self.collectionView!)
   }
 
   private func setAutoLayout() {
+    self.gradientView.snp.makeConstraints {
+      $0.top.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(400.adaptiveHeight)
+    }
     self.warningLabel.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide).offset(9.adaptiveHeight)
       $0.centerX.equalToSuperview()
