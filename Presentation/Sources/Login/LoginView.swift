@@ -11,6 +11,8 @@ import UIKit
 import SnapKit
 import Then
 
+import Common
+
 final class LoginView: UIView {
   
   let recordyLogo = UIView().then {
