@@ -19,11 +19,9 @@ import RxCocoa
 /// 시스템 권한을 이 뷰모델에서 판단하여야 함
 final class UploadVideoViewModel {
 
-//  let asset: PHAsset
-
   struct Input {
     let selectedAsset = BehaviorRelay<PHAsset?>(value: nil)
-    let selectedKeywords = BehaviorRelay<[Keyword]>(value: [.classic, .cozy, .neat])
+    let selectedKeywords = BehaviorRelay<[Keyword]>(value: [])
     let location = PublishRelay<String>()
     let contents = PublishRelay<String>()
   }
@@ -41,7 +39,6 @@ final class UploadVideoViewModel {
   let output = Output()
 
   init() {
-//    self.input.selectedAsset.accept(asset)
     self.bind()
   }
 
@@ -68,7 +65,7 @@ final class UploadVideoViewModel {
       .disposed(by: disposeBag)
 
     Observable.combineLatest(
-      output.uploadVideo,
+      input.selectedAsset,
       input.selectedKeywords,
       input.location,
       input.contents

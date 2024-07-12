@@ -10,8 +10,15 @@ import Foundation
 import Photos
 import UIKit
 
+import Core
+
 import RxSwift
 import RxCocoa
+
+/// TODO
+/// 1. 영상 15초 제한
+/// 2. 토스트 메세지
+/// 3. 컴포넌트 수정
 
 final class SelectVideoViewModel {
 
@@ -26,14 +33,14 @@ final class SelectVideoViewModel {
   }
 
   struct Output {
-    let asset: Driver<[PHAsset]>
+    let asset: Driver<[LocalVideo]>
     let fetchStatus: Driver<Bool>
     let selectedIndexPath: Driver<IndexPath?>
   }
 
   private let disposeBag = DisposeBag()
 
-  let assetsRelay = BehaviorRelay<[PHAsset]>(value: [])
+  let assetsRelay = BehaviorRelay<[LocalVideo]>(value: [])
   private let fetchStatusRelay = PublishRelay<Bool>()
   let selectedIndexPathRelay = BehaviorRelay<IndexPath?>(value: nil)
 
@@ -51,10 +58,10 @@ final class SelectVideoViewModel {
       .disposed(by: disposeBag)
 
     return Output(
-       asset: assetsRelay.asDriver(),
-       fetchStatus: fetchStatusRelay.asDriver(onErrorJustReturn: false),
-       selectedIndexPath: selectedIndexPathRelay.asDriver()
-     )
+      asset: assetsRelay.asDriver(),
+      fetchStatus: fetchStatusRelay.asDriver(onErrorJustReturn: false),
+      selectedIndexPath: selectedIndexPathRelay.asDriver()
+    )
   }
 
   private func fetchVideosFromGallery() {
@@ -88,7 +95,7 @@ final class SelectVideoViewModel {
       format: "mediaType == %d",
       PHAssetMediaType.video.rawValue
     )
-    
+
     let allVideos = PHAsset.fetchAssets(
       with: .video,
       options: fetchOptions
@@ -97,9 +104,21 @@ final class SelectVideoViewModel {
     allVideos.enumerateObjects { (asset, _, _) in
       videos.append(asset)
     }
-
-    self.assetsRelay.accept(videos.reversed())
+    let localVideos = getVideoDurations(videos: videos.reversed())
+    self.assetsRelay.accept(localVideos)
     self.fetchStatusRelay.accept(true)
+  }
+
+  func getVideoDurations(videos: [PHAsset]) -> [LocalVideo] {
+    let localVideos = videos.map { asset in
+      let minutes = Int(asset.duration) / 60
+      let seconds = Int(asset.duration) % 60
+      return LocalVideo(
+        asset: asset,
+        playtime: String(format: "%02d:%02d", minutes, seconds)
+      )
+    }
+    return localVideos
   }
 
   func isSelected(indexPath: IndexPath) -> Bool {

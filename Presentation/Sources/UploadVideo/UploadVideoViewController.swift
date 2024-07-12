@@ -116,7 +116,7 @@ public class UploadVideoViewController: UIViewController {
       videoThumbnailAlertLabel
     )
     self.contentView.addSubviews(
-      warningLabel
+      warningLabel,
       videoThumbnailLabel,
       videoThumbnailView,
       selectedKeywordLabel,
