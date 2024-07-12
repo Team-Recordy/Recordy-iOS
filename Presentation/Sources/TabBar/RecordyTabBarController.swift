@@ -8,23 +8,61 @@
 
 import UIKit
 
-class RecordyTabBarController: UITabBarController {
+import Common
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+@available(iOS 16.0, *)
+public final class RecordyTabBarController: UITabBarController, UITabBarControllerDelegate {
 
-        // Do any additional setup after loading the view.
-    }
-    
+  private var recordyTabBar = RecordyTabBar()
 
-    /*
-    // MARK: - Navigation
+  public override func viewDidLoad() {
+    super.viewDidLoad()
+    self.setValue(recordyTabBar, forKey: "tabBar")
+    setStyle()
+    setTabBarItem()
+    setDelegate()
+  }
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
+  private func setStyle() {
+    let appearance = UITabBarAppearance()
+    appearance.backgroundColor = CommonAsset.recordyBG.color
+    tabBar.backgroundColor = .white
+    tabBar.tintColor = .clear
+    tabBar.standardAppearance = appearance
+  }
 
+  private func setTabBarItem() {
+    let viewControllers = RecordyTabBarType.allCases.map { createTabBarItem(type: $0) }
+    setViewControllers(viewControllers, animated: false)
+  }
+
+  private func setDelegate() {
+    self.delegate = self
+  }
+}
+
+final class RecordyTabBar: UITabBar {
+  override func sizeThatFits(_ size: CGSize) -> CGSize {
+    var size = super.sizeThatFits(size)
+    size.height += 15
+    return size
+  }
+}
+
+@available(iOS 16.0, *)
+extension RecordyTabBarController {
+  private func createTabBarItem(
+    type: RecordyTabBarType
+  ) -> UIViewController {
+    let tabBarItem = UITabBarItem(
+      title: nil,
+      image: type.inactive.withRenderingMode(.alwaysOriginal),
+      selectedImage: type.active.withRenderingMode(.alwaysOriginal)
+    )
+    tabBarItem.imageInsets.top = 12
+    tabBarItem.imageInsets.bottom = -12
+    let currentViewController = type.viewController
+    currentViewController.tabBarItem = tabBarItem
+    return currentViewController
+  }
 }
