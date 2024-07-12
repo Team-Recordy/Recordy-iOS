@@ -9,7 +9,7 @@
 import UIKit
 
 public final class RecordyTextField: UITextField {
-  
+
   var style: RecordyTextFieldStyle {
     didSet { setStyle(style) }
   }
