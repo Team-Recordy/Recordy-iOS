@@ -26,7 +26,7 @@ public final class RecordyTabBarController: UITabBarController, UITabBarControll
   private func setStyle() {
     let appearance = UITabBarAppearance()
     appearance.backgroundColor = CommonAsset.recordyBG.color
-    tabBar.backgroundColor = .white
+    tabBar.backgroundColor = .clear
     tabBar.tintColor = .clear
     tabBar.standardAppearance = appearance
   }
