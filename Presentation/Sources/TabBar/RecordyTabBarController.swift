@@ -41,13 +41,7 @@ public final class RecordyTabBarController: UITabBarController, UITabBarControll
   }
 }
 
-final class RecordyTabBar: UITabBar {
-  override func sizeThatFits(_ size: CGSize) -> CGSize {
-    var size = super.sizeThatFits(size)
-    size.height += 15
-    return size
-  }
-}
+final class RecordyTabBar: UITabBar { }
 
 @available(iOS 16.0, *)
 extension RecordyTabBarController {
