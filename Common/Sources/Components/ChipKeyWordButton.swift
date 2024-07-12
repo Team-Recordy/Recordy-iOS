@@ -32,11 +32,15 @@ class ChipKeyWordButton: UIButton {
   }
   
   private func setUI() {
-    self.cornerRadius(15)
-    titleLabel?.font = RecordyFont.body2.font
+    self.cornerRadius(16)
+    titleLabel?.font = RecordyFont.caption1.font
     updateChipAppearance()
   }
-  
+
+  func setState(state: ChipState) {
+    self.chipstate = state
+  }
+
   private func updateChipAppearance() {
     switch chipstate {
     case .active:
@@ -49,11 +53,13 @@ class ChipKeyWordButton: UIButton {
       layer.borderWidth = 1
 
     case .inactive:
-      backgroundColor = CommonAsset.recordyGrey08.color
+      backgroundColor = CommonAsset.recordyGrey09.color
       setTitleColor(
         CommonAsset.recordyGrey04.color,
         for: .normal
       )
+      layer.borderColor = UIColor.clear.cgColor
+      layer.borderWidth = 0
     }
   }
 }

@@ -10,7 +10,7 @@ import UIKit
 
 public final class SignupViewController: UIViewController {
   
-  var rootView = TermsView()
+  var rootView = NicknameView()
   
   public override func loadView() {
     self.view = rootView

@@ -1,5 +1,5 @@
 //
-//  AgreeButton.swift
+//  AgreeToggleButton.swift
 //  Common
 //
 //  Created by 송여경 on 7/8/24.

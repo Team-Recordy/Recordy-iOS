@@ -17,7 +17,10 @@ let project = Project.makeModule(
   bundleId: moduleName,
   resources: ["Resources/**"],
   dependencies: [
+    .Project.Core,
     .external(name: "SnapKit", condition: .none),
-    .external(name: "Then", condition: .none)
+    .external(name: "Then", condition: .none),
+    .external(name: "RxSwift", condition: .none),
+    .external(name: "RxCocoa", condition: .none)
   ]
 )
