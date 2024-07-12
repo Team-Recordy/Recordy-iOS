@@ -15,7 +15,7 @@ protocol RecordyProgressViewDelegate: AnyObject {
   func didUpdatePage(currentPage: Int, totalPages: Int)
 }
 
-final class RecordyProgressView: UIView {
+public final class RecordyProgressView: UIView {
   
   weak var delegate: RecordyProgressViewDelegate?
   private var totalPages: Int = 0
@@ -46,7 +46,7 @@ final class RecordyProgressView: UIView {
     $0.backgroundColor = CommonAsset.recordyMain.color
   }
   
-  override init(frame: CGRect = .zero) {
+  public override init(frame: CGRect = .zero) {
     super.init(frame: frame)
     self.ratio = 1.0 / CGFloat(totalPages)
     setStyle()
@@ -62,15 +62,15 @@ final class RecordyProgressView: UIView {
     self.backgroundColor = CommonAsset.recordySub01.color
     self.layer.cornerRadius = 4
     self.clipsToBounds = true
-  }
-  
-  func setUI() {
-    self.addSubview(progressBarView)
     progressBarView.layer.cornerRadius = 6
     progressBarView.clipsToBounds = true
   }
   
-  func updateProgress(currentPage: Int, totalPages: Int) {
+  func setUI() {
+    self.addSubview(progressBarView)
+  }
+  
+  public func updateProgress(currentPage: Int, totalPages: Int) {
     let newRatio = CGFloat(currentPage + 1) / CGFloat(totalPages)
     self.ratio = newRatio
   }
