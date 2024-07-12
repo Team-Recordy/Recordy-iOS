@@ -17,6 +17,10 @@ import Then
 import RxSwift
 import RxRelay
 
+protocol SelectVideoDelegate: AnyObject {
+  func selectVideo(_ data: PHAsset)
+}
+
 public class SelectVideoViewController: UIViewController {
 
   private let warningLabel = UILabel().then {
@@ -34,6 +38,7 @@ public class SelectVideoViewController: UIViewController {
   var collectionView: UICollectionView? = nil
   var assets: [PHAsset] = []
   var viewModel = SelectVideoViewModel()
+  weak var delegate: SelectVideoDelegate?
 
   private let disposeBag = DisposeBag()
   private let fetchVideosRelay = PublishRelay<Void>()
@@ -130,7 +135,6 @@ public class SelectVideoViewController: UIViewController {
       .bind(to: selectedVideoRelay)
       .disposed(by: disposeBag)
 
-
     output.selectedIndexPath
       .drive { [weak self] indexPath in
         self?.collectionView!.reloadData()
@@ -144,16 +148,9 @@ public class SelectVideoViewController: UIViewController {
     guard let indexPath = viewModel.selectedIndexPathRelay.value
     else { return }
     let asset = viewModel.assetsRelay.value[indexPath.row]
-    let uploadVideoViewModel = UploadVideoViewModel(asset: asset)
-    let uploadViewController = UploadVideoViewController(
-      viewModel: uploadVideoViewModel
-    )
-    self.navigationController?.pushViewController(
-      uploadViewController,
-      animated: true
-    )
+    delegate?.selectVideo(asset)
+    self.dismiss(animated: true)
   }
-
 }
 
 extension SelectVideoViewController: UICollectionViewDelegateFlowLayout {
