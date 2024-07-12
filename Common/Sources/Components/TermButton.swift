@@ -16,7 +16,7 @@ public class TermButton: UIButton {
   let backgroundView = UIView()
   let agreeButton = AgreeToggleButton()
   public let agreeLabel = UILabel()
-  let moreButton1 = MoreButton()
+  let moreButton = MoreButton()
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -44,7 +44,7 @@ public class TermButton: UIButton {
       backgroundView,
       agreeButton,
       agreeLabel,
-      moreButton1
+      moreButton
     )
   }
   
@@ -72,7 +72,7 @@ public class TermButton: UIButton {
       $0.height.equalTo(16.adaptiveHeight)
     }
     
-    self.moreButton1.snp.makeConstraints {
+    self.moreButton.snp.makeConstraints {
       $0.trailing.equalToSuperview().inset(20)
       $0.verticalEdges.equalToSuperview().inset(5)
       $0.width.equalTo(50.adaptiveWidth)

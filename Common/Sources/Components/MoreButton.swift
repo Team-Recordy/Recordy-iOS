@@ -19,6 +19,7 @@ public final class MoreButton: UIButton {
     super.init(frame: frame)
     setStyle()
     setUI()
+    setAutoLayout()
   }
   
   required init?(coder: NSCoder) {
@@ -26,8 +27,6 @@ public final class MoreButton: UIButton {
   }
   
   func setStyle() {
-    
-    self.backgroundColor = .red
     
     moreText.do {
       $0.text = "더보기"
@@ -38,14 +37,13 @@ public final class MoreButton: UIButton {
   }
   
   func setUI() {
-    self.addSubviews(
-      moreText
-    )
+    self.addSubview(moreText)
   }
   
-  func setLayout() {
+  func setAutoLayout() {
     moreText.snp.makeConstraints {
       $0.edges.equalToSuperview()
+      $0.centerX.centerY.equalToSuperview()
     }
   }
 }
