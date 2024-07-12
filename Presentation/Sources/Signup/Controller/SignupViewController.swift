@@ -1,13 +1,4 @@
-//
-//  SignupViewController.swift
-//  Presentation
-//
-//  Created by Chandrala on 7/11/24.
-//  Copyright © 2024 com.recordy. All rights reserved.
-//
-
 import UIKit
-
 import Common
 
 public final class SignupViewController: UIViewController {
@@ -17,20 +8,8 @@ public final class SignupViewController: UIViewController {
   let totalPages = 3
   var currentPage = 0
   
-  public override func loadView() {
-    let termsView = TermsView()
-    termsView.nextButton.addTarget(
-      self,
-      action: #selector(showNicknameView),
-      for: .touchUpInside
-    )
-    self.view = termsView
-    rootView = termsView
-  }
-  
   public override func viewDidLoad() {
     super.viewDidLoad()
-    setStyle()
     setUI()
     setAutoLayout()
     showTermsView()
@@ -38,9 +17,6 @@ public final class SignupViewController: UIViewController {
       currentPage: currentPage,
       totalPages: totalPages
     )
-  }
-  
-  func setStyle() {
   }
   
   func setUI() {
@@ -56,30 +32,50 @@ public final class SignupViewController: UIViewController {
   }
   
   func showTermsView() {
-    let termsView = TermsView()
-    termsView.nextButton.addTarget(self, action: #selector(showNicknameView), for: .touchUpInside)
-    switchView(termsView)
+      let termsView = TermsView()
+      termsView.nextButton.addTarget(self, action: #selector(showNicknameView), for: .touchUpInside)
+      switchView(termsView)
   }
   
-  @objc func showNicknameView() {
+  @objc
+  func showNicknameView() {
     currentPage += 1
     progressView.updateProgress(
       currentPage: currentPage,
       totalPages: totalPages
     )
     let nicknameView = NicknameView()
-    nicknameView.nextButton.addTarget(self, action: #selector(showCompleteView), for: .touchUpInside)
+    nicknameView.nextButton.addTarget(
+      self,
+      action: #selector(
+        showCompleteView
+      ),
+      for: .touchUpInside
+    )
     switchView(nicknameView)
   }
   
-  @objc func showCompleteView() {
+  @objc
+  func showCompleteView() {
     currentPage += 1
     progressView.updateProgress(
       currentPage: currentPage,
       totalPages: totalPages
     )
     let completeView = CompleteView()
+    completeView.completeButton.addTarget(
+      self,
+      action: #selector(
+        completeSignup
+      ),
+      for: .touchUpInside
+    )
     switchView(completeView)
+  }
+  
+  @objc
+  func completeSignup() {
+    // 추가구현
   }
   
   func switchView(_ newView: UIView) {
@@ -88,9 +84,12 @@ public final class SignupViewController: UIViewController {
     newView.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
-    rootView = newView 
-    
+    rootView = newView
     view.addSubview(progressView)
-    setAutoLayout()
+    progressView.snp.remakeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(12)
+      $0.leading.trailing.equalToSuperview().inset(20)
+      $0.height.equalTo(6)
+    }
   }
 }

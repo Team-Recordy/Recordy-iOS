@@ -1,13 +1,4 @@
-//
-//  RecordyProgressView.swift
-//  Common
-//
-//  Created by Chandrala on 7/9/24.
-//  Copyright © 2024 com.recordy. All rights reserved.
-//
-
 import UIKit
-
 import SnapKit
 import Then
 
@@ -36,7 +27,9 @@ public final class RecordyProgressView: UIView {
         withDuration: 0.5,
         delay: 0,
         options: .curveEaseInOut,
-        animations: self.layoutIfNeeded,
+        animations: {
+          self.layoutIfNeeded()
+        },
         completion: nil
       )
     }
@@ -48,7 +41,6 @@ public final class RecordyProgressView: UIView {
   
   public override init(frame: CGRect = .zero) {
     super.init(frame: frame)
-    self.ratio = 1.0 / CGFloat(totalPages)
     setStyle()
     setUI()
   }
@@ -73,20 +65,5 @@ public final class RecordyProgressView: UIView {
   public func updateProgress(currentPage: Int, totalPages: Int) {
     let newRatio = CGFloat(currentPage + 1) / CGFloat(totalPages)
     self.ratio = newRatio
-  }
-  
-  @objc func nextButtonTapped() {
-    currentPage += 1
-    if currentPage >= totalPages {
-      currentPage = 0
-    }
-    updateProgress(
-      currentPage: currentPage,
-      totalPages: totalPages
-    )
-    delegate?.didUpdatePage(
-      currentPage: currentPage,
-      totalPages: totalPages
-    )
   }
 }
