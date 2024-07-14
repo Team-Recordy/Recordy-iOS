@@ -10,14 +10,14 @@ import UIKit
 import SnapKit
 import Then
 
-enum ButtonState {
+public enum ButtonState {
   case active
   case inactive
 }
 
 public class RecordyButton: UIButton {
   
-  var buttonState: ButtonState = .inactive {
+  public var buttonState: ButtonState = .inactive {
     didSet {
       updateButtonAppearance()
     }

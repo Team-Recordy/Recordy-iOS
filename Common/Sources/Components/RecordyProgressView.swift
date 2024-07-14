@@ -1,13 +1,4 @@
-//
-//  RecordyProgressView.swift
-//  Common
-//
-//  Created by Chandrala on 7/9/24.
-//  Copyright © 2024 com.recordy. All rights reserved.
-//
-
 import UIKit
-
 import SnapKit
 import Then
 
@@ -15,7 +6,7 @@ protocol RecordyProgressViewDelegate: AnyObject {
   func didUpdatePage(currentPage: Int, totalPages: Int)
 }
 
-final class RecordyProgressView: UIView {
+public final class RecordyProgressView: UIView {
   
   weak var delegate: RecordyProgressViewDelegate?
   private var totalPages: Int = 0
@@ -36,7 +27,9 @@ final class RecordyProgressView: UIView {
         withDuration: 0.5,
         delay: 0,
         options: .curveEaseInOut,
-        animations: self.layoutIfNeeded,
+        animations: {
+          self.layoutIfNeeded()
+        },
         completion: nil
       )
     }
@@ -46,9 +39,8 @@ final class RecordyProgressView: UIView {
     $0.backgroundColor = CommonAsset.recordyMain.color
   }
   
-  override init(frame: CGRect = .zero) {
+  public override init(frame: CGRect = .zero) {
     super.init(frame: frame)
-    self.ratio = 1.0 / CGFloat(totalPages)
     setStyle()
     setUI()
   }
@@ -62,31 +54,16 @@ final class RecordyProgressView: UIView {
     self.backgroundColor = CommonAsset.recordySub01.color
     self.layer.cornerRadius = 4
     self.clipsToBounds = true
-  }
-  
-  func setUI() {
-    self.addSubview(progressBarView)
     progressBarView.layer.cornerRadius = 6
     progressBarView.clipsToBounds = true
   }
   
-  func updateProgress(currentPage: Int, totalPages: Int) {
-    let newRatio = CGFloat(currentPage + 1) / CGFloat(totalPages)
-    self.ratio = newRatio
+  func setUI() {
+    self.addSubview(progressBarView)
   }
   
-  @objc func nextButtonTapped() {
-    currentPage += 1
-    if currentPage >= totalPages {
-      currentPage = 0
-    }
-    updateProgress(
-      currentPage: currentPage,
-      totalPages: totalPages
-    )
-    delegate?.didUpdatePage(
-      currentPage: currentPage,
-      totalPages: totalPages
-    )
+  public func updateProgress(currentPage: Int, totalPages: Int) {
+    let newRatio = CGFloat(currentPage + 1) / CGFloat(totalPages)
+    self.ratio = newRatio
   }
 }
