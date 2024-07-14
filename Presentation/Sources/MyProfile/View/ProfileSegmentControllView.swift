@@ -113,14 +113,28 @@ public final class ProfileSegmentControllView: UIView {
       $0.verticalEdges.equalToSuperview()
     }
   }
+  private func updateView() {
+    switch selectedTab {
+    case .taste:
+      // 내 취향 탭을 선택했을 때
+      let tasteVC = TasteViewController()
+      parentViewController?.addChild(tasteVC)
+      self.addSubview(tasteVC.view)
+      tasteVC.view.frame = self.bounds
+      tasteVC.didMove(toParent: parentViewController)
+    case .record:
+      // 내 기록 탭을 선택했을 때
+      break
+    case .bookmark:
+      // 북마크 탭을 선택했을 때
+      break
+    }
+  }
 }
 
 
 private extension ProfileSegmentControllView {
-  func applySelectUI(
-    to button: UIButton,
-    type: ControlType
-  ) {
+  func applySelectUI(to button: UIButton, type: ControlType) {
     guard let text = button.titleLabel?.text else { return }
     
     let isSelected = type == self.selectedTab
@@ -134,20 +148,17 @@ private extension ProfileSegmentControllView {
         location: 0,
         length: attrString.length
       )
-      )
+    )
     button.setAttributedTitle(
       attrString,
       for: .normal
     )
     if isSelected {
-      moveSelectedLine(
-        below: button
-      )
+      moveSelectedLine(below: button)
     }
   }
   
   func moveSelectedLine(below button: UIButton) {
-    
     UIView.animate(withDuration: 0.2) {
       self.underDivider.snp.remakeConstraints {
         $0.horizontalEdges.equalTo(button)
@@ -156,5 +167,18 @@ private extension ProfileSegmentControllView {
       }
       self.layoutIfNeeded()
     }
+  }
+}
+
+extension UIView {
+  var parentViewController: UIViewController? {
+    var parentResponder: UIResponder? = self
+    while parentResponder != nil {
+      parentResponder = parentResponder?.next
+      if let viewController = parentResponder as? UIViewController {
+        return viewController
+      }
+    }
+    return nil
   }
 }
