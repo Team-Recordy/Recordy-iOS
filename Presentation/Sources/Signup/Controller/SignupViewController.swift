@@ -1,3 +1,12 @@
+//
+//  SignupViewController.swift
+//  Presentation
+//
+//  Created by Chandrala on 7/4/24.
+//  Copyright © 2024 com.recordy. All rights reserved.
+//
+
+
 import UIKit
 import Common
 
@@ -7,6 +16,7 @@ public final class SignupViewController: UIViewController {
   let progressView = RecordyProgressView()
   let totalPages = 3
   var currentPage = 0
+  var textFieldState: RecordyTextFieldState = .unselected
   
   public override func viewDidLoad() {
     super.viewDidLoad()
@@ -17,6 +27,7 @@ public final class SignupViewController: UIViewController {
       currentPage: currentPage,
       totalPages: totalPages
     )
+    self.hideKeyboard()
   }
   
   func setUI() {
@@ -32,9 +43,9 @@ public final class SignupViewController: UIViewController {
   }
   
   func showTermsView() {
-      let termsView = TermsView()
-      termsView.nextButton.addTarget(self, action: #selector(showNicknameView), for: .touchUpInside)
-      switchView(termsView)
+    let termsView = TermsView()
+    termsView.nextButton.addTarget(self, action: #selector(showNicknameView), for: .touchUpInside)
+    switchView(termsView)
   }
   
   @objc
@@ -91,5 +102,11 @@ public final class SignupViewController: UIViewController {
       $0.leading.trailing.equalToSuperview().inset(20)
       $0.height.equalTo(6)
     }
+  }
+}
+
+extension SignupViewController: RecordyTextFieldStateDelegate {
+  public func state(_ currentState: Common.RecordyTextFieldState) {
+    self.textFieldState = currentState
   }
 }
