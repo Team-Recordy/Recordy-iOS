@@ -12,6 +12,8 @@ import Common
 
 class FeedView: UIView {
 
+  private let backgroundView = UIView()
+  private let backgroundLayer = CAGradientLayer()
   private let locationStackView = UIStackView().then {
     $0.spacing = 4.adaptiveWidth
     $0.axis = .horizontal
@@ -78,6 +80,7 @@ class FeedView: UIView {
 
   override init(frame: CGRect) {
     super.init(frame: frame)
+    setStyle()
     setUI()
     setAutolayout()
     addAction()
@@ -87,17 +90,38 @@ class FeedView: UIView {
     fatalError("init(coder:) has not been implemented")
   }
 
+  public override func layoutSubviews() {
+    super.layoutSubviews()
+    checkIfTextViewNeedsTap()
+    self.backgroundLayer.frame = self.backgroundView.bounds
+  }
+
+  private func setStyle() {
+    let colors: [UIColor] = [
+      .black.withAlphaComponent(0.01),
+      .black
+    ]
+    backgroundLayer.do {
+      $0.startPoint = CGPoint(x: 0.5, y: 0.0)
+      $0.endPoint = CGPoint(x: 0.5, y: 1.0)
+      $0.locations = [0.0, 0.5, 1.0]
+      $0.colors = colors.map { $0.cgColor }
+    }
+  }
+
   private func setUI() {
+    backgroundView.layer.addSublayer(backgroundLayer)
     bookmarkStackView.addArrangedSubview(bookmarkButton)
     bookmarkStackView.addArrangedSubview(bookmarkLabel)
     locationStackView.addArrangedSubview(locationImage)
     locationStackView.addArrangedSubview(locationLabel)
     descriptionStackView.addArrangedSubview(nicknameLabel)
     descriptionStackView.addArrangedSubview(descriptionTextView)
+    backgroundView.addSubview(descriptionStackView)
+    backgroundView.addSubview(bookmarkStackView)
     [
-      descriptionStackView,
-      locationStackView,
-      bookmarkStackView
+      backgroundView,
+      locationStackView
     ].forEach {
       self.addSubview($0)
     }
@@ -109,11 +133,19 @@ class FeedView: UIView {
       $0.leading.equalTo(self.safeAreaLayoutGuide).inset(20.adaptiveWidth)
       $0.height.equalTo(32.adaptiveHeight)
     }
+    backgroundView.snp.makeConstraints {
+      $0.bottom.equalToSuperview()
+      $0.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(200.adaptiveHeight)
+    }
     descriptionStackView.snp.makeConstraints {
       $0.bottom.equalTo(self.safeAreaLayoutGuide).inset(20.adaptiveHeight)
       $0.leading.equalTo(self.safeAreaLayoutGuide).inset(20.adaptiveWidth)
       $0.width.equalTo(220.adaptiveWidth)
-      $0.height.equalTo(80.adaptiveHeight)
+      $0.height.equalTo(90.adaptiveHeight)
+    }
+    nicknameLabel.snp.makeConstraints {
+      $0.height.equalTo(28.adaptiveHeight)
     }
     bookmarkStackView.snp.makeConstraints {
       $0.bottom.equalTo(self.safeAreaLayoutGuide).inset(20.adaptiveHeight)
@@ -135,16 +167,43 @@ class FeedView: UIView {
       self.descriptionStackView.snp.updateConstraints {
         $0.height.equalTo(228.adaptiveHeight)
       }
+      self.backgroundView.snp.updateConstraints {
+        $0.height.equalTo(338.adaptiveHeight)
+      }
     } else {
       self.descriptionTextView.isScrollEnabled = false
       self.descriptionTextView.textContainer.maximumNumberOfLines = 2
       self.descriptionStackView.snp.updateConstraints {
-        $0.height.equalTo(80.adaptiveHeight)
+        $0.height.equalTo(90.adaptiveHeight)
+      }
+      self.backgroundView.snp.updateConstraints {
+        $0.height.equalTo(200.adaptiveHeight)
       }
     }
 
     UIView.animate(withDuration: 0.3) {
       self.layoutIfNeeded()
     }
+  }
+
+  private func checkIfTextViewNeedsTap() {
+    let textViewWidth = self.descriptionTextView.frame.width
+    let size = CGSize(width: textViewWidth, height: .infinity)
+    let estimatedSize = self.descriptionTextView.sizeThatFits(size)
+    print(estimatedSize)
+
+    let lineHeight = self.descriptionTextView.font?.lineHeight ?? 0
+    print(lineHeight)
+    let numberOfLines = estimatedSize.height / lineHeight
+
+    if numberOfLines > 2 {
+      self.descriptionTextView.isUserInteractionEnabled = true
+    } else {
+      self.descriptionTextView.isUserInteractionEnabled = false
+    }
+  }
+
+  func updateDescriptionTextView() {
+    checkIfTextViewNeedsTap()
   }
 }
