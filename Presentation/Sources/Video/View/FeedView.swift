@@ -190,10 +190,8 @@ class FeedView: UIView {
     let textViewWidth = self.descriptionTextView.frame.width
     let size = CGSize(width: textViewWidth, height: .infinity)
     let estimatedSize = self.descriptionTextView.sizeThatFits(size)
-    print(estimatedSize)
 
     let lineHeight = self.descriptionTextView.font?.lineHeight ?? 0
-    print(lineHeight)
     let numberOfLines = estimatedSize.height / lineHeight
 
     if numberOfLines > 2 {
