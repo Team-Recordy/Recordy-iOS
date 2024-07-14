@@ -8,22 +8,23 @@
 
 import UIKit
 import SnapKit
+
 import Then
 
-enum MediumState {
+public enum MediumState {
   case active
   case inactive
 }
 
-class MediumButton: UIButton {
+public class MediumButton: UIButton {
   
-  var mediumState: MediumState = .inactive {
+  public var mediumState: MediumState = .inactive {
     didSet {
       mediumButtonAppearance()
     }
   }
   
-  override init(frame: CGRect) {
+  public override init(frame: CGRect) {
     super.init(frame: frame)
     setUI()
   }
@@ -32,16 +33,16 @@ class MediumButton: UIButton {
     fatalError("init(coder:) has not been implemented")
   }
   
-  private func setUI() {
+  public func setUI() {
     layer.cornerRadius = 8
     titleLabel?.font = RecordyFont.button2.font
     mediumButtonAppearance()
   }
   
-  private func mediumButtonAppearance(){
+  public func mediumButtonAppearance(){
     switch mediumState {
     case .active:
-      backgroundColor = CommonAsset.recordyMain.color
+      backgroundColor = CommonAsset.recordyWhite.color
       setTitleColor(
         CommonAsset.recordyGrey09.color,
         for: .normal
