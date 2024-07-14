@@ -5,14 +5,12 @@
 //  Created by 송여경 on 7/10/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
-
 import UIKit
 
 import SnapKit
 import Then
 
 import Common
-
 
 enum ControlType: String {
   case taste = "내 취향"
@@ -25,6 +23,7 @@ public final class ProfileSegmentControllView: UIView {
   private var selectedTab: ControlType = .taste {
     didSet {
       setupStyle()
+      updateView()
     }
   }
   
@@ -32,12 +31,12 @@ public final class ProfileSegmentControllView: UIView {
   private let tasteButton = UIButton()
   private let recordButton = UIButton()
   private let bookmarkButton = UIButton()
-  private let underDivider = Divider(color: CommonAsset.recordyGrey01.color)
+  private let underDivider = UIView()
   
   private var didTap: ((_ controlType: ControlType) -> Void)?
   
   private lazy var tapAction = UIAction { [weak self] action in
-    guard let self, let sender = action.sender as? UIButton else {return}
+    guard let self, let sender = action.sender as? UIButton else { return }
     switch sender {
     case self.tasteButton:
       self.selectedTab = .taste
@@ -72,16 +71,8 @@ public final class ProfileSegmentControllView: UIView {
   }
   
   private func setUpLayout() {
-    [
-      tasteButton,
-      recordButton,
-      bookmarkButton
-    ].forEach { barStack.addArrangedSubview($0)}
-    
-    [
-      barStack,
-      underDivider
-    ].forEach{ self.addSubview($0) }
+    [tasteButton, recordButton, bookmarkButton].forEach { barStack.addArrangedSubview($0) }
+    [barStack, underDivider].forEach { addSubview($0) }
   }
   
   private func setupStyle() {
@@ -92,18 +83,22 @@ public final class ProfileSegmentControllView: UIView {
     }
     
     tasteButton.do {
-      $0.titleLabel?.text = ControlType.taste.rawValue
+      $0.setTitle(ControlType.taste.rawValue, for: .normal)
       applySelectUI(to: $0, type: .taste)
     }
     
     recordButton.do {
-      $0.titleLabel?.text = ControlType.record.rawValue
+      $0.setTitle(ControlType.record.rawValue, for: .normal)
       applySelectUI(to: $0, type: .record)
     }
     
     bookmarkButton.do {
-      $0.titleLabel?.text = ControlType.bookmark.rawValue
+      $0.setTitle(ControlType.bookmark.rawValue, for: .normal)
       applySelectUI(to: $0, type: .bookmark)
+    }
+    
+    underDivider.do {
+      $0.backgroundColor = CommonAsset.recordyGrey01.color
     }
   }
   
@@ -113,28 +108,12 @@ public final class ProfileSegmentControllView: UIView {
       $0.verticalEdges.equalToSuperview()
     }
   }
+  
   private func updateView() {
-    switch selectedTab {
-    case .taste:
-      // 내 취향 탭을 선택했을 때
-      let tasteVC = TasteViewController()
-      parentViewController?.addChild(tasteVC)
-      self.addSubview(tasteVC.view)
-      tasteVC.view.frame = self.bounds
-      tasteVC.didMove(toParent: parentViewController)
-    case .record:
-      // 내 기록 탭을 선택했을 때
-      break
-    case .bookmark:
-      // 북마크 탭을 선택했을 때
-      break
-    }
+    // 선택된 탭에 따라 다른 뷰를 표시
   }
-}
-
-
-private extension ProfileSegmentControllView {
-  func applySelectUI(to button: UIButton, type: ControlType) {
+  
+  private func applySelectUI(to button: UIButton, type: ControlType) {
     guard let text = button.titleLabel?.text else { return }
     
     let isSelected = type == self.selectedTab
@@ -144,21 +123,15 @@ private extension ProfileSegmentControllView {
         .font: isSelected ? RecordyFont.body2Bold.font : RecordyFont.body2.font,
         .foregroundColor: isSelected ? CommonAsset.recordyGrey01.color : CommonAsset.recordyGrey04.color
       ],
-      range: NSRange(
-        location: 0,
-        length: attrString.length
-      )
+      range: NSRange(location: 0, length: attrString.length)
     )
-    button.setAttributedTitle(
-      attrString,
-      for: .normal
-    )
+    button.setAttributedTitle(attrString, for: .normal)
     if isSelected {
       moveSelectedLine(below: button)
     }
   }
   
-  func moveSelectedLine(below button: UIButton) {
+  private func moveSelectedLine(below button: UIButton) {
     UIView.animate(withDuration: 0.2) {
       self.underDivider.snp.remakeConstraints {
         $0.horizontalEdges.equalTo(button)
@@ -167,18 +140,5 @@ private extension ProfileSegmentControllView {
       }
       self.layoutIfNeeded()
     }
-  }
-}
-
-extension UIView {
-  var parentViewController: UIViewController? {
-    var parentResponder: UIResponder? = self
-    while parentResponder != nil {
-      parentResponder = parentResponder?.next
-      if let viewController = parentResponder as? UIViewController {
-        return viewController
-      }
-    }
-    return nil
   }
 }

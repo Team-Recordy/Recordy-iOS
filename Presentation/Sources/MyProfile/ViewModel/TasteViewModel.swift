@@ -15,8 +15,11 @@ class TasteViewModel {
   var isEmpty: Bindable<Bool> = Bindable(true)
   
   func fetchTasteData() {
-    //데이터 로직!! 들어갈 자리임
-    let fetchedData: [TasteData] = []
+    let fetchedData: [TasteData] = [
+//      TasteData(title: "집중하기 좋은", percentage: 66),
+//      TasteData(title: "집중하기 좋은", percentage: 22),
+//      TasteData(title: "집중하기 좋은", percentage: 10)
+    ]    
     tasteData.value = fetchedData
     isEmpty.value = fetchedData.isEmpty
   }

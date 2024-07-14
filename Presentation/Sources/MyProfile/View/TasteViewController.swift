@@ -5,7 +5,6 @@
 //  Created by 송여경 on 7/15/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
-
 import UIKit
 import SnapKit
 import Then
@@ -19,6 +18,8 @@ public class TasteViewController: UIViewController {
   private let emptyView = UIView()
   private let dataView = UIView()
   
+  let profileInfoView = ProfileInfoView()
+  let segmentControlView = ProfileSegmentControllView()
   let emptyImageView = UIImageView()
   let emptyLabel = UIImageView()
   let actionButton = UIButton()
@@ -36,8 +37,25 @@ public class TasteViewController: UIViewController {
   public func setUI() {
     view.backgroundColor = .black
     
+    view.addSubview(profileInfoView)
+    view.addSubview(segmentControlView)
+    view.addSubview(emptyView)
+    view.addSubview(dataView)
+    
+    profileInfoView.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+      $0.leading.trailing.equalToSuperview()
+      $0.width.equalTo(335.adaptiveWidth)
+      $0.height.equalTo(52.adaptiveHeight)
+    }
+    
+    segmentControlView.snp.makeConstraints {
+      $0.top.equalTo(profileInfoView.snp.bottom).offset(35)
+      $0.leading.trailing.equalToSuperview()
+    }
+    
     emptyImageView.do {
-      $0.image = CommonAsset.bubbleChecked21.image
+      $0.image = CommonAsset.mypagebubble.image
       $0.contentMode = .scaleAspectFit
     }
     
@@ -61,10 +79,9 @@ public class TasteViewController: UIViewController {
     emptyView.addSubview(emptyLabel)
     emptyView.addSubview(actionButton)
     emptyView.addSubview(bottomMessage)
-    view.addSubview(emptyView)
     
     emptyImageView.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(331)
+      $0.top.equalToSuperview().offset(78)
       $0.centerX.equalToSuperview()
       $0.leading.equalToSuperview().offset(138)
       $0.width.height.equalTo(100)
@@ -88,16 +105,16 @@ public class TasteViewController: UIViewController {
     }
     
     emptyView.snp.makeConstraints {
-      $0.edges.equalToSuperview()
+      $0.top.equalTo(segmentControlView.snp.bottom).offset(18)
+      $0.leading.trailing.equalToSuperview()
     }
     
-    
-    view.addSubview(dataView)
     dataView.snp.makeConstraints {
-      $0.edges.equalToSuperview()
+      $0.top.equalTo(segmentControlView.snp.bottom).offset(20)
+      $0.leading.trailing.equalToSuperview()
     }
     
-    //데이터를 표시하는 뷰 구성 요소 - 추후 추가 해주어야 함
+    // 데이터를 표시하는 뷰 구성 요소 - 추후 추가 해주어야 함
   }
   
   public func bindViewModel() {
