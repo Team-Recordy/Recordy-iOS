@@ -11,4 +11,5 @@ import Foundation
 public struct TasteData {
   let title: String
   let percentage: Int
+  let type: TasteCase
 }

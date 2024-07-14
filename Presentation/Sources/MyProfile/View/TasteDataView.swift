@@ -15,9 +15,16 @@ class TasteDataView: UIView {
   
   private let titleLabel = UILabel()
   private let percentageLabel = UILabel()
+  private let tasteType: TasteCase
   
-  override init(frame: CGRect) {
-    super.init(frame: frame)
+  public init(
+    frame: CGRect = .zero,
+    type: TasteCase
+  ) {
+    self.tasteType = type
+    super.init(
+      frame: frame
+    )
     setupUI()
   }
   
@@ -39,11 +46,11 @@ class TasteDataView: UIView {
       $0.top.equalTo(titleLabel.snp.bottom).offset(8)
     }
     
-    titleLabel.font = RecordyFont.keyword1.font
+    titleLabel.font = tasteType.title
     titleLabel.textColor = .white
     titleLabel.textAlignment = .center
     
-    percentageLabel.font = RecordyFont.number1.font
+    percentageLabel.font = tasteType.subtitle
     percentageLabel.textColor = .white
     percentageLabel.textAlignment = .center
   }
