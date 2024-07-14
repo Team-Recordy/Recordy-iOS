@@ -31,6 +31,10 @@ public class VideoFeedViewController: UIViewController {
     fetchInitialVideos()
   }
 
+  private func setStyle() {
+    self.view.backgroundColor = CommonAsset.recordyBG.color
+  }
+
   private func setUI() {
     self.view.addSubview(collectionView!)
     self.view.addSubview(recordyToggle)
@@ -61,6 +65,7 @@ public class VideoFeedViewController: UIViewController {
     self.collectionView!.showsVerticalScrollIndicator = false
     self.collectionView!.contentInsetAdjustmentBehavior = .never
     self.collectionView!.isPagingEnabled = true
+    self.collectionView!.backgroundColor = CommonAsset.recordyBG.color
     self.collectionView!.register(
       FeedCell.self,
       forCellWithReuseIdentifier: FeedCell.cellIdentifier
