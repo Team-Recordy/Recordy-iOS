@@ -9,6 +9,7 @@
 import Foundation
 
 import Common
+import Core
 
 class FollowerViewModel {
   var followers: Bindable<[Follower]> = Bindable([])
@@ -30,21 +31,3 @@ class FollowerViewModel {
   }
 }
 
-class Bindable<T> {
-  var value: T {
-    didSet {
-      observer?(value)
-    }
-  }
-  
-  private var observer: ((T) -> Void)?
-  
-  init(_ value: T) {
-    self.value = value
-  }
-  
-  func bind(_ observer: @escaping (T) -> Void) {
-    self.observer = observer
-    observer(value)
-  }
-}
