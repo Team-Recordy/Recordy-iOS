@@ -88,6 +88,9 @@ public class FollowerViewController: UIViewController, UITableViewDataSource, UI
     let cell = tableView.dequeueReusableCell(withIdentifier: "FollowerCell", for: indexPath) as! FollowerCell
     let follower = viewModel.followers.value[indexPath.row]
     cell.configure(with: follower)
+    cell.followButtonAction = { [weak self] in
+      self?.viewModel.toggleFollow(at: indexPath.row)
+    }
     return cell
   }
 }
@@ -96,6 +99,8 @@ public class FollowerCell: UITableViewCell {
   let profileImageView = UIImageView()
   let usernameLabel = UILabel()
   let followButton = MediumButton()
+  
+  var followButtonAction: (() -> Void)?
   
   public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -106,11 +111,18 @@ public class FollowerCell: UITableViewCell {
     
     setStyle()
     setAutoLayout()
+    
+    followButton.addTarget(self, action: #selector(followButtonTapped), for: .touchUpInside)
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
+  
+  @objc private func followButtonTapped() {
+    followButtonAction?()
+  }
+  
   public func setStyle() {
     usernameLabel.font = RecordyFont.body2Bold.font
     usernameLabel.textColor = CommonAsset.recordyGrey01.color
@@ -143,7 +155,6 @@ public class FollowerCell: UITableViewCell {
     profileImageView.image = follower.profileImage
     usernameLabel.text = follower.username
     followButton.setTitle(follower.isFollowing ? "팔로잉" : "팔로우", for: .normal)
-    
     followButton.mediumState = follower.isFollowing ? .active : .inactive
   }
 }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+
 import Common
 
 class FollowerViewModel {
@@ -15,11 +16,17 @@ class FollowerViewModel {
   
   func fetchFollowers() {
     let fetchedFollowers: [Follower] = [
-      Follower(username: "닉네임", isFollowing: false, profileImage: CommonAsset.profileImage.image),
-      Follower(username: "닉네임", isFollowing: true, profileImage: CommonAsset.profileImage.image),
+      Follower(username: "닉네임1", isFollowing: false, profileImage: CommonAsset.profileImage.image),
+      Follower(username: "닉네임2", isFollowing: true, profileImage: CommonAsset.profileImage.image),
     ]
     followers.value = fetchedFollowers
     isEmpty.value = fetchedFollowers.isEmpty
+  }
+  
+  func toggleFollow(at index: Int) {
+    guard index < followers.value.count else { return }
+    followers.value[index].isFollowing.toggle()
+    followers.value = followers.value
   }
 }
 

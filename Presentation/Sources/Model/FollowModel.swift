@@ -10,6 +10,6 @@ import UIKit
 
 struct Follower {
   let username: String
-  let isFollowing: Bool
+  var isFollowing: Bool
   let profileImage : UIImage
 }
