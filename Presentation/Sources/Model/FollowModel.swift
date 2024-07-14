@@ -6,4 +6,10 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 
-import Foundation
+import UIKit
+
+struct Follower {
+  let username: String
+  let isFollowing: Bool
+  let profileImage : UIImage
+}

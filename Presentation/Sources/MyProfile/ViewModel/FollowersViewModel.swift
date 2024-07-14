@@ -7,16 +7,16 @@
 //
 
 import Foundation
+import Common
 
-
-class FollowersViewModel {
+class FollowerViewModel {
   var followers: Bindable<[Follower]> = Bindable([])
   var isEmpty: Bindable<Bool> = Bindable(true)
   
   func fetchFollowers() {
     let fetchedFollowers: [Follower] = [
-      Follower(username: "닉네임", isFollowing: false),
-      Follower(username: "닉네임", isFollowing: true)
+      Follower(username: "닉네임", isFollowing: false, profileImage: CommonAsset.profileImage.image),
+      Follower(username: "닉네임", isFollowing: true, profileImage: CommonAsset.profileImage.image),
     ]
     followers.value = fetchedFollowers
     isEmpty.value = fetchedFollowers.isEmpty
