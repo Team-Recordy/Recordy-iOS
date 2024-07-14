@@ -17,6 +17,10 @@ import Then
 import RxSwift
 import RxRelay
 
+protocol SelectVideoDelegate: AnyObject {
+  func selectVideo(_ data: PHAsset)
+}
+
 public class SelectVideoViewController: UIViewController {
 
   private let warningLabel = UILabel().then {
@@ -24,16 +28,11 @@ public class SelectVideoViewController: UIViewController {
     $0.textColor = CommonAsset.recordyGrey03.color
     $0.font = RecordyFont.caption1.font
   }
-  private let nextButton = UIButton().then {
-    $0.setTitle("다음", for: .normal)
-    $0.titleLabel?.font = RecordyFont.button1.font
-    $0.setTitleColor(.white, for: .normal)
-    $0.backgroundColor = .black
-    $0.cornerRadius(12)
-  }
+
   var collectionView: UICollectionView? = nil
   var assets: [PHAsset] = []
   var viewModel = SelectVideoViewModel()
+  weak var delegate: SelectVideoDelegate?
 
   private let disposeBag = DisposeBag()
   private let fetchVideosRelay = PublishRelay<Void>()
@@ -55,20 +54,9 @@ public class SelectVideoViewController: UIViewController {
   private func setUI() {
     self.view.addSubview(self.warningLabel)
     self.view.addSubview(self.collectionView!)
-    self.view.addSubview(self.nextButton)
-    nextButton.addTarget(
-      self,
-      action: #selector(nextButtonTapped),
-      for: .touchUpInside
-    )
   }
 
   private func setAutoLayout() {
-    self.nextButton.snp.makeConstraints {
-      $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-14.adaptiveHeight)
-      $0.horizontalEdges.equalToSuperview().inset(20.adaptiveWidth)
-      $0.height.equalTo(54.adaptiveHeight)
-    }
     self.warningLabel.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide).offset(9.adaptiveHeight)
       $0.centerX.equalToSuperview()
@@ -105,8 +93,8 @@ public class SelectVideoViewController: UIViewController {
           cellIdentifier: VideoCell.cellIdentifier,
           cellType: VideoCell.self
         )
-      ) { (row, asset, cell) in
-        cell.bind(asset: asset)
+      ) { (row, localVideo, cell) in
+        cell.bind(localVideo: localVideo)
         cell.setSelected(
           self.viewModel.isSelected(
             indexPath: IndexPath(
@@ -130,7 +118,6 @@ public class SelectVideoViewController: UIViewController {
       .bind(to: selectedVideoRelay)
       .disposed(by: disposeBag)
 
-
     output.selectedIndexPath
       .drive { [weak self] indexPath in
         self?.collectionView!.reloadData()
@@ -139,24 +126,19 @@ public class SelectVideoViewController: UIViewController {
 
     fetchVideosRelay.accept(())
   }
-  
-  @objc private func nextButtonTapped() {
-    guard let indexPath = viewModel.selectedIndexPathRelay.value
-    else { return }
-    let asset = viewModel.assetsRelay.value[indexPath.row]
-    let uploadVideoViewModel = UploadVideoViewModel(asset: asset)
-    let uploadViewController = UploadVideoViewController(
-      viewModel: uploadVideoViewModel
-    )
-    self.navigationController?.pushViewController(
-      uploadViewController,
-      animated: true
-    )
-  }
 
 }
 
 extension SelectVideoViewController: UICollectionViewDelegateFlowLayout {
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    didSelectItemAt indexPath: IndexPath
+  ) {
+    let localVideo = viewModel.assetsRelay.value[indexPath.row]
+    delegate?.selectVideo(localVideo.asset)
+    self.dismiss(animated: true)
+  }
+
   public func collectionView(
     _ collectionView: UICollectionView,
     layout collectionViewLayout: UICollectionViewLayout,

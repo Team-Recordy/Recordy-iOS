@@ -8,4 +8,4 @@
 
 import Foundation
 
-protocol Request: Encodable { }
+protocol BaseRequest: Encodable { }

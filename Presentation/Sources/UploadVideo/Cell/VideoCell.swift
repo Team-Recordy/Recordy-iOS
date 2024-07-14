@@ -10,12 +10,17 @@ import UIKit
 import Photos
 
 import Core
+import Common
 
 import SnapKit
 
 class VideoCell: UICollectionViewCell {
   private let previewImageView = UIImageView().then {
     $0.contentMode = .scaleToFill
+  }
+  private let playtimeLabel = UILabel().then {
+    $0.font = RecordyFont.caption2.font
+    $0.textColor = CommonAsset.recordyWhite.color
   }
 
   override init(frame: CGRect) {
@@ -30,17 +35,23 @@ class VideoCell: UICollectionViewCell {
   
   private func setUI() {
     self.addSubview(previewImageView)
+    self.addSubview(playtimeLabel)
   }
   
   private func setAutoLayout() {
     previewImageView.snp.makeConstraints {
       $0.verticalEdges.horizontalEdges.equalToSuperview()
     }
+    playtimeLabel.snp.makeConstraints {
+      $0.bottom.equalToSuperview().inset(4)
+      $0.trailing.equalToSuperview().inset(6)
+    }
   }
   
-  func bind(asset: PHAsset) {
-    let assetImage = PhotoKitManager.getAssetThumbnail(asset: asset, size: bounds.size)
+  func bind(localVideo: LocalVideo) {
+    let assetImage = PhotoKitManager.getAssetThumbnail(asset: localVideo.asset, size: bounds.size)
     previewImageView.image = assetImage
+    playtimeLabel.text = localVideo.playtime
   }
 
   func setSelected(_ selected: Bool) {

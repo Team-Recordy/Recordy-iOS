@@ -13,7 +13,9 @@ import Core
 import SnapKit
 import Then
 
-//TODO: Delegate로 선택 키워드 넘겨버리기~
+public protocol FilteringDelegate: AnyObject {
+  func selectKeywords(_ keywords: [Keyword])
+}
 
 public class RecordyFilteringViewController: UIViewController {
 
@@ -24,6 +26,7 @@ public class RecordyFilteringViewController: UIViewController {
 
   let keywords = Keyword.allCases
   var selectedKeywords: [Keyword] = []
+  weak public var delegate: FilteringDelegate?
 
   public override func viewDidLoad() {
     super.viewDidLoad()
@@ -43,6 +46,11 @@ public class RecordyFilteringViewController: UIViewController {
     }
     self.closeButton.do {
       $0.setImage(CommonAsset.closeButton.image, for: .normal)
+      $0.addTarget(
+        self,
+        action: #selector(closeButtonTapped),
+        for: .touchUpInside
+      )
     }
     self.applyButton.do {
       $0.backgroundColor = CommonAsset.recordyMain.color
@@ -50,6 +58,11 @@ public class RecordyFilteringViewController: UIViewController {
       $0.setTitleColor(CommonAsset.recordyGrey09.color, for: .normal)
       $0.titleLabel?.font = RecordyFont.button2.font
       $0.cornerRadius(8)
+      $0.addTarget(
+        self, 
+        action: #selector(applyButtonTapped), 
+        for: .touchUpInside
+      )
     }
   }
 
@@ -119,6 +132,15 @@ public class RecordyFilteringViewController: UIViewController {
       }
     }
     self.collectionView!.reloadData()
+  }
+
+  @objc func applyButtonTapped() {
+    delegate?.selectKeywords(selectedKeywords)
+    self.dismiss(animated: true)
+  }
+
+  @objc func closeButtonTapped() {
+    self.dismiss(animated: true)
   }
 }
 
