@@ -15,14 +15,14 @@ enum ChipState {
   case inactive
 }
 
-class ChipKeyWordButton: UIButton {
+public class ChipKeyWordButton: UIButton {
   var chipstate: ChipState = .inactive {
     didSet {
       updateChipAppearance()
     }
   }
   
-  override init(frame: CGRect) {
+  public override init(frame: CGRect) {
     super.init(frame: frame)
     setUI()
   }
