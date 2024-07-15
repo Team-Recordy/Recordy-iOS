@@ -5,11 +5,11 @@
       "scale" : "1x"
     },
     {
+      "filename" : "homeRottie.svg",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "bookmarkUnselected.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
