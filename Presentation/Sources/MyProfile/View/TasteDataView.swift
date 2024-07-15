@@ -43,7 +43,7 @@ class TasteDataView: UIView {
     
     percentageLabel.snp.makeConstraints {
       $0.centerX.equalToSuperview()
-      $0.top.equalTo(titleLabel.snp.bottom).offset(8)
+      $0.top.equalTo(titleLabel.snp.bottom).offset(4)
     }
     
     titleLabel.font = tasteType.title

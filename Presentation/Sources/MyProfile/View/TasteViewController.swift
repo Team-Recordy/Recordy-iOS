@@ -125,6 +125,7 @@ public class TasteViewController: UIViewController {
     backgroundImageView.snp.makeConstraints {
       $0.top.equalTo(segmentControlView.snp.bottom).offset(47)
       $0.edges.equalToSuperview()
+      $0.width.height.equalTo(374)
     }
   }
   
@@ -161,26 +162,33 @@ public class TasteViewController: UIViewController {
       dataView.addSubview(secondDataView)
       dataView.addSubview(thirdDataView)
       
+      let bubbleCenters = [
+        CGPoint(x: 0.4, y: 0.6),
+        CGPoint(x: 0.8, y: 0.4),
+        CGPoint(x: 0.5, y: 0.8)
+      ]
+      
       firstDataView.snp.makeConstraints {
-        $0.top.equalTo(segmentControlView.snp.bottom).offset(189)
-        $0.leading.equalToSuperview().offset(100)
-        $0.width.equalTo(107)
-        $0.height.equalTo(75)
+        $0.centerX.equalToSuperview().multipliedBy(bubbleCenters[0].x * 2)
+        $0.centerY.equalToSuperview().multipliedBy(bubbleCenters[0].y * 1.65)
+        $0.width.equalTo(200)
+        $0.height.equalTo(200)
       }
       
       secondDataView.snp.makeConstraints {
-        $0.top.equalTo(segmentControlView.snp.bottom).offset(112)
-        $0.leading.equalToSuperview().offset(229)
-        $0.width.equalTo(71)
-        $0.height.equalTo(63)
+        $0.centerX.equalToSuperview().multipliedBy(bubbleCenters[1].x * 1.75)
+        $0.centerY.equalToSuperview().multipliedBy(bubbleCenters[1].y * 1.4)
+        $0.width.equalTo(150)
+        $0.height.equalTo(150)
       }
       
       thirdDataView.snp.makeConstraints {
-        $0.top.equalTo(secondDataView.snp.bottom).offset(141)
-        $0.leading.equalToSuperview().offset(211)
-        $0.width.equalTo(60)
-        $0.height.equalTo(53)
+        $0.centerX.equalToSuperview().multipliedBy(bubbleCenters[2].x * 2.574)
+        $0.centerY.equalToSuperview().multipliedBy(bubbleCenters[2].y * 1.95)
+        $0.width.equalTo(100)
+        $0.height.equalTo(100)
       }
     }
   }
 }
+
