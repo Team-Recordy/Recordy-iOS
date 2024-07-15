@@ -101,7 +101,6 @@ final class LoginView: UIView {
     appleStackView.addArrangedSubview(appleLogo)
     appleStackView.addArrangedSubview(appleButtonText)
     appleLoginButton.addSubview(appleStackView)
-
   }
   
   func setAutoLayout() {

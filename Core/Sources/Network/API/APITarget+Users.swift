@@ -11,8 +11,8 @@ import Foundation
 import Moya
 
 extension APITarget {
-  enum Users {
-    case signIn
+  public enum Users {
+    case signIn(DTO.SignInRequest)
     case signUp
     case signOut
     case checkNickname
@@ -24,11 +24,11 @@ extension APITarget {
 }
 
 extension APITarget.Users: TargetType {
-  var baseURL: URL {
-    return URL(string: "BASE_URL + /users")!
+  public var baseURL: URL {
+    return URL(string: BaseURL.string + "/users")!
   }
 
-  var path: String {
+  public var path: String {
     switch self {
     case .signIn:
       "signIn"
@@ -49,7 +49,7 @@ extension APITarget.Users: TargetType {
     }
   }
 
-  var method: Moya.Method {
+  public var method: Moya.Method {
     switch self {
     case .signIn:
       return .post
@@ -70,11 +70,28 @@ extension APITarget.Users: TargetType {
     }
   }
 
-  var task: Moya.Task {
-    return .requestPlain
+  public var task: Moya.Task {
+    switch self {
+    case .signIn(let signInRequest):
+      return .requestParameters(
+        parameters: ["platformType": signInRequest.platformType.rawValue],
+        encoding: JSONEncoding.default
+      )
+    default:
+      return .requestPlain
+    }
   }
 
-  var headers: [String : String]? {
-    return ["Content-Type": "application/json"]
+  public var headers: [String : String]? {
+    switch self {
+    case .signIn(let signInRequest):
+      return [
+        "Content-Type": "application/json",
+        "Authorization": signInRequest.authorization
+      ]
+    default:
+      return ["Content-Type": "application/json"]
+    }
+
   }
 }

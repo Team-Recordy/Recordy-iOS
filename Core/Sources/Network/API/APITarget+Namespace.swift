@@ -8,4 +8,4 @@
 
 import Foundation
 
-enum APITarget { }
+public enum APITarget { }
