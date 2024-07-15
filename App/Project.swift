@@ -37,7 +37,11 @@ let infoPlist: [String: Plist.Value] = [
     "kakao$(KAKAO_NATIVE_APP_KEY)"
   ],
   "KAKAO_NATIVE_APP_KEY": "$(KAKAO_NATIVE_APP_KEY)",
-  "NSPhotoLibraryUsageDescription": "앱에서 사진 라이브러리에 접근하려면 권한이 필요합니다."
+  "BASE_URL": "$(BASE_URL)",
+  "NSPhotoLibraryUsageDescription": "앱에서 사진 라이브러리에 접근하려면 권한이 필요합니다.",
+  "NSAppTransportSecurity": [
+    "NSAllowsArbitraryLoads": true
+  ]
 ]
 
 private let settings = Settings.settings(configurations: [
@@ -57,8 +61,6 @@ let project = Project.makeModule(
   resources: ["Resources/**"],
   entitlements: .file(path: "App.entitlements"),
   dependencies: [
-    .Project.Common,
-    .Project.Core,
     .Project.Presentation,
     .external(name: "KakaoSDKAuth", condition: .none),
     .external(name: "KakaoSDKCommon", condition: .none),

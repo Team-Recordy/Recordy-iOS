@@ -20,6 +20,7 @@ import Then
 @available(iOS 16.0, *)
 public class UploadVideoViewController: UIViewController {
 
+  private let gradientView = RecordyGradientView()
   private let warningLabel = UILabel()
   private let scrollView = UIScrollView()
   private let contentView = UIView()
@@ -54,7 +55,11 @@ public class UploadVideoViewController: UIViewController {
   }
 
   private func setStyle() {
+    self.title = "내용 작성"
     self.view.backgroundColor = CommonAsset.recordyBG.color
+    scrollView.do {
+      $0.backgroundColor = .clear
+    }
     warningLabel.do {
       $0.text = "ⓘ 주제와 무관한 기록은 무통보로 삭제될 수 있습니다."
       $0.textColor = CommonAsset.recordyGrey03.color
@@ -108,6 +113,7 @@ public class UploadVideoViewController: UIViewController {
   }
 
   private func setUI() {
+    self.view.addSubview(gradientView)
     self.view.addSubview(scrollView)
     self.scrollView.addSubview(contentView)
     self.videoThumbnailView.addSubviews(
@@ -132,8 +138,13 @@ public class UploadVideoViewController: UIViewController {
   }
 
   private func setAutolayout() {
+    self.gradientView.snp.makeConstraints {
+      $0.top.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(400.adaptiveHeight)
+    }
     self.scrollView.snp.makeConstraints {
-      $0.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+      $0.top.equalTo(view.safeAreaLayoutGuide)
+      $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
       $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-12.adaptiveHeight)
     }
     self.contentView.snp.makeConstraints {
@@ -266,9 +277,11 @@ public class UploadVideoViewController: UIViewController {
   }
 
   @objc func videoThumbnailSelectButtonTapped() {
-    let modalViewController = SelectVideoViewController()
-    modalViewController.delegate = self
-    self.present(modalViewController, animated: true)
+    let selectVideoViewController = SelectVideoViewController()
+    selectVideoViewController.delegate = self
+    let navigationController = BaseNavigationController(rootViewController: selectVideoViewController)
+    navigationController.modalPresentationStyle = .fullScreen
+    self.present(navigationController, animated: true)
   }
 
   @objc func selectedKeywordButtonTapped() {

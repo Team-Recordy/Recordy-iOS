@@ -41,6 +41,8 @@ final class NicknameView: UIView {
     nextButton.do {
       $0.setTitle("다음", for: .normal)
     }
+    
+    nicknameTextField.stateDelegate = self
   }
   
   func setUI() {
@@ -68,9 +70,19 @@ final class NicknameView: UIView {
       $0.bottom.equalTo(safeAreaLayoutGuide).inset(14)
       $0.height.equalTo(54.adaptiveHeight)
     }
-
-    
   }
 }
 
-
+extension NicknameView: RecordyTextFieldStateDelegate {
+  func state(_ currentState: Common.RecordyTextFieldState) {
+    nicknameTextField.layer.borderColor = currentState.borderColor.cgColor
+    nicknameTextField.layer.borderWidth = currentState.borderWidth
+    
+    switch currentState {
+    case .unselected, .error:
+      nextButton.buttonState = .inactive
+    case .selected:
+      nextButton.buttonState = .active
+    }
+  }
+}

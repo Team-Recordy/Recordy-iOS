@@ -21,6 +21,7 @@ let project = Project.makeModule(
     .external(name: "SnapKit", condition: .none),
     .external(name: "Then", condition: .none),
     .external(name: "RxSwift", condition: .none),
-    .external(name: "RxCocoa", condition: .none)
+    .external(name: "RxCocoa", condition: .none),
+    .external(name: "Lottie", condition: .none)
   ]
 )
