@@ -103,11 +103,11 @@ public class RecordyToggle: UIButton {
   func update() {
     UIView.animate(withDuration: 0.3) {
       if self.toggleState == .all {
-        self.leftStateView.backgroundColor = .clear
-        self.rightStateView.backgroundColor = CommonAsset.recordyGrey08.color
-      } else {
         self.leftStateView.backgroundColor = CommonAsset.recordyGrey08.color
         self.rightStateView.backgroundColor = .clear
+      } else {
+        self.leftStateView.backgroundColor = .clear
+        self.rightStateView.backgroundColor = CommonAsset.recordyGrey08.color
       }
     }
   }
