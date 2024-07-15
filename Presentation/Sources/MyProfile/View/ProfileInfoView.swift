@@ -124,8 +124,9 @@ public class ProfileInfoView: UIView {
     }
     
     userName.snp.makeConstraints {
-      $0.top.equalTo(profileImage)
+      $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(21)
       $0.leading.equalTo(profileImage.snp.trailing).offset(12)
+      $0.height.equalTo(28)
       $0.trailing.equalToSuperview().inset(20)
     }
     
