@@ -14,14 +14,14 @@ import Then
 public class MypageRecordButton: UIButton {
   public override init (frame: CGRect) {
     super.init(frame: frame)
-    setUI()
+    setStyle()
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
-  public func setUI() {
+  public func setStyle() {
     layer.cornerRadius = 30
     titleLabel?.font = RecordyFont.button2.font
   }

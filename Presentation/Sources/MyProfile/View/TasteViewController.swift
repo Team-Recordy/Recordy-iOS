@@ -4,7 +4,8 @@
 //
 //  Created by 송여경 on 7/15/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
-//
+//  setStyle() -> setUI() -> setAutoLayout()
+
 import UIKit
 import SnapKit
 import Then
@@ -29,31 +30,16 @@ public class TasteViewController: UIViewController {
   public override func viewDidLoad() {
     super.viewDidLoad()
     
+    setStyle()
     setUI()
+    setAutoLayout()
     bindViewModel()
     
     viewModel.fetchTasteData()
   }
   
-  public func setUI() {
+  private func setStyle() {
     view.backgroundColor = .black
-    
-    view.addSubview(profileInfoView)
-    view.addSubview(segmentControlView)
-    view.addSubview(emptyView)
-    view.addSubview(dataView)
-    
-    profileInfoView.snp.makeConstraints {
-      $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-      $0.leading.trailing.equalToSuperview()
-      $0.width.equalTo(335.adaptiveWidth)
-      $0.height.equalTo(52.adaptiveHeight)
-    }
-    
-    segmentControlView.snp.makeConstraints {
-      $0.top.equalTo(profileInfoView.snp.bottom).offset(35)
-      $0.leading.trailing.equalToSuperview()
-    }
     
     emptyImageView.do {
       $0.image = CommonAsset.mypagebubble.image
@@ -76,10 +62,38 @@ public class TasteViewController: UIViewController {
       $0.textColor = CommonAsset.recordyGrey03.color
     }
     
+    backgroundImageView.do {
+      $0.image = CommonAsset.bubbleBackImg.image
+      $0.contentMode = .scaleAspectFit
+    }
+  }
+  
+  private func setUI() {
+    view.addSubview(profileInfoView)
+    view.addSubview(segmentControlView)
+    view.addSubview(emptyView)
+    view.addSubview(dataView)
+    
     emptyView.addSubview(emptyImageView)
     emptyView.addSubview(emptyLabel)
     emptyView.addSubview(actionButton)
     emptyView.addSubview(bottomMessage)
+    
+    dataView.addSubview(backgroundImageView)
+  }
+  
+  private func setAutoLayout() {
+    profileInfoView.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+      $0.leading.trailing.equalToSuperview()
+      $0.width.equalTo(335.adaptiveWidth)
+      $0.height.equalTo(52.adaptiveHeight)
+    }
+    
+    segmentControlView.snp.makeConstraints {
+      $0.top.equalTo(profileInfoView.snp.bottom).offset(35)
+      $0.leading.trailing.equalToSuperview()
+    }
     
     emptyImageView.snp.makeConstraints {
       $0.top.equalToSuperview().offset(78)
@@ -115,13 +129,6 @@ public class TasteViewController: UIViewController {
       $0.leading.trailing.equalToSuperview()
     }
     
-    backgroundImageView.do {
-      $0.image = CommonAsset.bubbleBackImg.image
-      $0.contentMode = .scaleAspectFit
-    }
-    
-    dataView.addSubview(backgroundImageView)
-    
     backgroundImageView.snp.makeConstraints {
       $0.top.equalTo(segmentControlView.snp.bottom).offset(47)
       $0.edges.equalToSuperview()
@@ -129,7 +136,7 @@ public class TasteViewController: UIViewController {
     }
   }
   
-  public func bindViewModel() {
+  private func bindViewModel() {
     viewModel.isEmpty.bind { [weak self] isEmpty in
       self?.emptyView.isHidden = !isEmpty
       self?.dataView.isHidden = isEmpty
@@ -144,7 +151,7 @@ public class TasteViewController: UIViewController {
     print("기록하러 가기 버튼 눌렸을 때다.")
   }
   
-  public func updateDataView() {
+  private func updateDataView() {
     dataView.subviews.forEach { if $0 != backgroundImageView { $0.removeFromSuperview() } }
     
     let dataViews = viewModel.tasteData.value.map { data -> TasteDataView in
@@ -191,4 +198,3 @@ public class TasteViewController: UIViewController {
     }
   }
 }
-

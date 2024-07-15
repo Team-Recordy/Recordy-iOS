@@ -25,17 +25,31 @@ class TasteDataView: UIView {
     super.init(
       frame: frame
     )
-    setupUI()
+    setUI()
+    setStyle()
+    setAutolayout()
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
-  private func setupUI() {
+  private func setUI() {
     addSubview(titleLabel)
     addSubview(percentageLabel)
+  }
+  
+  private func setStyle() {
+    titleLabel.font = tasteType.title
+    titleLabel.textColor = .white
+    titleLabel.textAlignment = .center
     
+    percentageLabel.font = tasteType.subtitle
+    percentageLabel.textColor = .white
+    percentageLabel.textAlignment = .center
+  }
+  
+  private func setAutolayout() {
     titleLabel.snp.makeConstraints {
       $0.centerX.equalToSuperview()
       $0.centerY.equalToSuperview().offset(-10)
@@ -45,14 +59,6 @@ class TasteDataView: UIView {
       $0.centerX.equalToSuperview()
       $0.top.equalTo(titleLabel.snp.bottom).offset(4)
     }
-    
-    titleLabel.font = tasteType.title
-    titleLabel.textColor = .white
-    titleLabel.textAlignment = .center
-    
-    percentageLabel.font = tasteType.subtitle
-    percentageLabel.textColor = .white
-    percentageLabel.textAlignment = .center
   }
   
   func configure(with data: TasteData) {

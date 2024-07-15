@@ -46,10 +46,22 @@ class TasteViewModel {
   
   func fetchTasteData() {
     let fetchedData: [TasteData] = [
-      TasteData(title: "집중하기 좋은", percentage: 66, type: .large),
-      TasteData(title: "분위기 좋은", percentage: 22, type: .medium),
-      TasteData(title: "클래식한", percentage: 10, type: .small)
-    ]    
+      TasteData(
+        title: "집중하기 좋은",
+        percentage: 66,
+        type: .large
+      ),
+      TasteData(
+        title: "분위기 좋은",
+        percentage: 22,
+        type: .medium
+      ),
+      TasteData(
+        title: "클래식한",
+        percentage: 10,
+        type: .small
+      )
+    ]
     tasteData.value = fetchedData
     isEmpty.value = fetchedData.isEmpty
   }

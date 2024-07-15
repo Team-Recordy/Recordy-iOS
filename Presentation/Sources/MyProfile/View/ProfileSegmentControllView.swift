@@ -4,7 +4,8 @@
 //
 //  Created by 송여경 on 7/10/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
-//
+// setStyle() -> setUI() -> setAutoLayout()
+
 import UIKit
 
 import SnapKit
@@ -22,8 +23,8 @@ public final class ProfileSegmentControllView: UIView {
   
   private var selectedTab: ControlType = .taste {
     didSet {
-      setupStyle()
-      updateView()
+      setStyle()
+      setTabUI()
     }
   }
   
@@ -54,28 +55,22 @@ public final class ProfileSegmentControllView: UIView {
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
-    setUpViews()
-    setUpLayout()
-    setupStyle()
-    setUpConstraint()
+    setUI()
+    setStyle()
+    setAutoLayout()
+    setTabViews()
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
-  private func setUpViews() {
-    tasteButton.addAction(tapAction, for: .touchUpInside)
-    recordButton.addAction(tapAction, for: .touchUpInside)
-    bookmarkButton.addAction(tapAction, for: .touchUpInside)
-  }
-  
-  private func setUpLayout() {
+  private func setUI() {
     [tasteButton, recordButton, bookmarkButton].forEach { barStack.addArrangedSubview($0) }
     [barStack, underDivider].forEach { addSubview($0) }
   }
   
-  private func setupStyle() {
+  private func setStyle() {
     barStack.do {
       $0.axis = .horizontal
       $0.spacing = 50
@@ -102,14 +97,20 @@ public final class ProfileSegmentControllView: UIView {
     }
   }
   
-  private func setUpConstraint() {
+  private func setAutoLayout() {
     barStack.snp.makeConstraints {
       $0.centerX.equalToSuperview()
       $0.verticalEdges.equalToSuperview()
     }
   }
   
-  private func updateView() {
+  private func setTabViews() {
+    tasteButton.addAction(tapAction, for: .touchUpInside)
+    recordButton.addAction(tapAction, for: .touchUpInside)
+    bookmarkButton.addAction(tapAction, for: .touchUpInside)
+  }
+  
+  private func setTabUI() {
     // 선택된 탭에 따라 다른 뷰를 표시
   }
   
