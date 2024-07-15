@@ -24,12 +24,6 @@ public extension TargetDependency.Project {
       "Core"
     )
   )
-//  static let Data = TargetDependency.project(
-//    target: "Data",
-//    path: .relativeToRoot(
-//      "Data"
-//    )
-//  )
   static let Presentation = TargetDependency.project(
     target: "Presentation",
     path: .relativeToRoot(
