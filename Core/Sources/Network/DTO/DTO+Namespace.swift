@@ -8,4 +8,4 @@
 
 import Foundation
 
-enum DTO { }
+public enum DTO { }
