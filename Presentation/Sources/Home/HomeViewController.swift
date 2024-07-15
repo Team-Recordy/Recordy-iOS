@@ -26,7 +26,7 @@ public final class HomeViewController: UIViewController {
   let recentLabel = UILabel()
   
   let floatingButton = UIButton()
-  let floatingButtonContainer = UIView()
+  let floatingButtonStackView = UIStackView()
   let floatingButtonImage = UIImageView()
   let floatingButtonText = UILabel()
   
@@ -59,29 +59,42 @@ public final class HomeViewController: UIViewController {
       $0.textColor = .white
       $0.numberOfLines = 0
     }
+    
     homeImage.do {
-      $0.image = CommonAsset.homeRottie.image
+      $0.image = CommonAsset.homeImage.image
       $0.contentMode = .scaleAspectFit
     }
+    
     popularLabel.do {
       $0.text = "이번 주 인기 기록"
       $0.font = RecordyFont.subtitle.font
       $0.textColor = CommonAsset.recordyWhite.color
     }
+    
     recentLabel.do {
       $0.text = "방금 막 올라왔어요"
       $0.font = RecordyFont.subtitle.font
       $0.textColor = CommonAsset.recordyWhite.color
     }
+    
+    floatingButtonStackView.do {
+      $0.axis = .horizontal
+      $0.distribution = .fillProportionally
+      $0.alignment = .center
+      $0.spacing = 3
+    }
+    
     floatingButton.do {
       $0.backgroundColor = CommonAsset.recordyMain.color
       $0.cornerRadius(22.adaptiveHeight)
     }
+    
     floatingButtonText.do {
       $0.text = "기록하기"
-      $0.font = RecordyFont.caption2.font
+      $0.font = RecordyFont.button2.font
       $0.textColor = CommonAsset.recordyGrey08.color
     }
+    
     floatingButtonImage.do {
       $0.image = CommonAsset.uploadButton.image
     }
@@ -102,11 +115,9 @@ public final class HomeViewController: UIViewController {
       popularLabel,
       recentLabel
     )
-    floatingButton.addSubview(floatingButtonContainer)
-    floatingButtonContainer.addSubviews(
-      floatingButtonText,
-      floatingButtonImage
-    )
+    floatingButton.addSubview(floatingButtonStackView)
+    floatingButtonStackView.addArrangedSubview(floatingButtonImage)
+    floatingButtonStackView.addArrangedSubview(floatingButtonText)
   }
   
   func setAutoLayout() {
@@ -118,31 +129,30 @@ public final class HomeViewController: UIViewController {
     contentView.snp.makeConstraints {
       $0.edges.equalToSuperview()
       $0.width.equalToSuperview()
-      $0.height.greaterThanOrEqualToSuperview().priority(.low)
+      $0.height.equalTo(950)
     }
     
     homeTitle.snp.makeConstraints {
-      $0.top.equalTo(contentView.safeAreaLayoutGuide).offset(128)
+      $0.top.equalTo(contentView.safeAreaLayoutGuide).offset(117)
       $0.leading.equalToSuperview().offset(20)
     }
     
     homeImage.snp.makeConstraints {
       $0.width.equalTo(140.adaptiveWidth)
-      $0.height.equalTo(140.adaptiveHeight)
-      $0.top.equalTo(contentView.safeAreaLayoutGuide).offset(60)
-      $0.trailing.equalToSuperview().inset(9)
+      $0.height.equalTo(155.adaptiveHeight)
+      $0.top.equalToSuperview().offset(25)
+      $0.trailing.equalToSuperview().inset(16)
     }
     
     keywordCollectionView.snp.makeConstraints {
       $0.top.equalTo(homeTitle.snp.bottom).offset(20)
       $0.height.equalTo(34.adaptiveHeight)
-      $0.leading.equalToSuperview().offset(10)
-      $0.trailing.equalToSuperview()
+      $0.leading.trailing.equalToSuperview().offset(20)
     }
     
     popularLabel.snp.makeConstraints {
-      $0.top.equalTo(keywordCollectionView.snp.bottom).offset(10)
-      $0.leading.equalToSuperview().offset(10)
+      $0.top.equalTo(keywordCollectionView.snp.bottom).offset(34)
+      $0.leading.equalToSuperview().offset(20)
     }
     
     recentLabel.snp.makeConstraints {
@@ -152,15 +162,16 @@ public final class HomeViewController: UIViewController {
     
     popularCollectionView.snp.makeConstraints {
       $0.top.equalTo(popularLabel.snp.bottom).offset(12)
-      $0.leading.trailing.equalToSuperview()
+      $0.leading.equalToSuperview().offset(20)
+      $0.trailing.equalToSuperview()
       $0.height.equalTo(240.adaptiveHeight)
     }
     
     recentCollectionView.snp.makeConstraints {
       $0.top.equalTo(recentLabel.snp.bottom).offset(12)
-      $0.leading.trailing.equalToSuperview()
+      $0.leading.equalToSuperview().offset(20)
+      $0.trailing.equalToSuperview()
       $0.height.equalTo(240.adaptiveHeight)
-      $0.bottom.equalTo(contentView)
     }
     
     floatingButton.snp.makeConstraints {
@@ -170,20 +181,13 @@ public final class HomeViewController: UIViewController {
       $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
     }
     
-    floatingButtonContainer.snp.makeConstraints {
-      $0.edges.equalToSuperview()
+    floatingButtonStackView.snp.makeConstraints {
+      $0.centerX.centerY.equalToSuperview()
     }
     
     floatingButtonImage.snp.makeConstraints {
-      $0.leading.equalToSuperview().offset(14)
-      $0.centerY.equalToSuperview()
       $0.width.equalTo(25.adaptiveWidth)
       $0.height.equalTo(20.adaptiveHeight)
-    }
-    
-    floatingButtonText.snp.makeConstraints {
-      $0.leading.equalTo(floatingButtonImage.snp.trailing).offset(5)
-      $0.centerY.equalToSuperview()
     }
   }
   
@@ -198,6 +202,7 @@ public final class HomeViewController: UIViewController {
       collectionViewLayout: layout
     )
     self.keywordCollectionView.showsVerticalScrollIndicator = false
+    self.keywordCollectionView.showsHorizontalScrollIndicator = false 
     self.keywordCollectionView.register(
       RecordyFilteringCell.self,
       forCellWithReuseIdentifier: RecordyFilteringCell.cellIdentifier
@@ -218,8 +223,8 @@ public final class HomeViewController: UIViewController {
     )
     self.popularCollectionView.showsHorizontalScrollIndicator = false
     self.popularCollectionView.register(
-      PopularCollectionViewCell.self,
-      forCellWithReuseIdentifier: PopularCollectionViewCell.cellIdentifier
+      ThumbnailCollectionViewCell.self,
+      forCellWithReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier
     )
     self.popularCollectionView.delegate = self
     self.popularCollectionView.dataSource = self
@@ -238,8 +243,8 @@ public final class HomeViewController: UIViewController {
     
     self.recentCollectionView.showsHorizontalScrollIndicator = false
     self.recentCollectionView.register(
-      RecentCollectionViewCell.self,
-      forCellWithReuseIdentifier: RecentCollectionViewCell.cellIdentifier
+      ThumbnailCollectionViewCell.self,
+      forCellWithReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier
     )
     self.recentCollectionView.delegate = self
     self.recentCollectionView.dataSource = self
@@ -275,16 +280,16 @@ extension HomeViewController: UICollectionViewDataSource {
     switch collectionView {
     case popularCollectionView:
       let cell = collectionView.dequeueReusableCell(
-        withReuseIdentifier: PopularCollectionViewCell.cellIdentifier,
+        withReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier,
         for: indexPath
-      ) as! PopularCollectionViewCell
+      ) as! ThumbnailCollectionViewCell
       return cell
       
     case recentCollectionView:
       let cell = collectionView.dequeueReusableCell(
-        withReuseIdentifier: RecentCollectionViewCell.cellIdentifier,
+        withReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier,
         for: indexPath
-      ) as! RecentCollectionViewCell
+      ) as! ThumbnailCollectionViewCell
       return cell
       
     case keywordCollectionView:

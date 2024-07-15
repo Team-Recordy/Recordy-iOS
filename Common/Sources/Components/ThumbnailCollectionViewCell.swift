@@ -1,5 +1,5 @@
 //
-//  PopularCollectionViewCell.swift
+//  RecentCollectionViewCell.swift
 //  Common
 //
 //  Created by Chandrala on 7/15/24.
@@ -13,11 +13,12 @@ import Core
 import SnapKit
 import Then
 
-public class PopularCollectionViewCell: UICollectionViewCell {
+
+public class ThumbnailCollectionViewCell: UICollectionViewCell {
   
   let label = UILabel()
-  let location = UILabel()
-  let container = UIView()
+  let locationStackView = UIStackView()
+  let locationText = UILabel()
   let locationImageView = UIImageView()
   let bookmarkButton = UIButton()
   
@@ -33,16 +34,26 @@ public class PopularCollectionViewCell: UICollectionViewCell {
   }
   
   private func setStyle() {
-    label.backgroundColor = CommonAsset.recordyGrey05.color
+    label.backgroundColor = CommonAsset.recordyGrey03.color
     label.cornerRadius(12)
-    location.do {
+    
+    locationStackView.do {
+      $0.axis = .horizontal
+      $0.distribution = .fillProportionally
+      $0.alignment = .center
+      $0.spacing = 3
+    }
+    
+    locationText.do {
       $0.text = "최대열글자들어갑니다"
       $0.font = RecordyFont.caption2.font
       $0.textColor = CommonAsset.recordyGrey01.color
     }
+    
     locationImageView.do {
       $0.image = CommonAsset.location.image
     }
+    
     bookmarkButton.do {
       $0.setImage(CommonAsset.bookmarkUnselected.image, for: .normal)
     }
@@ -51,12 +62,12 @@ public class PopularCollectionViewCell: UICollectionViewCell {
   private func setUI() {
     self.addSubviews(label)
     label.addSubviews(
-      container,
+      locationStackView,
       bookmarkButton
     )
-    container.addSubviews(
-      location,
-      locationImageView)
+    
+    locationStackView.addArrangedSubview(locationImageView)
+    locationStackView.addArrangedSubview(locationText)
   }
   
   private func setAutoLayout() {
@@ -64,11 +75,9 @@ public class PopularCollectionViewCell: UICollectionViewCell {
       $0.edges.equalToSuperview()
     }
     
-    container.snp.makeConstraints {
-      $0.width.equalTo(120.adaptiveWidth)
-      $0.height.equalTo(26.adaptiveHeight)
-      $0.centerX.equalToSuperview()
-      $0.bottom.equalToSuperview().offset(-10)
+    locationStackView.snp.makeConstraints {
+      $0.leading.equalToSuperview().offset(12)
+      $0.bottom.equalToSuperview().offset(15)
     }
     
     locationImageView.snp.makeConstraints {
@@ -78,9 +87,9 @@ public class PopularCollectionViewCell: UICollectionViewCell {
       $0.centerY.equalToSuperview()
     }
     
-    location.snp.makeConstraints {
-      $0.leading.equalTo(locationImageView.snp.trailing).offset(4)
-      $0.centerY.equalToSuperview()
+    locationStackView.snp.makeConstraints {
+      $0.leading.equalToSuperview().offset(12)
+      $0.bottom.equalToSuperview().inset(14)
     }
     
     bookmarkButton.snp.makeConstraints {
