@@ -9,7 +9,7 @@
 import UIKit
 
 extension UICollectionViewCell {
-    public static var cellIdentifier: String {
-        return String(describing: self)
-    }
+  public static var cellIdentifier: String {
+    return String(describing: self)
+  }
 }

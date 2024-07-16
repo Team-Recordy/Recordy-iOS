@@ -77,8 +77,9 @@ public class RecordyFilteringViewController: UIViewController {
         CommonAsset.recordyGrey01.color,
         for: .normal
       )
-      $0.isEnabled = false
       $0.titleLabel?.font = RecordyFont.button2.font
+      $0.backgroundColor = CommonAsset.recordyGrey06.color
+      $0.isEnabled = false
       $0.cornerRadius(8)
       $0.addTarget(
         self, 
