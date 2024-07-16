@@ -34,7 +34,6 @@ public final class ProfileSegmentControllView: UIView {
   
   private lazy var tapAction = UIAction { [weak self] action in
     guard let self, let sender = action.sender as? UIButton else { return }
-    print("@Log")
     switch sender {
     case self.tasteButton:
       self.selectedTab = .taste

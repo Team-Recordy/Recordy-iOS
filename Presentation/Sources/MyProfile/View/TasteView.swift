@@ -111,8 +111,8 @@ class TasteView: UIView {
     actionButton.snp.makeConstraints {
       $0.top.equalTo(emptyLabel.snp.bottom).offset(31)
       $0.leading.equalTo(130)
-      $0.width.equalTo(116)
-      $0.height.equalTo(42)
+      $0.width.equalTo(116.adaptiveWidth)
+      $0.height.equalTo(42.adaptiveHeight)
     }
     
     bottomMessage.snp.makeConstraints {
