@@ -12,6 +12,7 @@
 | [한지석](https://github.com/sozohoy) | [송여경](https://github.com/0gonge) | [문형근](https://github.com/Chandrarla) |
 |:---:|:---:|:---:|
 |<img width="250" alt="sozohoy" src="https://avatars.githubusercontent.com/sozohoy">|<img width="250" alt="0gonge" src="https://avatars.githubusercontent.com/0gonge">|<img width="250" alt="Chandrarla" src="https://avatars.githubusercontent.com/Chandrarla">|
+![IMG_8049 2](https://github.com/user-attachments/assets/8fc48fd8-5fa1-4f72-98c6-dbf07cd2c72c)
 
 
 ## 3. Library
