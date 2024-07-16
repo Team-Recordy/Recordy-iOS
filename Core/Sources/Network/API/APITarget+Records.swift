@@ -12,10 +12,16 @@ import Moya
 
 extension APITarget {
   enum Records {
-    case createRecord
-    case deleteRecord
-    case getUserRecordList
-    case getRecordList
+    case getPresignedUrl
+    case createRecord(DTO.CreateRecordRequest)
+    case deleteRecord(DTO.DeleteRecordRequest)
+    case isRecordWatched(DTO.IsRecordWatchedRequest)
+    case getRecordList(DTO.GetRecordListRequest)
+    case getUserRecordList(DTO.GetUserRecordListRequest)
+    case getRecentRecordList(DTO.GetRecentRecordListRequest)
+    case getFamousRecordList(DTO.GetFamousRecordListRequest)
+    case getFollowingRecordList(DTO.GetFollowingRecordListRequest)
+    case getBookmarkedRecordList(DTO.GetBookmarkedListRequest)
   }
 }
 
@@ -23,38 +29,121 @@ extension APITarget.Records: TargetType {
   var baseURL: URL {
     return URL(string: "BASE_URL + /records")!
   }
-  
+
   var path: String {
     switch self {
-    case .createRecord:
-      ""
-    case .deleteRecord:
-      "(recordId)"
-    case .getUserRecordList:
-      ""
+    case .getPresignedUrl:
+      return "presigned-url"
+    case .createRecord(let createRecordRequest):
+      return ""
+    case .deleteRecord(let deleteRecordRequest):
+      return "\(deleteRecordRequest.record_id)"
+    case .isRecordWatched(let isRecordWatchedRequest):
+      return "\(isRecordWatchedRequest)"
     case .getRecordList:
-      "(recordId)"
+      return ""
+    case .getUserRecordList(let getUserRecordListRequest):
+      return "user/\(getUserRecordListRequest.otherUserId)"
+    case .getRecentRecordList(let getRecentRecordListRequest):
+      return "recent"
+    case .getFamousRecordList(let getFamousRecordListRequest):
+      return "famous"
+    case .getFollowingRecordList(let getFollowingRecordListRequest):
+      return "following"
+    case .getBookmarkedRecordList(let getBookmarkedListRequest):
+      return "bookmark"
     }
+
   }
-  
+
+  /// 다 붙이고 수정하기
   var method: Moya.Method {
     switch self {
-    case .createRecord:
-      return .post
-    case .deleteRecord:
-      return .delete
-    case .getUserRecordList:
+    case .getPresignedUrl:
       return .get
-    case .getRecordList:
+    case .createRecord(let createRecordRequest):
+      return .post
+    case .deleteRecord(let deleteRecordRequest):
+      return .delete
+    case .isRecordWatched(let isRecordWatchedRequest):
+      return .post
+    case .getRecordList(let getRecordListRequest):
+      return .get
+    case .getUserRecordList(let getUserRecordListRequest):
+      return .get
+    case .getRecentRecordList(let getRecentRecordListRequest):
+      return .get
+    case .getFamousRecordList(let getFamousRecordListRequest):
+      return .get
+    case .getFollowingRecordList(let getFollowingRecordListRequest):
+      return .get
+    case .getBookmarkedRecordList(let getBookmarkedListRequest):
       return .get
     }
   }
-  
+
   var task: Moya.Task {
-    return .requestPlain
+    switch self {
+    case .createRecord(let createRecordRequest):
+      return .requestJSONEncodable(createRecordRequest)
+    case .deleteRecord(let deleteRecordRequest):
+      return .requestPlain
+    case .isRecordWatched(let isWatchRecordRequest):
+      return .requestPlain
+    case .getRecordList(let getRecordListRequest):
+      return .requestParameters(
+        parameters: ["size": getRecordListRequest.size],
+        encoding: URLEncoding.queryString
+      )
+    case .getUserRecordList(let getUserRecordListRequest):
+      return .requestParameters(
+        parameters: [
+          "cursorId": getUserRecordListRequest.cursorId,
+          "size": getUserRecordListRequest.size
+        ],
+        encoding: URLEncoding.queryString
+      )
+    case .getRecentRecordList(let getRecentRecordListRequest):
+      return .requestParameters(
+        parameters: [
+          "keywords": getRecentRecordListRequest.keywords,
+          "pageNumber": getRecentRecordListRequest.pageNumber,
+          "pageSize":
+            getRecentRecordListRequest.pageSize
+        ],
+        encoding: URLEncoding.queryString
+      )
+    case .getFamousRecordList(let getFamousRecordListRequest):
+      return .requestParameters(
+        parameters: [
+          "keywords": getFamousRecordListRequest.keywords,
+          "pageNumber": getFamousRecordListRequest.pageNumber,
+          "pageSize":
+            getFamousRecordListRequest.pageSize
+        ],
+        encoding: URLEncoding.queryString
+      )
+    case .getFollowingRecordList(let getFollowingRecordListRequest):
+      return .requestParameters(
+        parameters: [
+          "cursorId": getFollowingRecordListRequest.cursorId,
+          "size": getFollowingRecordListRequest.size
+        ],
+        encoding: URLEncoding.queryString
+      )
+    case .getBookmarkedRecordList(let getBookmarkedRecordListRequest):
+      return .requestParameters(
+        parameters: [
+          "cursorId": getBookmarkedRecordListRequest.cursorId,
+          "size": getBookmarkedRecordListRequest.size
+        ],
+        encoding: URLEncoding.queryString
+      )
+    default: return .requestPlain
+    }
   }
 
   var headers: [String : String]? {
-    return ["Content-Type": "application/json"]
+    return .none
   }
 }
