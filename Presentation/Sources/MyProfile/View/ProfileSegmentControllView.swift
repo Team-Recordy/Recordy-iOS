@@ -13,10 +13,8 @@ import Then
 
 import Common
 
-enum ControlType: String {
-  case taste = "내 취향"
-  case record = "내 기록"
-  case bookmark = "북마크"
+protocol ControlTypeDelegate: AnyObject {
+  func sendControlType(_ type: ControlType)
 }
 
 public final class ProfileSegmentControllView: UIView {
@@ -27,27 +25,26 @@ public final class ProfileSegmentControllView: UIView {
       setTabUI()
     }
   }
-  
+  weak var delegate: ControlTypeDelegate?
   private let barStack = UIStackView()
   private let tasteButton = UIButton()
   private let recordButton = UIButton()
   private let bookmarkButton = UIButton()
   private let underDivider = UIView()
   
-  private var didTap: ((_ controlType: ControlType) -> Void)?
-  
   private lazy var tapAction = UIAction { [weak self] action in
     guard let self, let sender = action.sender as? UIButton else { return }
+    print("@Log")
     switch sender {
     case self.tasteButton:
       self.selectedTab = .taste
-      self.didTap?(.taste)
+      delegate?.sendControlType(.taste)
     case self.recordButton:
       self.selectedTab = .record
-      self.didTap?(.record)
+      delegate?.sendControlType(.record)
     case self.bookmarkButton:
       self.selectedTab = .bookmark
-      self.didTap?(.bookmark)
+      delegate?.sendControlType(.bookmark)
     default:
       return
     }

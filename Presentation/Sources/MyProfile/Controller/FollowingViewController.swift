@@ -1,21 +1,21 @@
 //
-//  FollowingViewController.swift
+//  FollowerViewController.swift
 //  Presentation
 //
-//  Created by 송여경 on 7/15/24.
+//  Created by 송여경 on 7/13/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
-//
+//  setStyle() -> setUI() -> setAutolayout()
 
 import UIKit
-
 import SnapKit
+
 import Then
 
 import Common
 
-public class FollowingViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+public class FollowerViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
   
-  private let viewModel = FollowingViewModel()
+  private let viewModel = FollowerViewModel()
   private let tableView = UITableView()
   private let emptyView = UIView()
   let emptyLabel = UIImageView()
@@ -27,7 +27,7 @@ public class FollowingViewController: UIViewController, UITableViewDataSource, U
     setEmptyViewStyle()
     bindViewModel()
     
-    viewModel.fetchFollowings()
+    viewModel.fetchFollowers()
   }
   
   public func setEmptyViewStyle() {
@@ -63,14 +63,14 @@ public class FollowingViewController: UIViewController, UITableViewDataSource, U
     tableView.dataSource = self
     tableView.delegate = self
     tableView.backgroundColor = .black
-    tableView.register(FollowingCell.self, forCellReuseIdentifier: "FollowingCell")
+    tableView.register(FollowerCell.self, forCellReuseIdentifier: "FollowerCell")
     
     view.addSubview(emptyView)
     view.addSubview(tableView)
   }
   
   public func bindViewModel() {
-    viewModel.followings.bind { [weak self] _ in
+    viewModel.followers.bind { [weak self] _ in
       self?.tableView.reloadData()
     }
     
@@ -81,13 +81,13 @@ public class FollowingViewController: UIViewController, UITableViewDataSource, U
   }
   
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return viewModel.followings.value.count
+    return viewModel.followers.value.count
   }
   
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "FollowingCell", for: indexPath) as! FollowingCell
-    let following = viewModel.followings.value[indexPath.row]
-    cell.configure(with: following)
+    let cell = tableView.dequeueReusableCell(withIdentifier: "FollowerCell", for: indexPath) as! FollowerCell
+    let follower = viewModel.followers.value[indexPath.row]
+    cell.configure(with: follower)
     cell.followButtonAction = { [weak self] in
       self?.viewModel.toggleFollow(at: indexPath.row)
     }
@@ -95,7 +95,7 @@ public class FollowingViewController: UIViewController, UITableViewDataSource, U
   }
 }
 
-public class FollowingCell: UITableViewCell {
+public class FollowerCell: UITableViewCell {
   let profileImageView = UIImageView()
   let usernameLabel = UILabel()
   let followButton = MediumButton()
@@ -151,11 +151,10 @@ public class FollowingCell: UITableViewCell {
     }
   }
   
-  func configure(with following: Following) {
-    profileImageView.image = following.profileImage
-    usernameLabel.text = following.username
-    followButton.isHidden = !following.isFollowButtonVisible
-    followButton.setTitle(following.isFollowing ? "팔로잉" : "팔로우", for: .normal)
-    followButton.mediumState = following.isFollowing ? .active : .inactive
+  func configure(with follower: Follower) {
+    profileImageView.image = follower.profileImage
+    usernameLabel.text = follower.username
+    followButton.setTitle(follower.isFollowing ? "팔로잉" : "팔로우", for: .normal)
+    followButton.mediumState = follower.isFollowing ? .active : .inactive
   }
 }

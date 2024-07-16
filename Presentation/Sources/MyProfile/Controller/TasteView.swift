@@ -1,5 +1,5 @@
 //
-//  TasteViewController.swift
+//  TasteView.swift
 //  Presentation
 //
 //  Created by 송여경 on 7/15/24.
@@ -11,35 +11,50 @@ import SnapKit
 import Then
 
 import Common
-import Core
 
-public class TasteViewController: UIViewController {
+class TasteView: UIView {
   
-  private let viewModel = TasteViewModel()
   private let emptyView = UIView()
   private let dataView = UIView()
   private let backgroundImageView = UIImageView()
   
-  let profileInfoView = ProfileInfoView()
-  let segmentControlView = ProfileSegmentControllView()
   let emptyImageView = UIImageView()
   let emptyLabel = UIImageView()
   let actionButton = UIButton()
   let bottomMessage = UILabel()
   
-  public override func viewDidLoad() {
-    super.viewDidLoad()
-    
+  let fetchedData: [TasteData] = [
+    TasteData(
+      title: "집중하기 좋은",
+      percentage: 66,
+      type: .large
+    ),
+    TasteData(
+      title: "분위기 좋은",
+      percentage: 22,
+      type: .medium
+    ),
+    TasteData(
+      title: "집중하기 좋은",
+      percentage: 10,
+      type: .small
+    )
+  ]
+  
+  override init(frame: CGRect) {
+    super.init(frame: frame)
     setStyle()
     setUI()
     setAutoLayout()
-    bindViewModel()
-    
-    viewModel.fetchTasteData()
+    checkDataEmpty()
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
   
   private func setStyle() {
-    view.backgroundColor = .black
+    self.backgroundColor = .black
     
     emptyImageView.do {
       $0.image = CommonAsset.mypagebubble.image
@@ -69,10 +84,8 @@ public class TasteViewController: UIViewController {
   }
   
   private func setUI() {
-    view.addSubview(profileInfoView)
-    view.addSubview(segmentControlView)
-    view.addSubview(emptyView)
-    view.addSubview(dataView)
+    self.addSubview(emptyView)
+    self.addSubview(dataView)
     
     emptyView.addSubview(emptyImageView)
     emptyView.addSubview(emptyLabel)
@@ -83,18 +96,6 @@ public class TasteViewController: UIViewController {
   }
   
   private func setAutoLayout() {
-    profileInfoView.snp.makeConstraints {
-      $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-      $0.leading.trailing.equalToSuperview()
-      $0.width.equalTo(335.adaptiveWidth)
-      $0.height.equalTo(52.adaptiveHeight)
-    }
-    
-    segmentControlView.snp.makeConstraints {
-      $0.top.equalTo(profileInfoView.snp.bottom).offset(35)
-      $0.leading.trailing.equalToSuperview()
-    }
-    
     emptyImageView.snp.makeConstraints {
       $0.top.equalToSuperview().offset(78)
       $0.centerX.equalToSuperview()
@@ -104,46 +105,41 @@ public class TasteViewController: UIViewController {
     
     emptyLabel.snp.makeConstraints {
       $0.top.equalTo(emptyImageView.snp.bottom).offset(18)
-      $0.leading.trailing.equalToSuperview().inset(79)
+      $0.leading.equalTo(79)
     }
     
     actionButton.snp.makeConstraints {
       $0.top.equalTo(emptyLabel.snp.bottom).offset(31)
-      $0.centerX.equalToSuperview()
+      $0.leading.equalTo(130)
       $0.width.equalTo(116)
       $0.height.equalTo(42)
     }
     
     bottomMessage.snp.makeConstraints {
       $0.top.equalTo(actionButton.snp.bottom).offset(94)
-      $0.centerX.equalToSuperview()
-    }
-    
-    emptyView.snp.makeConstraints {
-      $0.top.equalTo(segmentControlView.snp.bottom).offset(18)
-      $0.leading.trailing.equalToSuperview()
+      $0.left.equalTo(71)
     }
     
     dataView.snp.makeConstraints {
-      $0.top.equalTo(segmentControlView.snp.bottom).offset(20)
+      $0.top.equalToSuperview().offset(20)
       $0.leading.trailing.equalToSuperview()
     }
     
     backgroundImageView.snp.makeConstraints {
-      $0.top.equalTo(segmentControlView.snp.bottom).offset(47)
+      $0.top.equalToSuperview().offset(47)
       $0.edges.equalToSuperview()
       $0.width.height.equalTo(374)
     }
   }
   
-  private func bindViewModel() {
-    viewModel.isEmpty.bind { [weak self] isEmpty in
-      self?.emptyView.isHidden = !isEmpty
-      self?.dataView.isHidden = isEmpty
-    }
-    
-    viewModel.tasteData.bind { [weak self] _ in
-      self?.updateDataView()
+  func checkDataEmpty() {
+    if !fetchedData.isEmpty {
+      emptyView.isHidden = true
+      dataView.isHidden = false
+      updateDataViews(fetchedData)
+    } else {
+      emptyView.isHidden = false
+      dataView.isHidden = true
     }
   }
   
@@ -151,19 +147,17 @@ public class TasteViewController: UIViewController {
     print("기록하러 가기 버튼 눌렸을 때다.")
   }
   
-  private func updateDataView() {
-    dataView.subviews.forEach { if $0 != backgroundImageView { $0.removeFromSuperview() } }
-    
-    let dataViews = viewModel.tasteData.value.map { data -> TasteDataView in
-      let view = TasteDataView(type: data.type)
-      view.configure(with: data)
-      return view
+  func updateDataViews(_ tasteData: [TasteData]) {
+    for view in dataView.subviews {
+      if view != backgroundImageView {
+        view.removeFromSuperview()
+      }
     }
     
-    if dataViews.count >= 3 {
-      let firstDataView = dataViews[0]
-      let secondDataView = dataViews[1]
-      let thirdDataView = dataViews[2]
+    if tasteData.count >= 3 {
+      let firstDataView = TasteDataView(tasteData: fetchedData[0])
+      let secondDataView = TasteDataView(tasteData: fetchedData[1])
+      let thirdDataView = TasteDataView(tasteData: fetchedData[2])
       
       dataView.addSubview(firstDataView)
       dataView.addSubview(secondDataView)
@@ -177,14 +171,14 @@ public class TasteViewController: UIViewController {
       
       firstDataView.snp.makeConstraints {
         $0.centerX.equalToSuperview().multipliedBy(bubbleCenters[0].x * 2)
-        $0.centerY.equalToSuperview().multipliedBy(bubbleCenters[0].y * 1.65)
+        $0.centerY.equalToSuperview().multipliedBy(bubbleCenters[0].y * 1.5)
         $0.width.equalTo(200)
         $0.height.equalTo(200)
       }
       
       secondDataView.snp.makeConstraints {
         $0.centerX.equalToSuperview().multipliedBy(bubbleCenters[1].x * 1.75)
-        $0.centerY.equalToSuperview().multipliedBy(bubbleCenters[1].y * 1.4)
+        $0.centerY.equalToSuperview().multipliedBy(bubbleCenters[1].y * 1.18)
         $0.width.equalTo(150)
         $0.height.equalTo(150)
       }
