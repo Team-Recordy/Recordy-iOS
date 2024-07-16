@@ -29,7 +29,6 @@ public class TasteViewController: UIViewController {
   
   public override func viewDidLoad() {
     super.viewDidLoad()
-    
     setStyle()
     setUI()
     setAutoLayout()
@@ -39,6 +38,7 @@ public class TasteViewController: UIViewController {
   }
   
   private func setStyle() {
+    self.title = "프로필"
     view.backgroundColor = .black
     
     emptyImageView.do {

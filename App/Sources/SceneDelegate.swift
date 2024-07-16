@@ -13,6 +13,7 @@ import Common
 
 import KakaoSDKAuth
 
+@available(iOS 16.0, *)
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   var window: UIWindow?
@@ -40,8 +41,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     window = UIWindow(frame: windowScene.coordinateSpace.bounds)
     window?.windowScene = windowScene
-    let viewController = TestViewController()
-    window?.rootViewController = viewController
+    let rootViewController = RecordyTabBarController()
+    window?.rootViewController = rootViewController
     window?.makeKeyAndVisible()
   }
 }

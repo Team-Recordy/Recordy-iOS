@@ -56,6 +56,7 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
     
     bookmarkButton.do {
       $0.setImage(CommonAsset.bookmarkUnselected.image, for: .normal)
+      $0.titleLabel?.font = RecordyFont.button2.font
     }
   }
   
@@ -76,27 +77,22 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
     }
     
     locationStackView.snp.makeConstraints {
-      $0.leading.equalToSuperview().offset(12)
+      $0.horizontalEdges.equalToSuperview().inset(9)
       $0.bottom.equalToSuperview().offset(15)
     }
     
     locationImageView.snp.makeConstraints {
       $0.leading.equalToSuperview().offset(3)
-      $0.width.equalTo(16.adaptiveWidth)
-      $0.height.equalTo(16.adaptiveHeight)
+      $0.width.equalTo(12.adaptiveWidth)
+      $0.height.equalTo(12.adaptiveHeight)
       $0.centerY.equalToSuperview()
     }
-    
-    locationStackView.snp.makeConstraints {
-      $0.leading.equalToSuperview().offset(12)
-      $0.bottom.equalToSuperview().inset(14)
-    }
-    
+
     bookmarkButton.snp.makeConstraints {
-      $0.width.equalTo(20.adaptiveWidth)
-      $0.height.equalTo(20.adaptiveHeight)
-      $0.top.equalToSuperview().offset(10)
-      $0.trailing.equalToSuperview().offset(-10)
+      $0.width.equalTo(13.adaptiveWidth)
+      $0.height.equalTo(15.adaptiveHeight)
+      $0.top.equalToSuperview().offset(15)
+      $0.trailing.equalToSuperview().offset(-15)
     }
   }
 }

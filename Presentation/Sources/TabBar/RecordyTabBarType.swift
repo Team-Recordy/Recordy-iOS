@@ -38,6 +38,13 @@ enum RecordyTabBarType: CaseIterable {
   }
   
   var viewController: UIViewController {
-    UploadVideoViewController()
+    switch self {
+    case .home:
+      HomeViewController()
+    case .video:
+      VideoFeedViewController()
+    case .profile:
+      BaseNavigationController(rootViewController: TasteViewController())
+    }
   }
 }

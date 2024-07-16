@@ -13,6 +13,7 @@ protocol HomeCollectionViewDelegate: AnyObject {
   func keywordCollectionView(indexPath: IndexPath)
 }
 
+@available(iOS 16.0, *)
 public final class HomeViewController: UIViewController {
   
   var selectedKeywords: [Keyword] = []
@@ -20,6 +21,7 @@ public final class HomeViewController: UIViewController {
   
   let scrollView = UIScrollView()
   let contentView = UIView()
+  let gradientView = RecordyGradientView()
   let homeTitle = UILabel()
   let homeImage = UIImageView()
   let popularLabel = UILabel()
@@ -58,6 +60,7 @@ public final class HomeViewController: UIViewController {
       $0.font = RecordyFont.title1.font
       $0.textColor = .white
       $0.numberOfLines = 0
+      $0.setLineSpacing(lineHeightMultiple: 1.22)
     }
     
     homeImage.do {
@@ -87,6 +90,11 @@ public final class HomeViewController: UIViewController {
     floatingButton.do {
       $0.backgroundColor = CommonAsset.recordyMain.color
       $0.cornerRadius(22.adaptiveHeight)
+      $0.addTarget(
+        self,
+        action: #selector(floatingButtonTapped),
+        for: .touchUpInside
+      )
     }
     
     floatingButtonText.do {
@@ -102,6 +110,7 @@ public final class HomeViewController: UIViewController {
   
   func setUI() {
     view.addSubviews(
+      gradientView,
       scrollView,
       floatingButton
     )
@@ -121,7 +130,12 @@ public final class HomeViewController: UIViewController {
   }
   
   func setAutoLayout() {
-    
+
+    gradientView.snp.makeConstraints {
+      $0.top.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(400.adaptiveHeight)
+    }
+
     scrollView.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
@@ -249,13 +263,20 @@ public final class HomeViewController: UIViewController {
     self.recentCollectionView.delegate = self
     self.recentCollectionView.dataSource = self
   }
-  
+
+  @objc
+  func floatingButtonTapped(_ sender: UIButton) {
+    let uploadViewController = UploadVideoViewController()
+    self.present(uploadViewController, animated: true)
+  }
+
   @objc
   func chipButtonTapped(_ sender: UIButton) {
     let index = sender.tag
   }
 }
 
+@available(iOS 16.0, *)
 extension HomeViewController: UICollectionViewDataSource {
   public func collectionView(
     _ collectionView: UICollectionView,
@@ -312,6 +333,8 @@ extension HomeViewController: UICollectionViewDataSource {
     }
   }
 }
+
+@available(iOS 16.0, *)
 extension HomeViewController: UICollectionViewDelegateFlowLayout {
   public func collectionView(
     _ collectionView: UICollectionView,
