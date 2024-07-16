@@ -13,10 +13,10 @@ import Moya
 extension APITarget {
   public enum Users {
     case signIn(DTO.SignInRequest)
-    case signUp
+    case signUp(DTO.SignUpRequest)
     case signOut
     case checkNickname
-    case refreshToken
+    case refreshToken(DTO.RefreshTokenRequest)
     case withdraw
     case getfollowList
     case getfollowerList
@@ -24,6 +24,7 @@ extension APITarget {
 }
 
 extension APITarget.Users: TargetType {
+
   public var baseURL: URL {
     return URL(string: BaseURL.string + "/users")!
   }
@@ -77,21 +78,24 @@ extension APITarget.Users: TargetType {
         parameters: ["platformType": signInRequest.platformType.rawValue],
         encoding: JSONEncoding.default
       )
+    case .signUp(let signUpRequest):
+      return .requestParameters(
+        parameters: [
+          "nickname": signUpRequest.nickname,
+          "termsAgreement": [
+            "useTerm": signUpRequest.termsAgreement.useTerm,
+            "personalInfoTerm": signUpRequest.termsAgreement.personalInfoTerm,
+            "ageTerm": signUpRequest.termsAgreement.ageTerm
+          ]
+        ],
+        encoding: JSONEncoding.default
+      )
     default:
       return .requestPlain
     }
   }
 
   public var headers: [String : String]? {
-    switch self {
-    case .signIn(let signInRequest):
-      return [
-        "Content-Type": "application/json",
-        "Authorization": signInRequest.authorization
-      ]
-    default:
-      return ["Content-Type": "application/json"]
-    }
-
+    return .none
   }
 }
