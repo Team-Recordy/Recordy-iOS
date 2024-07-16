@@ -25,4 +25,14 @@ extension String {
     )
     return boundingBox.height
   }
+
+  public func timeStringToSeconds() -> Int {
+    let components = self.split(separator: ":")
+    guard components.count == 2,
+          let minutes = Int(components[0]),
+          let seconds = Int(components[1]) else {
+      return 100
+    }
+    return (minutes * 60) + seconds
+  }
 }

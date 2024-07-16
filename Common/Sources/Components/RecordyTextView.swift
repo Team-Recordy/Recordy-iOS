@@ -32,6 +32,7 @@ public class RecordyTextView: UIView {
     $0.textColor = CommonAsset.recordyGrey04.color
   }
 
+  private let textViewPlaceHolder = "공간에 대한 나의 생각을 자유롭게 적어주세요!"
   private let minHeight = 148.adaptiveHeight
   private let maxHeight = 408.adaptiveHeight
 
@@ -48,7 +49,9 @@ public class RecordyTextView: UIView {
   }
 
   private func setStyle() {
+    self.textView.text = textViewPlaceHolder
     self.textView.cornerRadius(8)
+    self.textView.textColor = CommonAsset.recordyGrey04.color
   }
 
   private func setUI() {
@@ -81,12 +84,20 @@ extension RecordyTextView: UITextViewDelegate {
   }
 
   public func textViewDidBeginEditing(_ textView: UITextView) {
+    if textView.text == textViewPlaceHolder {
+      textView.text = nil
+      textView.textColor = CommonAsset.recordyGrey01.color
+    }
     self.textView.layer.borderColor = CommonAsset.recordyMain.color.cgColor
     self.textView.layer.borderWidth = 1
     self.textCountLabel.textColor = CommonAsset.recordyMain.color
   }
 
   public func textViewDidEndEditing(_ textView: UITextView) {
+    if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        textView.text = textViewPlaceHolder
+        textView.textColor = CommonAsset.recordyGrey04.color
+    }
     self.textView.layer.borderColor = UIColor.clear.cgColor
     self.textView.layer.borderWidth = 0
     self.textCountLabel.textColor = CommonAsset.recordyGrey04.color
