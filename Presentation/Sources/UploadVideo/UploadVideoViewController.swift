@@ -161,7 +161,7 @@ public class UploadVideoViewController: UIViewController {
       $0.height.equalTo(284.adaptiveHeight)
     }
     self.selectedKeywordLabel.snp.makeConstraints {
-      $0.top.equalTo(videoThumbnailImageView.snp.bottom).offset(8.adaptiveHeight)
+      $0.top.equalTo(videoThumbnailImageView.snp.bottom).offset(20.adaptiveHeight)
       $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
       $0.height.equalTo(28.adaptiveHeight)
     }
