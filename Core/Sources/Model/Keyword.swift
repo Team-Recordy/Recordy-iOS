@@ -9,59 +9,61 @@
 import Foundation
 
 public enum Keyword: CaseIterable {
-  case exotic
-  case quiet
-  case trendy
-  case sensuous
+  case all
+  case sensitive
+  case intensive
   case cute
-  case fanAttracting
-  case fun
+  case clean
+  case nerdy
   case cozy
+  case exotic
+  case fun
+  case quiet
+  case concentrate
   case classic
-  case concentration
-  case neat
-  case scary
-  case intense
+  case trendy
 
   public var title: String {
     switch self {
-    case .exotic:
-      "이색적인"
-    case .quiet:
-      "조용한"
-    case .trendy:
-      "트렌디한"
-    case .sensuous:
+    case .all:
+      "전체"
+    case .sensitive:
       "감각적인"
+    case .intensive:
+      "강렬한"
     case .cute:
       "귀여운"
-    case .fanAttracting:
+    case .clean:
+      "깔끔한"
+    case .nerdy:
       "덕후몰이"
-    case .fun:
-      "재밌는"
     case .cozy:
       "아늑한"
+    case .exotic:
+      "이색적인"
+    case .fun:
+      "재밌는"
+    case .quiet:
+      "조용한"
+    case .concentrate:
+      "집중하기 좋은"
     case .classic:
       "클래식한"
-    case .concentration:
-      "집중하기 좋은"
-    case .neat:
-      "깔끔한"
-    case .scary:
-      "무서운"
-    case .intense:
-      "강렬한"
+    case .trendy:
+      "트렌디한"
     }
   }
 
   public var width: CGFloat {
     switch self {
-    case .exotic, .trendy, .sensuous, .fanAttracting, .classic:
-      return 62
-    case .quiet, .cute, .fun, .cozy, .neat, .scary, .intense:
-      return 52
-    case .concentration:
-      return 86
+    case .all:
+      return 45 //2
+    case .intensive, .cute, .clean, .cozy, .fun, .quiet:
+      return 56 //3
+    case .sensitive, .nerdy, .exotic, .classic, .trendy:
+      return 66 //4
+    case .concentrate:
+      return 92
     }
   }
 }

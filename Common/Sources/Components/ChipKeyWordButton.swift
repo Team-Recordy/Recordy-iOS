@@ -15,14 +15,14 @@ enum ChipState {
   case inactive
 }
 
-class ChipKeyWordButton: UIButton {
+public class ChipKeyWordButton: UIButton {
   var chipstate: ChipState = .inactive {
     didSet {
       updateChipAppearance()
     }
   }
   
-  override init(frame: CGRect) {
+  public override init(frame: CGRect) {
     super.init(frame: frame)
     setUI()
   }
@@ -44,13 +44,11 @@ class ChipKeyWordButton: UIButton {
   private func updateChipAppearance() {
     switch chipstate {
     case .active:
-      backgroundColor = CommonAsset.recordyGrey08.color
+      backgroundColor = CommonAsset.recordyGrey01.color
       setTitleColor(
-        CommonAsset.recordyMain.color,
+        CommonAsset.recordyGrey09.color,
         for: .normal
       )
-      layer.borderColor = CommonAsset.recordyMain.color.cgColor
-      layer.borderWidth = 1
 
     case .inactive:
       backgroundColor = CommonAsset.recordyGrey09.color
@@ -58,8 +56,6 @@ class ChipKeyWordButton: UIButton {
         CommonAsset.recordyGrey04.color,
         for: .normal
       )
-      layer.borderColor = UIColor.clear.cgColor
-      layer.borderWidth = 0
     }
   }
 }

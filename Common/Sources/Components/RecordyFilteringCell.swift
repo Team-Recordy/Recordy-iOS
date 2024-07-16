@@ -13,10 +13,10 @@ import Core
 import SnapKit
 import Then
 
-class RecordyFilteringCell: UICollectionViewCell {
-  let chipButton = ChipKeyWordButton()
+public class RecordyFilteringCell: UICollectionViewCell {
+  public let chipButton = ChipKeyWordButton()
 
-  override init(frame: CGRect) {
+  public override init(frame: CGRect) {
     super.init(frame: frame)
     setUI()
     setAutoLayout()
@@ -36,7 +36,7 @@ class RecordyFilteringCell: UICollectionViewCell {
     }
   }
 
-  func bind(keyword: Keyword, isSelected: Bool) {
+  public func bind(keyword: Keyword, isSelected: Bool) {
     self.chipButton.setTitle(keyword.title, for: .normal)
     self.chipButton.setState(state: isSelected ? .active : .inactive)
   }

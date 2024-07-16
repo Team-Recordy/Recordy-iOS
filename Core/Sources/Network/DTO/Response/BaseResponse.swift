@@ -8,4 +8,4 @@
 
 import Foundation
 
-protocol BaseResponse: Decodable { }
+protocol BaseResponse: Codable { }

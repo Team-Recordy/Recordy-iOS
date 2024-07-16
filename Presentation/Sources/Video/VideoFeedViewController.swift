@@ -11,8 +11,6 @@ import AVKit
 
 import Common
 
-import RxSwift
-import RxCocoa
 import SnapKit
 import Then
 
@@ -20,16 +18,21 @@ public class VideoFeedViewController: UIViewController {
 
   private var collectionView: UICollectionView? = nil
   private let recordyToggle = RecordyToggle()
+  private var isFetched = false
+  private var isPlayed = false
 
   private var viewModel = VideoFeedViewModel()
-  private let disposeBag = DisposeBag()
 
   public override func viewDidLoad() {
     super.viewDidLoad()
     setUpCollectionView()
     setUI()
     setAutolayout()
-    bind()
+    fetchInitialVideos()
+  }
+
+  private func setStyle() {
+    self.view.backgroundColor = CommonAsset.recordyBG.color
   }
 
   private func setUI() {
@@ -62,82 +65,119 @@ public class VideoFeedViewController: UIViewController {
     self.collectionView!.showsVerticalScrollIndicator = false
     self.collectionView!.contentInsetAdjustmentBehavior = .never
     self.collectionView!.isPagingEnabled = true
+    self.collectionView!.backgroundColor = CommonAsset.recordyBG.color
     self.collectionView!.register(
       FeedCell.self,
       forCellWithReuseIdentifier: FeedCell.cellIdentifier
     )
-    self.collectionView!.rx.setDelegate(self).disposed(by: disposeBag)
+    self.collectionView!.delegate = self
+    self.collectionView!.dataSource = self
   }
 
-  func bind() {
-    viewModel.output.feedList
-      .asDriver()
-      .drive(
-        collectionView!.rx.items(
-          cellIdentifier: FeedCell.cellIdentifier,
-          cellType: FeedCell.self
-        )
-      ) { (row, feed, cell) in
-        cell.bind(
-          feed: feed,
-          bounds: self.collectionView!.frame
-        )
-        cell.avQueuePlayer?.play()
-        cell.bookmarkTappedRelay
-          .map { row }
-          .bind(to: self.viewModel.input.bookmarkTapped)
-          .disposed(by: cell.disposeBag)
+  private func fetchInitialVideos() {
+    viewModel.fetchVideos {
+      DispatchQueue.main.async {
+        self.collectionView?.reloadData()
       }
-      .disposed(by: disposeBag)
+    }
+  }
 
-    collectionView?.rx.willDisplayCell
-      .subscribe(onNext: { [weak self] cell, indexPath in
-        guard let self = self else { return }
-        if indexPath.row == self.viewModel.output.feedList.value.count - 3 {
-          viewModel.input.fetchVideos.accept(())
+  private func fetchMoreVideos() {
+    if !isFetched {
+      viewModel.fetchMoreVideos {
+        DispatchQueue.main.async {
+          self.collectionView?.reloadData()
+          self.isFetched.toggle()
         }
-        self.viewModel.input.currentIndex.accept(indexPath.row)
-      })
-      .disposed(by: disposeBag)
-
-    collectionView!.rx.didEndDisplayingCell
-      .subscribe { cell, indexPath in
-        let cell = cell as! FeedCell
-        cell.avQueuePlayer?.pause()
       }
-      .disposed(by: disposeBag)
-
-    collectionView?.rx.willBeginDragging
-        .subscribe(onNext: { [weak self] in
-            guard let self = self else { return }
-            self.collectionView?.visibleCells.forEach { cell in
-                if let feedCell = cell as? FeedCell {
-                    feedCell.avQueuePlayer?.pause()
-                }
-            }
-        })
-        .disposed(by: disposeBag)
-
-    collectionView?.rx.didEndDecelerating
-        .subscribe(onNext: { [weak self] in
-            guard let self = self else { return }
-            self.collectionView?.visibleCells.forEach { cell in
-                if let feedCell = cell as? FeedCell {
-                    feedCell.avQueuePlayer?.seek(to: CMTime.zero)
-                    feedCell.avQueuePlayer?.play()
-                }
-            }
-        })
-        .disposed(by: disposeBag)
+    }
   }
 }
 
-extension VideoFeedViewController: UICollectionViewDelegateFlowLayout {
+
+extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    numberOfItemsInSection section: Int
+  ) -> Int {
+    return viewModel.feedList.count
+  }
+
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    cellForItemAt indexPath: IndexPath
+  ) -> UICollectionViewCell {
+    let cell = collectionView.dequeueReusableCell(
+      withReuseIdentifier: FeedCell.cellIdentifier,
+      for: indexPath
+    ) as! FeedCell
+    let feed = viewModel.feedList[indexPath.row]
+    cell.bind(
+      feed: feed,
+      bounds: collectionView.frame,
+      shouldAddPlayer: cell.avQueuePlayer == nil
+    )
+    if !isPlayed {
+      cell.play()
+      isPlayed = true
+    }
+    cell.bookmarkTappedRelay = {
+      self.viewModel.bookmarkButtonTapped(indexPath.row)
+      cell.updateBookmarkStatus(isBookmarked: self.viewModel.feedList[indexPath.row].isBookmarked)
+    }
+    return cell
+  }
+
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    willDisplay cell: UICollectionViewCell,
+    forItemAt indexPath: IndexPath
+  ) {
+    if viewModel.feedList.count == indexPath.row + 1 {
+      fetchMoreVideos()
+    }
+  }
+
+  public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    checkAndPlay()
+  }
+
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    didEndDisplaying cell: UICollectionViewCell,
+    forItemAt indexPath: IndexPath
+  ) {
+    let cell = cell as! FeedCell
+    cell.pause()
+  }
+
   public func collectionView(
     _ collectionView: UICollectionView,
     layout collectionViewLayout: UICollectionViewLayout,
     sizeForItemAt indexPath: IndexPath
   ) -> CGSize {
     return collectionView.frame.size
+  }
+}
+
+
+extension VideoFeedViewController {
+  private func checkAndPlay() {
+    let visibleCells = collectionView!.visibleCells.compactMap { $0 as? FeedCell }
+    visibleCells.forEach {
+      let frame = $0.frame
+      let window = self.view.window!
+      let rect = window.convert(frame, from: $0.superview!)
+      let intersection = rect.intersection(window.bounds)
+      let ratio = (intersection.width * intersection.height) / (frame.width * frame.height)
+      if ratio > 0.5 {
+        if !$0.isPlayRequested {
+          $0.play()
+        }
+      } else {
+        $0.pause()
+      }
+    }
   }
 }

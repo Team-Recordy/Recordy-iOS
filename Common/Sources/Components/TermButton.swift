@@ -30,9 +30,7 @@ public class TermButton: UIButton {
   }
   
   private func setStyle() {
-    // backgroundView를 StackView 같이 사용
     backgroundView.backgroundColor = .clear
-    
     agreeLabel.do {
       $0.font = RecordyFont.caption1.font
       $0.textColor = CommonAsset.recordyGrey03.color

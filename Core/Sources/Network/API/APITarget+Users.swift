@@ -11,12 +11,12 @@ import Foundation
 import Moya
 
 extension APITarget {
-  enum Users {
-    case signIn
-    case signUp
+  public enum Users {
+    case signIn(DTO.SignInRequest)
+    case signUp(DTO.SignUpRequest)
     case signOut
     case checkNickname
-    case refreshToken
+    case refreshToken(DTO.RefreshTokenRequest)
     case withdraw
     case getfollowList
     case getfollowerList
@@ -24,11 +24,12 @@ extension APITarget {
 }
 
 extension APITarget.Users: TargetType {
-  var baseURL: URL {
-    return URL(string: "BASE_URL + /users")!
+
+  public var baseURL: URL {
+    return URL(string: BaseURL.string + "/users")!
   }
 
-  var path: String {
+  public var path: String {
     switch self {
     case .signIn:
       "signIn"
@@ -49,7 +50,7 @@ extension APITarget.Users: TargetType {
     }
   }
 
-  var method: Moya.Method {
+  public var method: Moya.Method {
     switch self {
     case .signIn:
       return .post
@@ -70,11 +71,31 @@ extension APITarget.Users: TargetType {
     }
   }
 
-  var task: Moya.Task {
-    return .requestPlain
+  public var task: Moya.Task {
+    switch self {
+    case .signIn(let signInRequest):
+      return .requestParameters(
+        parameters: ["platformType": signInRequest.platformType.rawValue],
+        encoding: JSONEncoding.default
+      )
+    case .signUp(let signUpRequest):
+      return .requestParameters(
+        parameters: [
+          "nickname": signUpRequest.nickname,
+          "termsAgreement": [
+            "useTerm": signUpRequest.termsAgreement.useTerm,
+            "personalInfoTerm": signUpRequest.termsAgreement.personalInfoTerm,
+            "ageTerm": signUpRequest.termsAgreement.ageTerm
+          ]
+        ],
+        encoding: JSONEncoding.default
+      )
+    default:
+      return .requestPlain
+    }
   }
 
-  var headers: [String : String]? {
-    return ["Content-Type": "application/json"]
+  public var headers: [String : String]? {
+    return .none
   }
 }

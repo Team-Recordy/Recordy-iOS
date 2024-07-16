@@ -29,6 +29,8 @@ public final class RecordyTabBarController: UITabBarController, UITabBarControll
     tabBar.backgroundColor = .clear
     tabBar.tintColor = .clear
     tabBar.standardAppearance = appearance
+    tabBar.scrollEdgeAppearance = appearance
+    tabBar.standardAppearance = appearance
   }
 
   private func setTabBarItem() {

@@ -1,4 +1,6 @@
 ## 1. Recordy
+![KakaoTalk_Photo_2024-07-16-22-49-38](https://github.com/user-attachments/assets/c5b9df1c-2e9e-47f0-9863-64a43861121c)
+
 ```
 레코디는 공간을 영상을 통해 디깅하고, 본인의 취향을 발견하는 서비스이다. 취향에 맞는 공간 정보를 받을 수 있는
 플랫폼들은 분산되어 있고, 가공된 리뷰 사진으로 인해 실제 공간감을 느낄 수 없다는 문제로부터 서비스가 시작되었다.
@@ -10,6 +12,9 @@
 | [한지석](https://github.com/sozohoy) | [송여경](https://github.com/0gonge) | [문형근](https://github.com/Chandrarla) |
 |:---:|:---:|:---:|
 |<img width="250" alt="sozohoy" src="https://avatars.githubusercontent.com/sozohoy">|<img width="250" alt="0gonge" src="https://avatars.githubusercontent.com/0gonge">|<img width="250" alt="Chandrarla" src="https://avatars.githubusercontent.com/Chandrarla">|
+
+
+![IMG_8049 2](https://github.com/user-attachments/assets/8fc48fd8-5fa1-4f72-98c6-dbf07cd2c72c)
 
 
 ## 3. Library
