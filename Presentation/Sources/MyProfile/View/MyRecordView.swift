@@ -16,7 +16,6 @@ class MyRecordView: UIView {
   private let videoEmptyView = UIView()
   private let videoDataView = UIView()
   
-  let recordCount = UILabel()
   let videoEmptyImageView = UIImageView()
   let videoEmptyTextView = UIImageView()
   let goActionButton = UIButton()
@@ -35,35 +34,6 @@ class MyRecordView: UIView {
   
   private func setStyle() {
     self.backgroundColor = .black
-    
-    let recordText = "• 0 개의 기록"
-    let attributedString = NSMutableAttributedString(string: recordText)
-    
-    // Make "•" white
-    if let rangeBullet = recordText.range(of: "•") {
-      let nsRangeBullet = NSRange(rangeBullet, in: recordText)
-      attributedString.addAttribute(.foregroundColor, value: UIColor.white, range: nsRangeBullet)
-    }
-    
-    // Make "0" white
-    if let rangeZero = recordText.range(of: "0") {
-      let nsRangeZero = NSRange(rangeZero, in: recordText)
-      attributedString.addAttribute(.foregroundColor, value: UIColor.white, range: nsRangeZero)
-    }
-    
-    // Make "개의 기록" grey
-    if let rangeRest = recordText.range(of: "개의 기록") {
-      let nsRangeRest = NSRange(rangeRest, in: recordText)
-      attributedString.addAttribute(.foregroundColor, value: CommonAsset.recordyGrey03.color, range: nsRangeRest)
-    }
-    
-    recordCount.do {
-      $0.attributedText = attributedString
-      $0.font = RecordyFont.caption1.font
-      $0.numberOfLines = 0
-      $0.textAlignment = .right
-    }
-    
     videoEmptyImageView.do {
       $0.image = CommonAsset.mypageCamera.image
       $0.contentMode = .scaleAspectFit
@@ -84,20 +54,12 @@ class MyRecordView: UIView {
     self.addSubview(videoEmptyView)
     self.addSubview(videoDataView)
     
-    videoEmptyView.addSubview(recordCount)
     videoEmptyView.addSubview(videoEmptyImageView)
     videoEmptyView.addSubview(videoEmptyTextView)
     videoEmptyView.addSubview(goActionButton)
   }
   
   private func setAutoLayout() {
-    recordCount.snp.makeConstraints {
-      $0.top.equalToSuperview()
-      $0.leading.equalToSuperview().offset(194)
-      $0.width.equalTo(160)
-      $0.height.equalTo(18)
-    }
-    
     videoEmptyImageView.snp.makeConstraints {
       $0.top.equalToSuperview().offset(78)
       $0.leading.equalTo(138)
