@@ -49,12 +49,15 @@ class VideoCell: UICollectionViewCell {
   }
   
   func bind(localVideo: LocalVideo) {
-    let assetImage = PhotoKitManager.getAssetThumbnail(asset: localVideo.asset, size: bounds.size)
+    let assetImage = PhotoKitManager.getAssetThumbnail(
+      asset: localVideo.asset,
+      size: bounds.size
+    )
     previewImageView.image = assetImage
     playtimeLabel.text = localVideo.playtime
   }
 
-  func setSelected(_ selected: Bool) {
-    contentView.backgroundColor = selected ? UIColor.black.withAlphaComponent(0.3) : UIColor.clear
-  }
+//  func setSelected(_ selected: Bool) {
+//    contentView.backgroundColor = selected ? UIColor.black.withAlphaComponent(0.3) : UIColor.clear
+//  }
 }
