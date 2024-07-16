@@ -50,6 +50,7 @@ public class SelectVideoViewController: UIViewController {
 
   private func setStyle() {
     self.title = "영상 선택"
+    self.view.backgroundColor = CommonAsset.recordyBG.color
   }
 
   private func setUI() {
@@ -101,14 +102,6 @@ public class SelectVideoViewController: UIViewController {
         )
       ) { (row, localVideo, cell) in
         cell.bind(localVideo: localVideo)
-        cell.setSelected(
-          self.viewModel.isSelected(
-            indexPath: IndexPath(
-              row: row,
-              section: 0
-            )
-          )
-        )
       }
       .disposed(by: disposeBag)
 
@@ -141,8 +134,12 @@ extension SelectVideoViewController: UICollectionViewDelegateFlowLayout {
     didSelectItemAt indexPath: IndexPath
   ) {
     let localVideo = viewModel.assetsRelay.value[indexPath.row]
-    delegate?.selectVideo(localVideo.asset)
-    self.dismiss(animated: true)
+    if localVideo.playtime.timeStringToSeconds() <= 15 {
+      delegate?.selectVideo(localVideo.asset)
+      self.dismiss(animated: true)
+    } else {
+      self.showToast(status: .warning, message: "기준에 맞는 영상을 선택해주세요.", height: 44)
+    }
   }
 
   public func collectionView(

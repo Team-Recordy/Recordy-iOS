@@ -60,7 +60,13 @@ final class UploadVideoViewModel {
       .disposed(by: disposeBag)
 
     input.contents
-      .map { "\($0.count) / 300" }
+      .map {
+        if $0 == "공간에 대한 나의 생각을 자유롭게 적어주세요!" {
+          "0 / 300"
+        } else {
+          "\($0.count) / 300"
+        }
+      }
       .bind(to: output.contentsTextCount)
       .disposed(by: disposeBag)
 
@@ -70,7 +76,7 @@ final class UploadVideoViewModel {
       input.location,
       input.contents
     ).map { asset, keywords, location, contents in
-      return asset != nil && keywords.count == 3 && location.count > 0 && contents.count > 0
+      return asset != nil && keywords.count == 3 && location.count > 0 && contents.count > 0 && contents == "공간에 대한 나의 생각을 자유롭게 적어주세요!"
     }
     .bind(to: output.uploadEnabled)
     .disposed(by: disposeBag)

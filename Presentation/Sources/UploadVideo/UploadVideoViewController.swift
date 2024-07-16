@@ -30,8 +30,7 @@ public class UploadVideoViewController: UIViewController {
   private let videoThumbnailImageView = UIImageView()
   let videoThumbnailAlertLabel = UILabel()
   private let selectedKeywordLabel = RecordySubtitleLabel(subtitle: "키워드")
-  private let selectedKeywordButton = UIButton()
-  private let selectedKeywordStackView = UIStackView()
+  private let selectKeywordStackView = RecordySelectKeywordStackView()
   private let firstKeywordLabel = RecordyKeywordLabel()
   private let secondKeywordLabel = RecordyKeywordLabel()
   private let thirdKeywordLabel = RecordyKeywordLabel()
@@ -86,18 +85,12 @@ public class UploadVideoViewController: UIViewController {
       $0.font = RecordyFont.caption2.font
       $0.textColor = CommonAsset.recordyGrey01.color
     }
-    selectedKeywordButton.do {
-      $0.setImage(CommonAsset.keywordButton.image, for: .normal)
+    selectKeywordStackView.keywordButton.do {
       $0.addTarget(
         self,
         action: #selector(selectedKeywordButtonTapped),
         for: .touchUpInside
       )
-    }
-    selectedKeywordStackView.do {
-      $0.axis = .horizontal
-      $0.spacing = 8
-      $0.isHidden = true
     }
     locationTextCountLabel.do {
       $0.font = RecordyFont.caption2.font
@@ -125,9 +118,8 @@ public class UploadVideoViewController: UIViewController {
       warningLabel,
       videoThumbnailLabel,
       videoThumbnailView,
+      selectKeywordStackView,
       selectedKeywordLabel,
-      selectedKeywordStackView,
-      selectedKeywordButton,
       locationLabel,
       locationTextField,
       locationTextCountLabel,
@@ -169,23 +161,17 @@ public class UploadVideoViewController: UIViewController {
       $0.height.equalTo(284.adaptiveHeight)
     }
     self.selectedKeywordLabel.snp.makeConstraints {
-      $0.top.equalTo(videoThumbnailImageView.snp.bottom).offset(8.adaptiveHeight)
+      $0.top.equalTo(videoThumbnailImageView.snp.bottom).offset(20.adaptiveHeight)
       $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
       $0.height.equalTo(28.adaptiveHeight)
     }
-    self.selectedKeywordStackView.snp.makeConstraints {
-      $0.top.equalTo(selectedKeywordLabel.snp.bottom).offset(12.adaptiveHeight)
+    self.selectKeywordStackView.snp.makeConstraints {
+      $0.top.equalTo(selectedKeywordLabel.snp.bottom).offset(10.adaptiveHeight)
       $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
-      $0.width.equalTo(0)
-      $0.height.equalTo(36.adaptiveHeight)
-    }
-    self.selectedKeywordButton.snp.makeConstraints {
-      $0.top.equalTo(selectedKeywordLabel.snp.bottom).offset(12.adaptiveHeight)
-      $0.leading.equalTo(contentView.snp.leading).inset(20.adaptiveWidth)
       $0.height.equalTo(36.adaptiveHeight)
     }
     self.locationLabel.snp.makeConstraints {
-      $0.top.equalTo(selectedKeywordButton.snp.bottom).offset(24.adaptiveHeight)
+      $0.top.equalTo(selectKeywordStackView.snp.bottom).offset(24.adaptiveHeight)
       $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
       $0.height.equalTo(28.adaptiveHeight)
     }
@@ -252,8 +238,9 @@ public class UploadVideoViewController: UIViewController {
 
     locationTextField.rx.text.orEmpty
       .subscribe(onNext: { [weak self] text in
+        guard let self = self else { return }
         if text.count > 20 {
-          self?.locationTextField.text = String(text.prefix(20))
+          self.locationTextField.text = String(text.prefix(20))
         }
       })
       .disposed(by: disposeBag)
@@ -290,9 +277,10 @@ public class UploadVideoViewController: UIViewController {
     if let sheet = filteringViewController.sheetPresentationController {
       sheet.detents = [
         .custom { _ in
-          return 509.adaptiveHeight
+          return 495.adaptiveHeight
         }
       ]
+      sheet.prefersGrabberVisible = true
     }
     self.present(filteringViewController, animated: true)
   }
@@ -309,29 +297,7 @@ extension UploadVideoViewController: SelectVideoDelegate {
 extension UploadVideoViewController: FilteringDelegate {
   public func selectKeywords(_ keywords: [Keyword]) {
     viewModel.input.selectedKeywords.accept(keywords)
-
-    selectedKeywordButton.isHidden.toggle()
-    selectedKeywordStackView.isHidden.toggle()
-
-    let keywordLabels = [firstKeywordLabel, secondKeywordLabel, thirdKeywordLabel]
-
-    for (index, keyword) in keywords.enumerated() {
-      let label = keywordLabels[index]
-      label.text = keyword.title
-      label.snp.remakeConstraints {
-        $0.width.equalTo(keywords[index].width.adaptiveWidth)
-        $0.height.equalTo(36.adaptiveHeight)
-      }
-    }
-
-    for label in keywordLabels {
-      selectedKeywordStackView.addArrangedSubview(label)
-    }
-
-    let stackViewWidth = keywords.reduce(0) { $0 + $1.width }
-    selectedKeywordStackView.snp.updateConstraints {
-      $0.width.equalTo(stackViewWidth.adaptiveWidth + 16)
-    }
+    selectKeywordStackView.updateKeywords(keywords: keywords)
   }
 }
 

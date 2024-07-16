@@ -42,7 +42,7 @@ public enum Keyword: CaseIterable {
     case .exotic:
       "이색적인"
     case .fun:
-      "재밋는"
+      "재밌는"
     case .quiet:
       "조용한"
     case .concentrate:
@@ -57,13 +57,13 @@ public enum Keyword: CaseIterable {
   public var width: CGFloat {
     switch self {
     case .all:
-      return 41 //2
+      return 45 //2
     case .intensive, .cute, .clean, .cozy, .fun, .quiet:
-      return 52 //3
+      return 56 //3
     case .sensitive, .nerdy, .exotic, .classic, .trendy:
-      return 62 //4
+      return 66 //4
     case .concentrate:
-      return 86
+      return 92
     }
   }
 }
