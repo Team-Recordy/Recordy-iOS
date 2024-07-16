@@ -24,21 +24,21 @@ class TasteView: UIView {
   let bottomMessage = UILabel()
   
   let fetchedData: [TasteData] = [
-    TasteData(
-      title: "집중하기 좋은",
-      percentage: 66,
-      type: .large
-    ),
-    TasteData(
-      title: "분위기 좋은",
-      percentage: 22,
-      type: .medium
-    ),
-    TasteData(
-      title: "집중하기 좋은",
-      percentage: 10,
-      type: .small
-    )
+//    TasteData(
+//      title: "집중하기 좋은",
+//      percentage: 66,
+//      type: .large
+//    ),
+//    TasteData(
+//      title: "분위기 좋은",
+//      percentage: 22,
+//      type: .medium
+//    ),
+//    TasteData(
+//      title: "집중하기 좋은",
+//      percentage: 10,
+//      type: .small
+//    )
   ]
   
   override init(frame: CGRect) {

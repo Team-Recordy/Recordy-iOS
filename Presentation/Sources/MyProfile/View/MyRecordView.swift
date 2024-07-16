@@ -5,7 +5,6 @@
 //  Created by 송여경 on 7/17/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
-
 import UIKit
 import SnapKit
 import Then
@@ -34,6 +33,7 @@ class MyRecordView: UIView {
   
   private func setStyle() {
     self.backgroundColor = .black
+    
     videoEmptyImageView.do {
       $0.image = CommonAsset.mypageCamera.image
       $0.contentMode = .scaleAspectFit

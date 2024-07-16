@@ -25,7 +25,7 @@ public class ProfileViewController: UIViewController {
   let segmentControlView = ProfileSegmentControllView()
   let tasteView = TasteView()
   let recordView = MyRecordView()
-  let bookmarkView = UIView()
+  let bookmarkView = BookMarkView()
   
   var controlType: ControlType = .taste {
     didSet {
@@ -44,9 +44,6 @@ public class ProfileViewController: UIViewController {
   
   func setStyle() {
   
-    bookmarkView.do {
-      $0.backgroundColor = .blue
-    }
   }
   
   func setUI() {
