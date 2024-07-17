@@ -10,12 +10,36 @@ import Foundation
 
 import Core
 
+import RxSwift
+
 class VideoFeedViewModel {
   
   private(set) var feedList: [Feed] = []
+  let apiProvider = APIProvider<APITarget.Records>()
+  let disposeBag = DisposeBag()
+  var isFetching = false
+  var onFeedListUpdate: (() -> ())?
+  var isBookmarked: (() -> ())?
 
-  func fetchVideos(completion: @escaping () -> Void) {
-    let feeds: [Feed] = Feed.mockdata
+  func getRecordList() {
+    guard !isFetching else { return }
+    isFetching = true
+    let request = DTO.GetRecordListRequest(size: 10)
+    apiProvider.requestResponsable(.getRecordList(request), DTO.RecordList.self) { result in
+      self.isFetching = false
+      switch result {
+      case .success(let response):
+        self.feedList += response.feeds
+        self.onFeedListUpdate?()
+      case .failure(let error):
+        print(error)
+      }
+    }
+  }
+
+  func cacheVideos(
+    feeds: [Feed],
+    completion: @escaping () -> Void) {
     let dispatchGroup = DispatchGroup()
     var cachedFeeds: [Feed] = []
     
@@ -36,42 +60,66 @@ class VideoFeedViewModel {
       let newFeeds = cachedFeeds.filter { newFeed in
         !self.feedList.contains(where: { $0.id == newFeed.id })
       }
-      self.feedList = newFeeds
+      self.feedList += newFeeds
       completion()
     }
   }
-  
-  func fetchMoreVideos(completion: @escaping () -> Void) {
-    let feeds: [Feed] = Feed.mockdata1
-    let dispatchGroup = DispatchGroup()
-    var cachedFeeds: [Feed] = []
-    
-    for feed in feeds {
-      dispatchGroup.enter()
-      VideoCacheManager.shared.downloadAndCacheURL(url: feed.videoLink) { url in
-        guard url != nil else {
-          dispatchGroup.leave()
-          return
-        }
-        cachedFeeds.append(feed)
-        dispatchGroup.leave()
+
+  func postIsFeedWatched(feed: Feed) {
+    let request = DTO.IsRecordWatchedRequest(recordId: feed.id)
+    apiProvider.justRequest(.isRecordWatched(request)) { result in
+      switch result {
+      case .success:
+        print("@Log - success")
+      case .failure(let failure):
+        print(failure)
       }
-    }
-    dispatchGroup.notify(queue: .main) { [weak self] in
-      guard let self = self else { return }
-      let newFeeds = cachedFeeds.filter { newFeed in
-        !self.feedList.contains(where: { $0.id == newFeed.id })
-      }
-      self.feedList.append(contentsOf: newFeeds)
-      completion()
     }
   }
-  
+
   func bookmarkButtonTapped(_ index: Int) {
-    feedList[index].isBookmarked.toggle()
+    self.feedList[index].isBookmarked.toggle()
+    let count = self.feedList[index].isBookmarked ? 1 : -1
+    self.feedList[index].bookmarkCount += count
+    let bookmarkProvider = APIProvider<APITarget.Bookmark>()
+    let request = DTO.PostBookmarkRequest(recordId: feedList[index].id)
+    bookmarkProvider.justRequest(.postBookmark(request)) { result in
+      switch result {
+      case .success:
+        print("@Log - success")
+      case .failure(let failure):
+        print(failure)
+      }
+    }
   }
 }
 
+//
+//  func fetchMoreVideos(completion: @escaping () -> Void) {
+//    let feeds: [Feed] = Feed.mockdata1
+//    let dispatchGroup = DispatchGroup()
+//    var cachedFeeds: [Feed] = []
+//
+//    for feed in feeds {
+//      dispatchGroup.enter()
+//      VideoCacheManager.shared.downloadAndCacheURL(url: feed.videoLink) { url in
+//        guard url != nil else {
+//          dispatchGroup.leave()
+//          return
+//        }
+//        cachedFeeds.append(feed)
+//        dispatchGroup.leave()
+//      }
+//    }
+//    dispatchGroup.notify(queue: .main) { [weak self] in
+//      guard let self = self else { return }
+//      let newFeeds = cachedFeeds.filter { newFeed in
+//        !self.feedList.contains(where: { $0.id == newFeed.id })
+//      }
+//      self.feedList.append(contentsOf: newFeeds)
+//      completion()
+//    }
+//  }
 //class VideoFeedViewModel {
 //
 //  struct Input {

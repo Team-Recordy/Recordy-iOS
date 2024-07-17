@@ -9,6 +9,7 @@
 import UIKit
 import AVKit
 
+import Core
 import Common
 
 import SnapKit
@@ -26,12 +27,26 @@ public class VideoFeedViewController: UIViewController {
   public override func viewDidLoad() {
     super.viewDidLoad()
     setUpCollectionView()
+    setStyle()
     setUI()
     setAutolayout()
-    fetchInitialVideos()
+  }
+
+  public override func viewWillAppear(_ animated: Bool) {
+    bind()
+    viewModel.getRecordList()
+  }
+
+  private func bind() {
+    viewModel.onFeedListUpdate = { [weak self] in
+      DispatchQueue.main.async {
+        self?.collectionView!.reloadData()
+      }
+    }
   }
 
   private func setStyle() {
+    self.navigationController?.navigationBar.isHidden = true
     self.view.backgroundColor = CommonAsset.recordyBG.color
   }
 
@@ -74,26 +89,17 @@ public class VideoFeedViewController: UIViewController {
     self.collectionView!.dataSource = self
   }
 
-  private func fetchInitialVideos() {
-    viewModel.fetchVideos {
-      DispatchQueue.main.async {
-        self.collectionView?.reloadData()
-      }
-    }
-  }
-
-  private func fetchMoreVideos() {
-    if !isFetched {
-      viewModel.fetchMoreVideos {
-        DispatchQueue.main.async {
-          self.collectionView?.reloadData()
-          self.isFetched.toggle()
-        }
-      }
-    }
+  @objc private func nicknameButtonTapped() {
+    let userVC = UserProfileViewController()
+    self.navigationController?.pushViewController(userVC, animated: true)
   }
 }
 
+extension VideoFeedViewController: FeedWatchDelegate {
+  func play(feed: Feed) {
+    viewModel.postIsFeedWatched(feed: feed)
+  }
+}
 
 extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
@@ -113,10 +119,11 @@ extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDat
       for: indexPath
     ) as! FeedCell
     let feed = viewModel.feedList[indexPath.row]
+    cell.delegate = self
     cell.bind(
       feed: feed,
       bounds: collectionView.frame,
-      shouldAddPlayer: cell.avQueuePlayer == nil
+      shouldAddPlayer: cell.avPlayer == nil
     )
     if !isPlayed {
       cell.play()
@@ -124,8 +131,16 @@ extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDat
     }
     cell.bookmarkTappedRelay = {
       self.viewModel.bookmarkButtonTapped(indexPath.row)
-      cell.updateBookmarkStatus(isBookmarked: self.viewModel.feedList[indexPath.row].isBookmarked)
+      cell.updateBookmarkStatus(
+        count: self.viewModel.feedList[indexPath.row].bookmarkCount,
+        isBookmarked: self.viewModel.feedList[indexPath.row].isBookmarked
+      )
     }
+    cell.feedView.nicknameButton.addTarget(
+      self,
+      action: #selector(nicknameButtonTapped),
+      for: .touchUpInside
+    )
     return cell
   }
 
@@ -134,8 +149,9 @@ extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDat
     willDisplay cell: UICollectionViewCell,
     forItemAt indexPath: IndexPath
   ) {
-    if viewModel.feedList.count == indexPath.row + 1 {
-      fetchMoreVideos()
+    print(indexPath.row)
+    if indexPath.row == viewModel.feedList.count - 5 {
+      viewModel.getRecordList()
     }
   }
 
