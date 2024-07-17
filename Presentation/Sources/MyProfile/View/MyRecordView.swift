@@ -18,27 +18,16 @@ class MyRecordView: UIView, UICollectionViewDataSource, UICollectionViewDelegate
   private let videoEmptyTextView = UIImageView()
   private let goActionButton = UIButton()
   private let countLabel = UILabel()
-  private let collectionView: UICollectionView
+  private var collectionView: UICollectionView!
   private let feeds: [Feed] = Feed.mockdata
   
   override init(frame: CGRect) {
-    let layout = UICollectionViewFlowLayout()
-    layout.itemSize = CGSize(width: 170, height: 288)
-    layout.minimumLineSpacing = 10
-    layout.minimumInteritemSpacing = 10
-    layout.sectionInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
-    
-    collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     super.init(frame: frame)
-    
+    setUpCollectionView()
     setStyle()
     setUI()
     setAutoLayout()
     checkDataEmpty()
-    
-    collectionView.dataSource = self
-    collectionView.delegate = self
-    collectionView.register(ThumbnailCollectionViewCell.self, forCellWithReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier)
   }
   
   required init?(coder: NSCoder) {
@@ -124,6 +113,19 @@ class MyRecordView: UIView, UICollectionViewDataSource, UICollectionViewDelegate
     }
   }
   
+  private func setUpCollectionView() {
+    let layout = UICollectionViewFlowLayout()
+    layout.itemSize = CGSize(width: 170, height: 288)
+    layout.minimumLineSpacing = 10
+    layout.minimumInteritemSpacing = 10
+    layout.sectionInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
+    
+    collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    collectionView.dataSource = self
+    collectionView.delegate = self
+    collectionView.register(ThumbnailCollectionViewCell.self, forCellWithReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier)
+  }
+  
   @objc private func didTapActionButton() {
     print("기록하기 버튼 눌림")
   }
@@ -145,7 +147,7 @@ class MyRecordView: UIView, UICollectionViewDataSource, UICollectionViewDelegate
     let whiteText = "• \(feeds.count)"
     let greyText = " 개의 기록"
     let attributedText = NSMutableAttributedString(string: whiteText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
-    attributedText.append(NSAttributedString(string: greyText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray]))
+    attributedText.append(NSAttributedString(string: greyText, attributes: [NSAttributedString.Key.foregroundColor: CommonAsset.recordyGrey03.color]))
     countLabel.attributedText = attributedText
   }
   

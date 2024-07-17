@@ -5,7 +5,6 @@
 //  Created by 송여경 on 7/17/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
-
 import UIKit
 import SnapKit
 import Then
@@ -13,38 +12,27 @@ import Then
 import Common
 import Core
 
-class BookMarkView: UIView, UICollectionViewDataSource,UICollectionViewDelegate {
+class BookMarkView: UIView, UICollectionViewDataSource, UICollectionViewDelegate {
   private let bookmarkEmptyView = UIView()
   private let bookmarkDataView = UIView()
   
   let bookmarkEmptyImageView = UIImageView()
   let bookmarkEmptyTextVIew = UIImageView()
   private let countLabel = UILabel()
-  private let collectionView: UICollectionView
+  private var collectionView: UICollectionView!
   private let feeds: [Feed] = Feed.mockdata
   
   override init(frame: CGRect) {
-    let layout = UICollectionViewFlowLayout()
-    layout.itemSize = CGSize(width: 170, height: 288)
-    layout.minimumLineSpacing = 10
-    layout.minimumInteritemSpacing = 10
-    layout.sectionInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
-    
-    collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     super.init(frame: frame)
-    
+    setUpCollectionView()
     setStyle()
     setUI()
     setAutoLayout()
     checkDataEmpty()
-    
-    collectionView.dataSource = self
-    collectionView.delegate = self
-    collectionView.register(ThumbnailCollectionViewCell.self, forCellWithReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier)
   }
   
   required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    fatalError("init(coder:)가 구현되지 않았습니다.")
   }
   
   private func setStyle() {
@@ -73,7 +61,7 @@ class BookMarkView: UIView, UICollectionViewDataSource,UICollectionViewDelegate 
   private func setUI() {
     self.addSubview(bookmarkEmptyView)
     self.addSubview(bookmarkDataView)
-    self.addSubviews(countLabel)
+    self.addSubview(countLabel)
     self.addSubview(collectionView)
     
     bookmarkEmptyView.addSubview(bookmarkEmptyImageView)
@@ -109,26 +97,41 @@ class BookMarkView: UIView, UICollectionViewDataSource,UICollectionViewDelegate 
       $0.leading.trailing.bottom.equalToSuperview()
     }
   }
+  
+  private func setUpCollectionView() {
+    let layout = UICollectionViewFlowLayout()
+    layout.itemSize = CGSize(width: 170, height: 288)
+    layout.minimumLineSpacing = 10
+    layout.minimumInteritemSpacing = 10
+    layout.sectionInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
+    
+    collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    collectionView.dataSource = self
+    collectionView.delegate = self
+    collectionView.register(ThumbnailCollectionViewCell.self, forCellWithReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier)
+  }
+  
   private func checkDataEmpty() {
     if feeds.isEmpty {
-      bookmarkEmptyImageView.isHidden = false
-      bookmarkEmptyTextVIew.isHidden = false
-      collectionView.isHidden = true }
-    else {
+      bookmarkEmptyView.isHidden = false
+      countLabel.isHidden = true
+      collectionView.isHidden = true
+    } else {
       bookmarkEmptyView.isHidden = true
       countLabel.isHidden = false
-      collectionView.isHidden
-      = false
+      collectionView.isHidden = false
       setCountLabelText()
     }
   }
+  
   private func setCountLabelText() {
     let whiteText = "• \(feeds.count)"
     let greyText = " 개의 기록"
     let attributedText = NSMutableAttributedString(string: whiteText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
-    attributedText.append(NSAttributedString(string: greyText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray]))
+    attributedText.append(NSAttributedString(string: greyText, attributes: [NSAttributedString.Key.foregroundColor: CommonAsset.recordyGrey03.color]))
     countLabel.attributedText = attributedText
   }
+  
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return feeds.count
   }
@@ -145,4 +148,3 @@ class BookMarkView: UIView, UICollectionViewDataSource,UICollectionViewDelegate 
     return cell
   }
 }
-
