@@ -373,19 +373,19 @@ extension HomeViewController: UIScrollViewDelegate {
       homeTitle.isHidden = true
       homeImage.isHidden = true
     } else {
-            if keywordIsSticky {
-                keywordCollectionView.removeFromSuperview()
-                contentView.addSubview(keywordCollectionView)
-                keywordCollectionView.snp.remakeConstraints { make in
-                    make.top.equalTo(homeTitle.snp.bottom).offset(20)
-                    make.leading.trailing.equalToSuperview().inset(20)
-                    make.height.equalTo(34.adaptiveHeight)
-                }
-                keywordIsSticky = false
-            }
-          homeTitle.isHidden = false
-          homeImage.isHidden = false
+      if keywordIsSticky {
+        keywordCollectionView.removeFromSuperview()
+        contentView.addSubview(keywordCollectionView)
+        keywordCollectionView.snp.remakeConstraints { make in
+          make.top.equalTo(homeTitle.snp.bottom).offset(20)
+          make.leading.trailing.equalToSuperview().inset(20)
+          make.height.equalTo(34.adaptiveHeight)
         }
-        view.layoutIfNeeded()
+        keywordIsSticky = false
+      }
+      homeTitle.isHidden = false
+      homeImage.isHidden = false
     }
+    view.layoutIfNeeded()
+  }
 }
