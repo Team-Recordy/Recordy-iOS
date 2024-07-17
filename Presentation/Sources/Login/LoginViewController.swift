@@ -74,7 +74,10 @@ public final class LoginViewController: UIViewController {
     }
   }
 
-  func postSignInRequest(authorization: String, platformType: PlatformType) {
+  func postSignInRequest(
+    authorization: String,
+    platformType: PlatformType
+  ) {
     let apiProvider = APIProvider<APITarget.Users>()
     let request = DTO.SignInRequest(authorization: authorization,
                                     platformType: platformType)

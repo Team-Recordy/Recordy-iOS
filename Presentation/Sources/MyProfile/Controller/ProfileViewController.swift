@@ -43,7 +43,7 @@ public class ProfileViewController: UIViewController {
     getBookmarkedRecordList()
     getTasteRecordList()
     print(KeychainManager.shared.read(token: .AccessToken))
-    
+    getMyRecordList()
   }
   
   func setStyle() {
@@ -121,6 +121,35 @@ public class ProfileViewController: UIViewController {
         self.bookmarkView.getBookmarkList(feeds: feeds)
       case .failure(let failure):
         print("@Log - \(failure.localizedDescription)")
+      }
+    }
+  }
+  
+  func getMyRecordList() {
+    let apiProvider = APIProvider<APITarget.Records>()
+    let request = DTO.GetUserRecordListRequest(otherUserId: 1, cursorId: 0, size: 10)
+    apiProvider.requestResponsable(.getUserRecordList(request), DTO.GetUserRecordListResponse.self) {[weak self]
+      result in
+      guard let self = self else {return}
+      switch result {
+      case .success(let response):
+        print("@Log - \(response)")
+        let feeds = response.content.map {
+          Feed(
+            id: $0.recordInfo.id,
+            location: $0.recordInfo.location,
+            nickname: $0.recordInfo.uploaderNickname,
+            description: $0.recordInfo.content,
+            bookmarkCount: $0.recordInfo.bookmarkCount,
+            isBookmarked: $0.isBookmark,
+            videoLink: $0.recordInfo.fileUrl.videoUrl,
+            thumbnailLink: $0.recordInfo.fileUrl.thumbnailUrl
+          )
+        }
+        print("@Log - \(feeds)")
+        self.recordView.getMyRecordList(feeds:feeds)
+      case .failure(let failure):
+        print(failure.localizedDescription)
       }
     }
   }
