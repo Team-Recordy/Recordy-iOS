@@ -24,21 +24,21 @@ class TasteView: UIView {
   let bottomMessage = UILabel()
   
   let fetchedData: [TasteData] = [
-//    TasteData(
-//      title: "집중하기 좋은",
-//      percentage: 66,
-//      type: .large
-//    ),
-//    TasteData(
-//      title: "분위기 좋은",
-//      percentage: 22,
-//      type: .medium
-//    ),
-//    TasteData(
-//      title: "집중하기 좋은",
-//      percentage: 10,
-//      type: .small
-//    )
+    TasteData(
+      title: "집중하기 좋은",
+      percentage: 66,
+      type: .large
+    ),
+    TasteData(
+      title: "분위기 좋은",
+      percentage: 22,
+      type: .medium
+    ),
+    TasteData(
+      title: "집중하기 좋은",
+      percentage: 10,
+      type: .small
+    )
   ]
   
   override init(frame: CGRect) {
@@ -117,7 +117,7 @@ class TasteView: UIView {
     
     bottomMessage.snp.makeConstraints {
       $0.top.equalTo(actionButton.snp.bottom).offset(94)
-      $0.left.equalTo(71)
+      $0.left.equalTo(76)
     }
     
     dataView.snp.makeConstraints {
