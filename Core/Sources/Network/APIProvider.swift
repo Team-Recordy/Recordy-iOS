@@ -9,33 +9,49 @@
 import Foundation
 
 import Moya
-import RxMoya
-import RxSwift
+
 
 public final class APIProvider<T: TargetType>: MoyaProvider<T> {
+  //  typealias APIResult = Result<U: Codable, MoyaError>
+  private let interceptor = BaseInterceptor()
+  let decoder = JSONDecoder()
 
   public init() {
     let plugin: [PluginType] = [RecordyPlugin()]
-    super.init(plugins: plugin)
+    let session = Session(interceptor: interceptor)
+    super.init(session: session, plugins: plugin)
   }
 
-  public func request<U: Codable>(
+  public func justRequest(_ target: Target, completion: @escaping (Result<Void, Error>) -> Void) {
+    request(target) { result in
+      switch result {
+      case .success:
+        self.printLog(title: "response", message: "success")
+        completion(.success(()))
+      case let .failure(error):
+        do {
+          let apiError = try self.getAPIError(error)
+          completion(.failure(apiError))
+        } catch {
+          completion(.failure(error))
+        }
+      }
+    }
+  }
+
+  public func requestResponsable<U: Codable>(
+    _ target: T,
     _ object: U.Type,
-    target: T
-  ) -> Single<Result<U, RecordyNetworkError>> {
-    return self.rx.request(target)
-      .map { response in
-        let statusCode = response.statusCode
-        let data = response.data
-        return self.handleResponseStatus(statusCode, data, object)
+    completion: @escaping (Result<U, RecordyNetworkError>) -> Void
+  ) {
+    request(target) { response in
+      switch response {
+      case .success(let response):
+        completion(self.handleResponseStatus(response.statusCode, response.data, U.self))
+      case .failure(let error):
+        completion(.failure(.requestFailed("@Log - \(error.localizedDescription)")))
       }
-      .catch { error in
-        return .just(
-          .failure(
-            .requestFailed("✅ 요청 문제 발생 - \(error.localizedDescription)")
-          )
-        )
-      }
+    }
   }
 
   func handleResponseStatus<U: Codable>(
@@ -45,7 +61,7 @@ public final class APIProvider<T: TargetType>: MoyaProvider<T> {
   ) -> Result<U, RecordyNetworkError> {
     switch statusCode {
     case 200..<300:
-      return decodeData(data, object)
+      return getResponse(data, object: object)
     case 400..<500:
       return .failure(.requestFailed("✅ 클라이언트 문제에요. \(statusCode)"))
     case 500..<600:
@@ -55,9 +71,9 @@ public final class APIProvider<T: TargetType>: MoyaProvider<T> {
     }
   }
 
-  private func decodeData<U: Codable>(
+  private func getResponse<U: Codable>(
     _ data: Data,
-    _ object: U.Type
+    object: U.Type
   ) -> Result<U, RecordyNetworkError> {
     let decoder = JSONDecoder()
     do {
@@ -73,5 +89,31 @@ public final class APIProvider<T: TargetType>: MoyaProvider<T> {
       return .failure(.decodingFailed(error.localizedDescription))
     }
   }
+
+  private func getAPIError(_ error: MoyaError) throws -> APIError {
+    guard let data = error.response?.data else {
+      return .unknown
+    }
+    printLog(title: "response error", data: data)
+    return try decoder.decode(APIError.self, from: data)
+  }
+
+  // TODO: - Logger
+
+  private func printLog(title: String, data: Data) {
+    let message = String(data: data, encoding: .utf8) ?? ""
+    printLog(title: title, message: message)
+  }
+
+  private func printLog(title: String, message: String) {
+    print("@LOG \(title)\n\(message)")
+  }
 }
 
+struct APIError: Error, Decodable {
+  let detail: String
+}
+
+extension APIError {
+  static let unknown = APIError(detail: "unknown error")
+}
