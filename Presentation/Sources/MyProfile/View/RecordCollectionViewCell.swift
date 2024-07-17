@@ -48,7 +48,7 @@ class RecordCollectionViewCell: UICollectionViewCell {
     if let image = UIImage(named: record.thumbnail) {
       imageView.image = image
     } else {
-      imageView.image = UIImage(named: "placeholder_image") // Placeholder image
+      imageView.image = UIImage(named: "placeholder_image")
     }
     locationLabel.text = record.location
   }

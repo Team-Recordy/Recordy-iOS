@@ -42,7 +42,7 @@ class VideoFeedViewModel {
   }
   
   func fetchMoreVideos(completion: @escaping () -> Void) {
-    let feeds: [Feed] = Feed.mockdata1
+    let feeds: [Feed] = []
     let dispatchGroup = DispatchGroup()
     var cachedFeeds: [Feed] = []
     
