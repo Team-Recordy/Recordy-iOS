@@ -11,7 +11,7 @@ import Foundation
 import Moya
 
 extension APITarget {
-  enum Records {
+  public enum Records {
     case getPresignedUrl
     case createRecord(DTO.CreateRecordRequest)
     case deleteRecord(DTO.DeleteRecordRequest)
@@ -25,12 +25,16 @@ extension APITarget {
   }
 }
 
+//extension APITarget.Records {
+//  static func 
+//}
+
 extension APITarget.Records: TargetType {
-  var baseURL: URL {
-    return URL(string: "BASE_URL + /records")!
+  public var baseURL: URL {
+    return URL(string: BaseURL.string + "/records")!
   }
 
-  var path: String {
+  public var path: String {
     switch self {
     case .getPresignedUrl:
       return "presigned-url"
@@ -39,7 +43,7 @@ extension APITarget.Records: TargetType {
     case .deleteRecord(let deleteRecordRequest):
       return "\(deleteRecordRequest.record_id)"
     case .isRecordWatched(let isRecordWatchedRequest):
-      return "\(isRecordWatchedRequest)"
+      return "\(isRecordWatchedRequest.recordId)"
     case .getRecordList:
       return ""
     case .getUserRecordList(let getUserRecordListRequest):
@@ -57,7 +61,7 @@ extension APITarget.Records: TargetType {
   }
 
   /// 다 붙이고 수정하기
-  var method: Moya.Method {
+  public var method: Moya.Method {
     switch self {
     case .getPresignedUrl:
       return .get
@@ -82,7 +86,7 @@ extension APITarget.Records: TargetType {
     }
   }
 
-  var task: Moya.Task {
+  public var task: Moya.Task {
     switch self {
     case .createRecord(let createRecordRequest):
       return .requestJSONEncodable(createRecordRequest)
@@ -143,7 +147,7 @@ extension APITarget.Records: TargetType {
     }
   }
 
-  var headers: [String : String]? {
+  public var headers: [String : String]? {
     return .none
   }
 }

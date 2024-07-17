@@ -12,5 +12,9 @@ extension DTO {
   public struct GetRecordListRequest: BaseRequest {
     /// 요청 리스트 사이즈, 디폴트 10
     public let size: Int
+
+    public init(size: Int) {
+      self.size = size
+    }
   }
 }

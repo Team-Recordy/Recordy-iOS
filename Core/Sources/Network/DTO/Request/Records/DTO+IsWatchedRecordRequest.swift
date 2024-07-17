@@ -11,5 +11,9 @@ import Foundation
 extension DTO {
   public struct IsRecordWatchedRequest: BaseRequest {
     let recordId: Int
+
+    public init(recordId: Int) {
+      self.recordId = recordId
+    }
   }
 }
