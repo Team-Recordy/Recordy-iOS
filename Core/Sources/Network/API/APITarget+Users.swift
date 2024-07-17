@@ -13,17 +13,20 @@ import Moya
 extension APITarget {
   public enum Users {
     case signIn(DTO.SignInRequest)
-    case signUp
-    case signOut
-    case checkNickname
-    case refreshToken
-    case withdraw
-    case getfollowList
-    case getfollowerList
+    case signUp(DTO.SignUpRequest)
+    case signOut // 로그아웃
+    case checkNickname(DTO.CheckNicknameRequest)
+    case refreshToken(DTO.RefreshTokenRequest)
+    case withdraw // 회원 탈퇴
+    case getfollowList(DTO.GetFollowListRequest)
+    case getfollowerList(DTO.GetFollowerListRequest)
+    case follow(DTO.FollowRequest)
+    case getProfile
   }
 }
 
 extension APITarget.Users: TargetType {
+
   public var baseURL: URL {
     return URL(string: BaseURL.string + "/users")!
   }
@@ -43,9 +46,13 @@ extension APITarget.Users: TargetType {
     case .withdraw:
       "delete"
     case .getfollowList:
-      "follow"
+      "following"
     case .getfollowerList:
       "follower"
+    case .follow:
+      "follow"
+    case .getProfile:
+      "profile"
     }
   }
 
@@ -67,6 +74,10 @@ extension APITarget.Users: TargetType {
       return .get
     case .getfollowerList:
       return .get
+    case .follow:
+      return .post
+    case .getProfile:
+      return .get
     }
   }
 
@@ -77,21 +88,40 @@ extension APITarget.Users: TargetType {
         parameters: ["platformType": signInRequest.platformType.rawValue],
         encoding: JSONEncoding.default
       )
+    case .signUp(let signUpRequest):
+      return .requestJSONEncodable(signUpRequest)
+    case .checkNickname(let checkNicknameRequest):
+      return .requestParameters(
+        parameters: ["nickname": checkNicknameRequest.nickname],
+        encoding: URLEncoding.queryString
+      )
+    case .getfollowList(let getFollowListRequest):
+      return .requestParameters(
+        parameters: [
+          "cursorId": getFollowListRequest.cursorId,
+          "size": getFollowListRequest.size
+        ],
+        encoding: URLEncoding.queryString
+      )
+    case .getfollowerList(let getFollowerListRequest):
+      return .requestParameters(
+        parameters: [
+          "cursorId": getFollowerListRequest.cursorId,
+          "size": getFollowerListRequest.size
+        ],
+        encoding: URLEncoding.queryString
+      )
+    case .follow(let followRequest):
+      return .requestParameters(
+        parameters: ["followingId": followRequest.followingId],
+        encoding: URLEncoding.queryString
+      )
     default:
       return .requestPlain
     }
   }
 
   public var headers: [String : String]? {
-    switch self {
-    case .signIn(let signInRequest):
-      return [
-        "Content-Type": "application/json",
-        "Authorization": signInRequest.authorization
-      ]
-    default:
-      return ["Content-Type": "application/json"]
-    }
-
+    return .none
   }
 }

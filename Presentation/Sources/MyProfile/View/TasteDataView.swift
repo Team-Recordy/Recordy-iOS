@@ -15,16 +15,17 @@ class TasteDataView: UIView {
   
   private let titleLabel = UILabel()
   private let percentageLabel = UILabel()
-  private let tasteType: TasteCase
+  private let tasteData: TasteData
   
   public init(
     frame: CGRect = .zero,
-    type: TasteCase
+    tasteData: TasteData
   ) {
-    self.tasteType = type
+    self.tasteData = tasteData
     super.init(
       frame: frame
     )
+    configure(with: tasteData)
     setUI()
     setStyle()
     setAutolayout()
@@ -40,11 +41,11 @@ class TasteDataView: UIView {
   }
   
   private func setStyle() {
-    titleLabel.font = tasteType.title
+    titleLabel.font = tasteData.type.title
     titleLabel.textColor = .white
     titleLabel.textAlignment = .center
     
-    percentageLabel.font = tasteType.subtitle
+    percentageLabel.font = tasteData.type.subtitle
     percentageLabel.textColor = .white
     percentageLabel.textAlignment = .center
   }

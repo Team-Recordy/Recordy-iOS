@@ -51,14 +51,14 @@ public class RecordyFilteringViewController: UIViewController {
       $0.textColor = CommonAsset.recordyGrey01.color
       $0.font = RecordyFont.subtitle.font
     }
-    self.closeButton.do {
-      $0.setImage(CommonAsset.closeButton.image, for: .normal)
-      $0.addTarget(
-        self,
-        action: #selector(closeButtonTapped),
-        for: .touchUpInside
-      )
-    }
+//    self.closeButton.do {
+//      $0.setImage(CommonAsset.closeButton.image, for: .normal)
+//      $0.addTarget(
+//        self,
+//        action: #selector(closeButtonTapped),
+//        for: .touchUpInside
+//      )
+//    }
     self.descriptionLabel.do {
       $0.text = "해당 공간은\n어떤 느낌인가요?"
       $0.textColor = CommonAsset.recordyWhite.color
@@ -93,7 +93,7 @@ public class RecordyFilteringViewController: UIViewController {
     self.view.addSubviews(
       collectionView!,
       titleLabel,
-      closeButton,
+//      closeButton,
       descriptionLabel,
       additionalDescriptionLabel,
       applyButton
@@ -102,16 +102,16 @@ public class RecordyFilteringViewController: UIViewController {
 
   private func setAutolayout() {
     self.titleLabel.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(24.adaptiveHeight)
+      $0.top.equalToSuperview().offset(40.adaptiveHeight)
       $0.centerX.equalToSuperview()
     }
-    self.closeButton.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(20.adaptiveHeight)
-      $0.trailing.equalToSuperview().inset(16.adaptiveWidth)
-      $0.width.height.equalTo(28)
-    }
+//    self.closeButton.snp.makeConstraints {
+//      $0.top.equalToSuperview().offset(20.adaptiveHeight)
+//      $0.trailing.equalToSuperview().inset(16.adaptiveWidth)
+//      $0.width.height.equalTo(28)
+//    }
     self.descriptionLabel.snp.makeConstraints {
-      $0.top.equalTo(self.titleLabel.snp.bottom).offset(22.adaptiveHeight)
+      $0.top.equalTo(self.titleLabel.snp.bottom).offset(28.adaptiveHeight)
       $0.leading.equalToSuperview().inset(20.adaptiveWidth)
       $0.height.equalTo(64.adaptiveHeight)
     }
@@ -126,7 +126,7 @@ public class RecordyFilteringViewController: UIViewController {
       $0.height.equalTo(126.adaptiveHeight)
     }
     self.applyButton.snp.makeConstraints {
-      $0.bottom.equalToSuperview().inset(38.adaptiveHeight)
+      $0.bottom.equalToSuperview().inset(68.adaptiveHeight)
       $0.centerX.equalToSuperview()
       $0.width.equalTo(125.adaptiveWidth)
       $0.height.equalTo(44.adaptiveHeight)
