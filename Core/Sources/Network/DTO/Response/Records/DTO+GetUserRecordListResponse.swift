@@ -12,13 +12,13 @@ extension DTO {
   public struct GetUserRecordListResponse: BaseResponse {
     public let nextCursor: Int
     public let hasNext: Bool
-    public let content: Content
+    public let content: [Content]
   }
 }
 
 extension DTO.GetUserRecordListResponse {
   public struct Content: BaseResponse {
-    public let recordInfo: Bool
+    public let recordInfo: RecordInfo
     public let isBookmark: Bool
   }
 }
@@ -38,10 +38,10 @@ extension DTO.GetUserRecordListResponse.Content {
 
 extension DTO.GetUserRecordListResponse.Content.RecordInfo {
   public struct FileUrl: BaseResponse {
-    let videoUrl: String
-    let thumbnailUrl: String
+    public let videoUrl: String
+    public let thumbnailUrl: String
 
-    init(
+    public init(
       videoUrl: String,
       thumbnailUrl: String
     ) {

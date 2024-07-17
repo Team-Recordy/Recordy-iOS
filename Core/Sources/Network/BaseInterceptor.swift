@@ -21,6 +21,9 @@ final class BaseInterceptor: RequestInterceptor {
   ) {
     print("HI")
     var request = urlRequest
+    guard !(request.url?.absoluteString.contains("signIn"))! else {
+      return completion(.success(request))
+    }
     request.headers.add(.contentType("application/json"))
     if request.url?.absoluteString.contains("/refresh") == false {
       if let accessToken = keychainManager.read(token: .AccessToken) {
