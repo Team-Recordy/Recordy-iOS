@@ -39,11 +39,17 @@ public final class HomeViewController: UIViewController {
   weak var popularDelegate: HomeCollectionViewDelegate?
   weak var recentDelegate: HomeCollectionViewDelegate?
   
+  var keywordCollectionViewTopAnchor: Constraint!
+  var popularLabelTopAnchor: Constraint!
+  
+  var keywordIsSticky = false
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
     setKeywordCollectionView()
     setPopularCollectionView()
     setRecentCollectionView()
+    scrollView.delegate = self
     setStyle()
     setUI()
     setAutoLayout()
@@ -51,9 +57,9 @@ public final class HomeViewController: UIViewController {
   
   func setStyle() {
     self.view.backgroundColor = CommonAsset.recordyBG.color
-    self.keywordCollectionView.backgroundColor = CommonAsset.recordyBG.color
-    self.popularCollectionView.backgroundColor = CommonAsset.recordyBG.color
-    self.recentCollectionView.backgroundColor = CommonAsset.recordyBG.color
+    self.keywordCollectionView.backgroundColor = .clear
+    self.popularCollectionView.backgroundColor = .clear
+    self.recentCollectionView.backgroundColor = .clear
     
     homeTitle.do {
       $0.text = "오늘은 어떤 키워드로\n공간을 둘러볼까요?"
@@ -130,12 +136,12 @@ public final class HomeViewController: UIViewController {
   }
   
   func setAutoLayout() {
-
+    
     gradientView.snp.makeConstraints {
       $0.top.horizontalEdges.equalToSuperview()
       $0.height.equalTo(400.adaptiveHeight)
     }
-
+    
     scrollView.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
@@ -143,7 +149,7 @@ public final class HomeViewController: UIViewController {
     contentView.snp.makeConstraints {
       $0.edges.equalToSuperview()
       $0.width.equalToSuperview()
-      $0.height.equalTo(950)
+      $0.height.equalTo(980)
     }
     
     homeTitle.snp.makeConstraints {
@@ -159,13 +165,13 @@ public final class HomeViewController: UIViewController {
     }
     
     keywordCollectionView.snp.makeConstraints {
-      $0.top.equalTo(homeTitle.snp.bottom).offset(20)
       $0.height.equalTo(34.adaptiveHeight)
       $0.leading.trailing.equalToSuperview().offset(20)
+      keywordCollectionViewTopAnchor = $0.top.equalTo(homeTitle.snp.bottom).offset(20).constraint
     }
     
     popularLabel.snp.makeConstraints {
-      $0.top.equalTo(keywordCollectionView.snp.bottom).offset(34)
+      $0.top.equalTo(contentView.snp.top).offset(260)
       $0.leading.equalToSuperview().offset(20)
     }
     
@@ -216,7 +222,7 @@ public final class HomeViewController: UIViewController {
       collectionViewLayout: layout
     )
     self.keywordCollectionView.showsVerticalScrollIndicator = false
-    self.keywordCollectionView.showsHorizontalScrollIndicator = false 
+    self.keywordCollectionView.showsHorizontalScrollIndicator = false
     self.keywordCollectionView.register(
       RecordyFilteringCell.self,
       forCellWithReuseIdentifier: RecordyFilteringCell.cellIdentifier
@@ -263,13 +269,13 @@ public final class HomeViewController: UIViewController {
     self.recentCollectionView.delegate = self
     self.recentCollectionView.dataSource = self
   }
-
+  
   @objc
   func floatingButtonTapped(_ sender: UIButton) {
     let uploadViewController = UploadVideoViewController()
     self.present(uploadViewController, animated: true)
   }
-
+  
   @objc
   func chipButtonTapped(_ sender: UIButton) {
     let index = sender.tag
@@ -299,20 +305,12 @@ extension HomeViewController: UICollectionViewDataSource {
     cellForItemAt indexPath: IndexPath
   ) -> UICollectionViewCell {
     switch collectionView {
-    case popularCollectionView:
+    case popularCollectionView, recentCollectionView:
       let cell = collectionView.dequeueReusableCell(
         withReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier,
         for: indexPath
       ) as! ThumbnailCollectionViewCell
       return cell
-      
-    case recentCollectionView:
-      let cell = collectionView.dequeueReusableCell(
-        withReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier,
-        for: indexPath
-      ) as! ThumbnailCollectionViewCell
-      return cell
-      
     case keywordCollectionView:
       let cell = collectionView.dequeueReusableCell(
         withReuseIdentifier: RecordyFilteringCell.cellIdentifier,
@@ -375,19 +373,19 @@ extension HomeViewController: UIScrollViewDelegate {
       homeTitle.isHidden = true
       homeImage.isHidden = true
     } else {
-      if keywordIsSticky {
-        keywordCollectionView.removeFromSuperview()
-        contentView.addSubview(keywordCollectionView)
-        keywordCollectionView.snp.remakeConstraints { make in
-          make.top.equalTo(homeTitle.snp.bottom).offset(20)
-          make.leading.trailing.equalToSuperview().inset(20)
-          make.height.equalTo(34.adaptiveHeight)
+            if keywordIsSticky {
+                keywordCollectionView.removeFromSuperview()
+                contentView.addSubview(keywordCollectionView)
+                keywordCollectionView.snp.remakeConstraints { make in
+                    make.top.equalTo(homeTitle.snp.bottom).offset(20)
+                    make.leading.trailing.equalToSuperview().inset(20)
+                    make.height.equalTo(34.adaptiveHeight)
+                }
+                keywordIsSticky = false
+            }
+          homeTitle.isHidden = false
+          homeImage.isHidden = false
         }
-        keywordIsSticky = false
-      }
-      homeTitle.isHidden = false
-      homeImage.isHidden = false
+        view.layoutIfNeeded()
     }
-    view.layoutIfNeeded()
-  }
 }
