@@ -22,6 +22,7 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
   public let locationText = UILabel()
   public let locationImageView = UIImageView()
   public let bookmarkButton = UIButton()
+  public var bookmarkButtonEvent: (() -> Void)?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -57,6 +58,7 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
     bookmarkButton.do {
       $0.setImage(CommonAsset.bookmarkUnselected.image, for: .normal)
       $0.titleLabel?.font = RecordyFont.button2.font
+      $0.addTarget(self, action: #selector(bookmarkButtonTapped), for: .touchUpInside)
     }
   }
   private func setUI() {
@@ -92,11 +94,18 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
   }
   
   public func configure(with record: MainRecord) {
-    let image = String(record.thumbnailUrl.dropLast(1))
+    let image = String(record.thumbnailUrl)
     self.backgroundImageView.kf.setImage(with: URL(string: image))
     self.locationText.text = record.location
     self.bookmarkButton.isSelected = record.isBookmarked
   }
   
+  @objc private func bookmarkButtonTapped() {
+    self.bookmarkButtonEvent?()
+  }
   
+  public func updateBookmarkButton(isBookmarked: Bool) {
+    self.bookmarkButton.setImage(isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image, for: .normal)
+    print("@Log update \(isBookmarked)")
+  }
 }
