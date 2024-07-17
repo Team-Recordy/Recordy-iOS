@@ -9,6 +9,7 @@ import UIKit
 
 import Core
 
+import Kingfisher
 import SnapKit
 import Then
 
@@ -35,7 +36,7 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
   
   private func setStyle() {
     self.cornerRadius(12)
-
+    
     locationStackView.do {
       $0.axis = .horizontal
       $0.distribution = .fillProportionally
@@ -89,4 +90,13 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
       $0.trailing.equalToSuperview().offset(-15)
     }
   }
+  
+  public func configure(with record: MainRecord) {
+    let image = String(record.thumbnailUrl.dropLast(1))
+    self.backgroundImageView.kf.setImage(with: URL(string: image))
+    self.locationText.text = record.location
+    self.bookmarkButton.isSelected = record.isBookmarked
+  }
+  
+  
 }

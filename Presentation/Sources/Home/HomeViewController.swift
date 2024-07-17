@@ -17,6 +17,10 @@ protocol HomeCollectionViewDelegate: AnyObject {
 public final class HomeViewController: UIViewController {
   
   var selectedKeywords: [Keyword] = []
+  var famousRecords: [MainRecord] = []
+  var recentRecords: [MainRecord] = []
+  struct EmptyResponse: Codable { }
+  
   let keywords = Keyword.allCases
   
   let scrollView = UIScrollView()
@@ -53,6 +57,8 @@ public final class HomeViewController: UIViewController {
     setStyle()
     setUI()
     setAutoLayout()
+    getFamousRecordList()
+    getRecentRecordList()
   }
   
   func setStyle() {
@@ -231,7 +237,7 @@ public final class HomeViewController: UIViewController {
     self.keywordCollectionView.dataSource = self
   }
   
-  private func setPopularCollectionView() {
+  public func setPopularCollectionView() {
     let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .horizontal
     layout.minimumLineSpacing = 12
@@ -250,7 +256,7 @@ public final class HomeViewController: UIViewController {
     self.popularCollectionView.dataSource = self
   }
   
-  private func setRecentCollectionView() {
+  public func setRecentCollectionView() {
     let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .horizontal
     layout.minimumLineSpacing = 12
@@ -280,6 +286,65 @@ public final class HomeViewController: UIViewController {
   func chipButtonTapped(_ sender: UIButton) {
     let index = sender.tag
   }
+  
+  func getFamousRecordList() {
+    let apiProvider = APIProvider<APITarget.Records>()
+    let keyword = "전체".data(using: .utf8)!.base64EncodedString()
+    let request = DTO.GetFamousRecordListRequest(keywords: [], pageNumber: 0, pageSize: 10)
+    apiProvider.requestResponsable(.getFamousRecordList(request), DTO.GetFamousRecordListResponse.self) { [weak self] result in
+      guard let self = self else { return }
+      switch result {
+      case .success(let response):
+        self.famousRecords = response.content.map {
+          MainRecord(
+            id: $0.recordInfo.id,
+            thumbnailUrl: $0.recordInfo.fileUrl.thumbnailUrl,
+            location: $0.recordInfo.location,
+            isBookmarked: $0.isBookmark
+          )
+        }
+        self.popularCollectionView.reloadData()
+      case .failure(let error):
+        print("Error: \(error)")
+      }
+    }
+  }
+  
+  func getRecentRecordList() {
+    let apiProvider = APIProvider<APITarget.Records>()
+    let keyword = "전체".data(using: .utf8)!.base64EncodedString()
+    let request = DTO.GetRecentRecordListRequest(keywords: [], pageNumber: 0, pageSize: 10)
+    apiProvider.requestResponsable(.getRecentRecordList(request), DTO.GetRecentRecordListResponse.self) { [weak self] result in
+      guard let self = self else { return }
+      switch result {
+      case .success(let response):
+        self.recentRecords = response.content.map {
+          MainRecord(
+            id: $0.recordInfo.id,
+            thumbnailUrl: $0.recordInfo.fileUrl.thumbnailUrl,
+            location: $0.recordInfo.location,
+            isBookmarked: $0.isBookmark
+          )
+        }
+        self.recentCollectionView.reloadData()
+      case .failure(let error):
+        print("Error: \(error)")
+      }
+    }
+  }
+  
+  func postBookmarkRequest(recordId: Int) {
+    let apiProvider = APIProvider<APITarget.Bookmark>()
+    let request = DTO.PostBookmarkRequest(recordId: recordId)
+    apiProvider.requestResponsable(.postBookmark(request), EmptyResponse.self) { result in
+      switch result {
+      case .success:
+        print("Bookmark successfully posted")
+      case .failure(let error):
+        print("Error: \(error)")
+      }
+    }
+  }
 }
 
 @available(iOS 16.0, *)
@@ -290,9 +355,9 @@ extension HomeViewController: UICollectionViewDataSource {
   ) -> Int {
     switch collectionView {
     case popularCollectionView:
-      return 10
+      return famousRecords.count
     case recentCollectionView:
-      return 10
+      return recentRecords.count
     case keywordCollectionView:
       return keywords.count
     default:
@@ -305,11 +370,21 @@ extension HomeViewController: UICollectionViewDataSource {
     cellForItemAt indexPath: IndexPath
   ) -> UICollectionViewCell {
     switch collectionView {
-    case popularCollectionView, recentCollectionView:
+    case popularCollectionView:
       let cell = collectionView.dequeueReusableCell(
         withReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier,
         for: indexPath
       ) as! ThumbnailCollectionViewCell
+      let famousRecord = famousRecords[indexPath.row]
+      cell.configure(with: famousRecord)
+      return cell
+    case recentCollectionView:
+      let cell = collectionView.dequeueReusableCell(
+        withReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier,
+        for: indexPath
+      ) as! ThumbnailCollectionViewCell
+      let recentRecord = recentRecords[indexPath.row]
+      cell.configure(with: recentRecord)
       return cell
     case keywordCollectionView:
       let cell = collectionView.dequeueReusableCell(
@@ -373,19 +448,19 @@ extension HomeViewController: UIScrollViewDelegate {
       homeTitle.isHidden = true
       homeImage.isHidden = true
     } else {
-            if keywordIsSticky {
-                keywordCollectionView.removeFromSuperview()
-                contentView.addSubview(keywordCollectionView)
-                keywordCollectionView.snp.remakeConstraints { make in
-                    make.top.equalTo(homeTitle.snp.bottom).offset(20)
-                    make.leading.trailing.equalToSuperview().inset(20)
-                    make.height.equalTo(34.adaptiveHeight)
-                }
-                keywordIsSticky = false
-            }
-          homeTitle.isHidden = false
-          homeImage.isHidden = false
+      if keywordIsSticky {
+        keywordCollectionView.removeFromSuperview()
+        contentView.addSubview(keywordCollectionView)
+        keywordCollectionView.snp.remakeConstraints { make in
+          make.top.equalTo(homeTitle.snp.bottom).offset(20)
+          make.leading.trailing.equalToSuperview().inset(20)
+          make.height.equalTo(34.adaptiveHeight)
         }
-        view.layoutIfNeeded()
+        keywordIsSticky = false
+      }
+      homeTitle.isHidden = false
+      homeImage.isHidden = false
     }
+    view.layoutIfNeeded()
+  }
 }
