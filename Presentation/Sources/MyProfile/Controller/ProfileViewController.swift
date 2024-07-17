@@ -40,9 +40,11 @@ public class ProfileViewController: UIViewController {
     setAutoLayout()
     setDelegate()
     controlTypeChanged()
+  }
+  public override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
     getBookmarkedRecordList()
     getTasteRecordList()
-    print(KeychainManager.shared.read(token: .AccessToken))
     getMyRecordList()
   }
   
@@ -101,7 +103,7 @@ public class ProfileViewController: UIViewController {
   
   func getBookmarkedRecordList() {
     let apiProvider = APIProvider<APITarget.Records>()
-    let request = DTO.GetBookmarkedListRequest(cursorId: 0, size: 10)
+    let request = DTO.GetBookmarkedListRequest(cursorId: 0, size: 100)
     apiProvider.requestResponsable(.getBookmarkedRecordList(request), DTO.GetBookmarkedListResponse.self) { [weak self] result in
       guard let self = self else { return }
       switch result {
@@ -127,7 +129,7 @@ public class ProfileViewController: UIViewController {
   
   func getMyRecordList() {
     let apiProvider = APIProvider<APITarget.Records>()
-    let request = DTO.GetUserRecordListRequest(otherUserId: 1, cursorId: 0, size: 10)
+    let request = DTO.GetUserRecordListRequest(otherUserId: 1, cursorId: 0, size: 100)
     apiProvider.requestResponsable(.getUserRecordList(request), DTO.GetUserRecordListResponse.self) {[weak self]
       result in
       guard let self = self else {return}
