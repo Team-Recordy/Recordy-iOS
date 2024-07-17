@@ -9,6 +9,7 @@
 import Foundation
 
 extension DTO {
+  public typealias RecordList = [GetRecordListResponse]
   public struct GetRecordListResponse: BaseResponse {
     let recordInfo: RecordInfo
     let isBookmark: Bool
@@ -67,6 +68,22 @@ extension DTO.GetRecordListResponse.RecordInfo {
     ) {
       self.videoUrl = videoUrl
       self.thumbnailUrl = thumbnailUrl
+    }
+  }
+}
+
+extension DTO.RecordList {
+  public var feeds: [Feed] {
+    return self.map { response in
+      Feed(
+        id: response.recordInfo.id,
+        location: response.recordInfo.location,
+        nickname: response.recordInfo.uploaderNickname,
+        description: response.recordInfo.content,
+        bookmarkCount: response.recordInfo.bookmarkCount,
+        isBookmarked: response.isBookmark,
+        videoLink: URL(string: response.recordInfo.fileUrl.videoUrl)!
+      )
     }
   }
 }

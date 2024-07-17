@@ -1,5 +1,5 @@
 //
-//  DTO+IsWatchedRecordRequest.swift
+//  DTO+PostBookmarkRequest.swift
 //  Core
 //
 //  Created by 한지석 on 7/17/24.
@@ -9,8 +9,8 @@
 import Foundation
 
 extension DTO {
-  public struct IsRecordWatchedRequest: BaseRequest {
-    let recordId: Int
+  public struct PostBookmarkRequest: BaseRequest {
+    public let recordId: Int
 
     public init(recordId: Int) {
       self.recordId = recordId

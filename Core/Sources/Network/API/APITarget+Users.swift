@@ -122,6 +122,13 @@ extension APITarget.Users: TargetType {
   }
 
   public var headers: [String : String]? {
-    return .none
+    switch self {
+    case .signIn(let signInRequest):
+      return [
+        "Content-Type": "application/json",
+        "Authorization": "Bearer\(signInRequest.authorization)"
+      ]
+    default: return .none
+    }
   }
 }

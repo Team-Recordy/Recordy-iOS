@@ -35,6 +35,7 @@ class FeedView: UIView {
   private let descriptionStackView = UIStackView().then {
     $0.spacing = 8.adaptiveHeight
     $0.axis = .vertical
+    $0.alignment = .leading
   }
   private let locationImage = UIImageView().then {
     $0.image = CommonAsset.location.image
@@ -45,10 +46,10 @@ class FeedView: UIView {
     $0.textColor = .white
     $0.font = RecordyFont.caption1.font
   }
-  let nicknameLabel = UILabel().then {
-    $0.text = "닉네임"
-    $0.textColor = .white
-    $0.font = RecordyFont.subtitle.font
+  let nicknameButton = UIButton().then {
+    $0.setTitle("닉네임", for: .normal)
+    $0.setTitleColor(.white, for: .normal)
+    $0.titleLabel?.font = RecordyFont.subtitle.font
   }
   let descriptionTextView = UITextView().then {
     $0.text = "계절이 지나가는 하늘에는 가을로 가득 차 있습니다. 나는 아무 걱정도 없이...더보기"
@@ -115,7 +116,7 @@ class FeedView: UIView {
     bookmarkStackView.addArrangedSubview(bookmarkLabel)
     locationStackView.addArrangedSubview(locationImage)
     locationStackView.addArrangedSubview(locationLabel)
-    descriptionStackView.addArrangedSubview(nicknameLabel)
+    descriptionStackView.addArrangedSubview(nicknameButton)
     descriptionStackView.addArrangedSubview(descriptionTextView)
     backgroundView.addSubview(descriptionStackView)
     backgroundView.addSubview(bookmarkStackView)
@@ -144,7 +145,8 @@ class FeedView: UIView {
       $0.width.equalTo(220.adaptiveWidth)
       $0.height.equalTo(90.adaptiveHeight)
     }
-    nicknameLabel.snp.makeConstraints {
+    nicknameButton.snp.makeConstraints {
+      $0.leading.equalTo(self.safeAreaLayoutGuide).inset(20.adaptiveWidth)
       $0.height.equalTo(28.adaptiveHeight)
     }
     bookmarkStackView.snp.makeConstraints {

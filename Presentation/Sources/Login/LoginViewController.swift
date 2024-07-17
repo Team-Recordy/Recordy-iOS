@@ -78,18 +78,24 @@ public final class LoginViewController: UIViewController {
     let apiProvider = APIProvider<APITarget.Users>()
     let request = DTO.SignInRequest(authorization: authorization,
                                     platformType: platformType)
-    apiProvider.request(DTO.SignInResponse.self, target: .signIn(request))
-      .subscribe(onSuccess: { result in
-        switch result {
-        case .success(let response):
-          print("@Log - \(response)")
-        case .failure(let error):
-          print("Sign in failed with error: \(error)")
-        }
-      }, onFailure: { error in
-        print("Sign in request failed with error: \(error)")
-      })
-      .disposed(by: disposeBag)
+    apiProvider.requestResponsable(
+      .signIn(request),
+      DTO.SignInResponse.self
+    ) { result in
+      switch result {
+      case .success(let response):
+        KeychainManager.shared.create(
+          token: .AccessToken,
+          value: response.accessToken
+        )
+        KeychainManager.shared.create(
+          token: .RefreshToken,
+          value: response.refreshToken
+        )
+      case .failure(let error):
+        print("Sign in failed with error: \(error)")
+      }
+    }
   }
 }
 

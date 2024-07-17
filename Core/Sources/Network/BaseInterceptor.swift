@@ -9,23 +9,22 @@
 import Foundation
 
 import Alamofire
-import RxSwift
 
 final class BaseInterceptor: RequestInterceptor {
   
   let keychainManager = KeychainManager.shared
-  private let disposeBag = DisposeBag()
   
   func adapt(
     _ urlRequest: URLRequest,
     for session: Session,
     completion: @escaping (Result<URLRequest, Error>) -> Void
   ) {
+    print("HI")
     var request = urlRequest
     request.headers.add(.contentType("application/json"))
     if request.url?.absoluteString.contains("/refresh") == false {
       if let accessToken = keychainManager.read(token: .AccessToken) {
-        request.headers.add(.authorization(accessToken))
+        request.headers.add(.authorization(bearerToken: accessToken))
       }
     } else {
       if let refreshToken = keychainManager.read(token: .RefreshToken) {
@@ -50,10 +49,7 @@ final class BaseInterceptor: RequestInterceptor {
     }
     let apiProvider = APIProvider<APITarget.Users>()
     let request = DTO.RefreshTokenRequest(authorization: refreshToken)
-    apiProvider.request(
-      DTO.RefreshTokenResponse.self,
-      target: .refreshToken(request)
-    ).subscribe { [weak self] result in
+    apiProvider.requestResponsable(.refreshToken(request), DTO.RefreshTokenResponse.self) { [weak self] result in
       guard let self = self else { return }
       switch result {
       case .success(let response):
@@ -65,9 +61,7 @@ final class BaseInterceptor: RequestInterceptor {
       case .failure(let error):
         completion(.doNotRetryWithError(error))
       }
-    } onFailure: { error in
-      completion(.doNotRetryWithError(error))
-    }.disposed(by: disposeBag)
+    }
   }
 }
 
