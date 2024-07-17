@@ -155,9 +155,9 @@ class TasteView: UIView {
     }
     
     if tasteData.count >= 3 {
-      let firstDataView = TasteDataView(tasteData: fetchedData[0])
-      let secondDataView = TasteDataView(tasteData: fetchedData[1])
-      let thirdDataView = TasteDataView(tasteData: fetchedData[2])
+      let firstDataView = TasteDataView(tasteData: tasteData[0])
+      let secondDataView = TasteDataView(tasteData: tasteData[1])
+      let thirdDataView = TasteDataView(tasteData: tasteData[2])
       
       dataView.addSubview(firstDataView)
       dataView.addSubview(secondDataView)

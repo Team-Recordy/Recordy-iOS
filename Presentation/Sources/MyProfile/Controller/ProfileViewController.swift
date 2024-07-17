@@ -41,11 +41,13 @@ public class ProfileViewController: UIViewController {
     setDelegate()
     controlTypeChanged()
     getBookmarkedRecordList()
+    getTasteRecordList()
     print(KeychainManager.shared.read(token: .AccessToken))
+    
   }
   
   func setStyle() {
-  
+    
   }
   
   func setUI() {
@@ -96,7 +98,7 @@ public class ProfileViewController: UIViewController {
     recordView.isHidden = controlType == .record ? false : true
     bookmarkView.isHidden = controlType == .bookmark ? false : true
   }
-
+  
   func getBookmarkedRecordList() {
     let apiProvider = APIProvider<APITarget.Records>()
     let request = DTO.GetBookmarkedListRequest(cursorId: 0, size: 10)
@@ -117,6 +119,29 @@ public class ProfileViewController: UIViewController {
           )
         }
         self.bookmarkView.getBookmarkList(feeds: feeds)
+      case .failure(let failure):
+        print("@Log - \(failure.localizedDescription)")
+      }
+    }
+  }
+  
+  func getTasteRecordList() {
+    let apiProvider = APIProvider<APITarget.Preference>()
+    apiProvider.requestResponsable(.getPreference, DTO.GetPreferenceResponse.self) { [weak self] result in
+      guard let self = self else { return }
+      switch result {
+      case .success(let response):
+        var tasteData: [TasteData] = []
+        let tasteDataList = response.preference.count
+        for i in 0..<tasteDataList {
+          print("@Log - \(response.preference[i])")
+          let percentage = Int(response.preference[i][1]) ?? 0
+          let taste = TasteData(title: response.preference[i][0], percentage: percentage, type: TasteCase(rawValue: i)!)
+          tasteData.append(taste)
+        }
+        DispatchQueue.main.async {
+          self.tasteView.updateDataViews(tasteData)
+        }
       case .failure(let failure):
         print("@Log - \(failure.localizedDescription)")
       }
