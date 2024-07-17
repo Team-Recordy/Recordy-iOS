@@ -40,6 +40,8 @@ public class ProfileViewController: UIViewController {
     setAutoLayout()
     setDelegate()
     controlTypeChanged()
+    getBookmarkedRecordList()
+    print(KeychainManager.shared.read(token: .AccessToken))
   }
   
   func setStyle() {
@@ -93,6 +95,32 @@ public class ProfileViewController: UIViewController {
     tasteView.isHidden = controlType == .taste ? false : true
     recordView.isHidden = controlType == .record ? false : true
     bookmarkView.isHidden = controlType == .bookmark ? false : true
+  }
+
+  func getBookmarkedRecordList() {
+    let apiProvider = APIProvider<APITarget.Records>()
+    let request = DTO.GetBookmarkedListRequest(cursorId: 0, size: 10)
+    apiProvider.requestResponsable(.getBookmarkedRecordList(request), DTO.GetBookmarkedListResponse.self) { [weak self] result in
+      guard let self = self else { return }
+      switch result {
+      case .success(let response):
+        let feeds = response.content.map {
+          Feed(
+            id: $0.recordInfo.id,
+            location: $0.recordInfo.location,
+            nickname: $0.recordInfo.uploaderNickname,
+            description: $0.recordInfo.content,
+            bookmarkCount: $0.recordInfo.bookmarkCount,
+            isBookmarked: $0.isBookmark,
+            videoLink: $0.recordInfo.fileUrl.videoUrl,
+            thumbnailLink: $0.recordInfo.fileUrl.thumbnailUrl
+          )
+        }
+        self.bookmarkView.getBookmarkList(feeds: feeds)
+      case .failure(let failure):
+        print("@Log - \(failure.localizedDescription)")
+      }
+    }
   }
 }
 

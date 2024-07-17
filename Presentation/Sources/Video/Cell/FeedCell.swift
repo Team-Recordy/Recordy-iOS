@@ -155,7 +155,7 @@ class FeedCell: UICollectionViewCell {
   func bind(feed: Feed, bounds: CGRect, shouldAddPlayer: Bool) {
     self.feed = feed
     if shouldAddPlayer {
-      addPlayer(for: feed.videoLink, bounds: bounds)
+      addPlayer(for: URL(string: feed.videoLink)!, bounds: bounds)
     }
     self.feedView.locationLabel.text = feed.location
     self.feedView.nicknameButton.setTitle(feed.nickname, for: .normal)

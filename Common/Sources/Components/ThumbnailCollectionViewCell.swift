@@ -34,9 +34,8 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
   }
   
   private func setStyle() {
-    self.backgroundColor = .gray
     self.cornerRadius(12)
-    
+
     locationStackView.do {
       $0.axis = .horizontal
       $0.distribution = .fillProportionally

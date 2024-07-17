@@ -6,11 +6,14 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 import UIKit
-import SnapKit
-import Then
+
 
 import Common
 import Core
+
+import SnapKit
+import Then
+import Kingfisher
 
 class BookMarkView: UIView, UICollectionViewDataSource, UICollectionViewDelegate {
   private let bookmarkEmptyView = UIView()
@@ -20,8 +23,8 @@ class BookMarkView: UIView, UICollectionViewDataSource, UICollectionViewDelegate
   let bookmarkEmptyTextVIew = UIImageView()
   private let countLabel = UILabel()
   private var collectionView: UICollectionView!
-  private let feeds: [Feed] = Feed.mockdata
-  
+  private var feeds: [Feed] = []
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     setUpCollectionView()
@@ -131,7 +134,13 @@ class BookMarkView: UIView, UICollectionViewDataSource, UICollectionViewDelegate
     attributedText.append(NSAttributedString(string: greyText, attributes: [NSAttributedString.Key.foregroundColor: CommonAsset.recordyGrey03.color]))
     countLabel.attributedText = attributedText
   }
-  
+
+  func getBookmarkList(feeds: [Feed]) {
+    self.feeds.append(contentsOf: feeds)
+    self.collectionView.reloadData()
+    checkDataEmpty()
+  }
+
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return feeds.count
   }
@@ -143,7 +152,8 @@ class BookMarkView: UIView, UICollectionViewDataSource, UICollectionViewDelegate
     ) as? ThumbnailCollectionViewCell else {
       return UICollectionViewCell()
     }
-    cell.backgroundImageView.image = UIImage(systemName: "person")
+    let thumbnailUrl = URL(string: String(feeds[indexPath.row].thumbnailLink.dropLast(1)))
+    cell.backgroundImageView.kf.setImage(with: thumbnailUrl)
     cell.locationText.text = feeds[indexPath.row].location
     return cell
   }

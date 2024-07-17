@@ -82,7 +82,8 @@ extension DTO.RecordList {
         description: response.recordInfo.content,
         bookmarkCount: response.recordInfo.bookmarkCount,
         isBookmarked: response.isBookmark,
-        videoLink: URL(string: response.recordInfo.fileUrl.videoUrl)!
+        videoLink: response.recordInfo.fileUrl.videoUrl,
+        thumbnailLink: response.recordInfo.fileUrl.thumbnailUrl
       )
     }
   }

@@ -54,10 +54,9 @@ extension APITarget.Records: TargetType {
       return "famous"
     case .getFollowingRecordList(let getFollowingRecordListRequest):
       return "following"
-    case .getBookmarkedRecordList(let getBookmarkedListRequest):
-      return "bookmark"
+    case .getBookmarkedRecordList:
+      return "bookmarks"
     }
-
   }
 
   /// 다 붙이고 수정하기
@@ -81,7 +80,7 @@ extension APITarget.Records: TargetType {
       return .get
     case .getFollowingRecordList(let getFollowingRecordListRequest):
       return .get
-    case .getBookmarkedRecordList(let getBookmarkedListRequest):
+    case .getBookmarkedRecordList:
       return .get
     }
   }

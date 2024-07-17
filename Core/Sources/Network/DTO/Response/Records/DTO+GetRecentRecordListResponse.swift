@@ -12,14 +12,22 @@ extension DTO {
   public struct GetRecentRecordListResponse: BaseResponse {
     public let nextCursor: Int
     public let hasNext: Bool
-    public let content: Content
+    public let content: [Content]
   }
 }
 
 extension DTO.GetRecentRecordListResponse {
   public struct Content: BaseResponse {
-    public let recordInfo: Bool
+    public let recordInfo: RecordInfo
     public let isBookmark: Bool
+
+    public init(
+      recordInfo: RecordInfo,
+      isBookmark: Bool
+    ) {
+      self.recordInfo = recordInfo
+      self.isBookmark = isBookmark
+    }
   }
 }
 

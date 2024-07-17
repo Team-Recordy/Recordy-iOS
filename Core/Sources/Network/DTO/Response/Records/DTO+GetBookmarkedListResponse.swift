@@ -12,14 +12,32 @@ extension DTO {
   public struct GetBookmarkedListResponse: BaseResponse {
     public let nextCursor: Int
     public let hasNext: Bool
-    public let content: Content
+    public let content: [Content]
+
+    public init(
+      nextCursor: Int,
+      hasNext: Bool,
+      content: [Content]
+    ) {
+      self.nextCursor = nextCursor
+      self.hasNext = hasNext
+      self.content = content
+    }
   }
 }
 
 extension DTO.GetBookmarkedListResponse {
   public struct Content: BaseResponse {
-    public let recordInfo: Bool
+    public let recordInfo: RecordInfo
     public let isBookmark: Bool
+
+    public init(
+      recordInfo: RecordInfo,
+      isBookmark: Bool
+    ) {
+      self.recordInfo = recordInfo
+      self.isBookmark = isBookmark
+    }
   }
 }
 
@@ -33,13 +51,33 @@ extension DTO.GetBookmarkedListResponse.Content {
     public let uploaderNickname: String
     public let bookmarkCount: Int
     public let isMine: Bool
+
+    public init(
+      id: Int,
+      fileUrl: FileUrl,
+      location: String,
+      content: String,
+      uploaderId: Int,
+      uploaderNickname: String,
+      bookmarkCount: Int,
+      isMine: Bool
+    ) {
+      self.id = id
+      self.fileUrl = fileUrl
+      self.location = location
+      self.content = content
+      self.uploaderId = uploaderId
+      self.uploaderNickname = uploaderNickname
+      self.bookmarkCount = bookmarkCount
+      self.isMine = isMine
+    }
   }
 }
 
 extension DTO.GetBookmarkedListResponse.Content.RecordInfo {
   public struct FileUrl: BaseResponse {
-    let videoUrl: String
-    let thumbnailUrl: String
+    public let videoUrl: String
+    public let thumbnailUrl: String
 
     init(
       videoUrl: String,

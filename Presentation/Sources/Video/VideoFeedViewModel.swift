@@ -45,7 +45,8 @@ class VideoFeedViewModel {
     
     for feed in feeds {
       dispatchGroup.enter()
-      VideoCacheManager.shared.downloadAndCacheURL(url: feed.videoLink) { url in
+
+      VideoCacheManager.shared.downloadAndCacheURL(url: URL(string: feed.videoLink)!) { url in
         guard url != nil else {
           dispatchGroup.leave()
           return

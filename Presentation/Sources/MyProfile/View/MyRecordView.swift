@@ -19,7 +19,7 @@ class MyRecordView: UIView, UICollectionViewDataSource, UICollectionViewDelegate
   private let goActionButton = UIButton()
   private let countLabel = UILabel()
   private var collectionView: UICollectionView!
-  private let feeds: [Feed] = Feed.mockdata
+  private let feeds: [Feed] = []
   
   override init(frame: CGRect) {
     super.init(frame: frame)
