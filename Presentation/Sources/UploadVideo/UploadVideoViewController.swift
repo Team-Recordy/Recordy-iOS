@@ -102,6 +102,7 @@ public class UploadVideoViewController: UIViewController {
       $0.titleLabel?.font = RecordyFont.button1.font
       $0.titleLabel?.textColor = CommonAsset.recordyGrey09.color
       $0.cornerRadius(12)
+      $0.addTarget(self, action: #selector(uploadButtonTapped), for: .touchUpInside)
     }
   }
 
@@ -284,12 +285,56 @@ public class UploadVideoViewController: UIViewController {
     }
     self.present(filteringViewController, animated: true)
   }
+
+  @objc func uploadButtonTapped() {
+    viewModel.uploadButtonTapped()
+  }
 }
 
 @available(iOS 16.0, *)
 extension UploadVideoViewController: SelectVideoDelegate {
   func selectVideo(_ data: PHAsset) {
     viewModel.input.selectedAsset.accept(data)
+    let apiProvider = APIProvider<APITarget.Records>()
+    let thumbnailData = PhotoKitManager.getAssetThumbnailData(asset: data)
+
+    PhotoKitManager.getData(of: data) { binaryData in
+      apiProvider.requestResponsable(
+        .getPresignedUrl,
+        DTO.GetPresignedUrlResponse.self
+      ) { result in
+        switch result {
+        case .success(let response):
+          AWSS3Uploader.upload(
+            binaryData!,
+            toPresignedURL: URL(string: response.videoUrl)!
+          ) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let success):
+              self.viewModel.input.videoUrl.accept(success?.removeQueryParameters())
+            case .failure(let failure):
+              print("@Log - \(failure.localizedDescription)")
+            }
+          }
+
+          AWSS3Uploader.upload(
+            thumbnailData!,
+            toPresignedURL: URL(string: response.thumbnailUrl)!
+          ) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let success):
+              self.viewModel.input.thumbnailUrl.accept(success?.removeQueryParameters())
+            case .failure(let failure):
+              print("@Log - \(failure.localizedDescription)")
+            }
+          }
+        case .failure(let failure):
+          print(failure)
+        }
+      }
+    }
   }
 }
 
