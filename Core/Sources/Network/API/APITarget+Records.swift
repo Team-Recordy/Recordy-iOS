@@ -25,9 +25,6 @@ extension APITarget {
   }
 }
 
-//extension APITarget.Records {
-//  static func 
-//}
 
 extension APITarget.Records: TargetType {
   public var baseURL: URL {
@@ -38,7 +35,7 @@ extension APITarget.Records: TargetType {
     switch self {
     case .getPresignedUrl:
       return "presigned-url"
-    case .createRecord(let createRecordRequest):
+    case .createRecord:
       return ""
     case .deleteRecord(let deleteRecordRequest):
       return "\(deleteRecordRequest.record_id)"
@@ -48,11 +45,11 @@ extension APITarget.Records: TargetType {
       return ""
     case .getUserRecordList(let getUserRecordListRequest):
       return "user/\(getUserRecordListRequest.otherUserId)"
-    case .getRecentRecordList(let getRecentRecordListRequest):
+    case .getRecentRecordList:
       return "recent"
-    case .getFamousRecordList(let getFamousRecordListRequest):
+    case .getFamousRecordList:
       return "famous"
-    case .getFollowingRecordList(let getFollowingRecordListRequest):
+    case .getFollowingRecordList:
       return "following"
     case .getBookmarkedRecordList:
       return "bookmarks"
@@ -64,21 +61,21 @@ extension APITarget.Records: TargetType {
     switch self {
     case .getPresignedUrl:
       return .get
-    case .createRecord(let createRecordRequest):
+    case .createRecord:
       return .post
-    case .deleteRecord(let deleteRecordRequest):
+    case .deleteRecord:
       return .delete
-    case .isRecordWatched(let isRecordWatchedRequest):
+    case .isRecordWatched:
       return .post
-    case .getRecordList(let getRecordListRequest):
+    case .getRecordList:
       return .get
-    case .getUserRecordList(let getUserRecordListRequest):
+    case .getUserRecordList:
       return .get
-    case .getRecentRecordList(let getRecentRecordListRequest):
+    case .getRecentRecordList:
       return .get
-    case .getFamousRecordList(let getFamousRecordListRequest):
+    case .getFamousRecordList:
       return .get
-    case .getFollowingRecordList(let getFollowingRecordListRequest):
+    case .getFollowingRecordList:
       return .get
     case .getBookmarkedRecordList:
       return .get
@@ -89,9 +86,9 @@ extension APITarget.Records: TargetType {
     switch self {
     case .createRecord(let createRecordRequest):
       return .requestJSONEncodable(createRecordRequest)
-    case .deleteRecord(let deleteRecordRequest):
+    case .deleteRecord:
       return .requestPlain
-    case .isRecordWatched(let isWatchRecordRequest):
+    case .isRecordWatched:
       return .requestPlain
     case .getRecordList(let getRecordListRequest):
       return .requestParameters(
@@ -107,23 +104,39 @@ extension APITarget.Records: TargetType {
         encoding: URLEncoding.queryString
       )
     case .getRecentRecordList(let getRecentRecordListRequest):
+      var parameters: [String: Any]
+      if getRecentRecordListRequest.keywords == nil {
+        parameters = [
+          "cursorId": getRecentRecordListRequest.cursorId,
+          "size": getRecentRecordListRequest.size
+        ]
+      } else {
+        parameters = [
+          "keywords": getRecentRecordListRequest.keywords!,
+          "cursorId": getRecentRecordListRequest.cursorId,
+          "size": getRecentRecordListRequest.size
+        ]
+      }
       return .requestParameters(
-        parameters: [
-          "keywords": getRecentRecordListRequest.keywords,
-          "pageNumber": getRecentRecordListRequest.pageNumber,
-          "pageSize":
-            getRecentRecordListRequest.pageSize
-        ],
+        parameters: parameters,
         encoding: URLEncoding.queryString
       )
     case .getFamousRecordList(let getFamousRecordListRequest):
-      return .requestParameters(
-        parameters: [
-          "keywords": getFamousRecordListRequest.keywords,
+      var parameters: [String: Any]
+      if getFamousRecordListRequest.keywords == nil {
+        parameters = [
           "pageNumber": getFamousRecordListRequest.pageNumber,
-          "pageSize":
-            getFamousRecordListRequest.pageSize
-        ],
+          "pageSize": getFamousRecordListRequest.pageSize
+        ]
+      } else {
+        parameters = [
+          "keywords": getFamousRecordListRequest.keywords!,
+          "pageNumber": getFamousRecordListRequest.pageNumber,
+          "pageSize": getFamousRecordListRequest.pageSize
+        ]
+      }
+      return .requestParameters(
+        parameters: parameters,
         encoding: URLEncoding.queryString
       )
     case .getFollowingRecordList(let getFollowingRecordListRequest):

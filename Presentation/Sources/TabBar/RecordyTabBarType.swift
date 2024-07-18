@@ -40,9 +40,9 @@ enum RecordyTabBarType: CaseIterable {
   var viewController: UIViewController {
     switch self {
     case .home:
-      HomeViewController()
+      BaseNavigationController(rootViewController: HomeViewController())
     case .video:
-      VideoFeedViewController()
+      VideoFeedViewController(type: .all)
     case .profile:
       BaseNavigationController(rootViewController: ProfileViewController())
     }

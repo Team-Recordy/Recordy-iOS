@@ -130,7 +130,7 @@ class FeedView: UIView {
 
   private func setAutolayout() {
     locationStackView.snp.makeConstraints {
-      $0.top.equalTo(self.safeAreaLayoutGuide).offset(64.adaptiveHeight)
+      $0.top.equalToSuperview().offset(110.adaptiveHeight)
       $0.leading.equalTo(self.safeAreaLayoutGuide).inset(20.adaptiveWidth)
       $0.height.equalTo(32.adaptiveHeight)
     }

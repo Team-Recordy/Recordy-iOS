@@ -24,8 +24,6 @@ final class UploadVideoViewModel {
     let selectedKeywords = BehaviorRelay<[Keyword]>(value: [])
     let location = BehaviorRelay<String>(value: "")
     let contents = BehaviorRelay<String>(value: "")
-    let videoUrl = BehaviorRelay<String?>(value: nil)
-    let thumbnailUrl = BehaviorRelay<String?>(value: nil)
   }
 
   struct Output {
@@ -39,30 +37,23 @@ final class UploadVideoViewModel {
   private let disposeBag = DisposeBag()
   let input = Input()
   let output = Output()
+  let apiProvider = APIProvider<APITarget.Records>()
 
   init() {
     self.bind()
-    print("@Log - \(KeychainManager.shared.read(token: .AccessToken))")
-    var encodedKeywords: [String] = []
-    for i in 0..<encodedKeywords.count {
-      let decodedData = Data(base64Encoded: encodedKeywords[i])
-      if let decode = String(data: decodedData!, encoding: .utf8) {
-          print("@Log decode - \(decode)")
-      }
-    }
   }
 
   func bind() {
     input.selectedAsset
-       .compactMap { asset -> UIImage? in
-         guard let asset = asset else { return nil }
-         return PhotoKitManager.getAssetThumbnail(
-           asset: asset,
-           size: CGSize(width: 180, height: 284)
-         )
-       }
-       .bind(to: output.thumbnailImage)
-       .disposed(by: disposeBag)
+      .compactMap { asset -> UIImage? in
+        guard let asset = asset else { return nil }
+        return PhotoKitManager.getAssetThumbnail(
+          asset: asset,
+          size: CGSize(width: 180, height: 284)
+        )
+      }
+      .bind(to: output.thumbnailImage)
+      .disposed(by: disposeBag)
 
     input.location
       .map { "\($0.count) / 20" }
@@ -84,39 +75,130 @@ final class UploadVideoViewModel {
       input.selectedAsset,
       input.selectedKeywords,
       input.location,
-      input.contents,
-      input.videoUrl,
-      input.thumbnailUrl
-    ).map { asset, keywords, location, contents, videoUrl, thumbnailUrl in
-      return asset != nil && keywords.count >= 1 && location.count > 0 && contents.count > 0 && contents != "공간에 대한 나의 생각을 자유롭게 적어주세요!" && videoUrl != nil && thumbnailUrl != nil
+      input.contents
+    ).map { asset, keywords, location, contents in
+      return asset != nil && keywords.count >= 1 && location.count > 0 && contents.count > 0 && contents != "공간에 대한 나의 생각을 자유롭게 적어주세요!"
     }
     .bind(to: output.uploadEnabled)
     .disposed(by: disposeBag)
   }
 
+  func getPhotoPermission(completionHandler: @escaping (Bool) -> Void) {
+    print("@getPhoto - \(#function)")
+    guard PHPhotoLibrary.authorizationStatus() != .authorized else {
+      completionHandler(true)
+      return
+    }
+    PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+      switch status {
+      case .authorized, .limited:
+        completionHandler(true)
+      default:
+        completionHandler(false)
+      }
+    }
+  }
+
   func uploadButtonTapped() {
-    let apiProvider = APIProvider<APITarget.Records>()
+    guard let asset = input.selectedAsset.value else { return }
+    print("Call - \(#function)")
+
+    let thumbnailData = PhotoKitManager.getAssetThumbnailData(asset: asset)
+    let dispatchGroup = DispatchGroup()
+    var videoUrl: String?
+    var thumbnailUrl: String?
+    var uploadError: Error?
+
+    PhotoKitManager.getData(of: asset) { [weak self] binaryData in
+      guard let self = self else { return }
+      self.apiProvider.requestResponsable(
+        .getPresignedUrl,
+        DTO.GetPresignedUrlResponse.self
+      ) { result in
+        switch result {
+        case .success(let response):
+          dispatchGroup.enter()
+          AWSS3Uploader.upload(
+            binaryData!,
+            toPresignedURL: URL(string: response.videoUrl)!
+          ) { result in
+            switch result {
+            case .success(let success):
+              videoUrl = success?.removeQueryParameters()
+            case .failure(let failure):
+              uploadError = failure
+            }
+            dispatchGroup.leave()
+          }
+
+          dispatchGroup.enter()
+          AWSS3Uploader.upload(
+            thumbnailData!,
+            toPresignedURL: URL(string: response.thumbnailUrl)!
+          ) { result in
+            switch result {
+            case .success(let success):
+              thumbnailUrl = success?.removeQueryParameters()
+            case .failure(let failure):
+              uploadError = failure
+            }
+            dispatchGroup.leave()
+          }
+
+          dispatchGroup.notify(queue: .global()) {
+            guard uploadError == nil, videoUrl != nil, thumbnailUrl != nil else {
+              print("@Log - \(uploadError!.localizedDescription)")
+              NotificationCenter.default.post(
+                name: .updateDidComplete,
+                object: nil,
+                userInfo: ["message": "업로드에 실패했어요!", "state": "failure"]
+              )
+              return
+            }
+            self.createRecord(videoUrl: videoUrl!, thumbnailUrl: thumbnailUrl!)
+          }
+
+        case .failure(let failure):
+          print(failure)
+        }
+      }
+    }
+  }
+
+  private func createRecord(
+    videoUrl: String,
+    thumbnailUrl: String
+  ) {
+    print("Call - \(#function)")
     var encodedString = ""
     let titles = input.selectedKeywords.value.map { $0.title }
     let concatenatedString = titles.joined(separator: ",")
     if let data = concatenatedString.data(using: .utf8) {
-        encodedString = data.base64EncodedString()
+      encodedString = data.base64EncodedString()
     }
     let request = DTO.CreateRecordRequest(
       location: input.location.value,
       content: input.contents.value,
       keywords: encodedString,
       fileUrl: DTO.CreateRecordRequest.FileUrl(
-        videoUrl: input.videoUrl.value!,
-        thumbnailUrl: input.thumbnailUrl.value!
+        videoUrl: videoUrl,
+        thumbnailUrl: thumbnailUrl
       )
     )
     apiProvider.justRequest(.createRecord(request)) { result in
       switch result {
       case .success(let success):
-        print("@Log - \(success)")
+        NotificationCenter.default.post(
+          name: .updateDidComplete,
+          object: nil,
+          userInfo: ["message": "업로드가 완료되었어요!", "state": "success"]
+        )
       case .failure(let failure):
-        print("@Log - \(failure.localizedDescription)")
+        NotificationCenter.default.post(
+          name: .updateDidComplete,
+          object: nil,
+          userInfo: ["message": "업로드가 완료되었어요!", "state": "failure"]
+        )
       }
     }
   }
