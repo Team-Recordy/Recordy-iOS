@@ -22,8 +22,29 @@ public class VideoFeedViewController: UIViewController {
   private var isFetched = false
   private var isPlayed = false
 
-  private var viewModel = VideoFeedViewModel()
+  let type: VideoFeedType
+  private var viewModel: VideoFeedViewModel
 
+  init(
+    type: VideoFeedType,
+    keyword: Keyword? = nil,
+    currentId: Int? = nil,
+    cursorId: Int? = nil
+  ) {
+    self.type = type
+    self.viewModel = VideoFeedViewModel(
+      type: type,
+      keyword: keyword,
+      currentId: currentId,
+      cursorId: cursorId
+    )
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
     setUpCollectionView()
@@ -34,7 +55,7 @@ public class VideoFeedViewController: UIViewController {
 
   public override func viewWillAppear(_ animated: Bool) {
     bind()
-    viewModel.getRecordList()
+    viewModel.recordListCase()
   }
 
   private func bind() {
@@ -46,9 +67,18 @@ public class VideoFeedViewController: UIViewController {
   }
 
   private func setStyle() {
-    self.navigationController?.navigationBar.isHidden = true
+    self.navigationController?.navigationBar.isHidden = self.type == .all
     self.view.backgroundColor = CommonAsset.recordyBG.color
+    self.recordyToggle.do {
+      $0.isHidden = type != .all
+    }
+    
+    if self.type != .all {
+      self.navigationController?.navigationBar.topItem?.title = ""
+    }
   }
+
+  @objc func temp () { }
 
   private func setUI() {
     self.view.addSubview(collectionView!)
@@ -149,9 +179,8 @@ extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDat
     willDisplay cell: UICollectionViewCell,
     forItemAt indexPath: IndexPath
   ) {
-    print(indexPath.row)
-    if indexPath.row == viewModel.feedList.count - 5 {
-      viewModel.getRecordList()
+    if indexPath.row == viewModel.feedList.count - 3 {
+      viewModel.recordListCase()
     }
   }
 

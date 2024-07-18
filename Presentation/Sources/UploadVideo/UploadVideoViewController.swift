@@ -19,7 +19,8 @@ import Then
 
 @available(iOS 16.0, *)
 public class UploadVideoViewController: UIViewController {
-
+  
+  private let popUpView = RecordyPopUpView(type: .permission)
   private let gradientView = RecordyGradientView()
   private let warningLabel = UILabel()
   private let scrollView = UIScrollView()
@@ -40,10 +41,10 @@ public class UploadVideoViewController: UIViewController {
   private let contentsLabel = RecordySubtitleLabel(subtitle: "내용")
   private let contentsTextView = RecordyTextView()
   let uploadButton = UIButton()
-
+  
   private let viewModel = UploadVideoViewModel()
   private let disposeBag = DisposeBag()
-
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
     setStyle()
@@ -52,10 +53,19 @@ public class UploadVideoViewController: UIViewController {
     bind()
     self.hideKeyboard()
   }
-
+  
   private func setStyle() {
     self.title = "내용 작성"
     self.view.backgroundColor = CommonAsset.recordyBG.color
+    let rightButton = UIButton(type: .system)
+    rightButton.setImage(UIImage(systemName: "xmark"), for: .normal)
+    rightButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+    let rightBarButtonItem = UIBarButtonItem(customView: rightButton)
+    self.navigationItem.rightBarButtonItem = rightBarButtonItem
+
+    popUpView.do {
+      $0.isHidden = true
+    }
     scrollView.do {
       $0.backgroundColor = .clear
     }
@@ -105,8 +115,9 @@ public class UploadVideoViewController: UIViewController {
       $0.addTarget(self, action: #selector(uploadButtonTapped), for: .touchUpInside)
     }
   }
-
+  
   private func setUI() {
+    self.view.addSubview(popUpView)
     self.view.addSubview(gradientView)
     self.view.addSubview(scrollView)
     self.scrollView.addSubview(contentView)
@@ -129,8 +140,13 @@ public class UploadVideoViewController: UIViewController {
       uploadButton
     )
   }
-
+  
   private func setAutolayout() {
+    self.popUpView.snp.makeConstraints {
+      $0.top.equalTo(180.adaptiveHeight)
+      $0.horizontalEdges.equalToSuperview().inset(40.adaptiveWidth)
+      $0.height.equalTo(252.adaptiveHeight)
+    }
     self.gradientView.snp.makeConstraints {
       $0.top.horizontalEdges.equalToSuperview()
       $0.height.equalTo(400.adaptiveHeight)
@@ -213,30 +229,30 @@ public class UploadVideoViewController: UIViewController {
       $0.centerX.equalToSuperview()
     }
   }
-
+  
   func bind() {
     viewModel.output.thumbnailImage
       .bind(to: self.videoThumbnailImageView.rx.image)
       .disposed(by: disposeBag)
-
+    
     viewModel.output.locationTextCount
       .bind(to: locationTextCountLabel.rx.text)
       .disposed(by: disposeBag)
-
+    
     viewModel.output.contentsTextCount
       .bind(to: contentsTextView.textCountLabel.rx.text)
       .disposed(by: disposeBag)
-
+    
     locationTextField.rx.text.orEmpty
       .filter { $0.count <= 20 }
       .bind(to: viewModel.input.location)
       .disposed(by: disposeBag)
-
+    
     contentsTextView.textView.rx.text.orEmpty
       .filter { $0.count <= 300 }
       .bind(to: viewModel.input.contents)
       .disposed(by: disposeBag)
-
+    
     locationTextField.rx.text.orEmpty
       .subscribe(onNext: { [weak self] text in
         guard let self = self else { return }
@@ -245,7 +261,7 @@ public class UploadVideoViewController: UIViewController {
         }
       })
       .disposed(by: disposeBag)
-
+    
     contentsTextView.textView.rx.text.orEmpty
       .subscribe(onNext: { [weak self] text in
         if text.count > 300 {
@@ -253,25 +269,36 @@ public class UploadVideoViewController: UIViewController {
         }
       })
       .disposed(by: disposeBag)
-
+    
     viewModel.output.uploadEnabled
       .bind(to: self.rx.uploadButtonEnabled)
       .disposed(by: disposeBag)
-
+    
     viewModel.output.thumbnailImage
       .map { $0 != nil }
       .bind(to: self.rx.uploadVideoSelected)
       .disposed(by: disposeBag)
   }
-
+  
   @objc func videoThumbnailSelectButtonTapped() {
-    let selectVideoViewController = SelectVideoViewController()
-    selectVideoViewController.delegate = self
-    let navigationController = BaseNavigationController(rootViewController: selectVideoViewController)
-    navigationController.modalPresentationStyle = .fullScreen
-    self.present(navigationController, animated: true)
+    viewModel.getPhotoPermission { [weak self] access in
+      guard let self = self else { return }
+      if access {
+        let selectVideoViewController = SelectVideoViewController()
+        selectVideoViewController.delegate = self
+        let navigationController = BaseNavigationController(rootViewController: selectVideoViewController)
+        navigationController.modalPresentationStyle = .fullScreen
+        self.present(navigationController, animated: true)
+      } else {
+        DispatchQueue.main.async {
+          self.showPopUp(type: .permission) {
+            UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+          }
+        }
+      }
+    }
   }
-
+  
   @objc func selectedKeywordButtonTapped() {
     let filteringViewController = RecordyFilteringViewController()
     filteringViewController.delegate = self
@@ -285,9 +312,14 @@ public class UploadVideoViewController: UIViewController {
     }
     self.present(filteringViewController, animated: true)
   }
-
+  
   @objc func uploadButtonTapped() {
     viewModel.uploadButtonTapped()
+    self.dismiss(animated: true)
+  }
+
+  @objc func closeButtonTapped() {
+    self.dismiss(animated: true)
   }
 }
 
@@ -295,46 +327,6 @@ public class UploadVideoViewController: UIViewController {
 extension UploadVideoViewController: SelectVideoDelegate {
   func selectVideo(_ data: PHAsset) {
     viewModel.input.selectedAsset.accept(data)
-    let apiProvider = APIProvider<APITarget.Records>()
-    let thumbnailData = PhotoKitManager.getAssetThumbnailData(asset: data)
-
-    PhotoKitManager.getData(of: data) { binaryData in
-      apiProvider.requestResponsable(
-        .getPresignedUrl,
-        DTO.GetPresignedUrlResponse.self
-      ) { result in
-        switch result {
-        case .success(let response):
-          AWSS3Uploader.upload(
-            binaryData!,
-            toPresignedURL: URL(string: response.videoUrl)!
-          ) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let success):
-              self.viewModel.input.videoUrl.accept(success?.removeQueryParameters())
-            case .failure(let failure):
-              print("@Log - \(failure.localizedDescription)")
-            }
-          }
-
-          AWSS3Uploader.upload(
-            thumbnailData!,
-            toPresignedURL: URL(string: response.thumbnailUrl)!
-          ) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let success):
-              self.viewModel.input.thumbnailUrl.accept(success?.removeQueryParameters())
-            case .failure(let failure):
-              print("@Log - \(failure.localizedDescription)")
-            }
-          }
-        case .failure(let failure):
-          print(failure)
-        }
-      }
-    }
   }
 }
 
@@ -355,7 +347,7 @@ extension Reactive where Base: UploadVideoViewController {
       viewController.uploadButton.setTitleColor(value ? CommonAsset.recordyGrey09.color : CommonAsset.recordyGrey04.color, for: .normal)
     }
   }
-
+  
   var uploadVideoSelected: Binder<Bool> {
     return Binder(self.base) { viewController, value in
       viewController.videoThumbnailSelectButton.setTitle(value ? "" : "영상 선택", for: .normal)

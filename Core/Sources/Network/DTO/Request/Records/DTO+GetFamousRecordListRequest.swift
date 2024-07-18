@@ -10,12 +10,12 @@ import Foundation
 
 extension DTO {
   public struct GetFamousRecordListRequest: BaseRequest {
-    public let keywords: [String]
+    public let keywords: String?
     public let pageNumber: Int
     public let pageSize: Int
 
     public init(
-      keywords: [String],
+      keywords: String?,
       pageNumber: Int,
       pageSize: Int
     ) {
