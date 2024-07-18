@@ -28,7 +28,7 @@ public class ProfileInfoView: UIView {
   
   override init(frame: CGRect) {
     super.init(frame: frame)
-    setUpStyle()
+    setStyle()
     setLayout()
     setUpConstraints()
   }
@@ -43,7 +43,7 @@ public class ProfileInfoView: UIView {
     addSubview(followStackView)
   }
   
-  public func setUpStyle() {
+  public func setStyle() {
     
     profileImage.do {
       $0.contentMode = .scaleAspectFill
