@@ -404,7 +404,6 @@ public final class HomeViewController: UIViewController {
         self.famousRecords = response.content.map {
           MainRecord(
             id: $0.recordInfo.id,
-            cursorId: nil,
             thumbnailUrl: $0.recordInfo.fileUrl.thumbnailUrl,
             location: $0.recordInfo.location,
             isBookmarked: $0.isBookmark
@@ -435,7 +434,6 @@ public final class HomeViewController: UIViewController {
         self.recentRecords = response.content.map {
           MainRecord(
             id: $0.recordInfo.id,
-            cursorId: response.nextCursor,
             thumbnailUrl: $0.recordInfo.fileUrl.thumbnailUrl,
             location: $0.recordInfo.location,
             isBookmarked: $0.isBookmark
@@ -551,14 +549,12 @@ extension HomeViewController: UICollectionViewDataSource {
     didSelectItemAt indexPath: IndexPath
   ) {
     var nextType: VideoFeedType = .famous
-    var cursorId: Int?
     var currentId: Int?
     if collectionView == popularCollectionView {
       nextType = .famous
       currentId = famousRecords[indexPath.row].id
     } else if collectionView == recentCollectionView {
       nextType = .recent
-      cursorId = recentRecords[indexPath.row].cursorId
       currentId = recentRecords[indexPath.row].id
     }
     let videoFeedViewController = VideoFeedViewController(
