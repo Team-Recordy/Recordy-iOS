@@ -71,6 +71,36 @@ public final class HomeViewController: UIViewController {
   public override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(true)
     self.navigationController?.navigationBar.isHidden = true
+    setObserver()
+  }
+
+  public override func viewWillDisappear(_ animated: Bool) {
+    NotificationCenter.default.removeObserver(self, name: .updateDidComplete, object: nil)
+  }
+
+  func setObserver() {
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleUploadCompletion),
+      name: .updateDidComplete,
+      object: nil
+    )
+  }
+
+  @objc private func handleUploadCompletion(_ notification: Notification) {
+    guard let state = notification.userInfo?["state"] as? String,
+          let message = notification.userInfo?["message"] as? String else {
+      return
+    }
+    if state == "success" {
+      showToast(status: .complete, message: message, height: 44)
+      if let keyword = selectedKeywords.first {
+        getFamousRecordList(selectedKeyword: keyword)
+        getRecentRecordList(selectedKeyword: keyword)
+      }
+    } else {
+      showToast(status: .warning, message: message, height: 44)
+    }
   }
 
   func setLottie() {
@@ -411,7 +441,6 @@ public final class HomeViewController: UIViewController {
             isBookmarked: $0.isBookmark
           )
         }
-        print("@feeds pre - \(self.recentRecords)")
         DispatchQueue.main.async {
           self.recentCollectionView.reloadData()
         }
@@ -536,7 +565,7 @@ extension HomeViewController: UICollectionViewDataSource {
       type: nextType,
       keyword: selectedKeywords.first,
       currentId: currentId,
-      cursorId: cursorId
+      cursorId: 0
     )
     self.navigationController?.pushViewController(
       videoFeedViewController,
