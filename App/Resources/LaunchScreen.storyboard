@@ -17,25 +17,28 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="appLogo" translatesAutoresizingMaskIntoConstraints="NO" id="SWd-p6-je2">
-                                <rect key="frame" x="120" y="312" width="153" height="108"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splashAppLogo" translatesAutoresizingMaskIntoConstraints="NO" id="SWd-p6-je2">
+                                <rect key="frame" x="120" y="373" width="153" height="106"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="106" id="XKI-ha-Fok"/>
+                                    <constraint firstAttribute="width" constant="153" id="Y1I-Nb-J3L"/>
+                                </constraints>
                             </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splashBackground" translatesAutoresizingMaskIntoConstraints="NO" id="UuB-sR-kf4">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="478"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="478" id="rmr-Gl-eIT"/>
+                                    <constraint firstAttribute="height" constant="478" id="eab-pw-uyG"/>
                                 </constraints>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
                         <color key="backgroundColor" name="recordyBG"/>
                         <constraints>
-                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="trailing" secondItem="SWd-p6-je2" secondAttribute="trailing" constant="120" id="2bo-cy-sal"/>
-                            <constraint firstItem="SWd-p6-je2" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="120" id="Bqr-Nk-NFo"/>
-                            <constraint firstItem="UuB-sR-kf4" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="Jtl-uZ-uRZ"/>
-                            <constraint firstItem="UuB-sR-kf4" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" id="NNo-X3-M4K"/>
-                            <constraint firstItem="SWd-p6-je2" firstAttribute="top" secondItem="Bcu-3y-fUS" secondAttribute="top" constant="253" id="eDm-26-y7E"/>
-                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="trailing" secondItem="UuB-sR-kf4" secondAttribute="trailing" id="seN-dc-tbj"/>
+                            <constraint firstItem="UuB-sR-kf4" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" id="DyI-Xd-cXz"/>
+                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="trailing" secondItem="UuB-sR-kf4" secondAttribute="trailing" id="lDN-xp-Div"/>
+                            <constraint firstItem="SWd-p6-je2" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="r4G-Yr-hTQ"/>
+                            <constraint firstItem="SWd-p6-je2" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="viM-fI-lz4"/>
+                            <constraint firstItem="UuB-sR-kf4" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="wwD-ra-MNL"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -45,7 +48,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="appLogo" width="136" height="108"/>
+        <image name="splashAppLogo" width="135.66667175292969" height="107"/>
         <image name="splashBackground" width="375" height="478"/>
         <namedColor name="recordyBG">
             <color red="0.015686274509803921" green="0.027450980392156862" blue="0.054901960784313725" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
