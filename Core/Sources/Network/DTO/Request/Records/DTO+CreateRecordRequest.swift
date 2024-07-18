@@ -15,13 +15,13 @@ extension DTO {
     /// 내용
     public let content: String
     /// 선택 키워드 - encoding etf8
-    public let keywords: [String]
+    public let keywords: String
     public let fileUrl: FileUrl
 
     public init(
       location: String,
       content: String,
-      keywords: [String],
+      keywords: String,
       fileUrl: FileUrl
     ) {
       self.location = location

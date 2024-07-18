@@ -21,6 +21,7 @@ let package = Package(
     .package(url: "https://github.com/ReactiveX/RxSwift.git", from: "6.0.0"),
     .package(url: "https://github.com/Moya/Moya.git", .upToNextMajor(from: "15.0.0")),
     .package(url: "https://github.com/airbnb/lottie-ios.git", from: "4.5.0"),
-    .package(url: "https://github.com/onevcat/Kingfisher.git", .upToNextMajor(from: "7.0.0"))
+    .package(url: "https://github.com/onevcat/Kingfisher.git", .upToNextMajor(from: "7.0.0")),
+    .package(url: "https://github.com/awslabs/aws-sdk-swift", from: "0.16.0")
   ]
 )
