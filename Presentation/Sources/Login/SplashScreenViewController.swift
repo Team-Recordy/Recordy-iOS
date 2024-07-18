@@ -15,15 +15,16 @@ import Common
 public class SplashScreenViewController: UIViewController {
   
   let logoImageView = UIImageView().then {
-    $0.image = CommonAsset.mypageCamera.image
+    $0.image = CommonAsset.loginAppLogo.image
     $0.contentMode = .scaleAspectFit
     $0.translatesAutoresizingMaskIntoConstraints = false
   }
   
   public override func viewDidLoad() {
     super.viewDidLoad()
-    
     view.backgroundColor = CommonAsset.recordyBG.color
+    setUI()
+    setLogoImageView()
   }
   
   public override func viewDidAppear(_ animated: Bool) {
@@ -40,13 +41,19 @@ public class SplashScreenViewController: UIViewController {
       $0.width.equalTo(135)
       $0.height.equalTo(106)
       $0.top.equalToSuperview().offset(253)
-      $0.horizontalEdges.equalToSuperview().offset(120)
+      $0.centerX.equalToSuperview()
     }
   }
   
   private func animateLogo() {
+    self.logoImageView.snp.remakeConstraints {
+      $0.centerX.equalToSuperview()
+      $0.top.equalToSuperview().offset(274)
+      $0.width.height.equalTo(120)
+    }
+    
     UIView.animate(withDuration: 1.0, delay: 0, options: [.curveEaseInOut], animations: {
-      self.logoImageView.frame = CGRect(x: 20, y: 50, width: 50, height: 50)
+      self.view.layoutIfNeeded()
     }) { _ in
       self.showLoginScreen()
     }
