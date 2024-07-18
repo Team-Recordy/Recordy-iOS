@@ -10,15 +10,15 @@ import Foundation
 
 extension DTO {
   public struct GetFamousRecordListResponse: BaseResponse {
-    public let nextCursor: Int
+    public let pageNumber: Int
     public let hasNext: Bool
-    public let content: Content
+    public let content: [Content]
   }
 }
 
 extension DTO.GetFamousRecordListResponse {
   public struct Content: BaseResponse {
-    public let recordInfo: Bool
+    public let recordInfo: RecordInfo
     public let isBookmark: Bool
   }
 }
@@ -38,10 +38,10 @@ extension DTO.GetFamousRecordListResponse.Content {
 
 extension DTO.GetFamousRecordListResponse.Content.RecordInfo {
   public struct FileUrl: BaseResponse {
-    let videoUrl: String
-    let thumbnailUrl: String
+    public let videoUrl: String
+    public let thumbnailUrl: String
 
-    init(
+    public init(
       videoUrl: String,
       thumbnailUrl: String
     ) {

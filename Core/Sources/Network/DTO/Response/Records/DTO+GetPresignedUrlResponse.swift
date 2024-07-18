@@ -10,8 +10,8 @@ import Foundation
 
 extension DTO {
   public struct GetPresignedUrlResponse: BaseResponse {
-    let videoUrl: String
-    let thumbnailUrl: String
+    public let videoUrl: String
+    public let thumbnailUrl: String
 
     public init(
       videoUrl: String,

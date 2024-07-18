@@ -46,8 +46,8 @@ extension DTO.GetRecentRecordListResponse.Content {
 
 extension DTO.GetRecentRecordListResponse.Content.RecordInfo {
   public struct FileUrl: BaseResponse {
-    let videoUrl: String
-    let thumbnailUrl: String
+    public let videoUrl: String
+    public let thumbnailUrl: String
 
     init(
       videoUrl: String,
