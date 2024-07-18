@@ -17,30 +17,30 @@ class FollowingViewModel {
   
   func fetchFollowings() {
     let fetchedFollowings: [Following] = [
-      Following(
-        username: "유영",
-        profileImage: CommonAsset.yoo0profile.image,
-        isFollowing: false,
-        isFollowButtonVisible: false
-      ),
-      Following(
-        username: "닉네임",
-        profileImage: CommonAsset.profileImage.image,
-        isFollowing: false,
-        isFollowButtonVisible: true
-      ),
-      Following(
-        username: "닉네임",
-        profileImage: CommonAsset.profileImage.image,
-        isFollowing: true,
-        isFollowButtonVisible: true
-      ),
-      Following(
-        username: "닉네임",
-        profileImage: CommonAsset.profileImage.image,
-        isFollowing: false,
-        isFollowButtonVisible: true
-      )
+//      Following(
+//        username: "유영",
+//        profileImage: CommonAsset.yoo0profile.image,
+//        isFollowing: false,
+//        isFollowButtonVisible: false
+//      ),
+//      Following(
+//        username: "닉네임",
+//        profileImage: CommonAsset.profileImage.image,
+//        isFollowing: false,
+//        isFollowButtonVisible: true
+//      ),
+//      Following(
+//        username: "닉네임",
+//        profileImage: CommonAsset.profileImage.image,
+//        isFollowing: true,
+//        isFollowButtonVisible: true
+//      ),
+//      Following(
+//        username: "닉네임",
+//        profileImage: CommonAsset.profileImage.image,
+//        isFollowing: false,
+//        isFollowButtonVisible: true
+//      )
     ]
     followings.value = fetchedFollowings
     isEmpty.value = fetchedFollowings.isEmpty

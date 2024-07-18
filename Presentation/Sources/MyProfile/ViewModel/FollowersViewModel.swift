@@ -16,12 +16,31 @@ class FollowerViewModel {
   var isEmpty: Bindable<Bool> = Bindable(true)
   
   func fetchFollowers() {
-    let fetchedFollowers: [Follower] = [
-      Follower(username: "닉네임1", isFollowing: false, profileImage: CommonAsset.profileImage.image),
-      Follower(username: "닉네임2", isFollowing: true, profileImage: CommonAsset.profileImage.image),
-    ]
-    followers.value = fetchedFollowers
-    isEmpty.value = fetchedFollowers.isEmpty
+    getFollowerList()
+  }
+  
+  func getFollowerList() {
+    let apiProvider = APIProvider<APITarget.Users>()
+    let request = DTO.GetFollowerListRequest(cursorId: 0, size: 10)
+    apiProvider.requestResponsable(
+      .getfollowerList(request),
+      DTO.GetFollowerListResponse.self) { [weak self]
+        result in
+        guard let self = self else { return }
+        switch result {
+        case .success(let response):
+          let followerList = response.content.map {
+            Follower(
+              username: $0.userInfo.nickname,
+              isFollowing: $0.following,
+              profileImage: CommonAsset.profileImage.image
+            )
+          }
+        case .failure(let failure):
+          print(failure)
+        }
+      }
+    
   }
   
   func toggleFollow(at index: Int) {

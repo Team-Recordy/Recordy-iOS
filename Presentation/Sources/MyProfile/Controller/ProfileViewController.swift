@@ -41,6 +41,7 @@ public class ProfileViewController: UIViewController {
     setDelegate()
     controlTypeChanged()
   }
+  
   public override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     getBookmarkedRecordList()
@@ -49,7 +50,17 @@ public class ProfileViewController: UIViewController {
   }
   
   func setStyle() {
-    
+    self.title = "프로필"
+    profileInfoView.followerButton.addTarget(
+      self,
+      action: #selector(showFollowers),
+      for: .touchUpInside
+    )
+    profileInfoView.followingButton.addTarget(
+      self,
+      action: #selector(showFollowings),
+      for: .touchUpInside
+    )
   }
   
   func setUI() {
@@ -66,8 +77,7 @@ public class ProfileViewController: UIViewController {
     profileInfoView.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide)
       $0.horizontalEdges.equalToSuperview()
-      $0.width.equalTo(335.adaptiveWidth)
-      $0.height.equalTo(52.adaptiveHeight)
+      $0.height.equalTo(65)
     }
     
     segmentControlView.snp.makeConstraints {
@@ -177,6 +187,16 @@ public class ProfileViewController: UIViewController {
         print("@Log - \(failure.localizedDescription)")
       }
     }
+  }
+  
+  @objc private func showFollowers() {
+    print(#function)
+    let followerViewController = FollowerViewController()
+    self.navigationController?.pushViewController(followerViewController, animated: true)
+  }
+  
+  @objc private func showFollowings() {
+    print("팔로잉 목록 보기")
   }
 }
 

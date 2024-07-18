@@ -157,4 +157,6 @@ public class FollowerCell: UITableViewCell {
     followButton.setTitle(follower.isFollowing ? "팔로잉" : "팔로우", for: .normal)
     followButton.mediumState = follower.isFollowing ? .active : .inactive
   }
+  
+  
 }

@@ -7,7 +7,9 @@
 //
 import UIKit
 
-struct Following {
+public struct Following {
+  let curser: Int
+  let hasNext: Bool
   let username: String
   let profileImage: UIImage
   var isFollowing: Bool
