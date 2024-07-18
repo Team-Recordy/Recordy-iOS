@@ -44,8 +44,18 @@ public final class SignupViewController: UIViewController {
   
   func showTermsView() {
     let termsView = TermsView()
-    termsView.nextButton.addTarget(self, action: #selector(showNicknameView), for: .touchUpInside)
+    termsView.nextButton.addTarget(
+      self,
+      action: #selector(checkAndShowNicknameView),
+      for: .touchUpInside
+    )
     switchView(termsView)
+  }
+  
+  @objc
+  func checkAndShowNicknameView() {
+    guard let termsView = rootView as? TermsView, termsView.areAllButtonsActive() else { return }
+    showNicknameView()
   }
   
   @objc
@@ -58,9 +68,7 @@ public final class SignupViewController: UIViewController {
     let nicknameView = NicknameView()
     nicknameView.nextButton.addTarget(
       self,
-      action: #selector(
-        showCompleteView
-      ),
+      action: #selector(showCompleteView),
       for: .touchUpInside
     )
     switchView(nicknameView)

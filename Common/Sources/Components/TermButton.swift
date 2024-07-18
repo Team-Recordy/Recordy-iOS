@@ -6,6 +6,12 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 
+public enum TermButtonState {
+  case agree
+  case disagree
+}
+
+
 import UIKit
 
 import SnapKit
@@ -13,10 +19,10 @@ import Then
 
 public class TermButton: UIButton {
   
-  let backgroundView = UIView()
-  let agreeButton = AgreeToggleButton()
+  public let agreeImageView = UIImageView()
   public let agreeLabel = UILabel()
-  let moreButton = MoreButton()
+  
+  public var currentState: TermButtonState = .disagree
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -30,7 +36,10 @@ public class TermButton: UIButton {
   }
   
   private func setStyle() {
-    backgroundView.backgroundColor = .clear
+    agreeImageView.do {
+      $0.image = CommonAsset.deactivateCheck.image
+    }
+    
     agreeLabel.do {
       $0.font = RecordyFont.caption1.font
       $0.textColor = CommonAsset.recordyGrey03.color
@@ -39,42 +48,38 @@ public class TermButton: UIButton {
   
   private func setUI() {
     self.addSubviews(
-      backgroundView,
-      agreeButton,
-      agreeLabel,
-      moreButton
+      agreeImageView,
+      agreeLabel
     )
   }
   
   private func setAutolayout() {
-    self.backgroundView.snp.makeConstraints {
-      $0.top.equalTo(self.snp.top)
-      $0.bottom.equalTo(self.snp.bottom)
-      $0.leading.equalTo(self.snp.leading)
-      $0.trailing.equalTo(self.snp.trailing)
-    }
-    
-    self.agreeButton.snp.makeConstraints {
-      $0.leading.equalTo(self.snp.leading).offset(20)
-      $0.verticalEdges.equalToSuperview().inset(12)
-      $0.width.equalTo(24)
-    }
-    
-    self.agreeLabel.snp.makeConstraints {
-      $0.leading.equalTo(self.agreeButton.snp.trailing).offset(16)
+    self.agreeImageView.snp.makeConstraints {
+      $0.leading.equalToSuperview().offset(24)
+      $0.width.height.equalTo(16)
       $0.centerY.equalToSuperview()
     }
     
-    self.agreeButton.checkImageView.snp.makeConstraints {
-      $0.width.equalTo(16.adaptiveWidth)
-      $0.height.equalTo(16.adaptiveHeight)
+    self.agreeLabel.snp.makeConstraints {
+      $0.leading.equalTo(agreeImageView.snp.trailing).offset(20)
+      $0.centerY.equalToSuperview()
     }
-    
-    self.moreButton.snp.makeConstraints {
-      $0.trailing.equalToSuperview().inset(20)
-      $0.verticalEdges.equalToSuperview().inset(5)
-      $0.width.equalTo(50.adaptiveWidth)
-    }
+  }
+  
+  public func toggleState() {
+    currentState = (currentState == .agree) ? .disagree : .agree
+    print("Toggle State: \(currentState)")
+    updateAgreeToggleButton()
+  }
+  
+  public func updateAgreeToggleButton() {
+    self.agreeImageView.image = (currentState == .agree) ? CommonAsset.activateCheck.image : CommonAsset.deactivateCheck.image
+    print("Updated Image: \(String(describing: self.agreeImageView.image))")
+  }
+  
+  public func updateState(_ state: TermButtonState) {
+    currentState = state
+    updateAgreeToggleButton()
   }
 }
 
