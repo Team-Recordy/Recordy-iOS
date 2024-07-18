@@ -9,6 +9,7 @@ import UIKit
 
 import Core
 
+import Kingfisher
 import SnapKit
 import Then
 
@@ -21,6 +22,7 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
   public let locationText = UILabel()
   public let locationImageView = UIImageView()
   public let bookmarkButton = UIButton()
+  public var bookmarkButtonEvent: (() -> Void)?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -35,7 +37,7 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
   
   private func setStyle() {
     self.cornerRadius(12)
-
+    
     locationStackView.do {
       $0.axis = .horizontal
       $0.distribution = .fillProportionally
@@ -56,6 +58,7 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
     bookmarkButton.do {
       $0.setImage(CommonAsset.bookmarkUnselected.image, for: .normal)
       $0.titleLabel?.font = RecordyFont.button2.font
+      $0.addTarget(self, action: #selector(bookmarkButtonTapped), for: .touchUpInside)
     }
   }
   private func setUI() {
@@ -88,5 +91,21 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
       $0.top.equalToSuperview().offset(15)
       $0.trailing.equalToSuperview().offset(-15)
     }
+  }
+  
+  public func configure(with record: MainRecord) {
+    let image = String(record.thumbnailUrl)
+    self.backgroundImageView.kf.setImage(with: URL(string: image))
+    self.locationText.text = record.location
+    self.bookmarkButton.isSelected = record.isBookmarked
+  }
+  
+  @objc private func bookmarkButtonTapped() {
+    self.bookmarkButtonEvent?()
+  }
+  
+  public func updateBookmarkButton(isBookmarked: Bool) {
+    self.bookmarkButton.setImage(isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image, for: .normal)
+    print("@Log update \(isBookmarked)")
   }
 }

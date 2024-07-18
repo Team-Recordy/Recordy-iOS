@@ -7,7 +7,6 @@
 //
 import UIKit
 
-
 import Common
 import Core
 
@@ -130,7 +129,7 @@ class BookMarkView: UIView, UICollectionViewDataSource, UICollectionViewDelegate
   private func setCountLabelText() {
     let whiteText = "• \(feeds.count)"
     let greyText = " 개의 기록"
-    let attributedText = NSMutableAttributedString(string: whiteText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
+    let attributedText = NSMutableAttributedString(string: whiteText, attributes:       [NSAttributedString.Key.foregroundColor: UIColor.white])
     attributedText.append(NSAttributedString(string: greyText, attributes: [NSAttributedString.Key.foregroundColor: CommonAsset.recordyGrey03.color]))
     countLabel.attributedText = attributedText
   }

@@ -12,14 +12,14 @@ import Then
 import Core
 import Common
 
-class MyRecordView: UIView, UICollectionViewDataSource, UICollectionViewDelegate {
+public class MyRecordView: UIView, UICollectionViewDataSource, UICollectionViewDelegate {
   private let videoEmptyView = UIView()
   private let videoEmptyImageView = UIImageView()
   private let videoEmptyTextView = UIImageView()
   private let goActionButton = UIButton()
   private let countLabel = UILabel()
   private var collectionView: UICollectionView!
-  private let feeds: [Feed] = []
+  private var feeds: [Feed] = []
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -151,18 +151,25 @@ class MyRecordView: UIView, UICollectionViewDataSource, UICollectionViewDelegate
     countLabel.attributedText = attributedText
   }
   
-  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+  func getMyRecordList(feeds: [Feed]) {
+    self.feeds.append(contentsOf: feeds)
+    self.collectionView.reloadData()
+    checkDataEmpty()
+  }
+  
+  public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return feeds.count
   }
   
-  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+  public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     guard let cell = collectionView.dequeueReusableCell(
       withReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier,
       for: indexPath
     ) as? ThumbnailCollectionViewCell else {
       return UICollectionViewCell()
     }
-    cell.backgroundImageView.image = UIImage(systemName: "person")
+    let thumbnailUrl = URL(string: String(feeds[indexPath.row].thumbnailLink.dropLast(1)))
+    cell.backgroundImageView.kf.setImage(with: thumbnailUrl)
     cell.locationText.text = feeds[indexPath.row].location
     return cell
   }

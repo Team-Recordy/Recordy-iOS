@@ -122,7 +122,7 @@ final class LoginView: UIView {
       $0.centerX.equalToSuperview()
       $0.top.equalTo(recordyLogo.snp.bottom).offset(24)
     }
-    
+
     self.kakaoLoginButton.snp.makeConstraints {
       $0.top.equalTo(projectIntro.snp.bottom).offset(152)
       $0.height.equalTo(48)
