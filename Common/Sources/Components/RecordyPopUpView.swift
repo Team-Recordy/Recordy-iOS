@@ -106,6 +106,7 @@ public class RecordyPopUpView: UIView {
     rightButton.snp.makeConstraints {
       $0.top.equalTo(subtitleLabel.snp.bottom).offset(18)
       $0.leading.equalTo(leftButton.snp.trailing).offset(8)
+      $0.trailing.equalToSuperview().offset(-20)
       $0.height.equalTo(44.adaptiveHeight)
       $0.width.equalTo(125.adaptiveWidth)
     }
