@@ -32,7 +32,7 @@ public class RecordyFilteringCell: UICollectionViewCell {
 
   private func setAutoLayout() {
     chipButton.snp.makeConstraints {
-      $0.edges.equalToSuperview()
+      $0.edges.equalToSuperview().inset(2)
     }
   }
 
@@ -40,5 +40,4 @@ public class RecordyFilteringCell: UICollectionViewCell {
     self.chipButton.setTitle(keyword.title, for: .normal)
     self.chipButton.setState(state: isSelected ? .active : .inactive)
   }
-
 }
