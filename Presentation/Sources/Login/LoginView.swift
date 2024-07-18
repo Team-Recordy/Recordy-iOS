@@ -15,8 +15,9 @@ import Common
 
 final class LoginView: UIView {
   
-  let recordyLogo = UIView().then {
-    $0.backgroundColor = CommonAsset.recordyMain.color
+  let recordyLogo = UIImageView().then {
+    $0.image = CommonAsset.loginAppLogo.image
+    $0.contentMode = .scaleAspectFit
   }
   
   let projectIntro = UITextField().then {
