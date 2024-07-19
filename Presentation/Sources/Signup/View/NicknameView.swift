@@ -1,6 +1,7 @@
 import UIKit
 
 import Common
+import Core
 
 final class NicknameView: UIView {
   
@@ -10,6 +11,9 @@ final class NicknameView: UIView {
   let nicknameTextField = RecordyTextField(placeholder: "EX) 레코디둥이들")
   let nextButton = RecordyButton()
   let textFieldCountLabel = UILabel()
+  let errorLabel = UILabel()
+  
+  private var isUsernameTakenFlag = false
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -17,6 +21,7 @@ final class NicknameView: UIView {
     setUI()
     setAutoLayout()
     setupTextFieldObserver()
+    nicknameTextField.delegate = self
   }
   
   deinit {
@@ -44,9 +49,15 @@ final class NicknameView: UIView {
     }
     
     textFieldCountLabel.do {
-      $0.text = ""
+      $0.text = "0 / 10"
       $0.font = RecordyFont.caption2.font
       $0.textColor = CommonAsset.recordyGrey04.color
+    }
+    
+    errorLabel.do {
+      $0.text = ""
+      $0.font = RecordyFont.caption2.font
+      $0.textColor = CommonAsset.recordyAlert.color
     }
     
     nicknameTextField.stateDelegate = self
@@ -57,7 +68,8 @@ final class NicknameView: UIView {
       nicknameText,
       nicknameTextField,
       nextButton,
-      textFieldCountLabel
+      textFieldCountLabel,
+      errorLabel
     )
   }
   
@@ -83,6 +95,25 @@ final class NicknameView: UIView {
       $0.top.equalTo(nicknameTextField.snp.bottom).offset(8)
       $0.trailing.equalTo(nicknameTextField.snp.trailing)
     }
+    
+    errorLabel.snp.makeConstraints {
+      $0.top.equalTo(nicknameTextField.snp.bottom).offset(8)
+      $0.leading.equalToSuperview().offset(20)
+    }
+  }
+  
+  func getCheckNicknameRequest(completion: @escaping (Bool) -> Void) {
+    print("getCheckNicknameRequest")
+    let apiProvider = APIProvider<APITarget.Users>()
+    let request = DTO.CheckNicknameRequest(nickname: nicknameTextField.text!)
+    apiProvider.justRequest(.checkNickname(request)) { result in
+      switch result {
+      case .success:
+        completion(true)
+      case .failure:
+        completion(false)
+      }
+    }
   }
   
   @objc func textFieldDidChange(_ sender: Any?) {
@@ -100,10 +131,25 @@ final class NicknameView: UIView {
       state(.error)
       return
     }
-    let pattern = "^[가-힣a-zA-Z0-9._]{1,10}$"
+    
+    let pattern = "^[가-힣0-9._]{1,10}$"
     let regex = try! NSRegularExpression(pattern: pattern)
     let matches = regex.matches(in: text, range: NSRange(location: 0, length: text.utf16.count))
-    state(matches.count > 0 && text.count <= 10 ? .selected : .error)
+    
+    if matches.count == 0 {
+      state(.error)
+      errorLabel.text = "ⓘ 한글, 숫자, 밑줄 및 마침표만 사용할 수 있어요"
+    } else {
+      getCheckNicknameRequest { isSuccess in
+        if !isSuccess {
+          self.state(.error)
+          self.errorLabel.text = "ⓘ 이미 사용중인 닉네임이에요"
+        } else {
+          self.state(.selected)
+          self.errorLabel.text = ""
+        }
+      }
+    }
   }
 }
 
@@ -118,5 +164,14 @@ extension NicknameView: RecordyTextFieldStateDelegate {
     case .selected:
       nextButton.buttonState = .active
     }
+  }
+}
+
+extension NicknameView: UITextFieldDelegate {
+  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    let currentText = textField.text ?? ""
+    guard let stringRange = Range(range, in: currentText) else { return false }
+    let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
+    return updatedText.count <= 10
   }
 }

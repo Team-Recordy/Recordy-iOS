@@ -75,6 +75,7 @@ public final class SignupViewController: UIViewController {
       action: #selector(showCompleteView),
       for: .touchUpInside
     )
+    nicknameView.nicknameTextField.stateDelegate = self
     switchView(nicknameView)
   }
   
@@ -138,5 +139,6 @@ public final class SignupViewController: UIViewController {
 extension SignupViewController: RecordyTextFieldStateDelegate {
   public func state(_ currentState: Common.RecordyTextFieldState) {
     self.textFieldState = currentState
+    nicknameView.state(currentState)
   }
 }
