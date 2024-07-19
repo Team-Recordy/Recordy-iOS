@@ -76,6 +76,9 @@ public class VideoFeedViewController: UIViewController {
 
   private func setStyle() {
     self.navigationController?.navigationBar.isHidden = self.type == .all || self.type == .following
+//    if self.type == .all || self.type == .following {
+//      self.setupCustomBackButton()
+//    }
     self.view.backgroundColor = CommonAsset.recordyBG.color
     self.recordyToggle.do {
       $0.isHidden = type != .all && type != .following

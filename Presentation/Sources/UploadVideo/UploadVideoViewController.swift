@@ -90,13 +90,10 @@ public class UploadVideoViewController: UIViewController {
         for: .touchUpInside
       )
     }
-    
     videoThumbnailAlertLabel.do {
       $0.text = "다른 영상 고르기"
       $0.font = RecordyFont.caption2.font
       $0.textColor = CommonAsset.recordyGrey01.color
-      $0.backgroundColor = CommonAsset.recordyBG.color.withAlphaComponent(0.5)
-      $0.cornerRadius(40)
     }
     selectKeywordStackView.keywordButton.do {
       $0.addTarget(
@@ -228,8 +225,6 @@ public class UploadVideoViewController: UIViewController {
       $0.edges.equalToSuperview()
     }
     self.videoThumbnailAlertLabel.snp.makeConstraints {
-      $0.width.equalTo(90.adaptiveWidth)
-      $0.height.equalTo(240.adaptiveHeight)
       $0.bottom.equalToSuperview().offset(-16.adaptiveHeight)
       $0.centerX.equalToSuperview()
     }

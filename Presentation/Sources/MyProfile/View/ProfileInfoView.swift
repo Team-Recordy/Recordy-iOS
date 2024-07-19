@@ -10,6 +10,7 @@ import UIKit
 import SnapKit
 import Then
 
+import Core
 import Common
 
 public class ProfileInfoView: UIView {
