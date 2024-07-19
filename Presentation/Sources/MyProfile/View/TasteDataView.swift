@@ -16,6 +16,7 @@
 import UIKit
 import SnapKit
 
+import Core
 import Common
 
 class TasteDataView: UIView {

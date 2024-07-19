@@ -44,7 +44,6 @@ public final class RecordyTabBarController: UITabBarController, UITabBarControll
   }
 }
 
-
 final class RecordyTabBar: UITabBar {
   override func sizeThatFits(_ size: CGSize) -> CGSize {
     var size = super.sizeThatFits(size)
@@ -55,9 +54,11 @@ final class RecordyTabBar: UITabBar {
   override func layoutSubviews() {
     super.layoutSubviews()
 
+    // 원하는 간격과 아이템 너비를 설정합니다.
     let itemWidth: CGFloat = 75
     let itemSpacing: CGFloat = 40
 
+    // 전체 너비에서 각 아이템의 너비와 간격을 뺀 후, 시작 위치를 계산합니다.
     let totalWidth = CGFloat(items?.count ?? 0) * itemWidth + CGFloat((items?.count ?? 0) - 1) * itemSpacing
     var xOffset: CGFloat = (self.bounds.width - totalWidth) / 2
 

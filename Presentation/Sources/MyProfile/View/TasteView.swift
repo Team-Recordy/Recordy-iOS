@@ -11,6 +11,7 @@ import SnapKit
 import Then
 
 import Common
+import Core
 
 // EmptyView
 class TasteView: UIView {
