@@ -15,6 +15,7 @@ import Common
 
 final class TermsView: UIView {
   
+  let gradientView = RecordyGradientView()
   let termImage = UIImageView()
   let termText = UILabel()
   
@@ -76,6 +77,7 @@ final class TermsView: UIView {
   
   func setUI() {
     self.addSubviews(
+      gradientView,
       termImage,
       termText,
       agreeToAllButton,
@@ -87,6 +89,11 @@ final class TermsView: UIView {
   }
   
   func setAutoLayout() {
+    gradientView.snp.makeConstraints {
+      $0.top.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(400.adaptiveHeight)
+    }
+
     termImage.snp.makeConstraints {
       $0.top.equalToSuperview().offset(148)
       $0.leading.equalToSuperview().offset(20)

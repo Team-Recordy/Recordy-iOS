@@ -42,7 +42,7 @@ enum RecordyTabBarType: CaseIterable {
     case .home:
       BaseNavigationController(rootViewController: HomeViewController())
     case .video:
-      VideoFeedViewController(type: .all)
+      BaseNavigationController(rootViewController: VideoFeedViewController(type: .following))
     case .profile:
       BaseNavigationController(rootViewController: ProfileViewController())
     }

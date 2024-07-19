@@ -10,7 +10,7 @@ import Foundation
 
 extension DTO {
   public struct GetUserRecordListResponse: BaseResponse {
-    public let nextCursor: Int
+    public let nextCursor: Int?
     public let hasNext: Bool
     public let content: [Content]
   }

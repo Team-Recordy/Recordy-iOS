@@ -22,7 +22,7 @@ public class VideoFeedViewController: UIViewController {
   private var isFetched = false
   private var isPlayed = false
 
-  let type: VideoFeedType
+  var type: VideoFeedType
   private var viewModel: VideoFeedViewModel
 
   init(
@@ -66,24 +66,37 @@ public class VideoFeedViewController: UIViewController {
 
   private func bind() {
     viewModel.onFeedListUpdate = { [weak self] in
+      guard let self = self else { return }
       DispatchQueue.main.async {
-        self?.collectionView!.reloadData()
+        self.collectionView!.reloadData()
+        self.isPlayed = false
       }
     }
   }
 
   private func setStyle() {
-    self.navigationController?.navigationBar.isHidden = self.type == .all
+    self.navigationController?.navigationBar.isHidden = self.type == .all || self.type == .following
+//    if self.type == .all || self.type == .following {
+//      self.setupCustomBackButton()
+//    }
     self.view.backgroundColor = CommonAsset.recordyBG.color
     self.recordyToggle.do {
-      $0.isHidden = type != .all
+      $0.isHidden = type != .all && type != .following
+    }
+    self.recordyToggle.toggleAction = { [weak self] toggleState in
+      guard let self = self else { return }
+      toggleButtonTapped(type: toggleState == .all ? .following : .all)
     }
     if self.type != .all {
       self.navigationController?.navigationBar.topItem?.title = ""
     }
   }
 
-  @objc func temp () { }
+  func toggleButtonTapped(type: VideoFeedType) {
+    self.viewModel.type = type == .all ? .following : .all
+    self.viewModel.recordListCase()
+    self.isPlayed = false
+  }
 
   private func setUI() {
     self.view.addSubview(collectionView!)
@@ -125,7 +138,9 @@ public class VideoFeedViewController: UIViewController {
   }
 
   @objc private func nicknameButtonTapped(_ sender: UIButton) {
+    print(type != .userProfile && type != .myProfile)
     guard type != .userProfile && type != .myProfile else { return }
+    print(#function)
     let index = sender.tag
     let feed = viewModel.feedList[index]
     let userVC = OtherUserProfileViewController(id: feed.userId)
@@ -157,7 +172,7 @@ extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDat
       bounds: collectionView.frame,
       shouldAddPlayer: cell.avPlayer == nil
     )
-    if !isPlayed {
+    if !isPlayed && indexPath.row == 0 {
       cell.play()
       isPlayed = true
     }
@@ -174,9 +189,9 @@ extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDat
         isBookmarked: self.viewModel.feedList[indexPath.row].isBookmarked
       )
     }
-//    cell.deleteAction = {
-//      
-//    }
+    //    cell.deleteAction = {
+    //
+    //    }
     return cell
   }
 
@@ -237,6 +252,13 @@ extension VideoFeedViewController {
         $0.pause()
       }
     }
+  }
+
+  private func playFirstVisibleCell() {
+    let visibleCells = collectionView?.visibleCells.compactMap { $0 as? FeedCell } ?? []
+    guard let firstCell = visibleCells.first else { return }
+    firstCell.play()
+    isPlayed = true
   }
 }
 

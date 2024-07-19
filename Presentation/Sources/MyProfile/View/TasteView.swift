@@ -11,9 +11,12 @@ import SnapKit
 import Then
 
 import Common
+import Core
 
+// EmptyView
 class TasteView: UIView {
   
+  private let gradientImageView = UIImageView()
   private let emptyView = UIView()
   private let dataView = UIView()
   private let backgroundImageView = UIImageView()
@@ -55,7 +58,12 @@ class TasteView: UIView {
   
   private func setStyle() {
     self.backgroundColor = .black
-    
+
+    gradientImageView.do {
+      $0.image = CommonAsset.gradientImage.image
+      $0.contentMode = .scaleAspectFit
+    }
+
     emptyImageView.do {
       $0.image = CommonAsset.mypagebubble.image
       $0.contentMode = .scaleAspectFit
@@ -86,7 +94,8 @@ class TasteView: UIView {
   private func setUI() {
     self.addSubview(emptyView)
     self.addSubview(dataView)
-    
+    self.addSubview(gradientImageView)
+
     emptyView.addSubview(emptyImageView)
     emptyView.addSubview(emptyLabel)
     emptyView.addSubview(actionButton)
@@ -96,6 +105,10 @@ class TasteView: UIView {
   }
   
   private func setAutoLayout() {
+    gradientImageView.snp.makeConstraints {
+      $0.edges.equalTo(self.safeAreaLayoutGuide)
+    }
+
     emptyImageView.snp.makeConstraints {
       $0.top.equalToSuperview().offset(78)
       $0.centerX.equalToSuperview()
@@ -170,8 +183,8 @@ class TasteView: UIView {
       ]
       
       firstDataView.snp.makeConstraints {
-        $0.centerX.equalToSuperview().multipliedBy(bubbleCenters[0].x * 2)
-        $0.centerY.equalToSuperview().multipliedBy(bubbleCenters[0].y * 1.5)
+        $0.centerX.equalToSuperview().multipliedBy(bubbleCenters[0].x * 2.05)
+        $0.centerY.equalToSuperview().multipliedBy(bubbleCenters[0].y * 1.47)
         $0.width.equalTo(200)
         $0.height.equalTo(200)
       }

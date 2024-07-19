@@ -10,13 +10,13 @@ import UIKit
 import SnapKit
 import Then
 
+import Core
 import Common
 
 public class ProfileInfoView: UIView {
   
-  private let profileImage = UIImageView()
-  private let userName = UILabel()
-  
+  let profileImage = UIImageView()
+  let userName = UILabel()
   let followerButton = UIButton()
   let followingButton = UIButton()
   

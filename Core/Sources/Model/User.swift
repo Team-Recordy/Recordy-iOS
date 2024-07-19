@@ -12,6 +12,7 @@ public struct User {
   public let id: Int
   public let nickname: String
   public let followerCount: Int
+  public let followingCount: Int
   public var isFollowing: Bool
   public let profileImage: String
 
@@ -19,12 +20,14 @@ public struct User {
     id: Int,
     nickname: String,
     followerCount: Int,
+    followingCount: Int,
     isFollowing: Bool,
     profileImage: String
   ) {
     self.id = id
     self.nickname = nickname
     self.followerCount = followerCount
+    self.followingCount = followerCount
     self.isFollowing = isFollowing
     self.profileImage = profileImage
   }

@@ -15,6 +15,7 @@ import Common
 @available(iOS 16.0, *)
 public class SplashScreenViewController: UIViewController {
   
+  let gradientView = RecordyGradientView()
   let logoImageView = UIImageView().then {
     $0.image = CommonAsset.loginAppLogo.image
     $0.contentMode = .scaleAspectFit
@@ -35,9 +36,15 @@ public class SplashScreenViewController: UIViewController {
   
   func setUI() {
     view.addSubview(logoImageView)
+    view.addSubview(gradientView)
   }
   
   private func setLogoImageView() {
+    gradientView.snp.makeConstraints {
+      $0.top.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(400.adaptiveHeight)
+    }
+
     logoImageView.snp.makeConstraints {
       $0.width.equalTo(173)
       $0.height.equalTo(126)

@@ -14,6 +14,7 @@ import RxSwift
 
 enum VideoFeedType {
   case all
+  case following
   case famous
   case recent
   case userProfile
@@ -24,11 +25,12 @@ enum VideoFeedType {
 class VideoFeedViewModel {
 
   private(set) var feedList: [Feed] = []
-  let type: VideoFeedType
+  var type: VideoFeedType
   var cursorId: Int?
   var currentId: Int?
   var userId: Int?
   var keyword: Keyword?
+  var hasNext = true
   var pageNumber = 0
   let apiProvider = APIProvider<APITarget.Records>()
   let disposeBag = DisposeBag()
@@ -52,6 +54,7 @@ class VideoFeedViewModel {
   }
 
   func recordListCase() {
+    print(#function)
     switch type {
     case .all:
       getRecordList()
@@ -61,12 +64,17 @@ class VideoFeedViewModel {
       getRecentRecordList()
     case .userProfile:
       getUserProfileRecordList()
+    case .bookmarked:
+      getBookmarkedFeedList()
+    case .following:
+      getFollowRecordList()
     default: return
     }
   }
 
   func getRecordList() {
     guard !isFetching else { return }
+    hasNext = false
     isFetching = true
     let request = DTO.GetRecordListRequest(size: 15)
     apiProvider.requestResponsable(
@@ -78,7 +86,7 @@ class VideoFeedViewModel {
       self.isFetching = false
       switch result {
       case .success(let response):
-        self.feedList += response.feeds
+        self.feedList = response.feeds
         self.onFeedListUpdate?()
       case .failure(let error):
         print(error)
@@ -190,6 +198,66 @@ class VideoFeedViewModel {
         print(failure)
       }
     }
+  }
+
+  func getBookmarkedFeedList() {
+    guard !isFetching,
+          let currentId = currentId,
+          hasNext
+    else { return }
+    let request = DTO.GetBookmarkedListRequest(
+      cursorId: 0,
+      size: 100
+    )
+    apiProvider.requestResponsable(.getBookmarkedRecordList(request), DTO.GetBookmarkedListResponse.self) { result in
+      self.isFetching = false
+      switch result {
+      case .success(let response):
+        if let index = response.feeds.firstIndex(where: { $0.id == currentId }) {
+          let newFeeds = Array(response.feeds[index...])
+          self.hasNext = response.hasNext
+          self.feedList = newFeeds
+          self.onFeedListUpdate?()
+        }
+      case .failure(let failure):
+        print(failure)
+      }
+    }
+  }
+
+  func getFollowRecordList() {
+    guard !isFetching
+    else { return }
+    let request = DTO.GetFollowingRecordListRequest(
+      cursorId: 0,
+      size: 100
+    )
+    print(#function)
+    apiProvider.requestResponsable(.getFollowingRecordList(request), DTO.GetFollowingRecordListResponse.self) { result in
+      self.isFetching = false
+      switch result {
+      case .success(let response):
+        self.feedList = response.feeds
+        self.onFeedListUpdate?()
+        self.pageNumber = 0
+      case .failure(let failure):
+        print(failure)
+      }
+    }
+//    apiProvider.requestResponsable(.getBookmarkedRecordList(request), DTO.GetBookmarkedListResponse.self) { result in
+//      self.isFetching = false
+//      switch result {
+//      case .success(let response):
+//        if let index = response.feeds.firstIndex(where: { $0.id == currentId }) {
+//          let newFeeds = Array(response.feeds[index...])
+//          self.hasNext = response.hasNext
+//          self.feedList = newFeeds
+//          self.onFeedListUpdate?()
+//        }
+//      case .failure(let failure):
+//        print(failure)
+//      }
+//    }
   }
 
   func cacheVideos(
