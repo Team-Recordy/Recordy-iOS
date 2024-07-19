@@ -8,8 +8,9 @@
 
 import Foundation
 
-public struct Feed {
+public struct Feed: Equatable {
   public let id: Int
+  public let userId: Int
   public let location: String
   public let nickname: String
   public let description: String
@@ -17,18 +18,22 @@ public struct Feed {
   public var isBookmarked: Bool
   public let videoLink: String
   public let thumbnailLink: String
+  public let isMine: Bool
 
   public init(
     id: Int,
+    userId: Int,
     location: String,
     nickname: String,
     description: String,
     bookmarkCount: Int,
     isBookmarked: Bool,
     videoLink: String,
-    thumbnailLink: String
+    thumbnailLink: String,
+    isMine: Bool
   ) {
     self.id = id
+    self.userId = userId
     self.location = location
     self.nickname = nickname
     self.description = description
@@ -36,6 +41,7 @@ public struct Feed {
     self.isBookmarked = isBookmarked
     self.videoLink = videoLink
     self.thumbnailLink = thumbnailLink
+    self.isMine = isMine
   }
 }
 //

@@ -21,7 +21,7 @@ extension APITarget {
     case getfollowList(DTO.GetFollowListRequest)
     case getfollowerList(DTO.GetFollowerListRequest)
     case follow(DTO.FollowRequest)
-    case getProfile
+    case getProfile(DTO.GetProfileRequest)
   }
 }
 
@@ -49,10 +49,10 @@ extension APITarget.Users: TargetType {
       "following"
     case .getfollowerList:
       "follower"
-    case .follow:
-      "follow"
-    case .getProfile:
-      "profile"
+    case .follow(let followRequest):
+      "follow/\(followRequest.followingId)"
+    case .getProfile(let getProfileRequest):
+      "profile/\(getProfileRequest.otherUserId)"
     }
   }
 
@@ -109,11 +109,6 @@ extension APITarget.Users: TargetType {
           "cursorId": getFollowerListRequest.cursorId,
           "size": getFollowerListRequest.size
         ],
-        encoding: URLEncoding.queryString
-      )
-    case .follow(let followRequest):
-      return .requestParameters(
-        parameters: ["followingId": followRequest.followingId],
         encoding: URLEncoding.queryString
       )
     default:
