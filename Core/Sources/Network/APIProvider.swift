@@ -54,6 +54,20 @@ public final class APIProvider<T: TargetType>: MoyaProvider<T> {
     }
   }
 
+  public static func validateToken(completion: @escaping (Bool) -> Void) {
+
+    let apiProvider = APIProvider<APITarget.Preference>()
+
+    apiProvider.requestResponsable(.getPreference, DTO.GetPreferenceResponse.self) { result in
+      switch result {
+      case .success:
+        completion(true)
+      case .failure:
+        completion(false)
+      }
+    }
+  }
+
   func handleResponseStatus<U: Codable>(
     _ statusCode: Int,
     _ data: Data,
