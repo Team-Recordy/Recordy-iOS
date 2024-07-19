@@ -1,8 +1,9 @@
 # yoo0 유영
-![KakaoTalk_Photo_2024-07-16-22-49-38](https://github.com/user-attachments/assets/8e6cdea6-4f61-481e-920c-d60cbb946d06)
+<img width="1920" alt="KakaoTalk_Photo_2024-07-19-23-03-58" src="https://github.com/user-attachments/assets/1afc56c5-19da-4dc9-9e0c-e76075c66d32">
 
 ## 🫧About 유영
 ### 같이 유영하러 갑시다.
+### 유저가 ‘공간’을 ‘영상’으로 디깅하고, 나만의 ‘공간 취향’을 발견하는 서비스
 
 ```
 "내 취향에 맞는 공간을 촬영하고 업로드하는 숏폼을 활용하는 라이프스타일 플랫폼"
