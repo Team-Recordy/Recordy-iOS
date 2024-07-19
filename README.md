@@ -31,17 +31,17 @@
 |:---:|:---:|:---:|
 |<img width="250" alt="sozohoy" src="https://avatars.githubusercontent.com/sozohoy">|<img width="250" alt="0gonge" src="https://avatars.githubusercontent.com/0gonge">|<img width="250" alt="Chandrarla" src="https://avatars.githubusercontent.com/Chandrarla">|
 
-- 한지석 : '영상, 기록'
-- 송여경 : '프로필, 팔로잉, 팔로워'
-- 문형근 : '로그인, 홈'
+- 한지석 : 영상, 기록
+- 송여경 : 프로필, 팔로잉, 팔로워
+- 문형근 : 로그인, 홈
 
 ## Team Photo
 ![IMG_8049 2](https://github.com/user-attachments/assets/8fc48fd8-5fa1-4f72-98c6-dbf07cd2c72c)
 
 
 ## Library
-[![Tuist badge](https://img.shields.io/badge/Powered%20by-Tuist-blue)](https://tuist.io)
 <p>
+  [![Tuist badge](https://img.shields.io/badge/Powered%20by-Tuist-blue)](https://tuist.io)
   <img src="https://img.shields.io/badge/Swift-F05138?style=flat-square&logo=Swift&logoColor=white"/>
 </p>
 
