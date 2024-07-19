@@ -7,13 +7,22 @@
 //
 
 import Foundation
+import UIKit
 
 import Common
 import Core
 
 class FollowerViewModel {
+  var followersMockData: Bindable<[Follower]> = Bindable(
+    [
+      Follower(id: 0, username: "유영", isFollowing: true, profileImage: UIImage(systemName: "person")!),
+      Follower(id: 1, username: "유영", isFollowing: false, profileImage: UIImage(systemName: "person")!),
+      Follower(id: 2, username: "유영", isFollowing: true, profileImage: UIImage(systemName: "person")!),
+      Follower(id: 3, username: "유영", isFollowing: false, profileImage: UIImage(systemName: "person")!),
+    ]
+  )
   var followers: Bindable<[Follower]> = Bindable([])
-  var isEmpty: Bindable<Bool> = Bindable(true)
+  var isEmpty: Bindable<Bool> = Bindable(false)
   
   func fetchFollowers() {
     getFollowerList()
@@ -31,7 +40,7 @@ class FollowerViewModel {
         case .success(let response):
           let followerList = response.content.map {
             Follower(
-              username: $0.userInfo.nickname,
+              id: $0.userInfo.id, username: $0.userInfo.nickname,
               isFollowing: $0.following,
               profileImage: CommonAsset.profileImage.image
             )

@@ -50,13 +50,14 @@ public final class FollowerEmptyView: UIView {
   private func setAutolayout() {
     self.emptyImage.snp.makeConstraints {
       $0.top.equalToSuperview().offset(226)
-      $0.leading.equalToSuperview().offset(138)
+      $0.center.equalToSuperview()
       $0.width.equalTo(100.adaptiveWidth)
       $0.height.equalTo(100.adaptiveHeight)
     }
     
     self.noFollowerLabel.snp.makeConstraints {
       $0.top.equalTo(emptyImage.snp.bottom).offset(18)
+      $0.center.equalToSuperview()
       $0.left.equalTo(105)
     }
   }

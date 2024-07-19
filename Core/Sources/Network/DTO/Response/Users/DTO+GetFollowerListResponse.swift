@@ -11,14 +11,14 @@ import Foundation
 extension DTO {
   public struct GetFollowerListResponse: BaseResponse {
     /// 다음 커서
-    public let nextCursor: Int
+    public let nextCursor: Int?
     /// 다음 페이지 여부
     public let hasNext: Bool
     /// 다음 커서
     public let content: [Content]
     
     public init(
-      nextCursor: Int,
+      nextCursor: Int?,
       hasNext: Bool,
       content: [Content]
     ) {

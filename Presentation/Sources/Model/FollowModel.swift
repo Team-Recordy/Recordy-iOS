@@ -9,6 +9,7 @@
 import UIKit
 
 struct Follower {
+  let id: Int
   let username: String
   var isFollowing: Bool
   let profileImage : UIImage

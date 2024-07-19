@@ -12,7 +12,7 @@ public struct Following {
   let hasNext: Bool
   let username: String
   let profileImage: UIImage
-  var isFollowing: Bool
+  public var isFollowing: Bool
   let isFollowButtonVisible: Bool
 }
 
