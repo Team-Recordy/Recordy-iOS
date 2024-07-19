@@ -46,10 +46,10 @@
   <img src="https://img.shields.io/badge/Swift-F05138?style=flat-square&logo=Swift&logoColor=white"/>
 </p>
 
-### Tuist : 프로젝트 관리 적용 , 모듈화 
-### UI : SnapKit + Then
-### NetWork : Moya
-### Reactive : RxSwift
+- Tuist : 프로젝트 관리 적용 , 모듈화 
+-  UI : SnapKit + Then
+-  NetWork : Moya
+-  Reactive : RxSwift
 
 ## Coding Convention
 ```
