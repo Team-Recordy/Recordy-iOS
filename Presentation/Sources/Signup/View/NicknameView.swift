@@ -131,22 +131,25 @@ final class NicknameView: UIView {
       state(.error)
       return
     }
-    
+
     let pattern = "^[가-힣0-9._]{1,10}$"
     let regex = try! NSRegularExpression(pattern: pattern)
     let matches = regex.matches(in: text, range: NSRange(location: 0, length: text.utf16.count))
-    
+
     if matches.count == 0 {
       state(.error)
       errorLabel.text = "ⓘ 한글, 숫자, 밑줄 및 마침표만 사용할 수 있어요"
+      errorLabel.textColor = CommonAsset.recordyAlert.color
     } else {
       getCheckNicknameRequest { isSuccess in
-        if !isSuccess {
+        if isSuccess {
+          self.errorLabel.text = "사용 가능한 닉네임이에요"
+          self.errorLabel.textColor = CommonAsset.recordyGrey09.color
+          self.state(.selected)
+        } else {
           self.state(.error)
           self.errorLabel.text = "ⓘ 이미 사용중인 닉네임이에요"
-        } else {
-          self.state(.selected)
-          self.errorLabel.text = ""
+          self.errorLabel.textColor = CommonAsset.recordyAlert.color
         }
       }
     }
