@@ -12,6 +12,7 @@ import Then
 
 import Common
 
+@available(iOS 16.0, *)
 public class SplashScreenViewController: UIViewController {
   
   let logoImageView = UIImageView().then {
@@ -38,7 +39,7 @@ public class SplashScreenViewController: UIViewController {
   
   private func setLogoImageView() {
     logoImageView.snp.makeConstraints {
-      $0.width.equalTo(135)
+      $0.width.equalTo(153)
       $0.height.equalTo(106)
       $0.top.equalToSuperview().offset(253)
       $0.centerX.equalToSuperview()

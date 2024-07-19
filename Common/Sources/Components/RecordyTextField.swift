@@ -19,7 +19,7 @@ public final class RecordyTextField: UITextField {
     didSet { setStyle(style) }
   }
   public var textState: RecordyTextFieldState = .unselected
-
+  
   public init(
     frame: CGRect = .zero,
     style: RecordyTextFieldStyle = .unselected,
@@ -76,10 +76,9 @@ extension RecordyTextField: UITextFieldDelegate {
     } else {
       stateDelegate?.state(.selected)
     }
-    
     return true
   }
-
+  
   public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
     return true
   }

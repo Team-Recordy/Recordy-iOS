@@ -8,16 +8,21 @@
 
 
 import UIKit
+
+import Core
 import Common
 
+@available(iOS 16.0, *)
 public final class SignupViewController: UIViewController {
   
   var rootView: UIView = UIView()
   let progressView = RecordyProgressView()
+  let nicknameView = NicknameView()
   let totalPages = 3
   var currentPage = 0
   var textFieldState: RecordyTextFieldState = .unselected
-  
+  var nickname = ""
+
   public override func viewDidLoad() {
     super.viewDidLoad()
     setUI()
@@ -44,8 +49,18 @@ public final class SignupViewController: UIViewController {
   
   func showTermsView() {
     let termsView = TermsView()
-    termsView.nextButton.addTarget(self, action: #selector(showNicknameView), for: .touchUpInside)
+    termsView.nextButton.addTarget(
+      self,
+      action: #selector(checkAndShowNicknameView),
+      for: .touchUpInside
+    )
     switchView(termsView)
+  }
+  
+  @objc
+  func checkAndShowNicknameView() {
+    guard let termsView = rootView as? TermsView, termsView.areAllButtonsActive() else { return }
+    showNicknameView()
   }
   
   @objc
@@ -55,12 +70,9 @@ public final class SignupViewController: UIViewController {
       currentPage: currentPage,
       totalPages: totalPages
     )
-    let nicknameView = NicknameView()
     nicknameView.nextButton.addTarget(
       self,
-      action: #selector(
-        showCompleteView
-      ),
+      action: #selector(showCompleteView),
       for: .touchUpInside
     )
     switchView(nicknameView)
@@ -74,6 +86,7 @@ public final class SignupViewController: UIViewController {
       totalPages: totalPages
     )
     let completeView = CompleteView()
+    completeView.completeButton.buttonState = .active
     completeView.completeButton.addTarget(
       self,
       action: #selector(
@@ -86,7 +99,23 @@ public final class SignupViewController: UIViewController {
   
   @objc
   func completeSignup() {
-    // 추가구현
+    guard let text = nicknameView.nicknameTextField.text else { return }
+    let apiProvider = APIProvider<APITarget.Users>()
+    let userId = UserDefaults.standard.integer(forKey: "userId")
+    let request = DTO.SignUpRequest(
+      nickname: text,
+      termsAgreement: DTO.SignUpRequest.TermsAgreement()
+    )
+    apiProvider.justRequest(.signUp(request)) { result in
+      switch result {
+      case .success:
+        let tabBarController = RecordyTabBarController()
+        tabBarController.modalPresentationStyle = .fullScreen
+        self.present(tabBarController, animated: false)
+      case .failure:
+        print("실패 팝업")
+      }
+    }
   }
   
   func switchView(_ newView: UIView) {
@@ -105,6 +134,7 @@ public final class SignupViewController: UIViewController {
   }
 }
 
+@available(iOS 16.0, *)
 extension SignupViewController: RecordyTextFieldStateDelegate {
   public func state(_ currentState: Common.RecordyTextFieldState) {
     self.textFieldState = currentState

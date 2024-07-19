@@ -14,6 +14,7 @@ import Core
 import RxSwift
 import RxCocoa
 
+@available(iOS 16.0, *)
 public final class LoginViewController: UIViewController {
 
   var rootView = LoginView()
@@ -97,6 +98,16 @@ public final class LoginViewController: UIViewController {
           token: .RefreshToken,
           value: response.refreshToken
         )
+        UserDefaults.standard.set(response.userId, forKey: "userId")
+        if response.isSignedUp {
+          let tabBarController = RecordyTabBarController()
+          tabBarController.modalPresentationStyle = .fullScreen
+          self.present(tabBarController, animated: false)
+        } else {
+          let signUpViewController = SignupViewController()
+          signUpViewController.modalPresentationStyle = .fullScreen
+          self.present(signUpViewController, animated: false)
+        }
       case .failure(let error):
         print("Sign in failed with error: \(error)")
       }
@@ -104,6 +115,7 @@ public final class LoginViewController: UIViewController {
   }
 }
 
+@available(iOS 16.0, *)
 extension LoginViewController: ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
 
   func loginWithApple(completion: @escaping (Result<String, Error>) -> Void) {
