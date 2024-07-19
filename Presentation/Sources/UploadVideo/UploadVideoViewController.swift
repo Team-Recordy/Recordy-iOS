@@ -319,7 +319,11 @@ public class UploadVideoViewController: UIViewController {
   }
 
   @objc func closeButtonTapped() {
-    self.dismiss(animated: true)
+    self.showPopUp(type: .exit) {
+      self.dismiss(animated: true) {
+        self.dismiss(animated: true)
+      }
+    }
   }
 }
 

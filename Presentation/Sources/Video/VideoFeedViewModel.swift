@@ -16,6 +16,9 @@ enum VideoFeedType {
   case all
   case famous
   case recent
+  case userProfile
+  case myProfile
+  case bookmarked
 }
 
 class VideoFeedViewModel {
@@ -24,6 +27,7 @@ class VideoFeedViewModel {
   let type: VideoFeedType
   var cursorId: Int?
   var currentId: Int?
+  var userId: Int?
   var keyword: Keyword?
   var pageNumber = 0
   let apiProvider = APIProvider<APITarget.Records>()
@@ -36,12 +40,14 @@ class VideoFeedViewModel {
     type: VideoFeedType,
     keyword: Keyword? = nil,
     currentId: Int? = nil,
-    cursorId: Int? = nil
+    cursorId: Int? = nil,
+    userId: Int? = nil
   ) {
     self.type = type
     self.keyword = keyword
     self.currentId = currentId
     self.cursorId = cursorId
+    self.userId = userId
     recordListCase()
   }
 
@@ -53,6 +59,9 @@ class VideoFeedViewModel {
       getFamousRecordList()
     case .recent:
       getRecentRecordList()
+    case .userProfile:
+      getUserProfileRecordList()
+    default: return
     }
   }
 
@@ -155,6 +164,34 @@ class VideoFeedViewModel {
     }
   }
 
+  func getUserProfileRecordList() {
+    guard !isFetching,
+          let currentId = currentId,
+          let userId = userId
+    else {
+      return
+    }
+    let request = DTO.GetUserRecordListRequest(
+      otherUserId: userId,
+      cursorId: 0,
+      size: 100
+    )
+    apiProvider.requestResponsable(.getUserRecordList(request), DTO.GetUserRecordListResponse.self) { [weak self] result in
+      guard let self = self else { return }
+      self.isFetching = false
+      switch result {
+      case .success(let response):
+        if let index = response.feeds.firstIndex(where: { $0.id == currentId }) {
+          let newFeeds = Array(response.feeds[index...])
+          self.feedList = newFeeds
+          self.onFeedListUpdate?()
+        }
+      case .failure(let failure):
+        print(failure)
+      }
+    }
+  }
+
   func cacheVideos(
     feeds: [Feed],
     completion: @escaping () -> Void) {
@@ -190,6 +227,20 @@ class VideoFeedViewModel {
       switch result {
       case .success:
         print("@Log - success")
+      case .failure(let failure):
+        print(failure)
+      }
+    }
+  }
+
+  func deleteFeed(_ index: Int) {
+    let feed = self.feedList[index]
+    let deleteIndex = self.feedList.firstIndex { $0 == feed }
+    let request = DTO.DeleteRecordRequest(record_id: feed.id)
+    apiProvider.justRequest(.deleteRecord(request)) { result in
+      switch result {
+      case .success(let success):
+        print(success)
       case .failure(let failure):
         print(failure)
       }

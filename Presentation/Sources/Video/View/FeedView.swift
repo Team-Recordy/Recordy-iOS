@@ -68,6 +68,9 @@ class FeedView: UIView {
     )
     $0.font = RecordyFont.body2Long.font
   }
+  let deleteButton = UIButton().then {
+    $0.setImage(CommonAsset.deleteButton.image, for: .normal)
+  }
   let bookmarkButton = UIButton().then {
     $0.setImage(CommonAsset.bookmarkSelected.image, for: .normal)
   }
@@ -108,12 +111,16 @@ class FeedView: UIView {
       $0.locations = [0.0, 0.5, 1.0]
       $0.colors = colors.map { $0.cgColor }
     }
+    deleteButton.do {
+      $0.isHidden = true
+    }
   }
 
   private func setUI() {
     backgroundView.layer.addSublayer(backgroundLayer)
     bookmarkStackView.addArrangedSubview(bookmarkButton)
     bookmarkStackView.addArrangedSubview(bookmarkLabel)
+    bookmarkStackView.addArrangedSubview(deleteButton)
     locationStackView.addArrangedSubview(locationImage)
     locationStackView.addArrangedSubview(locationLabel)
     descriptionStackView.addArrangedSubview(nicknameButton)
@@ -140,7 +147,7 @@ class FeedView: UIView {
       $0.height.equalTo(200.adaptiveHeight)
     }
     descriptionStackView.snp.makeConstraints {
-      $0.bottom.equalTo(self.safeAreaLayoutGuide).inset(20.adaptiveHeight)
+      $0.bottom.equalTo(self.safeAreaLayoutGuide).inset(10.adaptiveHeight)
       $0.leading.equalTo(self.safeAreaLayoutGuide).inset(20.adaptiveWidth)
       $0.width.equalTo(220.adaptiveWidth)
       $0.height.equalTo(90.adaptiveHeight)
@@ -150,7 +157,7 @@ class FeedView: UIView {
       $0.height.equalTo(28.adaptiveHeight)
     }
     bookmarkStackView.snp.makeConstraints {
-      $0.bottom.equalTo(self.safeAreaLayoutGuide).inset(20.adaptiveHeight)
+      $0.bottom.equalTo(self.safeAreaLayoutGuide).inset(40.adaptiveHeight)
       $0.trailing.equalTo(self.safeAreaLayoutGuide).inset(20.adaptiveWidth)
       $0.width.equalTo(40.adaptiveWidth)
     }
