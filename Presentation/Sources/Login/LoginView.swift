@@ -14,7 +14,9 @@ import Then
 import Common
 
 final class LoginView: UIView {
-  
+
+  let gradientView = RecordyGradientView()
+
   let recordyLogo = UIImageView().then {
     $0.image = CommonAsset.loginAppLogo.image
     $0.contentMode = .scaleAspectFit
@@ -91,6 +93,7 @@ final class LoginView: UIView {
   
   func setUI() {
     self.addSubviews(
+      gradientView,
       recordyLogo,
       projectIntro,
       kakaoLoginButton,
@@ -105,6 +108,11 @@ final class LoginView: UIView {
   }
   
   func setAutoLayout() {
+    self.gradientView.snp.makeConstraints {
+      $0.top.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(400.adaptiveHeight)
+    }
+
     self.kakaoLogo.snp.makeConstraints {
       $0.width.height.equalTo(24)
     }

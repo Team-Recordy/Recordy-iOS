@@ -15,6 +15,7 @@ import Common
 
 final class CompleteView: UIView {
   
+  let gradientView = RecordyGradientView()
   let completeImage = UIImageView()
   let completeText1 = UILabel()
   let completeText2 = UILabel()
@@ -55,6 +56,7 @@ final class CompleteView: UIView {
   
   func setUI() {
     self.addSubviews(
+      gradientView,
       completeImage,
       completeText1,
       completeText2,
@@ -63,6 +65,11 @@ final class CompleteView: UIView {
   }
   
   func setAutoLayout() {
+    gradientView.snp.makeConstraints {
+      $0.top.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(400.adaptiveHeight)
+    }
+
     completeImage.snp.makeConstraints {
       $0.top.equalToSuperview().offset(294)
       $0.width.equalTo(100.adaptiveWidth)

@@ -16,7 +16,7 @@
 |<img src="https://github.com/user-attachments/assets/8fb10f43-ebbe-411a-960f-c03115404327"/>|<img src="https://github.com/user-attachments/assets/cbf8f778-66fa-469a-bdb5-244d5019b1fb" />|<img src="https://github.com/user-attachments/assets/94afd3dd-62ef-49db-b201-a2a640a9997a">|
 |:---------:|:---------:|:---------:|
 |[한지석](https://github.com/Sangwook123)|[문형근](https://github.com/cacaocoffee)|[송여경](https://github.com/lsakee)|
-| `영상, 기록, 로그인` | `메인페이지, 회원가입` | `마이페이지, 버블그래프` | </br>
+| `영상, 기록, 로그인` | `메인페이지, 회원가입` | `마이페이지, 버블그래프` | </br>
 
 
 ## Library

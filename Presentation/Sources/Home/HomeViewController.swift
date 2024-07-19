@@ -211,8 +211,7 @@ public final class HomeViewController: UIViewController {
   func setAutoLayout() {
 
     lottieView.snp.makeConstraints {
-      $0.top.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(200.adaptiveHeight)
+      $0.edges.equalToSuperview()
     }
 
     gradientView.snp.makeConstraints {
@@ -261,6 +260,7 @@ public final class HomeViewController: UIViewController {
     }
 
     recentLabel.snp.makeConstraints {
+      /// 수정
       $0.top.equalTo(popularCollectionView.snp.bottom).offset(18.adaptiveHeight)
       $0.leading.equalToSuperview().offset(20.adaptiveWidth)
     }

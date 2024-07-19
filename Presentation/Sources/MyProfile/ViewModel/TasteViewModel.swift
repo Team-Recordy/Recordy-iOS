@@ -12,11 +12,7 @@ import UIKit
 import Core
 import Common
 
-enum TasteCase: Int {
-  case large
-  case medium
-  case small
-  
+public extension TasteCase {
   var title: UIFont {
     switch self {
     case .large:

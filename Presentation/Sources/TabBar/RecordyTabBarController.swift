@@ -26,11 +26,12 @@ public final class RecordyTabBarController: UITabBarController, UITabBarControll
   private func setStyle() {
     let appearance = UITabBarAppearance()
     appearance.backgroundColor = CommonAsset.recordyBG.color
+    appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.clear]
+    appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.clear]
     tabBar.backgroundColor = .clear
     tabBar.tintColor = .clear
     tabBar.standardAppearance = appearance
     tabBar.scrollEdgeAppearance = appearance
-    tabBar.standardAppearance = appearance
   }
 
   private func setTabBarItem() {
@@ -43,7 +44,35 @@ public final class RecordyTabBarController: UITabBarController, UITabBarControll
   }
 }
 
-final class RecordyTabBar: UITabBar { }
+final class RecordyTabBar: UITabBar {
+  override func sizeThatFits(_ size: CGSize) -> CGSize {
+    var size = super.sizeThatFits(size)
+    size.height += 15
+    return size
+  }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+
+    // 원하는 간격과 아이템 너비를 설정합니다.
+    let itemWidth: CGFloat = 75
+    let itemSpacing: CGFloat = 40
+
+    // 전체 너비에서 각 아이템의 너비와 간격을 뺀 후, 시작 위치를 계산합니다.
+    let totalWidth = CGFloat(items?.count ?? 0) * itemWidth + CGFloat((items?.count ?? 0) - 1) * itemSpacing
+    var xOffset: CGFloat = (self.bounds.width - totalWidth) / 2
+
+    for item in subviews where item is UIControl {
+      item.frame = CGRect(
+        x: xOffset,
+        y: item.frame.origin.y,
+        width: itemWidth,
+        height: item.frame.height
+      )
+      xOffset += itemWidth + itemSpacing
+    }
+  }
+}
 
 @available(iOS 16.0, *)
 extension RecordyTabBarController {

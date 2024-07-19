@@ -144,7 +144,7 @@ class FeedView: UIView {
     backgroundView.snp.makeConstraints {
       $0.bottom.equalToSuperview()
       $0.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(200.adaptiveHeight)
+      $0.height.equalTo(330.adaptiveHeight)
     }
     descriptionStackView.snp.makeConstraints {
       $0.bottom.equalTo(self.safeAreaLayoutGuide).inset(10.adaptiveHeight)
@@ -177,7 +177,7 @@ class FeedView: UIView {
         $0.height.equalTo(228.adaptiveHeight)
       }
       self.backgroundView.snp.updateConstraints {
-        $0.height.equalTo(338.adaptiveHeight)
+        $0.height.equalTo(468.adaptiveHeight)
       }
     } else {
       self.descriptionTextView.isScrollEnabled = false
@@ -186,7 +186,7 @@ class FeedView: UIView {
         $0.height.equalTo(90.adaptiveHeight)
       }
       self.backgroundView.snp.updateConstraints {
-        $0.height.equalTo(200.adaptiveHeight)
+        $0.height.equalTo(330.adaptiveHeight)
       }
     }
 

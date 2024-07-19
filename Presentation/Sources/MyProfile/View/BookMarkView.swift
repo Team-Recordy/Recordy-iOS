@@ -14,15 +14,21 @@ import SnapKit
 import Then
 import Kingfisher
 
-class BookMarkView: UIView, UICollectionViewDataSource, UICollectionViewDelegate {
+protocol BookmarkDelegate: AnyObject {
+  func bookmarkFeedTapped(feed: Feed)
+  func bookmarkButtonTapped(feed: Feed)
+}
+
+class BookmarkView: UIView, UICollectionViewDataSource, UICollectionViewDelegate {
   private let bookmarkEmptyView = UIView()
   private let bookmarkDataView = UIView()
-  
   let bookmarkEmptyImageView = UIImageView()
   let bookmarkEmptyTextVIew = UIImageView()
   private let countLabel = UILabel()
   private var collectionView: UICollectionView!
+
   private var feeds: [Feed] = []
+  weak var delegate: BookmarkDelegate?
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -135,7 +141,7 @@ class BookMarkView: UIView, UICollectionViewDataSource, UICollectionViewDelegate
   }
 
   func getBookmarkList(feeds: [Feed]) {
-    self.feeds.append(contentsOf: feeds)
+    self.feeds = feeds
     self.collectionView.reloadData()
     checkDataEmpty()
   }
@@ -151,9 +157,20 @@ class BookMarkView: UIView, UICollectionViewDataSource, UICollectionViewDelegate
     ) as? ThumbnailCollectionViewCell else {
       return UICollectionViewCell()
     }
-    let thumbnailUrl = URL(string: String(feeds[indexPath.row].thumbnailLink.dropLast(1)))
-    cell.backgroundImageView.kf.setImage(with: thumbnailUrl)
-    cell.locationText.text = feeds[indexPath.row].location
+    cell.configure(feed: feeds[indexPath.row])
+    cell.bookmarkButtonEvent = { [weak self] in
+      guard let self = self else { return }
+      self.feeds[indexPath.row].isBookmarked.toggle()
+      self.delegate?.bookmarkButtonTapped(feed: self.feeds[indexPath.row])
+      cell.updateBookmarkButton(isBookmarked: self.feeds[indexPath.row].isBookmarked)
+    }
     return cell
+  }
+
+  func collectionView(
+    _ collectionView: UICollectionView,
+    didSelectItemAt indexPath: IndexPath
+  ) {
+    delegate?.bookmarkFeedTapped(feed: feeds[indexPath.row])
   }
 }

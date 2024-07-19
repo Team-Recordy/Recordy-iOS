@@ -12,13 +12,13 @@ extension DTO {
   public struct GetFollowingRecordListResponse: BaseResponse {
     public let nextCursor: Int
     public let hasNext: Bool
-    public let content: Content
+    public let content: [Content]
   }
 }
 
 extension DTO.GetFollowingRecordListResponse {
   public struct Content: BaseResponse {
-    public let recordInfo: Bool
+    public let recordInfo: RecordInfo
     public let isBookmark: Bool
   }
 }
@@ -50,3 +50,23 @@ extension DTO.GetFollowingRecordListResponse.Content.RecordInfo {
     }
   }
 }
+
+extension DTO.GetFollowingRecordListResponse {
+  public var feeds: [Feed] {
+    return content.map {
+      Feed(
+        id: $0.recordInfo.id,
+        userId: $0.recordInfo.uploaderId,
+        location: $0.recordInfo.location,
+        nickname: $0.recordInfo.uploaderNickname,
+        description: $0.recordInfo.content,
+        bookmarkCount: $0.recordInfo.bookmarkCount,
+        isBookmarked: $0.isBookmark,
+        videoLink: $0.recordInfo.fileUrl.videoUrl,
+        thumbnailLink: $0.recordInfo.fileUrl.thumbnailUrl,
+        isMine: $0.recordInfo.isMine
+      )
+    }
+  }
+}
+

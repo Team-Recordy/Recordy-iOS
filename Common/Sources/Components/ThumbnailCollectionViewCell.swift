@@ -24,6 +24,7 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
   public let locationText = UILabel()
   public let locationImageView = UIImageView()
   public let bookmarkButton = UIButton()
+  private let thumbnailImage = UIImageView()
   public let bookmarkImage = UIImageView()
   public var bookmarkButtonEvent: (() -> Void)?
 
@@ -38,10 +39,10 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
     fatalError("init(coder:) has not been implemented")
   }
 
-  public override func layoutSubviews() {
-    super.layoutSubviews()
-    gradientLayer.frame = self.bounds
-  }
+//  public override func layoutSubviews() {
+//    super.layoutSubviews()
+//    gradientLayer.frame = self.bounds
+//  }
 
   private func setStyle() {
     self.cornerRadius(12)
@@ -62,7 +63,7 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
       $0.axis = .horizontal
       $0.distribution = .fillProportionally
       $0.alignment = .center
-      $0.spacing = 3
+      $0.spacing = 6
     }
 
     locationText.do {
@@ -87,12 +88,19 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
       $0.layer.shadowRadius = 4
       $0.clipsToBounds = false
     }
+
+    thumbnailImage.do {
+      $0.image = CommonAsset.bottomThumbnail.image
+      $0.contentMode = .scaleAspectFill
+      $0.clipsToBounds = true
+    }
   }
   private func setUI() {
     gradientView.layer.addSublayer(gradientLayer)
     self.addSubviews(
       backgroundImageView,
       gradientView,
+      thumbnailImage,
       locationStackView,
       bookmarkButton
     )
@@ -106,20 +114,21 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
     backgroundImageView.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
-
     gradientView.snp.makeConstraints {
       $0.horizontalEdges.bottom.equalToSuperview()
       $0.height.equalTo(60.adaptiveHeight)
     }
-
     locationStackView.snp.makeConstraints {
-      $0.horizontalEdges.equalToSuperview().inset(9)
-      $0.bottom.equalToSuperview().inset(15)
+      $0.horizontalEdges.equalToSuperview().inset(6)
+      $0.bottom.equalToSuperview().inset(12)
     }
     locationImageView.snp.makeConstraints {
-      $0.leading.equalToSuperview().offset(10)
+      $0.leading.equalToSuperview().offset(6)
       $0.width.equalTo(12.adaptiveWidth)
       $0.height.equalTo(12.adaptiveHeight)
+      $0.centerY.equalToSuperview()
+    }
+    locationText.snp.makeConstraints {
       $0.centerY.equalToSuperview()
     }
     bookmarkButton.snp.makeConstraints {
@@ -132,6 +141,11 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
       $0.centerX.centerY.equalToSuperview()
       $0.width.equalTo(14.adaptiveWidth)
       $0.height.equalTo(16.adaptiveHeight)
+    }
+    thumbnailImage.snp.makeConstraints {
+      $0.bottom.horizontalEdges.equalToSuperview()
+      $0.width.equalToSuperview()
+      $0.height.equalTo(90.adaptiveHeight)
     }
   }
 

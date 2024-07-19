@@ -10,8 +10,8 @@ import ProjectDescriptionHelpers
 
 let infoPlist: [String: Plist.Value] = [
   "CFBundleShortVersionString": "1.0.0",
-  "CFBundleVersion": "1",
-  "CFBundleDisplayName": "Recordy",
+  "CFBundleVersion": "2",
+  "CFBundleDisplayName": "유영",
   "CFBundleURLTypes": [
     [
       "CFBundleTypeRole": "Editor",
@@ -41,6 +41,10 @@ let infoPlist: [String: Plist.Value] = [
   "NSPhotoLibraryUsageDescription": "앱에서 사진 라이브러리에 접근하려면 권한이 필요합니다.",
   "NSAppTransportSecurity": [
     "NSAllowsArbitraryLoads": true
+  ],
+  "UIUserInterfaceStyle": "Dark",
+  "UISupportedInterfaceOrientations": [
+    "UIInterfaceOrientationPortait"
   ]
 ]
 

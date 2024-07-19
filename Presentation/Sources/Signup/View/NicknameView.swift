@@ -7,6 +7,7 @@ final class NicknameView: UIView {
   
   var textFieldCount = "0"
   
+  let gradientView = RecordyGradientView()
   let nicknameText = UILabel()
   let nicknameTextField = RecordyTextField(placeholder: "EX) 레코디둥이들")
   let nextButton = RecordyButton()
@@ -65,6 +66,7 @@ final class NicknameView: UIView {
   
   func setUI() {
     self.addSubviews(
+      gradientView,
       nicknameText,
       nicknameTextField,
       nextButton,
@@ -74,6 +76,11 @@ final class NicknameView: UIView {
   }
   
   func setAutoLayout() {
+    gradientView.snp.makeConstraints {
+      $0.top.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(400.adaptiveHeight)
+    }
+
     nicknameText.snp.makeConstraints {
       $0.top.equalToSuperview().offset(165)
       $0.leading.equalToSuperview().offset(20)
