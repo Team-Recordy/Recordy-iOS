@@ -1,5 +1,5 @@
 # yoo0 유영
-![유용](https://github.com/user-attachments/assets/4988dd36-afeb-4bfb-90ef-2de8b1ef87e9)
+![KakaoTalk_Photo_2024-07-16-22-49-38](https://github.com/user-attachments/assets/8e6cdea6-4f61-481e-920c-d60cbb946d06)
 
 ## 🫧About 유영
 ### 같이 유영하러 갑시다.
@@ -36,9 +36,9 @@
 
 
 ## Library
+[![Tuist badge](https://img.shields.io/badge/Powered%20by-Tuist-blue)](https://tuist.io)
 <img src="https://img.shields.io/badge/Svelte-FF3E00?style=flat-square&logo=Svelte&logoColor=white"/>
 <img src="https://img.shields.io/badge/Vue.js-4FC08D?style=flat-square&logo=Vue.js&logoColor=white"/>
-[![Tuist badge](https://img.shields.io/badge/Powered%20by-Tuist-blue)](https://tuist.io)
 
 ### Tuist : 프로젝트 관리 적용 , 모듈화 
 ### UI : SnapKit + Then
@@ -75,7 +75,7 @@
 5. PR & merge
 ```
 
-### Commit Message
+## Commit Message
 ```
 일반적인 커밋 : `feat: 버튼 작동 시 특정 이벤트 발생하는 기능 구현(#33)`
 최신 작업 상황 반영 : `merge: develop into #33
@@ -94,7 +94,7 @@
 #   init        : 초기 생성
 ```
 
-## 6. Foldering Convention
+## Foldering Convention
 ```
 ├── 🧩 App 
 |   ├── 🗂️ Sources
