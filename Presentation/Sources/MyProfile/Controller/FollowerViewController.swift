@@ -1,16 +1,8 @@
-//
-//  FollowerViewController.swift
-//  Presentation
-//
-//  Created by 송여경 on 7/13/24.
-//  Copyright © 2024 com.recordy. All rights reserved.
-//  setStyle() -> setUI() -> setAutolayout()
-
 import UIKit
 import SnapKit
-
 import Then
 
+import Core
 import Common
 
 public class FollowerViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
@@ -20,53 +12,65 @@ public class FollowerViewController: UIViewController, UITableViewDataSource, UI
   private let emptyView = UIView()
   let emptyLabel = UIImageView()
   let emptyImage = UIImageView()
+  let settingButton = UIButton()
+  
+  var follower: [MainRecord] = []
   
   public override func viewDidLoad() {
     super.viewDidLoad()
-    
-    setEmptyViewStyle()
+    setUI()
+    setStyle()
+    setAutoLayout()
+    setTableView()
     bindViewModel()
     
     viewModel.fetchFollowers()
   }
   
-  public func setEmptyViewStyle() {
+  private func setStyle() {
     view.backgroundColor = .black
-    
-    emptyView.frame = view.bounds
     emptyView.backgroundColor = .black
     
-    emptyImage.do {
-      $0.image = CommonAsset.noFollowers.image
-    }
-    
-    emptyLabel.do {
-      $0.image = CommonAsset.text.image
-    }
-    
+    emptyImage.image = CommonAsset.noFollowers.image
+    emptyLabel.image = CommonAsset.text.image
+  }
+  
+  private func setUI() {
     emptyView.addSubview(emptyImage)
     emptyView.addSubview(emptyLabel)
+    view.addSubview(emptyView)
+    view.addSubview(tableView)
+  }
+  
+  private func setAutoLayout() {
+    emptyView.snp.makeConstraints {
+      $0.center.equalToSuperview()
+      $0.width.equalTo(200.adaptiveWidth)
+      $0.height.equalTo(200.adaptiveHeight)
+    }
     
     emptyImage.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(226)
-      $0.leading.equalToSuperview().offset(138)
+      $0.top.equalToSuperview().offset(20.adaptiveHeight)
+      $0.centerX.equalToSuperview()
       $0.width.equalTo(100.adaptiveWidth)
       $0.height.equalTo(100.adaptiveHeight)
     }
     
     emptyLabel.snp.makeConstraints {
       $0.top.equalTo(emptyImage.snp.bottom).offset(18)
-      $0.left.equalTo(105)
+      $0.centerX.equalToSuperview()
     }
     
-    tableView.frame = view.bounds
+    tableView.snp.makeConstraints {
+      $0.edges.equalTo(view.safeAreaLayoutGuide)
+    }
+  }
+  
+  private func setTableView() {
     tableView.dataSource = self
     tableView.delegate = self
     tableView.backgroundColor = .black
     tableView.register(FollowerCell.self, forCellReuseIdentifier: "FollowerCell")
-    
-    view.addSubview(emptyView)
-    view.addSubview(tableView)
   }
   
   public func bindViewModel() {
@@ -81,17 +85,43 @@ public class FollowerViewController: UIViewController, UITableViewDataSource, UI
   }
   
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return viewModel.followers.value.count
+    return viewModel.followersMockData.value.count
   }
   
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: "FollowerCell", for: indexPath) as! FollowerCell
-    let follower = viewModel.followers.value[indexPath.row]
+    var follower = viewModel.followersMockData.value[indexPath.row]
     cell.configure(with: follower)
-    cell.followButtonAction = { [weak self] in
-      self?.viewModel.toggleFollow(at: indexPath.row)
+    cell.followButtonEvent = { [weak self] in
+      guard let self = self else { return }
+      postFollowRequest(index: indexPath.row)
+      cell.updateFollowButton(isFollowed: follower.isFollowing)
+      print("Follow Button Touched: \(follower.isFollowing)")
     }
     return cell
+  }
+  
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let otherProfileView = OtherUserProfileViewController()
+    if let navigationController = self.navigationController {
+      navigationController.pushViewController(otherProfileView, animated: true)
+    } else {
+      print("Error: No navigation controller found")
+    }
+  }
+  
+  func postFollowRequest(index: Int) {
+    self.viewModel.followersMockData.value[index].isFollowing.toggle()
+    let apiProvider = APIProvider<APITarget.Users>()
+    let request = DTO.FollowRequest(followingId: viewModel.followersMockData.value[index].id)
+    apiProvider.justRequest(.follow(request)) { result in
+      switch result {
+      case .success(let success):
+        print(success)
+      case .failure(let failure):
+        print(failure)
+      }
+    }
   }
 }
 
@@ -100,7 +130,7 @@ public class FollowerCell: UITableViewCell {
   let usernameLabel = UILabel()
   let followButton = MediumButton()
   
-  var followButtonAction: (() -> Void)?
+  var followButtonEvent: (() -> Void)?
   
   public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -111,7 +141,6 @@ public class FollowerCell: UITableViewCell {
     
     setStyle()
     setAutoLayout()
-    
     followButton.addTarget(self, action: #selector(followButtonTapped), for: .touchUpInside)
   }
   
@@ -119,17 +148,13 @@ public class FollowerCell: UITableViewCell {
     fatalError("init(coder:) has not been implemented")
   }
   
-  @objc private func followButtonTapped() {
-    followButtonAction?()
-  }
-  
-  public func setStyle() {
+  private func setStyle() {
     usernameLabel.font = RecordyFont.body2Bold.font
     usernameLabel.textColor = CommonAsset.recordyGrey01.color
     contentView.backgroundColor = .black
   }
   
-  public func setAutoLayout() {
+  private func setAutoLayout() {
     profileImageView.snp.makeConstraints {
       $0.top.equalTo(contentView.snp.top).offset(10)
       $0.leading.equalTo(contentView.snp.leading).offset(20)
@@ -151,10 +176,18 @@ public class FollowerCell: UITableViewCell {
     }
   }
   
+  @objc private func followButtonTapped() {
+    self.followButtonEvent?()
+  }
+  
+  public func updateFollowButton(isFollowed: Bool) {
+    followButton.mediumState = isFollowed ? .active : .inactive
+    followButton.setTitle(isFollowed ? "팔로잉" : "팔로우", for: .normal)
+  }
+  
   func configure(with follower: Follower) {
     profileImageView.image = follower.profileImage
     usernameLabel.text = follower.username
-    followButton.setTitle(follower.isFollowing ? "팔로잉" : "팔로우", for: .normal)
-    followButton.mediumState = follower.isFollowing ? .active : .inactive
+    updateFollowButton(isFollowed: follower.isFollowing)
   }
 }

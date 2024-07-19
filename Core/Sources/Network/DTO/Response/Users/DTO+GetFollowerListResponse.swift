@@ -11,16 +11,16 @@ import Foundation
 extension DTO {
   public struct GetFollowerListResponse: BaseResponse {
     /// 다음 커서
-    public let nextCursor: Int
+    public let nextCursor: Int?
     /// 다음 페이지 여부
     public let hasNext: Bool
     /// 다음 커서
-    public let content: Content
-
+    public let content: [Content]
+    
     public init(
-      nextCursor: Int,
+      nextCursor: Int?,
       hasNext: Bool,
-      content: Content
+      content: [Content]
     ) {
       self.nextCursor = nextCursor
       self.hasNext = hasNext
@@ -29,15 +29,28 @@ extension DTO {
   }
 }
 
-extension DTO.GetFollowerListResponse {
-  public struct Content: BaseResponse {
-    /// 사용자
-    public let id: Int
-    /// 닉네임
-    public let nickname: String
-    /// 프로필 사진
-    public let profileImageUrl: String
 
+extension DTO.GetFollowerListResponse {
+  public struct Content: Codable {
+    public let userInfo: UserInfo
+    public let following: Bool
+    
+    public init(
+      userInfo: UserInfo,
+      following: Bool
+    ) {
+      self.userInfo = userInfo
+      self.following = following
+    }
+  }
+}
+
+extension DTO.GetFollowerListResponse.Content {
+  public struct UserInfo: Codable {
+    public let id: Int
+    public let nickname: String
+    public let profileImageUrl: String
+    
     public init(
       id: Int,
       nickname: String,
@@ -49,3 +62,7 @@ extension DTO.GetFollowerListResponse {
     }
   }
 }
+
+
+
+// MARK: - UserInfo
