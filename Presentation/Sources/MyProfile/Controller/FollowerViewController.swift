@@ -102,12 +102,12 @@ public class FollowerViewController: UIViewController, UITableViewDataSource, UI
   }
   
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let otherProfileView = OtherUserProfileViewController()
-    if let navigationController = self.navigationController {
-      navigationController.pushViewController(otherProfileView, animated: true)
-    } else {
-      print("Error: No navigation controller found")
-    }
+//    let otherProfileView = OtherUserProfileViewController(id: <#Int#>)
+//    if let navigationController = self.navigationController {
+//      navigationController.pushViewController(otherProfileView, animated: true)
+//    } else {
+//      print("Error: No navigation controller found")
+//    }
   }
   
   func postFollowRequest(index: Int) {

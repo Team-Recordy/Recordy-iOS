@@ -75,11 +75,13 @@ public final class SignupViewController: UIViewController {
       action: #selector(showCompleteView),
       for: .touchUpInside
     )
+    nicknameView.nicknameTextField.stateDelegate = self
     switchView(nicknameView)
   }
   
   @objc
   func showCompleteView() {
+    guard nicknameView.nextButton.buttonState == .active else { return }
     currentPage += 1
     progressView.updateProgress(
       currentPage: currentPage,
@@ -138,5 +140,6 @@ public final class SignupViewController: UIViewController {
 extension SignupViewController: RecordyTextFieldStateDelegate {
   public func state(_ currentState: Common.RecordyTextFieldState) {
     self.textFieldState = currentState
+    nicknameView.state(currentState)
   }
 }
