@@ -17,10 +17,14 @@
 - 기존 플랫폼의 영상 알고리즘으로 내 취향에 맞지 않는 공간 노출
 
 ## 📍Solve
-- 내 공간 경험 업로드하기: 사용자가 다양한 장소를 촬영한 공간감이 느껴지는 짧은 영상을 앱에 업로드할 수 있으며, 간편한 인터페이스로 촬영부터 업로드까지 손쉽게 진행할 수 있습니다.
-- 취향 분석표 수집하기: 사용자 취향을 분석하여 맞춤형 취향 분석표를 제공합니다. 나만의 분석표를 받고 공간 취향을 알아볼 수 있습니다.
-- 취향 기반 유저의 소식 받기: 다른 유저를 팔로우하고, 그들의 영상을 저장하고 소식을 받을 수 있습니다.
-- 관심 있는 공간 저장하기: 마음에 드는 공간 영상을 저장하고, 쉽게 보관할 수 있습니다.
+1. 내 공간 경험 업로드하기
+: 사용자가 다양한 장소를 촬영한 공간감이 느껴지는 짧은 영상을 앱에 업로드할 수 있으며, 간편한 인터페이스로 촬영부터 업로드까지 손쉽게 진행할 수 있습니다.
+2. 내 취향 분석표 수집하기
+: 사용자 취향을 분석하여 맞춤형 취향 분석표를 제공합니다. 나만의 분석표를 받고 공간 취향을 알아볼 수 있습니다.
+3. 취향 기반 유저의 소식 받기
+: 다른 유저를 팔로우하고, 그들의 영상을 저장하고 소식을 받을 수 있습니다.
+4. 관심 있는 공간 저장하기
+: 마음에 드는 공간 영상을 저장하고, 쉽게 보관할 수 있습니다.
 
 ## 🫧About Team
 | [한지석](https://github.com/sozohoy) | [송여경](https://github.com/0gonge) | [문형근](https://github.com/Chandrarla) |
@@ -37,8 +41,9 @@
 
 ## Library
 [![Tuist badge](https://img.shields.io/badge/Powered%20by-Tuist-blue)](https://tuist.io)
-<img src="https://img.shields.io/badge/Svelte-FF3E00?style=flat-square&logo=Svelte&logoColor=white"/>
-<img src="https://img.shields.io/badge/Vue.js-4FC08D?style=flat-square&logo=Vue.js&logoColor=white"/>
+<p>
+  <img src="https://img.shields.io/badge/Swift-F05138?style=flat-square&logo=Swift&logoColor=white"/>
+</p>
 
 ### Tuist : 프로젝트 관리 적용 , 모듈화 
 ### UI : SnapKit + Then
