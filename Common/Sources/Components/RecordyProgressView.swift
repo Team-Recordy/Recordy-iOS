@@ -14,8 +14,6 @@ public final class RecordyProgressView: UIView {
   
   var ratio: CGFloat = 0.0 {
     didSet {
-      self.isHidden = !self.ratio.isLess(than: 1.0)
-      
       self.progressBarView.snp.remakeConstraints {
         $0.leading.equalToSuperview()
         $0.top.equalToSuperview().offset(-1)

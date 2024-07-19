@@ -9,7 +9,7 @@
 import UIKit
 
 import Presentation
-import Common
+import Core
 
 import KakaoSDKAuth
 
@@ -25,8 +25,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     if let url = URLContexts.first?.url {
       if (AuthApi.isKakaoTalkLoginUrl(url)) {
         _ = AuthController.handleOpenUrl(url: url)
-          }
       }
+    }
   }
 
   func scene(
@@ -41,8 +41,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     window = UIWindow(frame: windowScene.coordinateSpace.bounds)
     window?.windowScene = windowScene
-    let rootViewController = RecordyTabBarController()
-    window?.rootViewController = rootViewController
-    window?.makeKeyAndVisible()
+    APIProvider<APITarget.Users>.validateToken { login in
+      DispatchQueue.main.async {
+        var rootViewController: UIViewController
+        if login {
+          rootViewController = RecordyTabBarController()
+        } else {
+          rootViewController = UINavigationController(rootViewController: SplashScreenViewController())
+        }
+        self.window?.rootViewController = rootViewController
+        self.window?.makeKeyAndVisible()
+      }
+    }
   }
 }

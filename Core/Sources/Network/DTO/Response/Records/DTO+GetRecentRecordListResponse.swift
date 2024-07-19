@@ -13,6 +13,16 @@ extension DTO {
     public let nextCursor: Int
     public let hasNext: Bool
     public let content: [Content]
+
+    public init(
+      nextCursor: Int,
+      hasNext: Bool,
+      content: [Content]
+    ) {
+      self.nextCursor = nextCursor
+      self.hasNext = hasNext
+      self.content = content
+    }
   }
 }
 
@@ -58,3 +68,21 @@ extension DTO.GetRecentRecordListResponse.Content.RecordInfo {
     }
   }
 }
+
+extension DTO.GetRecentRecordListResponse {
+  public var feeds: [Feed] {
+    return content.map {
+      Feed(
+        id: $0.recordInfo.id,
+        location: $0.recordInfo.location,
+        nickname: $0.recordInfo.uploaderNickname,
+        description: $0.recordInfo.content,
+        bookmarkCount: $0.recordInfo.bookmarkCount,
+        isBookmarked: $0.isBookmark,
+        videoLink: $0.recordInfo.fileUrl.videoUrl,
+        thumbnailLink: $0.recordInfo.fileUrl.thumbnailUrl
+      )
+    }
+  }
+}
+

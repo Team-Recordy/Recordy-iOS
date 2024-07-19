@@ -49,6 +49,12 @@ public class SelectVideoViewController: UIViewController {
   }
 
   private func setStyle() {
+    let rightButton = UIButton(type: .system)
+    rightButton.setImage(UIImage(systemName: "xmark"), for: .normal)
+    rightButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+    let rightBarButtonItem = UIBarButtonItem(customView: rightButton)
+    self.navigationItem.rightBarButtonItem = rightBarButtonItem
+
     self.title = "영상 선택"
     self.view.backgroundColor = CommonAsset.recordyBG.color
   }
@@ -126,6 +132,9 @@ public class SelectVideoViewController: UIViewController {
     fetchVideosRelay.accept(())
   }
 
+  @objc func closeButtonTapped() {
+    self.dismiss(animated: true)
+  }
 }
 
 extension SelectVideoViewController: UICollectionViewDelegateFlowLayout {

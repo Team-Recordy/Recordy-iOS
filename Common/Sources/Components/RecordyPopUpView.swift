@@ -16,8 +16,8 @@ public class RecordyPopUpView: UIView {
   private let image = UIImageView()
   private let titleLabel = UILabel()
   private let subtitleLabel = UILabel()
-  private let leftButton = UIButton()
-  public let rightButton = UIButton()
+  let leftButton = UIButton()
+  let rightButton = UIButton()
   
   public init(type: RecordyPopUpType) {
     self.popUpType = type
@@ -53,7 +53,6 @@ public class RecordyPopUpView: UIView {
       $0.backgroundColor = popUpType.closeButtonBackgroundColor
       $0.setTitleColor(popUpType.closeButtonTitleColor, for: .normal)
       $0.titleLabel?.font = popUpType.buttonFont
-      $0.addTarget(self, action: #selector(leftButtonTapped), for: .touchUpInside)
       $0.cornerRadius(8)
     }
     
@@ -63,8 +62,6 @@ public class RecordyPopUpView: UIView {
       $0.setTitleColor(popUpType.buttonTitleColor, for: .normal)
       $0.titleLabel?.font = popUpType.buttonFont
       $0.cornerRadius(8)
-      
-      //      $0.addTarget(self, action: #selector(rightButtonTapped), for: .normal)
     }
     
   }
@@ -78,43 +75,33 @@ public class RecordyPopUpView: UIView {
       $0.width.equalTo(298.adaptiveWidth)
       $0.height.equalTo(252.adaptiveHeight)
     }
-    
     image.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(30)
+      $0.top.equalToSuperview().offset(30.adaptiveHeight)
       $0.centerX.equalToSuperview()
-      $0.leading.equalToSuperview().offset(113)
       $0.width.height.equalTo(72)
     }
-    
     titleLabel.snp.makeConstraints {
-      $0.top.equalTo(image.snp.bottom).offset(16)
+      $0.top.equalTo(image.snp.bottom).offset(20.adaptiveHeight)
       $0.centerX.equalToSuperview()
     }
     subtitleLabel.snp.makeConstraints {
-      $0.top.equalTo(titleLabel.snp.bottom).offset(6)
+      $0.top.equalTo(titleLabel.snp.bottom).offset(10.adaptiveHeight)
       $0.centerX.equalToSuperview()
     }
-    
     leftButton.snp.makeConstraints {
-      $0.top.equalTo(subtitleLabel.snp.bottom).offset(18)
+      $0.bottom.equalToSuperview().inset(20.adaptiveHeight)
       $0.leading.equalToSuperview().offset(20)
       $0.trailing.equalToSuperview().inset(153)
       $0.height.equalTo(44.adaptiveHeight)
       $0.width.equalTo(125.adaptiveWidth)
     }
-    
     rightButton.snp.makeConstraints {
-      $0.top.equalTo(subtitleLabel.snp.bottom).offset(18)
+      $0.bottom.equalToSuperview().inset(20.adaptiveHeight)
       $0.leading.equalTo(leftButton.snp.trailing).offset(8)
       $0.trailing.equalToSuperview().offset(-20)
       $0.height.equalTo(44.adaptiveHeight)
       $0.width.equalTo(125.adaptiveWidth)
     }
-    
-  }
-  
-  @objc public func leftButtonTapped() {
-    self.isHidden = true
   }
   
   required init?(coder: NSCoder) {

@@ -10,18 +10,18 @@ import Foundation
 
 extension DTO {
   public struct GetRecentRecordListRequest: BaseRequest {
-    public let keywords: [String]
-    public let pageNumber: Int
-    public let pageSize: Int
+    public let keywords: String?
+    public let cursorId: Int
+    public let size: Int
 
     public init(
-      keywords: [String],
-      pageNumber: Int,
-      pageSize: Int
+      keywords: String?,
+      cursorId: Int,
+      size: Int
     ) {
       self.keywords = keywords
-      self.pageNumber = pageNumber
-      self.pageSize = pageSize
+      self.cursorId = cursorId
+      self.size = size
     }
   }
 }

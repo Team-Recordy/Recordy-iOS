@@ -25,7 +25,7 @@ extension String {
     )
     return boundingBox.height
   }
-  
+
   public func timeStringToSeconds() -> Int {
     let components = self.split(separator: ":")
     guard components.count == 2,
@@ -35,7 +35,7 @@ extension String {
     }
     return (minutes * 60) + seconds
   }
-  
+
   public func removeQueryParameters() -> String? {
     if let urlComponents = URLComponents(string: self) {
       var modifiedComponents = urlComponents
@@ -43,5 +43,10 @@ extension String {
       return modifiedComponents.string
     }
     return nil
+  }
+
+  public func keywordEncode() -> String? {
+    guard let data = self.data(using: .utf8) else { return nil }
+    return data.base64EncodedString()
   }
 }

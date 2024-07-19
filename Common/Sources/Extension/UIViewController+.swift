@@ -31,21 +31,33 @@ extension UIViewController {
     let screenWidth = self.view.frame.size.width
     let toastLabelFrame = CGRect(
       x: 20,
-      y: self.view.frame.size.height - (height + 50),
+      y: self.view.frame.size.height - (height + 100),
       width: screenWidth - 40,
       height: 44
     )
     let toastView = RecordyToastMessageView(frame: toastLabelFrame)
-    toastView.setMessage(text: message, status: .warning)
+    toastView.setMessage(text: message, status: status)
     self.view.addSubview(toastView)
     self.view.endEditing(true)
     UIView.animate(withDuration: 0.5,
-                   delay: 1.0,
+                   delay: 1.8,
                    options: .curveEaseOut,
                    animations: {
       toastView.alpha = 0.0
     }, completion: { _ in
       toastView.removeFromSuperview()
     })
+  }
+
+  public func showPopUp(
+    type: RecordyPopUpType,
+    rightButtonAction: (() -> Void)?
+  ) {
+    let popupViewController = RecordyPopUpViewController(
+      type: type,
+      rightButtonAction: rightButtonAction
+    )
+    popupViewController.modalPresentationStyle = .overFullScreen
+    present(popupViewController, animated: false)
   }
 }

@@ -12,6 +12,14 @@ extension DTO {
   public struct SignUpRequest: BaseRequest {
     public let nickname: String
     public let termsAgreement: TermsAgreement
+
+    public init(
+      nickname: String,
+      termsAgreement: TermsAgreement
+    ) {
+      self.nickname = nickname
+      self.termsAgreement = termsAgreement
+    }
   }
 }
 
@@ -22,9 +30,9 @@ extension DTO.SignUpRequest {
     public let ageTerm: Bool
 
     public init(
-      useTerm: Bool,
-      personalInfoTerm: Bool,
-      ageTerm: Bool
+      useTerm: Bool = true,
+      personalInfoTerm: Bool = true,
+      ageTerm: Bool = true
     ) {
       self.useTerm = useTerm
       self.personalInfoTerm = personalInfoTerm

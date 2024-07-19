@@ -19,7 +19,6 @@ final class BaseInterceptor: RequestInterceptor {
     for session: Session,
     completion: @escaping (Result<URLRequest, Error>) -> Void
   ) {
-    print("HI")
     var request = urlRequest
     guard !(request.url?.absoluteString.contains("signIn"))! else { 
       return completion(.success(request))
