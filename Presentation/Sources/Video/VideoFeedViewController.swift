@@ -29,14 +29,16 @@ public class VideoFeedViewController: UIViewController {
     type: VideoFeedType,
     keyword: Keyword? = nil,
     currentId: Int? = nil,
-    cursorId: Int? = nil
+    cursorId: Int? = nil,
+    userId: Int? = nil
   ) {
     self.type = type
     self.viewModel = VideoFeedViewModel(
       type: type,
       keyword: keyword,
       currentId: currentId,
-      cursorId: cursorId
+      cursorId: cursorId,
+      userId: userId
     )
     super.init(nibName: nil, bundle: nil)
   }
@@ -44,7 +46,7 @@ public class VideoFeedViewController: UIViewController {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
+
   public override func viewDidLoad() {
     super.viewDidLoad()
     setUpCollectionView()
@@ -56,6 +58,10 @@ public class VideoFeedViewController: UIViewController {
   public override func viewWillAppear(_ animated: Bool) {
     bind()
     viewModel.recordListCase()
+  }
+
+  public override func viewDidDisappear(_ animated: Bool) {
+    removeAVPlayers()
   }
 
   private func bind() {
@@ -72,7 +78,6 @@ public class VideoFeedViewController: UIViewController {
     self.recordyToggle.do {
       $0.isHidden = type != .all
     }
-    
     if self.type != .all {
       self.navigationController?.navigationBar.topItem?.title = ""
     }
@@ -119,15 +124,12 @@ public class VideoFeedViewController: UIViewController {
     self.collectionView!.dataSource = self
   }
 
-  @objc private func nicknameButtonTapped() {
-    let userVC = UserProfileViewController()
+  @objc private func nicknameButtonTapped(_ sender: UIButton) {
+    guard type != .userProfile && type != .myProfile else { return }
+    let index = sender.tag
+    let feed = viewModel.feedList[index]
+    let userVC = OtherUserProfileViewController(id: feed.userId)
     self.navigationController?.pushViewController(userVC, animated: true)
-  }
-}
-
-extension VideoFeedViewController: FeedWatchDelegate {
-  func play(feed: Feed) {
-    viewModel.postIsFeedWatched(feed: feed)
   }
 }
 
@@ -159,18 +161,22 @@ extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDat
       cell.play()
       isPlayed = true
     }
-    cell.bookmarkTappedRelay = {
+    cell.feedView.nicknameButton.tag = indexPath.row
+    cell.feedView.nicknameButton.addTarget(
+      self,
+      action: #selector(nicknameButtonTapped),
+      for: .touchUpInside
+    )
+    cell.bookmarkAction = {
       self.viewModel.bookmarkButtonTapped(indexPath.row)
       cell.updateBookmarkStatus(
         count: self.viewModel.feedList[indexPath.row].bookmarkCount,
         isBookmarked: self.viewModel.feedList[indexPath.row].isBookmarked
       )
     }
-    cell.feedView.nicknameButton.addTarget(
-      self,
-      action: #selector(nicknameButtonTapped),
-      for: .touchUpInside
-    )
+//    cell.deleteAction = {
+//      
+//    }
     return cell
   }
 
@@ -208,6 +214,13 @@ extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDat
 
 
 extension VideoFeedViewController {
+  private func removeAVPlayers() {
+    let visibleCells = collectionView?.visibleCells.compactMap { $0 as? FeedCell } ?? []
+    for cell in visibleCells {
+      cell.deinitPlayers()
+    }
+  }
+
   private func checkAndPlay() {
     let visibleCells = collectionView!.visibleCells.compactMap { $0 as? FeedCell }
     visibleCells.forEach {
@@ -224,5 +237,11 @@ extension VideoFeedViewController {
         $0.pause()
       }
     }
+  }
+}
+
+extension VideoFeedViewController: FeedWatchDelegate {
+  func play(feed: Feed) {
+    viewModel.postIsFeedWatched(feed: feed)
   }
 }

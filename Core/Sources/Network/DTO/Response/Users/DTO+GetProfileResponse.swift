@@ -22,8 +22,10 @@ extension DTO {
     public let followerCount: Int
     /// 팔로잉 수
     public let followingCount: Int
+    /// 북마크 수
+    public let bookmarkCount: Int
     /// 팔로잉 여부
-    public let isFollwoing: Bool
+    public let isFollowing: Bool
 
     public init(
       id: Int,
@@ -32,7 +34,8 @@ extension DTO {
       recordCount: Int,
       followerCount: Int,
       followingCount: Int,
-      isFollwoing: Bool
+      bookmarkCount: Int,
+      isFollowing: Bool
     ) {
       self.id = id
       self.nickname = nickname
@@ -40,7 +43,8 @@ extension DTO {
       self.recordCount = recordCount
       self.followerCount = followerCount
       self.followingCount = followingCount
-      self.isFollwoing = isFollwoing
+      self.bookmarkCount = bookmarkCount
+      self.isFollowing = isFollowing
     }
   }
 }

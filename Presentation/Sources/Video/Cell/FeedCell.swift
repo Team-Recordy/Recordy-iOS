@@ -20,7 +20,7 @@ protocol FeedWatchDelegate: AnyObject {
 }
 
 class FeedCell: UICollectionViewCell {
-  
+
   var avPlayer: AVPlayer?
   var avPlayerLayer: AVPlayerLayer?
   var avPlayerLooper: AVPlayerLooper?
@@ -31,18 +31,20 @@ class FeedCell: UICollectionViewCell {
   let feedView = FeedView()
   var feed: Feed?
 
-  var bookmarkTappedRelay: (() -> Void)?
-  
+  var bookmarkAction: (() -> Void)?
+  var pushToOtherProfile: (() -> Void)?
+  var deleteAction: (() -> Void)?
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     setUI()
     setAutolayout()
   }
-  
+
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
+
   override func prepareForReuse() {
     super.prepareForReuse()
     avPlayer?.pause()
@@ -53,12 +55,16 @@ class FeedCell: UICollectionViewCell {
     isPlayRequested = false
     NotificationCenter.default.removeObserver(self)
   }
-  
+
+  deinit {
+    deinitPlayers()
+  }
+
   private func setUI() {
     self.addSubview(playerView)
     self.addSubview(feedView)
   }
-  
+
   private func setAutolayout() {
     self.feedView.snp.makeConstraints {
       $0.verticalEdges.horizontalEdges.equalToSuperview()
@@ -70,11 +76,7 @@ class FeedCell: UICollectionViewCell {
       $0.bottom.equalTo(playerView.snp.bottom)
     }
   }
-  
-  @objc private func bookmarkButtonTapped() {
-    self.bookmarkTappedRelay?()
-  }
-  
+
   func play() {
     isPlayRequested = true
     isPlaying = true
@@ -83,12 +85,21 @@ class FeedCell: UICollectionViewCell {
       delegate?.play(feed: feed)
     }
   }
-  
+
   func pause() {
     isPlayRequested = false
     self.avPlayer?.pause()
   }
-  
+
+  func deinitPlayers() {
+    avPlayer?.pause()
+    avPlayer = nil
+    avPlayerLayer?.removeFromSuperlayer()
+    avPlayerLayer = nil
+    avPlayerLooper = nil
+    NotificationCenter.default.removeObserver(self)
+  }
+
   private func addPlayer(
     for url: URL,
     bounds: CGRect
@@ -100,65 +111,72 @@ class FeedCell: UICollectionViewCell {
     avPlayerLayer?.fillMode = .both
     avPlayerLayer?.videoGravity = .resizeAspectFill
     playerView.layer.addSublayer(self.avPlayerLayer!)
-    
+
     NotificationCenter.default.addObserver(
       self,
       selector: #selector(playerItemDidReachEnd),
       name: .AVPlayerItemDidPlayToEndTime,
       object: avPlayer?.currentItem
     )
-//    avPlayer?.currentItem?.addObserver(
-//      self,
-//      forKeyPath: "playbackBufferEmpty",
-//      options: .new,
-//      context: nil
-//    )
-//    avPlayer?.currentItem?.addObserver(
-//      self,
-//      forKeyPath: "playbackLikelyToKeepUp",
-//      options: .new,
-//      context: nil
-//    )
-//    avPlayer?.currentItem?.addObserver(
-//      self,
-//      forKeyPath: "playbackBufferFull",
-//      options: .new,
-//      context: nil
-//    )
+    //    avPlayer?.currentItem?.addObserver(
+    //      self,
+    //      forKeyPath: "playbackBufferEmpty",
+    //      options: .new,
+    //      context: nil
+    //    )
+    //    avPlayer?.currentItem?.addObserver(
+    //      self,
+    //      forKeyPath: "playbackLikelyToKeepUp",
+    //      options: .new,
+    //      context: nil
+    //    )
+    //    avPlayer?.currentItem?.addObserver(
+    //      self,
+    //      forKeyPath: "playbackBufferFull",
+    //      options: .new,
+    //      context: nil
+    //    )
   }
-  
+
   @objc private func playerItemDidReachEnd(notification: Notification) {
     avPlayer?.seek(to: CMTime.zero)
     avPlayer?.play()
   }
-  
-//  override func observeValue(
-//    forKeyPath keyPath: String?,
-//    of object: Any?,
-//    change: [NSKeyValueChangeKey: Any]?,
-//    context: UnsafeMutableRawPointer?
-//  ) {
-//    if object is AVPlayerItem {
-//      switch keyPath {
-//      case "playbackBufferEmpty":
-//        print("bufferEmpty")
-//      case "playbackLikelyToKeepUp":
-//        print("LikelyToKeepUp")
-//      case "playbackBufferFull":
-//        print("BufferFull")
-//      default:
-//        print("Default")
-//      }
-//    }
-//  }
-  
+
+  //  override func observeValue(
+  //    forKeyPath keyPath: String?,
+  //    of object: Any?,
+  //    change: [NSKeyValueChangeKey: Any]?,
+  //    context: UnsafeMutableRawPointer?
+  //  ) {
+  //    if object is AVPlayerItem {
+  //      switch keyPath {
+  //      case "playbackBufferEmpty":
+  //        print("bufferEmpty")
+  //      case "playbackLikelyToKeepUp":
+  //        print("LikelyToKeepUp")
+  //      case "playbackBufferFull":
+  //        print("BufferFull")
+  //      default:
+  //        print("Default")
+  //      }
+  //    }
+  //  }
+
   func bind(feed: Feed, bounds: CGRect, shouldAddPlayer: Bool) {
     self.feed = feed
     if shouldAddPlayer {
       addPlayer(for: URL(string: feed.videoLink)!, bounds: bounds)
     }
+    self.feedView.descriptionTextView.attributedText = UITextView.setLineSpacing(
+      5,
+      text: feed.description
+    )
     self.feedView.locationLabel.text = feed.location
-    self.feedView.nicknameButton.setTitle(feed.nickname, for: .normal)
+    self.feedView.nicknameButton.setTitle(
+      feed.nickname,
+      for: .normal
+    )
     self.feedView.descriptionTextView.text = feed.description
     self.feedView.bookmarkButton.setImage(
       feed.isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image,
@@ -170,12 +188,14 @@ class FeedCell: UICollectionViewCell {
       action: #selector(bookmarkButtonTapped),
       for: .touchUpInside
     )
-    self.feedView.descriptionTextView.attributedText = UITextView.setLineSpacing(
-      5,
-      text: feed.description
+    self.feedView.deleteButton.isHidden = !feed.isMine
+    self.feedView.deleteButton.addTarget(
+      self,
+      action: #selector(deleteButtonTapped),
+      for: .touchUpInside
     )
   }
-  
+
   func updateBookmarkStatus(
     count: Int,
     isBookmarked: Bool
@@ -185,5 +205,13 @@ class FeedCell: UICollectionViewCell {
       for: .normal
     )
     self.feedView.bookmarkLabel.text = "\(count)"
+  }
+
+  @objc private func bookmarkButtonTapped() {
+    self.bookmarkAction?()
+  }
+
+  @objc private func deleteButtonTapped() {
+    self.deleteAction?()
   }
 }

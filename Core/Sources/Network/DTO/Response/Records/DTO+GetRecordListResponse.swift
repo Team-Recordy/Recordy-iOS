@@ -77,13 +77,15 @@ extension DTO.RecordList {
     return self.map { response in
       Feed(
         id: response.recordInfo.id,
+        userId: response.recordInfo.uploaderId,
         location: response.recordInfo.location,
         nickname: response.recordInfo.uploaderNickname,
         description: response.recordInfo.content,
         bookmarkCount: response.recordInfo.bookmarkCount,
         isBookmarked: response.isBookmark,
         videoLink: response.recordInfo.fileUrl.videoUrl,
-        thumbnailLink: response.recordInfo.fileUrl.thumbnailUrl
+        thumbnailLink: response.recordInfo.fileUrl.thumbnailUrl, 
+        isMine: response.recordInfo.isMine
       )
     }
   }

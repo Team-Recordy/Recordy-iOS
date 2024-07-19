@@ -74,13 +74,15 @@ extension DTO.GetRecentRecordListResponse {
     return content.map {
       Feed(
         id: $0.recordInfo.id,
+        userId: $0.recordInfo.uploaderId,
         location: $0.recordInfo.location,
         nickname: $0.recordInfo.uploaderNickname,
         description: $0.recordInfo.content,
         bookmarkCount: $0.recordInfo.bookmarkCount,
         isBookmarked: $0.isBookmark,
         videoLink: $0.recordInfo.fileUrl.videoUrl,
-        thumbnailLink: $0.recordInfo.fileUrl.thumbnailUrl
+        thumbnailLink: $0.recordInfo.fileUrl.thumbnailUrl,
+        isMine: $0.recordInfo.isMine
       )
     }
   }
