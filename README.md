@@ -40,8 +40,8 @@
 
 
 ## Library
-<p>
   [![Tuist badge](https://img.shields.io/badge/Powered%20by-Tuist-blue)](https://tuist.io)
+<p>
   <img src="https://img.shields.io/badge/Swift-F05138?style=flat-square&logo=Swift&logoColor=white"/>
 </p>
 
