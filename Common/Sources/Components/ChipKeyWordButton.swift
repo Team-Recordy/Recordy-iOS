@@ -32,7 +32,7 @@ public class ChipKeyWordButton: UIButton {
   }
   
   private func setUI() {
-    self.cornerRadius(16.adaptiveHeight)
+    self.cornerRadius(17.adaptiveHeight)
     titleLabel?.font = RecordyFont.caption1.font
     updateChipAppearance()
   }
