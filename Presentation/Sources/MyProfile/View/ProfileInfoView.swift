@@ -17,12 +17,8 @@ public class ProfileInfoView: UIView {
   private let profileImage = UIImageView()
   private let userName = UILabel()
   
-  private let followerStackView = UIStackView()
-  private let followingStackView = UIStackView()
-  private let followStackView = UIStackView()
-  
-  private let followerButton = UIButton()
-  private let followingButton = UIButton()
+  let followerButton = UIButton()
+  let followingButton = UIButton()
   
   private let middleDivider = UIView()
   
@@ -40,7 +36,9 @@ public class ProfileInfoView: UIView {
   private func setLayout() {
     addSubview(profileImage)
     addSubview(userName)
-    addSubview(followStackView)
+    addSubview(followerButton)
+    addSubview(middleDivider)
+    addSubview(followingButton)
   }
   
   public func setStyle() {
@@ -61,8 +59,7 @@ public class ProfileInfoView: UIView {
     followerButton.do {
       $0.setTitleColor(CommonAsset.recordyWhite.color, for: .normal)
       $0.titleLabel?.font = RecordyFont.body2.font
-      $0.addTarget(self, action: #selector(showFollowers), for: .touchUpInside)
-      let attributedText = NSMutableAttributedString(string: "2000000", attributes: [.font: RecordyFont.body2.font])
+      let attributedText = NSMutableAttributedString(string: "2.5만", attributes: [.font: RecordyFont.body2.font])
       attributedText.append(NSAttributedString(string: " 명의 팔로워", attributes: [.font: RecordyFont.body2.font, .foregroundColor: CommonAsset.recordyGrey03.color]))
       $0.setAttributedTitle(attributedText, for: .normal)
       $0.titleLabel?.numberOfLines = 1
@@ -72,7 +69,6 @@ public class ProfileInfoView: UIView {
     followingButton.do {
       $0.setTitleColor(CommonAsset.recordyWhite.color, for: .normal)
       $0.titleLabel?.font = RecordyFont.body2.font
-      $0.addTarget(self, action: #selector(showFollowings), for: .touchUpInside)
       let attributedText = NSMutableAttributedString(string: "0", attributes: [.font: RecordyFont.body2.font])
       attributedText.append(NSAttributedString(string: " 명의 팔로잉", attributes: [.font: RecordyFont.body2.font, .foregroundColor: CommonAsset.recordyGrey03.color]))
       $0.setAttributedTitle(attributedText, for: .normal)
@@ -83,37 +79,6 @@ public class ProfileInfoView: UIView {
     middleDivider.do {
       $0.backgroundColor = CommonAsset.recordyGrey04.color
     }
-    
-    followerStackView.do {
-      $0.axis = .horizontal
-      $0.spacing = 4
-      $0.alignment = .fill
-      $0.addArrangedSubview(followerButton)
-    }
-    
-    followingStackView.do {
-      $0.axis = .horizontal
-      $0.spacing = 4
-      $0.alignment = .fill
-      $0.addArrangedSubview(followingButton)
-    }
-    
-    followStackView.do {
-      $0.axis = .horizontal
-      $0.spacing = 8
-      $0.alignment = .center
-      $0.addArrangedSubview(followerStackView)
-      $0.addArrangedSubview(middleDivider)
-      $0.addArrangedSubview(followingStackView)
-    }
-  }
-  
-  @objc private func showFollowers() {
-    print("팔로워 목록 보기")
-  }
-  
-  @objc private func showFollowings() {
-    print("팔로잉 목록 보기")
   }
   
   public func setUpConstraints() {
@@ -130,15 +95,21 @@ public class ProfileInfoView: UIView {
       $0.trailing.equalToSuperview().inset(20)
     }
     
-    followStackView.snp.makeConstraints {
+    followerButton.snp.makeConstraints {
       $0.top.equalTo(userName.snp.bottom).offset(2)
       $0.leading.equalTo(profileImage.snp.trailing).offset(12)
-      $0.height.equalTo(20)
     }
     
     middleDivider.snp.makeConstraints {
+      $0.leading.equalTo(followerButton.snp.trailing).offset(8)
+      $0.centerY.equalTo(followerButton.snp.centerY)
       $0.width.equalTo(1)
       $0.height.equalTo(10)
+    }
+    
+    followingButton.snp.makeConstraints {
+      $0.top.equalTo(userName.snp.bottom).offset(2)
+      $0.leading.equalTo(middleDivider.snp.trailing).offset(8)
     }
   }
   

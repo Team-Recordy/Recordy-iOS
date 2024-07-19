@@ -15,12 +15,12 @@ extension DTO {
     /// 다음 페이지 여부
     public let hasNext: Bool
     /// 다음 커서
-    public let content: Content
+    public let content: [Content]
 
     public init(
       nextCursor: Int,
       hasNext: Bool,
-      content: Content
+      content: [Content]
     ) {
       self.nextCursor = nextCursor
       self.hasNext = hasNext

@@ -1,14 +1,5 @@
-//
-//  MediumButton.swift
-//  Common
-//
-//  Created by 송여경 on 7/9/24.
-//  Copyright © 2024 com.recordy. All rights reserved.
-//
-
 import UIKit
 import SnapKit
-
 import Then
 
 public enum MediumState {
@@ -33,26 +24,20 @@ public class MediumButton: UIButton {
     fatalError("init(coder:) has not been implemented")
   }
   
-  public func setUI() {
+  private func setUI() {
     layer.cornerRadius = 8
     titleLabel?.font = RecordyFont.button2.font
     mediumButtonAppearance()
   }
   
-  public func mediumButtonAppearance(){
+  private func mediumButtonAppearance() {
     switch mediumState {
     case .active:
       backgroundColor = CommonAsset.recordyWhite.color
-      setTitleColor(
-        CommonAsset.recordyGrey09.color,
-        for: .normal
-      )
+      setTitleColor(CommonAsset.recordyGrey09.color, for: .normal)
     case .inactive:
       backgroundColor = CommonAsset.recordyGrey08.color
-      setTitleColor(
-        CommonAsset.recordyGrey01.color,
-        for: .normal
-      )
+      setTitleColor(CommonAsset.recordyGrey01.color, for: .normal)
     }
   }
 }
