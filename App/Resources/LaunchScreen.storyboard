@@ -18,10 +18,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splashAppLogo" translatesAutoresizingMaskIntoConstraints="NO" id="SWd-p6-je2">
-                                <rect key="frame" x="120" y="373" width="153" height="106"/>
+                                <rect key="frame" x="110" y="254" width="173" height="126"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="106" id="XKI-ha-Fok"/>
-                                    <constraint firstAttribute="width" constant="153" id="Y1I-Nb-J3L"/>
+                                    <constraint firstAttribute="height" constant="126" id="XKI-ha-Fok"/>
+                                    <constraint firstAttribute="width" constant="173" id="Y1I-Nb-J3L"/>
                                 </constraints>
                             </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splashBackground" translatesAutoresizingMaskIntoConstraints="NO" id="UuB-sR-kf4">
@@ -37,7 +37,7 @@
                             <constraint firstItem="UuB-sR-kf4" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" id="DyI-Xd-cXz"/>
                             <constraint firstItem="Bcu-3y-fUS" firstAttribute="trailing" secondItem="UuB-sR-kf4" secondAttribute="trailing" id="lDN-xp-Div"/>
                             <constraint firstItem="SWd-p6-je2" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="r4G-Yr-hTQ"/>
-                            <constraint firstItem="SWd-p6-je2" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="viM-fI-lz4"/>
+                            <constraint firstItem="SWd-p6-je2" firstAttribute="top" secondItem="Bcu-3y-fUS" secondAttribute="top" constant="195" id="teI-1u-C3f"/>
                             <constraint firstItem="UuB-sR-kf4" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="wwD-ra-MNL"/>
                         </constraints>
                     </view>
