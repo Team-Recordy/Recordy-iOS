@@ -81,6 +81,7 @@ public final class SignupViewController: UIViewController {
   
   @objc
   func showCompleteView() {
+    guard nicknameView.nextButton.buttonState == .active else { return }
     currentPage += 1
     progressView.updateProgress(
       currentPage: currentPage,
