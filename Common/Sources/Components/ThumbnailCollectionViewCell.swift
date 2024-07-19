@@ -145,6 +145,16 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
     self.bookmarkImage.image = record.isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image
   }
 
+  public func configure(feed: Feed) {
+    let image = String(feed.thumbnailLink)
+    self.backgroundImageView.kf.setImage(
+      with: URL(string: image),
+      options: [.cacheOriginalImage]
+    )
+    self.locationText.text = feed.location
+    self.bookmarkImage.image = feed.isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image
+  }
+
   @objc private func bookmarkButtonTapped() {
     self.bookmarkButtonEvent?()
   }
