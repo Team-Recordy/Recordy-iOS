@@ -11,8 +11,10 @@ import UIKit
 import Then
 import SnapKit
 
+import Core
 import Common
 
+@available(iOS 16.0, *)
 public class SetViewController: UIViewController {
   
   let helpTableView: CustomTableView = {
@@ -75,6 +77,7 @@ public class SetViewController: UIViewController {
     view.backgroundColor = .black
     setUI()
     setAutoLayout()
+    setDelegate()
   }
   
   private func setUI() {
@@ -83,7 +86,7 @@ public class SetViewController: UIViewController {
     view.addSubview(divider)
     view.addSubview(extraTableView)
   }
-  
+
   private func setAutoLayout() {
     helpTableView.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide)
@@ -102,4 +105,53 @@ public class SetViewController: UIViewController {
       $0.leading.trailing.bottom.equalToSuperview()
     }
   } 
+
+  private func setDelegate() {
+    extraTableView.signOutDelegate = self
+    extraTableView.withDrawDelegate = self
+  }
+}
+
+@available(iOS 16.0, *)
+extension SetViewController: SignOutDelegate {
+  func signOut() {
+    self.showPopUp(type: .signOut) {
+      let apiProvider = APIProvider<APITarget.Users>()
+      apiProvider.justRequest(.signOut) { result in
+        switch result {
+        case .success(let success):
+          KeychainManager.shared.delete(token: .AccessToken)
+          KeychainManager.shared.delete(token: .RefreshToken)
+        case .failure(let failure):
+          print(failure)
+        }
+      }
+      self.dismiss(animated: false)
+      let loginViewController = SplashScreenViewController()
+      loginViewController.modalPresentationStyle = .fullScreen
+      self.present(loginViewController, animated: false)
+    }
+  }
+}
+
+@available(iOS 16.0, *)
+extension SetViewController: WithDrawDelegate {
+  func withDraw() {
+    self.showPopUp(type: .withdraw) {
+      let apiProvider = APIProvider<APITarget.Users>()
+      apiProvider.justRequest(.withdraw) { result in
+        switch result {
+        case .success(let success):
+          KeychainManager.shared.delete(token: .AccessToken)
+          KeychainManager.shared.delete(token: .RefreshToken)
+        case .failure(let failure):
+          print(failure)
+        }
+      }
+      self.dismiss(animated: false)
+      let loginViewController = SplashScreenViewController()
+      loginViewController.modalPresentationStyle = .fullScreen
+      self.present(loginViewController, animated: false)
+    }
+  }
 }

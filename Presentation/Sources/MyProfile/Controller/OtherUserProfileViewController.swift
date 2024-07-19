@@ -182,6 +182,7 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
           id: response.id,
           nickname: response.nickname,
           followerCount: response.followerCount,
+          followingCount: response.followingCount,
           isFollowing: response.isFollowing,
           profileImage: response.profileImageUrl
         )

@@ -50,7 +50,7 @@ extension APITarget.Records: TargetType {
     case .getFamousRecordList:
       return "famous"
     case .getFollowingRecordList:
-      return "following"
+      return "follow"
     case .getBookmarkedRecordList:
       return "bookmarks"
     }

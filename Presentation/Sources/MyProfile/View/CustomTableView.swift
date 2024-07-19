@@ -12,7 +12,9 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
   var headerTitle: String
   var footerView: UIView?
   var cellArrowImages: [UIImage] = []
-  
+  weak var signOutDelegate: SignOutDelegate?
+  weak var withDrawDelegate: WithDrawDelegate?
+
   init(
     list: [String],
     headerTitle: String,
@@ -43,6 +45,7 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
       $0.backgroundColor = .black
       $0.isScrollEnabled = false
       $0.sectionHeaderTopPadding = 0
+      $0.separatorStyle = .none
     }
   }
   
@@ -72,7 +75,7 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
     headerView.addSubview(headerLabel)
     headerLabel.snp.makeConstraints {
       $0.top.equalTo(headerView.snp.top).inset(28)
-      $0.leading.equalToSuperview().inset(18)
+      $0.leading.equalToSuperview().inset(16)
     }
     return headerView
   }
@@ -91,7 +94,7 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
     cell.textLabel?.textColor = CommonAsset.recordyGrey01.color
     cell.backgroundColor = .black
     cell.selectionStyle = .none
-    
+
     if cellArrowImages.indices.contains(
       indexPath.row
     ) {
@@ -100,7 +103,6 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
       )
       cell.accessoryView = arrowImageView
     }
-    
     return cell
   }
   
@@ -121,4 +123,23 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
     
     return footerView
   }
+
+  public func tableView(
+    _ tableView: UITableView,
+    didSelectRowAt indexPath: IndexPath
+  ) {
+    if list[indexPath.row] == "로그아웃" {
+      signOutDelegate?.signOut()
+    } else if list[indexPath.row] == "탈퇴하기" {
+      withDrawDelegate?.withDraw()
+    }
+  }
+}
+
+protocol SignOutDelegate: AnyObject {
+  func signOut()
+}
+
+protocol WithDrawDelegate: AnyObject {
+  func withDraw()
 }

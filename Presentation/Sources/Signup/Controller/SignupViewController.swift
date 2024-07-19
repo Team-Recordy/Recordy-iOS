@@ -15,6 +15,7 @@ import Common
 @available(iOS 16.0, *)
 public final class SignupViewController: UIViewController {
   
+  let gradientView = RecordyGradientView()
   var rootView: UIView = UIView()
   let progressView = RecordyProgressView()
   let nicknameView = NicknameView()
@@ -22,6 +23,7 @@ public final class SignupViewController: UIViewController {
   var currentPage = 0
   var textFieldState: RecordyTextFieldState = .unselected
   var nickname = ""
+//  var titles = ["회원"]
 
   public override func viewDidLoad() {
     super.viewDidLoad()
@@ -36,7 +38,9 @@ public final class SignupViewController: UIViewController {
   }
   
   func setUI() {
+    self.title = "회원가입"
     view.addSubview(progressView)
+    view.addSubview(gradientView)
   }
   
   func setAutoLayout() {
@@ -44,6 +48,11 @@ public final class SignupViewController: UIViewController {
       $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(12)
       $0.leading.trailing.equalToSuperview().inset(20)
       $0.height.equalTo(6.adaptiveHeight)
+    }
+
+    gradientView.snp.makeConstraints {
+      $0.top.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(400.adaptiveHeight)
     }
   }
   

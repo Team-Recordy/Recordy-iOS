@@ -13,10 +13,12 @@ import Core
 
 import RxSwift
 import RxCocoa
+import Common
 
 @available(iOS 16.0, *)
 public final class LoginViewController: UIViewController {
 
+  let gradientView = RecordyGradientView()
   var rootView = LoginView()
   private var appleLoginCompletion: ((Result<String, Error>) -> Void)?
   private let disposeBag = DisposeBag()
@@ -27,7 +29,16 @@ public final class LoginViewController: UIViewController {
 
   public override func viewDidLoad() {
     super.viewDidLoad()
+
     setTarget()
+  }
+
+  func setGradientView() {
+    self.view.addSubview(gradientView)
+    gradientView.snp.makeConstraints {
+      $0.top.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(400.adaptiveHeight)
+    }
   }
 
   func setTarget() {
@@ -104,7 +115,7 @@ public final class LoginViewController: UIViewController {
           tabBarController.modalPresentationStyle = .fullScreen
           self.present(tabBarController, animated: false)
         } else {
-          let signUpViewController = SignupViewController()
+          let signUpViewController = BaseNavigationController(rootViewController: SignupViewController())
           signUpViewController.modalPresentationStyle = .fullScreen
           self.present(signUpViewController, animated: false)
         }

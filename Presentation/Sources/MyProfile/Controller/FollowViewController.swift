@@ -5,16 +5,30 @@ import Then
 import Core
 import Common
 
-public class FollowerViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+enum FollowType {
+  case follower
+  case following
+}
+
+public class FollowViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
   
-  private let viewModel = FollowerViewModel()
+  let followType: FollowType
+  private let viewModel: FollowViewModel
   private let tableView = UITableView()
   private let emptyView = UIView()
   let emptyLabel = UIImageView()
   let emptyImage = UIImageView()
   let settingButton = UIButton()
+
+  init(followType: FollowType) {
+    self.followType = followType
+    self.viewModel = FollowViewModel(followType: followType)
+    super.init(nibName: nil, bundle: nil)
+  }
   
-  var follower: [MainRecord] = []
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
   
   public override func viewDidLoad() {
     super.viewDidLoad()
@@ -24,7 +38,7 @@ public class FollowerViewController: UIViewController, UITableViewDataSource, UI
     setTableView()
     bindViewModel()
     
-    viewModel.fetchFollowers()
+    viewModel.fetchUsers()
   }
   
   private func setStyle() {
@@ -75,7 +89,9 @@ public class FollowerViewController: UIViewController, UITableViewDataSource, UI
   
   public func bindViewModel() {
     viewModel.followers.bind { [weak self] _ in
-      self?.tableView.reloadData()
+      guard let self = self else { return }
+      print("@Follower - \(self.viewModel.followers.value)")
+      self.tableView.reloadData()
     }
     
     viewModel.isEmpty.bind { [weak self] isEmpty in
@@ -85,35 +101,30 @@ public class FollowerViewController: UIViewController, UITableViewDataSource, UI
   }
   
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return viewModel.followersMockData.value.count
+    return viewModel.followers.value.count
   }
   
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: "FollowerCell", for: indexPath) as! FollowerCell
-    var follower = viewModel.followersMockData.value[indexPath.row]
+    var follower = viewModel.followers.value[indexPath.row]
     cell.configure(with: follower)
     cell.followButtonEvent = { [weak self] in
       guard let self = self else { return }
       postFollowRequest(index: indexPath.row)
       cell.updateFollowButton(isFollowed: follower.isFollowing)
-      print("Follow Button Touched: \(follower.isFollowing)")
     }
     return cell
   }
   
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//    let otherProfileView = OtherUserProfileViewController(id: <#Int#>)
-//    if let navigationController = self.navigationController {
-//      navigationController.pushViewController(otherProfileView, animated: true)
-//    } else {
-//      print("Error: No navigation controller found")
-//    }
+    let userVC = OtherUserProfileViewController(id: viewModel.followers.value[indexPath.row].id)
+    self.navigationController?.pushViewController(userVC, animated: true)
   }
   
   func postFollowRequest(index: Int) {
-    self.viewModel.followersMockData.value[index].isFollowing.toggle()
+    self.viewModel.followers.value[index].isFollowing.toggle()
     let apiProvider = APIProvider<APITarget.Users>()
-    let request = DTO.FollowRequest(followingId: viewModel.followersMockData.value[index].id)
+    let request = DTO.FollowRequest(followingId: viewModel.followers.value[index].id)
     apiProvider.justRequest(.follow(request)) { result in
       switch result {
       case .success(let success):
@@ -186,7 +197,8 @@ public class FollowerCell: UITableViewCell {
   }
   
   func configure(with follower: Follower) {
-    profileImageView.image = follower.profileImage
+    let url = URL(string: follower.profileImage)
+    profileImageView.kf.setImage(with: url)
     usernameLabel.text = follower.username
     updateFollowButton(isFollowed: follower.isFollowing)
   }

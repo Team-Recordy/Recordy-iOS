@@ -12,6 +12,12 @@ import Then
 import Core
 import Common
 
+protocol UserRecordDelegate: AnyObject {
+  func userRecordFeedTapped(feed: Feed)
+  func uploadFeedTapped()
+}
+
+@available(iOS 16.0, *)
 public class MyRecordView: UIView, UICollectionViewDataSource, UICollectionViewDelegate {
   private let videoEmptyView = UIView()
   private let videoEmptyImageView = UIImageView()
@@ -20,7 +26,8 @@ public class MyRecordView: UIView, UICollectionViewDataSource, UICollectionViewD
   private let countLabel = UILabel()
   private var collectionView: UICollectionView!
   private var feeds: [Feed] = []
-  
+  weak var delegate: UserRecordDelegate?
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     setUpCollectionView()
@@ -127,7 +134,7 @@ public class MyRecordView: UIView, UICollectionViewDataSource, UICollectionViewD
   }
   
   @objc private func didTapActionButton() {
-    print("기록하기 버튼 눌림")
+    delegate?.uploadFeedTapped()
   }
   
   private func checkDataEmpty() {
@@ -152,7 +159,7 @@ public class MyRecordView: UIView, UICollectionViewDataSource, UICollectionViewD
   }
   
   func getMyRecordList(feeds: [Feed]) {
-    self.feeds.append(contentsOf: feeds)
+    self.feeds = feeds
     self.collectionView.reloadData()
     checkDataEmpty()
   }
@@ -168,9 +175,14 @@ public class MyRecordView: UIView, UICollectionViewDataSource, UICollectionViewD
     ) as? ThumbnailCollectionViewCell else {
       return UICollectionViewCell()
     }
-    let thumbnailUrl = URL(string: String(feeds[indexPath.row].thumbnailLink.dropLast(1)))
-    cell.backgroundImageView.kf.setImage(with: thumbnailUrl)
-    cell.locationText.text = feeds[indexPath.row].location
+    cell.configure(feed: feeds[indexPath.row])
     return cell
+  }
+
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    didSelectItemAt indexPath: IndexPath
+  ) {
+    delegate?.userRecordFeedTapped(feed: feeds[indexPath.row])
   }
 }

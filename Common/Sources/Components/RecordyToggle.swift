@@ -11,26 +11,34 @@ import UIKit
 import SnapKit
 import Then
 
-enum ToggleState {
+public enum ToggleState {
   case all
   case following
 }
 
 public class RecordyToggle: UIButton {
 
-  var toggleState: ToggleState = .all {
+  var toggleState: ToggleState = .following {
     didSet {
       self.update()
     }
   }
+
+  public var toggleAction: ((ToggleState) -> Void)?
+
   private let backgroundView = UIStackView().then {
     $0.axis = .horizontal
     $0.layer.backgroundColor = (UIColor.black.cgColor).copy(alpha: 0.2)
     $0.isLayoutMarginsRelativeArrangement = true
     $0.cornerRadius(15)
+    $0.isUserInteractionEnabled = false
   }
-  private let leftStateView = UIView()
-  private let rightStateView = UIView()
+  private let leftStateView = UIView().then {
+    $0.isUserInteractionEnabled = false
+  }
+  private let rightStateView = UIView().then {
+    $0.isUserInteractionEnabled = false
+  }
   private let leftStateLabel = UILabel().then {
     $0.text = "전체"
     $0.textColor = .white
@@ -47,7 +55,7 @@ public class RecordyToggle: UIButton {
     setStyle()
     setUI()
     setAutolayout()
-    setState(state: .all)
+    setState(state: .following)
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -57,6 +65,7 @@ public class RecordyToggle: UIButton {
   public override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
     super.touchesEnded(touches, with: event)
     self.toggle()
+    toggleAction?(self.toggleState)
   }
 
   private func setStyle() {

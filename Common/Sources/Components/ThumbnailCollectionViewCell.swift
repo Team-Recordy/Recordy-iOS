@@ -62,7 +62,7 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
       $0.axis = .horizontal
       $0.distribution = .fillProportionally
       $0.alignment = .center
-      $0.spacing = 3
+      $0.spacing = 6
     }
 
     locationText.do {
@@ -113,13 +113,16 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
     }
 
     locationStackView.snp.makeConstraints {
-      $0.horizontalEdges.equalToSuperview().inset(9)
-      $0.bottom.equalToSuperview().inset(15)
+      $0.horizontalEdges.equalToSuperview().inset(6)
+      $0.bottom.equalToSuperview().inset(12)
     }
     locationImageView.snp.makeConstraints {
-      $0.leading.equalToSuperview().offset(10)
+      $0.leading.equalToSuperview().offset(6)
       $0.width.equalTo(12.adaptiveWidth)
       $0.height.equalTo(12.adaptiveHeight)
+      $0.centerY.equalToSuperview()
+    }
+    locationText.snp.makeConstraints {
       $0.centerY.equalToSuperview()
     }
     bookmarkButton.snp.makeConstraints {

@@ -69,7 +69,7 @@ public final class ProfileSegmentControllView: UIView {
   private func setStyle() {
     barStack.do {
       $0.axis = .horizontal
-      $0.spacing = 50
+      $0.spacing = 50.adaptiveWidth
       $0.distribution = .equalSpacing
     }
     
