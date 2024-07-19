@@ -49,7 +49,7 @@ final class CompleteView: UIView {
     }
     
     completeButton.do {
-      $0.setTitle("다음", for: .normal)
+      $0.setTitle("완료", for: .normal)
     }
   }
   
