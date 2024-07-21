@@ -53,11 +53,11 @@ class VideoFeedViewModel {
     recordListCase()
   }
 
-  func recordListCase() {
+  func recordListCase(toggle: Bool? = nil) {
     print(#function)
     switch type {
     case .all:
-      getRecordList()
+      getRecordList(toggle: toggle ?? false)
     case .famous:
       getFamousRecordList()
     case .recent:
@@ -72,7 +72,7 @@ class VideoFeedViewModel {
     }
   }
 
-  func getRecordList() {
+  func getRecordList(toggle: Bool) {
     guard !isFetching else { return }
     hasNext = false
     isFetching = true
@@ -86,7 +86,11 @@ class VideoFeedViewModel {
       self.isFetching = false
       switch result {
       case .success(let response):
-        self.feedList = response.feeds
+        if toggle {
+          self.feedList = response.feeds
+        } else {
+          self.feedList += response.feeds
+        }
         self.onFeedListUpdate?()
       case .failure(let error):
         print(error)
@@ -136,6 +140,7 @@ class VideoFeedViewModel {
           let cursorId = cursorId,
           let currentId = currentId
     else { return }
+    print("@fix - \(#function)")
     isFetching = true
     var selectedKeyword: String?
     if keyword != .all {
@@ -232,32 +237,16 @@ class VideoFeedViewModel {
       cursorId: 0,
       size: 100
     )
-    print(#function)
     apiProvider.requestResponsable(.getFollowingRecordList(request), DTO.GetFollowingRecordListResponse.self) { result in
       self.isFetching = false
       switch result {
       case .success(let response):
         self.feedList = response.feeds
         self.onFeedListUpdate?()
-        self.pageNumber = 0
       case .failure(let failure):
         print(failure)
       }
     }
-//    apiProvider.requestResponsable(.getBookmarkedRecordList(request), DTO.GetBookmarkedListResponse.self) { result in
-//      self.isFetching = false
-//      switch result {
-//      case .success(let response):
-//        if let index = response.feeds.firstIndex(where: { $0.id == currentId }) {
-//          let newFeeds = Array(response.feeds[index...])
-//          self.hasNext = response.hasNext
-//          self.feedList = newFeeds
-//          self.onFeedListUpdate?()
-//        }
-//      case .failure(let failure):
-//        print(failure)
-//      }
-//    }
   }
 
   func cacheVideos(

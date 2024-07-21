@@ -76,9 +76,6 @@ public class VideoFeedViewController: UIViewController {
 
   private func setStyle() {
     self.navigationController?.navigationBar.isHidden = self.type == .all || self.type == .following
-//    if self.type == .all || self.type == .following {
-//      self.setupCustomBackButton()
-//    }
     self.view.backgroundColor = CommonAsset.recordyBG.color
     self.recordyToggle.do {
       $0.isHidden = type != .all && type != .following
@@ -94,8 +91,17 @@ public class VideoFeedViewController: UIViewController {
 
   func toggleButtonTapped(type: VideoFeedType) {
     self.viewModel.type = type == .all ? .following : .all
-    self.viewModel.recordListCase()
+    self.viewModel.recordListCase(toggle: true)
     self.isPlayed = false
+    collectionView!.reloadData()
+    collectionView!.scrollToItem(
+      at: IndexPath(
+        row: 0,
+        section: 0
+      ),
+      at: .top,
+      animated: false
+    )
   }
 
   private func setUI() {
@@ -189,9 +195,6 @@ extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDat
         isBookmarked: self.viewModel.feedList[indexPath.row].isBookmarked
       )
     }
-    //    cell.deleteAction = {
-    //
-    //    }
     return cell
   }
 
