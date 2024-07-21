@@ -12,14 +12,19 @@ public protocol RecordyTextFieldStateDelegate: AnyObject {
   func state(_ currentState: RecordyTextFieldState)
 }
 
+
 public final class RecordyTextField: UITextField {
   
   public weak var stateDelegate: RecordyTextFieldStateDelegate?
   var style: RecordyTextFieldStyle {
     didSet { setStyle(style) }
   }
-  public var textState: RecordyTextFieldState = .unselected
-  
+  public var textState: RecordyTextFieldState = .unselected {
+     didSet {
+       setState(textState)
+     }
+   }
+
   public init(
     frame: CGRect = .zero,
     style: RecordyTextFieldStyle = .unselected,
@@ -30,12 +35,18 @@ public final class RecordyTextField: UITextField {
     self.placeholder = placeholder
     self.delegate = self
     setStyle(style)
+    self.textState = .unselected
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
+
+  private func setState(_ style: RecordyTextFieldState) {
+    self.layer.borderColor = style.borderColor.cgColor
+    self.layer.borderWidth = style.borderWidth
+  }
+
   func setStyle(_ style: RecordyTextFieldStyle) {
     self.setLayer(
       borderColor: style.borderColor,
