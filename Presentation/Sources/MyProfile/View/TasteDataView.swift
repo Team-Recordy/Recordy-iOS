@@ -5,13 +5,6 @@
 //  Created by 송여경 on 7/15/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 //  setStyle() -> setUI() -> setAutolayout()
-//
-//  TasteDataView.swift
-//  Presentation
-//
-//  Created by 송여경 on 7/15/24.
-//  Copyright © 2024 com.recordy. All rights reserved.
-//  setStyle() -> setUI() -> setAutolayout()
 
 import UIKit
 import SnapKit
