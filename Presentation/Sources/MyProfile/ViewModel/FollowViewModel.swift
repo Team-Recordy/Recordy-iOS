@@ -28,7 +28,7 @@ class FollowViewModel {
     case .follower:
       getFollowerList()
     case .following:
-      getFollowerList()
+      getFollowingList()
     }
   }
   
@@ -36,7 +36,8 @@ class FollowViewModel {
     let request = DTO.GetFollowerListRequest(cursorId: 0, size: 100)
     apiProvider.requestResponsable(
       .getfollowerList(request),
-      DTO.GetFollowerListResponse.self) { [weak self]
+      DTO.GetFollowerListResponse.self
+    ) { [weak self]
         result in
         guard let self = self else { return }
         switch result {
@@ -57,25 +58,25 @@ class FollowViewModel {
   }
 
   func getFollowingList() {
-//    let request = DTO.GetFollowListRequest(cursorId: 0, size: 100)
-//    apiProvider.requestResponsable(.getfollowList(request), DTO.GetFollowListResponse.self) { [weak self]
-//      result in
-//      guard let self = self else { return }
-//      switch result {
-//      case .success(let response):
-//        let followerList = response.map {
-//          Follower(
-//            id: $0.id,
-//            username: $0.nickname,
-//            isFollowing: $0.following,
-//            profileImage: $0.userInfo.profileImageUrl
-//          )
-//        }
-//        self.followers.value = followerList
-//      case .failure(let failure):
-//        print(failure)
-//      }
-//    }
+    let request = DTO.GetFollowListRequest(cursorId: 0, size: 100)
+    apiProvider.requestResponsable(.getfollowList(request), DTO.GetFollowListResponse.self) { [weak self]
+      result in
+      guard let self = self else { return }
+      switch result {
+      case .success(let response):
+        let followList = response.content.map {
+          Follower(
+            id: $0.id,
+            username: $0.nickname,
+            isFollowing: true,
+            profileImage: $0.profileImageUrl
+          )
+        }
+        self.followers.value = followList.reversed()
+      case .failure(let failure):
+        print(failure)
+      }
+    }
   }
 
   func toggleFollow(at index: Int) {
