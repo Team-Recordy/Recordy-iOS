@@ -42,7 +42,7 @@
   </tr>
   <tr>
     <td salign="center"><b>영상 기록</b></td>
-    <td align="center"><b>내 기록></b></td>
+    <td align="center"><b>내 기록 영상</b></td>
     <td align="center"><b>인기 영상</b></td>
     <td align="center"><b>영상 디테일</b></td>
   </tr>
