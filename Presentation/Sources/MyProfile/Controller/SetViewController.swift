@@ -20,6 +20,7 @@ public class SetViewController: UIViewController {
   let helpTableView: CustomTableView = {
     
     return CustomTableView(
+      type: .help,
       list: [
         "커뮤니티 가이드라인",
         "서비스 이용약관",
@@ -56,6 +57,7 @@ public class SetViewController: UIViewController {
     }
     
     return CustomTableView(
+      type: .etc,
       list: [
         "로그인 연동",
         "로그아웃",

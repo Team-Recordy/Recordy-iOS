@@ -25,6 +25,7 @@ public class ProfileViewController: UIViewController {
   let profileInfoView = ProfileInfoView()
   let segmentControlView = ProfileSegmentControllView()
   let tasteView = TasteView()
+  let tasteEmptyView = TasteEmptyView()
   let myRecordView = MyRecordView()
   let bookmarkView = BookmarkView()
   var user: User?
@@ -34,6 +35,7 @@ public class ProfileViewController: UIViewController {
       controlTypeChanged()
     }
   }
+  var fetchedData: [TasteData] = []
 
   public override func viewDidLoad() {
     super.viewDidLoad()
@@ -109,7 +111,8 @@ public class ProfileViewController: UIViewController {
       segmentControlView,
       tasteView,
       myRecordView,
-      bookmarkView
+      bookmarkView,
+      tasteEmptyView
     )
   }
 
@@ -123,9 +126,15 @@ public class ProfileViewController: UIViewController {
     segmentControlView.snp.makeConstraints {
       $0.top.equalTo(profileInfoView.snp.bottom).offset(35.adaptiveHeight)
       $0.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(40.adaptiveHeight)
     }
 
     tasteView.snp.makeConstraints {
+      $0.top.equalTo(segmentControlView.snp.bottom).offset(30)
+      $0.horizontalEdges.bottom.equalToSuperview()
+    }
+
+    tasteEmptyView.snp.makeConstraints {
       $0.top.equalTo(segmentControlView.snp.bottom).offset(30)
       $0.horizontalEdges.bottom.equalToSuperview()
     }
@@ -143,12 +152,29 @@ public class ProfileViewController: UIViewController {
 
   func setDelegate() {
     segmentControlView.delegate = self
+    tasteEmptyView.delegate = self
     bookmarkView.delegate = self
     myRecordView.delegate = self
   }
 
+  func updateTasteView(type: Bool) {
+    if type {
+      if fetchedData.isEmpty {
+        tasteEmptyView.isHidden = false
+        tasteView.isHidden = true
+      } else {
+        tasteEmptyView.isHidden = true
+        tasteView.isHidden = false
+        tasteView.updateDataViews(self.fetchedData)
+      }
+    } else {
+      tasteEmptyView.isHidden = true
+      tasteView.isHidden = true
+    }
+  }
+
   func controlTypeChanged() {
-    tasteView.isHidden = controlType == .taste ? false : true
+    updateTasteView(type: controlType == .taste)
     myRecordView.isHidden = controlType == .record ? false : true
     bookmarkView.isHidden = controlType == .bookmark ? false : true
   }
@@ -258,15 +284,20 @@ public class ProfileViewController: UIViewController {
       switch result {
       case .success(let response):
         var tasteData: [TasteData] = []
-        let tasteDataList = response.preference.count
-        for i in 0..<tasteDataList {
-          print("@Log - \(response.preference[i])")
+        guard !response.preference.isEmpty else {
+          DispatchQueue.main.async {
+            self.tasteView.updateDataViews([])
+          }
+          return
+        }
+        for i in 0..<response.preference.count {
           let percentage = Int(response.preference[i][1]) ?? 0
           let taste = TasteData(title: response.preference[i][0], percentage: percentage, type: TasteCase(rawValue: i)!)
           tasteData.append(taste)
         }
         DispatchQueue.main.async {
-          self.tasteView.updateDataViews(tasteData)
+          self.fetchedData = tasteData
+          self.updateTasteView(type: self.controlType == .taste)
         }
       case .failure(let failure):
         print("@Log - \(failure.localizedDescription)")
@@ -280,7 +311,8 @@ public class ProfileViewController: UIViewController {
   }
 
   @objc private func showFollowings() {
-    print("팔로잉 목록 보기")
+    let followerViewController = FollowViewController(followType: .following)
+    self.navigationController?.pushViewController(followerViewController, animated: true)
   }
 
   @objc private func settingButtonTapped() {
@@ -332,6 +364,16 @@ extension ProfileViewController: UserRecordDelegate {
   }
 
   func uploadFeedTapped() {
+    let uploadViewController = UploadVideoViewController()
+    let navigationController = BaseNavigationController(rootViewController: uploadViewController)
+    navigationController.modalPresentationStyle = .fullScreen
+    present(navigationController, animated: true)
+  }
+}
+
+@available(iOS 16.0, *)
+extension ProfileViewController: TasteViewDelegate {
+  func tasteViewUploadFeedTapped() {
     let uploadViewController = UploadVideoViewController()
     let navigationController = BaseNavigationController(rootViewController: uploadViewController)
     navigationController.modalPresentationStyle = .fullScreen

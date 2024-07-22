@@ -23,6 +23,7 @@ extension UIViewController {
     view.endEditing(true)
   }
 
+  @MainActor
   public func showToast(
     status: RecordyToastStatus,
     message: String,

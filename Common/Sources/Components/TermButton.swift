@@ -68,13 +68,11 @@ public class TermButton: UIButton {
   
   public func toggleState() {
     currentState = (currentState == .agree) ? .disagree : .agree
-    print("Toggle State: \(currentState)")
     updateAgreeToggleButton()
   }
   
   public func updateAgreeToggleButton() {
     self.agreeImageView.image = (currentState == .agree) ? CommonAsset.activateCheck.image : CommonAsset.deactivateCheck.image
-    print("Updated Image: \(String(describing: self.agreeImageView.image))")
   }
   
   public func updateState(_ state: TermButtonState) {

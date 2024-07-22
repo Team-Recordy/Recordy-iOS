@@ -138,17 +138,13 @@ final class TermsView: UIView {
   }
   
   @objc private func agreeToAllButtonTapped(_ sender: AgreeToAllButton) {
-    print("약관 동의 버튼 터치됨")
     sender.toggleState()
-    print("약관 동의함")
     updateAllTermButtonsState(sender.currentState == .agree)
     updateNextButtonState()
   }
   
   @objc private func termButtonTapped(_ sender: TermButton) {
-    print("약관 동의 버튼 터치됨")
     sender.toggleState()
-    print("약관 동의함")
     updateAgreeToAllButtonState()
     updateNextButtonState()
   }

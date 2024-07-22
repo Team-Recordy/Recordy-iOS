@@ -27,7 +27,7 @@ public struct User {
     self.id = id
     self.nickname = nickname
     self.followerCount = followerCount
-    self.followingCount = followerCount
+    self.followingCount = followingCount
     self.isFollowing = isFollowing
     self.profileImage = profileImage
   }

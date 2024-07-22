@@ -5,6 +5,31 @@ import SnapKit
 
 import Common
 
+enum SettingType: String {
+  case community = "커뮤니티 가이드라인"
+  case service = "서비스 이용약관"
+  case privacy = "개인정보 취급방침"
+  case inquiry = "문의"
+
+  var url: URL {
+    switch self {
+    case .community:
+      URL(string: "https://bohyunnkim.notion.site/98d0fa7eac84431ab6f6dd63be0fb8ff?pvs=4")!
+    case .service:
+      URL(string: "https://bohyunnkim.notion.site/e5c0a49d73474331a21b1594736ee0df?pvs=4")!
+    case .privacy:
+      URL(string: "https://bohyunnkim.notion.site/c2bdf3572df1495c92aedd0437158cf0?pvs=4")!
+    case .inquiry:
+      URL(string: "https://bohyunnkim.notion.site/46bdd724bf734cf79d34142a03ad52bc?pvs=4")!
+    }
+  }
+}
+
+enum SettingSection {
+  case help
+  case etc
+}
+
 public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource {
   
   var settingTableView = UITableView()
@@ -12,15 +37,18 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
   var headerTitle: String
   var footerView: UIView?
   var cellArrowImages: [UIImage] = []
+  let type: SettingSection
   weak var signOutDelegate: SignOutDelegate?
   weak var withDrawDelegate: WithDrawDelegate?
 
   init(
+    type: SettingSection,
     list: [String],
     headerTitle: String,
     footerView: UIView? = nil,
     cellArrowImages: [UIImage] = []
   ) {
+    self.type = type
     self.list = list
     self.headerTitle = headerTitle
     self.footerView = footerView
@@ -128,10 +156,16 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
     _ tableView: UITableView,
     didSelectRowAt indexPath: IndexPath
   ) {
-    if list[indexPath.row] == "로그아웃" {
-      signOutDelegate?.signOut()
-    } else if list[indexPath.row] == "탈퇴하기" {
-      withDrawDelegate?.withDraw()
+    if type == .help {
+      if let url = SettingType(rawValue: list[indexPath.row])?.url {
+        UIApplication.shared.open(url)
+      }
+    } else {
+      if list[indexPath.row] == "로그아웃" {
+        signOutDelegate?.signOut()
+      } else if list[indexPath.row] == "탈퇴하기" {
+        withDrawDelegate?.withDraw()
+      }
     }
   }
 }

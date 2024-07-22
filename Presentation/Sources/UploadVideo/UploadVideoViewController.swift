@@ -19,7 +19,7 @@ import Then
 
 @available(iOS 16.0, *)
 public class UploadVideoViewController: UIViewController {
-  
+
   private let popUpView = RecordyPopUpView(type: .permission)
   private let gradientView = RecordyGradientView()
   private let warningLabel = UILabel()
@@ -41,10 +41,10 @@ public class UploadVideoViewController: UIViewController {
   private let contentsLabel = RecordySubtitleLabel(subtitle: "내용")
   private let contentsTextView = RecordyTextView()
   let uploadButton = UIButton()
-  
+
   private let viewModel = UploadVideoViewModel()
   private let disposeBag = DisposeBag()
-  
+
   public override func viewDidLoad() {
     super.viewDidLoad()
     setStyle()
@@ -53,7 +53,7 @@ public class UploadVideoViewController: UIViewController {
     bind()
     self.hideKeyboard()
   }
-  
+
   private func setStyle() {
     self.title = "내용 작성"
     self.view.backgroundColor = CommonAsset.recordyBG.color
@@ -115,7 +115,7 @@ public class UploadVideoViewController: UIViewController {
       $0.addTarget(self, action: #selector(uploadButtonTapped), for: .touchUpInside)
     }
   }
-  
+
   private func setUI() {
     self.view.addSubview(popUpView)
     self.view.addSubview(gradientView)
@@ -140,7 +140,7 @@ public class UploadVideoViewController: UIViewController {
       uploadButton
     )
   }
-  
+
   private func setAutolayout() {
     self.popUpView.snp.makeConstraints {
       $0.top.equalTo(180.adaptiveHeight)
@@ -229,39 +229,50 @@ public class UploadVideoViewController: UIViewController {
       $0.centerX.equalToSuperview()
     }
   }
-  
+
   func bind() {
     viewModel.output.thumbnailImage
       .bind(to: self.videoThumbnailImageView.rx.image)
       .disposed(by: disposeBag)
-    
+
     viewModel.output.locationTextCount
       .bind(to: locationTextCountLabel.rx.text)
       .disposed(by: disposeBag)
-    
+
     viewModel.output.contentsTextCount
       .bind(to: contentsTextView.textCountLabel.rx.text)
       .disposed(by: disposeBag)
-    
+
     locationTextField.rx.text.orEmpty
       .filter { $0.count <= 20 }
       .bind(to: viewModel.input.location)
       .disposed(by: disposeBag)
-    
+
+    locationTextField.rx.controlEvent([.editingDidBegin])
+      .map { RecordyTextFieldState.selected }
+      .bind(to: locationTextField.rx.state)
+      .disposed(by: disposeBag)
+
+    locationTextField.rx.controlEvent([.editingDidEnd])
+      .map { RecordyTextFieldState.unselected }
+      .bind(to: locationTextField.rx.state)
+      .disposed(by: disposeBag)
+
     contentsTextView.textView.rx.text.orEmpty
       .filter { $0.count <= 300 }
       .bind(to: viewModel.input.contents)
       .disposed(by: disposeBag)
-    
+
     locationTextField.rx.text.orEmpty
       .subscribe(onNext: { [weak self] text in
         guard let self = self else { return }
         if text.count > 20 {
           self.locationTextField.text = String(text.prefix(20))
+          self.locationTextField.textState = .error
         }
       })
       .disposed(by: disposeBag)
-    
+
     contentsTextView.textView.rx.text.orEmpty
       .subscribe(onNext: { [weak self] text in
         if text.count > 300 {
@@ -269,17 +280,17 @@ public class UploadVideoViewController: UIViewController {
         }
       })
       .disposed(by: disposeBag)
-    
+
     viewModel.output.uploadEnabled
       .bind(to: self.rx.uploadButtonEnabled)
       .disposed(by: disposeBag)
-    
+
     viewModel.output.thumbnailImage
       .map { $0 != nil }
       .bind(to: self.rx.uploadVideoSelected)
       .disposed(by: disposeBag)
   }
-  
+
   @objc func videoThumbnailSelectButtonTapped() {
     viewModel.getPhotoPermission { [weak self] access in
       guard let self = self else { return }
@@ -298,7 +309,7 @@ public class UploadVideoViewController: UIViewController {
       }
     }
   }
-  
+
   @objc func selectedKeywordButtonTapped() {
     let filteringViewController = RecordyFilteringViewController()
     filteringViewController.delegate = self
@@ -312,7 +323,7 @@ public class UploadVideoViewController: UIViewController {
     }
     self.present(filteringViewController, animated: true)
   }
-  
+
   @objc func uploadButtonTapped() {
     viewModel.uploadButtonTapped()
     self.dismiss(animated: true)
@@ -351,12 +362,20 @@ extension Reactive where Base: UploadVideoViewController {
       viewController.uploadButton.setTitleColor(value ? CommonAsset.recordyGrey09.color : CommonAsset.recordyGrey04.color, for: .normal)
     }
   }
-  
+
   var uploadVideoSelected: Binder<Bool> {
     return Binder(self.base) { viewController, value in
       viewController.videoThumbnailSelectButton.setTitle(value ? "" : "영상 선택", for: .normal)
       viewController.videoThumbnailAlertLabel.isHidden = !value
       viewController.videoThumbnailView.backgroundColor = value ? .clear : CommonAsset.recordyGrey08.color
+    }
+  }
+}
+
+extension Reactive where Base: RecordyTextField {
+  var state: Binder<RecordyTextFieldState> {
+    return Binder(self.base) { textField, state in
+      textField.textState = state
     }
   }
 }

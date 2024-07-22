@@ -84,7 +84,6 @@ final class UploadVideoViewModel {
   }
 
   func getPhotoPermission(completionHandler: @escaping (Bool) -> Void) {
-    print("@getPhoto - \(#function)")
     guard PHPhotoLibrary.authorizationStatus() != .authorized else {
       completionHandler(true)
       return
@@ -101,7 +100,6 @@ final class UploadVideoViewModel {
 
   func uploadButtonTapped() {
     guard let asset = input.selectedAsset.value else { return }
-    print("Call - \(#function)")
 
     let thumbnailData = PhotoKitManager.getAssetThumbnailData(asset: asset)
     let dispatchGroup = DispatchGroup()
@@ -147,7 +145,6 @@ final class UploadVideoViewModel {
 
           dispatchGroup.notify(queue: .global()) {
             guard uploadError == nil, videoUrl != nil, thumbnailUrl != nil else {
-              print("@Log - \(uploadError!.localizedDescription)")
               NotificationCenter.default.post(
                 name: .updateDidComplete,
                 object: nil,
@@ -169,7 +166,6 @@ final class UploadVideoViewModel {
     videoUrl: String,
     thumbnailUrl: String
   ) {
-    print("Call - \(#function)")
     var encodedString = ""
     let titles = input.selectedKeywords.value.map { $0.title }
     let concatenatedString = titles.joined(separator: ",")

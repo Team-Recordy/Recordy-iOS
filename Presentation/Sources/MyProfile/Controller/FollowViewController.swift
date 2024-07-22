@@ -15,9 +15,7 @@ public class FollowViewController: UIViewController, UITableViewDataSource, UITa
   let followType: FollowType
   private let viewModel: FollowViewModel
   private let tableView = UITableView()
-  private let emptyView = UIView()
-  let emptyLabel = UIImageView()
-  let emptyImage = UIImageView()
+  private let emptyView = FollowerEmptyView()
   let settingButton = UIButton()
 
   init(followType: FollowType) {
@@ -32,49 +30,27 @@ public class FollowViewController: UIViewController, UITableViewDataSource, UITa
   
   public override func viewDidLoad() {
     super.viewDidLoad()
-    setUI()
     setStyle()
+    setUI()
     setAutoLayout()
     setTableView()
     bindViewModel()
-    
     viewModel.fetchUsers()
   }
   
   private func setStyle() {
     view.backgroundColor = .black
-    emptyView.backgroundColor = .black
-    
-    emptyImage.image = CommonAsset.noFollowers.image
-    emptyLabel.image = CommonAsset.text.image
   }
   
   private func setUI() {
-    emptyView.addSubview(emptyImage)
-    emptyView.addSubview(emptyLabel)
     view.addSubview(emptyView)
     view.addSubview(tableView)
   }
   
   private func setAutoLayout() {
     emptyView.snp.makeConstraints {
-      $0.center.equalToSuperview()
-      $0.width.equalTo(200.adaptiveWidth)
-      $0.height.equalTo(200.adaptiveHeight)
+      $0.edges.equalTo(view.safeAreaLayoutGuide)
     }
-    
-    emptyImage.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(20.adaptiveHeight)
-      $0.centerX.equalToSuperview()
-      $0.width.equalTo(100.adaptiveWidth)
-      $0.height.equalTo(100.adaptiveHeight)
-    }
-    
-    emptyLabel.snp.makeConstraints {
-      $0.top.equalTo(emptyImage.snp.bottom).offset(18)
-      $0.centerX.equalToSuperview()
-    }
-    
     tableView.snp.makeConstraints {
       $0.edges.equalTo(view.safeAreaLayoutGuide)
     }
@@ -85,18 +61,14 @@ public class FollowViewController: UIViewController, UITableViewDataSource, UITa
     tableView.delegate = self
     tableView.backgroundColor = .black
     tableView.register(FollowerCell.self, forCellReuseIdentifier: "FollowerCell")
+    tableView.separatorStyle = .none
   }
   
   public func bindViewModel() {
     viewModel.followers.bind { [weak self] _ in
       guard let self = self else { return }
-      print("@Follower - \(self.viewModel.followers.value)")
       self.tableView.reloadData()
-    }
-    
-    viewModel.isEmpty.bind { [weak self] isEmpty in
-      self?.emptyView.isHidden = !isEmpty
-      self?.tableView.isHidden = isEmpty
+      self.tableView.isHidden = viewModel.followers.value.isEmpty
     }
   }
   
@@ -105,8 +77,11 @@ public class FollowViewController: UIViewController, UITableViewDataSource, UITa
   }
   
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "FollowerCell", for: indexPath) as! FollowerCell
-    var follower = viewModel.followers.value[indexPath.row]
+    let cell = tableView.dequeueReusableCell(
+      withIdentifier: "FollowerCell",
+      for: indexPath
+    ) as! FollowerCell
+    let follower = viewModel.followers.value[indexPath.row]
     cell.configure(with: follower)
     cell.followButtonEvent = { [weak self] in
       guard let self = self else { return }
@@ -160,6 +135,7 @@ public class FollowerCell: UITableViewCell {
   }
   
   private func setStyle() {
+    profileImageView.cornerRadius(10)
     usernameLabel.font = RecordyFont.body2Bold.font
     usernameLabel.textColor = CommonAsset.recordyGrey01.color
     contentView.backgroundColor = .black
@@ -193,13 +169,17 @@ public class FollowerCell: UITableViewCell {
   
   public func updateFollowButton(isFollowed: Bool) {
     followButton.mediumState = isFollowed ? .active : .inactive
-    followButton.setTitle(isFollowed ? "팔로잉" : "팔로우", for: .normal)
+    followButton.setTitle(isFollowed ? "팔로우" : "팔로잉", for: .normal)
   }
   
   func configure(with follower: Follower) {
     let url = URL(string: follower.profileImage)
     profileImageView.kf.setImage(with: url)
     usernameLabel.text = follower.username
-    updateFollowButton(isFollowed: follower.isFollowing)
+    if follower.username == "유영" {
+      followButton.isHidden = true
+    } else {
+      updateFollowButton(isFollowed: follower.isFollowing)
+    }
   }
 }

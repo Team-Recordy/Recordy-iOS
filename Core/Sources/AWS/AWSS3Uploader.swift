@@ -16,12 +16,18 @@ public class AWSS3Uploader {
     toPresignedURL remoteURL: URL,
     completion: @escaping (Result<String?, Error>) -> Void
   ) {
+    let configuration = URLSessionConfiguration.default
+    configuration.timeoutIntervalForRequest = 10
+    configuration.timeoutIntervalForResource = 10
+
+    let session = URLSession(configuration: configuration)
+
     var request = URLRequest(url: remoteURL)
     request.cachePolicy = .reloadIgnoringLocalCacheData
     request.httpMethod = "PUT"
     request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
 
-    let uploadTask = URLSession.shared.uploadTask(with: request, from: data, completionHandler: { (data, response, error) in
+    let uploadTask = session.uploadTask(with: request, from: data, completionHandler: { (data, response, error) in
         if let error = error {
             completion(.failure(error))
             return
