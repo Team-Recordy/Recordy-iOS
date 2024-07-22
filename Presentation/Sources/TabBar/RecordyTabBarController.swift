@@ -26,11 +26,12 @@ public final class RecordyTabBarController: UITabBarController, UITabBarControll
   private func setStyle() {
     let appearance = UITabBarAppearance()
     appearance.backgroundColor = CommonAsset.recordyBG.color
+    appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.clear]
+    appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.clear]
     tabBar.backgroundColor = .clear
     tabBar.tintColor = .clear
     tabBar.standardAppearance = appearance
     tabBar.scrollEdgeAppearance = appearance
-    tabBar.standardAppearance = appearance
   }
 
   private func setTabBarItem() {
