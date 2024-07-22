@@ -15,9 +15,67 @@
 ## 👤 팀원별 역할 분담
 |<img src="https://github.com/user-attachments/assets/8fb10f43-ebbe-411a-960f-c03115404327"/>|<img src="https://github.com/user-attachments/assets/cbf8f778-66fa-469a-bdb5-244d5019b1fb" />|<img src="https://github.com/user-attachments/assets/94afd3dd-62ef-49db-b201-a2a640a9997a">|
 |:---------:|:---------:|:---------:|
-|[한지석](https://github.com/Sangwook123)|[문형근](https://github.com/cacaocoffee)|[송여경](https://github.com/lsakee)|
+|[한지석](https://github.com/sozohoy)|[문형근](https://github.com/Chandrarla)|[송여경](https://github.com/0gonge)|
 | `영상, 기록, 로그인` | `메인페이지, 회원가입` | `마이페이지, 버블그래프` | </br>
 
+## 🎥 시연 영상
+<table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/01267c2a-cfa8-4db5-a8d9-2140d6c8a555" width="300" /></td>
+    <td><img src="https://github.com/user-attachments/assets/8157b620-7801-4974-95f7-bb52068e6977" width="300" /></td>
+    <td><img src="https://github.com/user-attachments/assets/88fd4b83-821b-4066-b85f-d34974abaeeb" width="300" /></td>
+    <td><img src="https://github.com/user-attachments/assets/8ff0d3ad-39ae-4f0e-890d-7b964b560613" width="300" /></td>
+  </tr>
+  <tr>
+    <td align="center"><b>스플래시</b></td>
+    <td align="center"><b>카카오 로그인</b></td>
+    <td align="center"><b>애플 로그인</b></td>
+    <td align="center"><b>탈퇴 및 로그아웃</b></td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/9272a548-3213-4aba-a03d-21ac358d6e12" width="300" /></td>
+    <td><img src="https://github.com/user-attachments/assets/475dfb15-1d18-4e43-a753-e36882b8a2bb" width="300" /></td>
+    <td><img src="https://github.com/user-attachments/assets/dceeaa23-84c1-4e09-b0fc-45091ff05888" width="300" /></td>
+    <td><img src="https://github.com/user-attachments/assets/a5e29f62-1d4f-4449-a5f1-93a97d0307fe" width="300" /></td>
+  </tr>
+  <tr>
+    <td salign="center"><b>영상 기록</b></td>
+    <td align="center"><b>내 기록></b></td>
+    <td align="center"><b>인기 영상</b></td>
+    <td align="center"><b>영상 디테일</b></td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/a0a17166-0fec-4ec1-b6cf-a7c9454ef409" width="300" /></td>
+    <td><img src="https://github.com/user-attachments/assets/8f1ecaf0-db86-48aa-bede-5a4b393ae5d2" width="300" /></td>
+    <td><img src="https://github.com/user-attachments/assets/a562816c-6174-49b9-926e-847f7a776690" width="300" /></td>
+    <td><img src="https://github.com/user-attachments/assets/92f25f3a-86d4-4689-9db1-018cec92a2a2" width="300" /></td>
+  </tr>
+  <tr>
+    <td align="center"><b>프로필(내 취향)</b></td>
+    <td align="center"><b>프로필(내 기록)</b></td>
+    <td align="center"><b>프로필(북마크)</b></td>
+    <td align="center"><b>프로필 empty</b></td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/f077a563-e58f-48b7-a21f-bba092647be6" width="300" /></td>
+    <td><img src="https://github.com/user-attachments/assets/e2450c92-a5f8-4ccf-aec1-845fd0a4a712" width="300" /></td>
+    <td><img src="https://github.com/user-attachments/assets/850e6bd3-75f1-4070-a992-c979cc0d726f" width="300" /></td>
+    <td><img src="https://github.com/user-attachments/assets/46d36c69-a208-40b7-ab71-dbf588499a6e" width="300" /></td>
+  </tr>
+  <tr>
+    <td align="center"><b>칩 키워드</b></td>
+    <td align="center"><b>타 유저 팔로잉</b></td>
+    <td align="center"><b>팔로잉 팔로워</b></td>
+    <td align="center"><b>환경설정-이용약관</b></td>
+  </tr>
+</table>
+</br>
 
 ## Library
   [![Tuist badge](https://img.shields.io/badge/Powered%20by-Tuist-blue)](https://tuist.io)
