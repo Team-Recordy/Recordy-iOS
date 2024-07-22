@@ -144,9 +144,7 @@ public class VideoFeedViewController: UIViewController {
   }
 
   @objc private func nicknameButtonTapped(_ sender: UIButton) {
-    print(type != .userProfile && type != .myProfile)
     guard type != .userProfile && type != .myProfile else { return }
-    print(#function)
     let index = sender.tag
     let feed = viewModel.feedList[index]
     let userVC = OtherUserProfileViewController(id: feed.userId)

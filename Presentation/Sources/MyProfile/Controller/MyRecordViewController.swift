@@ -151,10 +151,6 @@ public class MyRecordViewController: UIViewController {
     countLabel.text = "• \(records.count)개의 기록"
     collectionView.reloadData()
   }
-  
-  @objc private func didTapRecordButton() {
-    print("기록하러 가기 버튼 눌림.")
-  }
 }
 
 extension MyRecordViewController: UICollectionViewDataSource {

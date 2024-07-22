@@ -54,7 +54,6 @@ class VideoFeedViewModel {
   }
 
   func recordListCase(toggle: Bool? = nil) {
-    print(#function)
     switch type {
     case .all:
       getRecordList(toggle: toggle ?? false)
@@ -140,7 +139,6 @@ class VideoFeedViewModel {
           let cursorId = cursorId,
           let currentId = currentId
     else { return }
-    print("@fix - \(#function)")
     isFetching = true
     var selectedKeyword: String?
     if keyword != .all {

@@ -246,7 +246,6 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
   }
 
   @objc private func showOtherFollowers() {
-    print("팔로워 목록 출력")
   }
 
   public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
