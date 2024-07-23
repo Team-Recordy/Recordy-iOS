@@ -14,9 +14,11 @@ import Then
 public final class MoreButton: UIButton {
   
   let moreText = UILabel()
+  var termURL: String
   
-  public override init(frame: CGRect) {
-    super.init(frame: frame)
+  public init(url: String) {
+    self.termURL = ""
+    super.init(frame: .zero)
     setStyle()
     setUI()
     setAutoLayout()
@@ -27,6 +29,9 @@ public final class MoreButton: UIButton {
   }
   
   func setStyle() {
+    
+    self.backgroundColor = .clear
+    self.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
     
     moreText.do {
       $0.text = "더보기"
@@ -46,5 +51,11 @@ public final class MoreButton: UIButton {
       $0.centerX.centerY.equalToSuperview()
     }
   }
+  
+  @objc func moreButtonTapped() {
+    print("moreButtonTapped")
+    if let url = URL(string: termURL) {
+      UIApplication.shared.open(url, options: [:], completionHandler: nil)
+    }
+  }
 }
-

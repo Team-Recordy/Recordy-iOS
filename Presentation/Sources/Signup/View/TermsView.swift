@@ -23,6 +23,9 @@ final class TermsView: UIView {
   let termButton1 = TermButton()
   let termButton2 = TermButton()
   let termButton3 = TermButton()
+  let moreButton1 = MoreButton(url: "www.naver.com")
+  let moreButton2 = MoreButton(url: "www.naver.com")
+  let moreButton3 = MoreButton(url: "www.naver.com")
   let nextButton = RecordyButton()
   
   public override init(frame: CGRect) {
@@ -84,6 +87,9 @@ final class TermsView: UIView {
       termButton1,
       termButton2,
       termButton3,
+      moreButton1,
+      moreButton2,
+      moreButton3,
       nextButton
     )
   }
@@ -114,20 +120,44 @@ final class TermsView: UIView {
     
     termButton1.snp.makeConstraints {
       $0.top.equalTo(agreeToAllButton.snp.bottom).offset(8)
-      $0.horizontalEdges.equalToSuperview().inset(20)
+      $0.leading.equalToSuperview().offset(20)
+      $0.trailing.equalTo(moreButton1.snp.leading).offset(-10)
       $0.height.equalTo(40)
     }
     
     termButton2.snp.makeConstraints {
       $0.top.equalTo(termButton1.snp.bottom)
-      $0.horizontalEdges.equalToSuperview().inset(20)
+      $0.leading.equalToSuperview().offset(20)
+      $0.trailing.equalTo(moreButton2.snp.leading).offset(-10)
       $0.height.equalTo(40)
     }
     
     termButton3.snp.makeConstraints {
       $0.top.equalTo(termButton2.snp.bottom)
-      $0.horizontalEdges.equalToSuperview().inset(20)
+      $0.leading.equalToSuperview().offset(20)
+      $0.trailing.equalTo(moreButton3.snp.leading).offset(-10)
       $0.height.equalTo(40)
+    }
+    
+    moreButton1.snp.makeConstraints {
+      $0.top.equalTo(agreeToAllButton.snp.bottom).offset(17)
+      $0.trailing.equalToSuperview().offset(-40)
+      $0.width.equalTo(32.adaptiveWidth)
+      $0.height.equalTo(18.adaptiveHeight)
+    }
+    
+    moreButton2.snp.makeConstraints {
+      $0.top.equalTo(moreButton1.snp.bottom).offset(22)
+      $0.trailing.equalToSuperview().offset(-40)
+      $0.width.equalTo(32.adaptiveWidth)
+      $0.height.equalTo(18.adaptiveHeight)
+    }
+    
+    moreButton3.snp.makeConstraints {
+      $0.top.equalTo(moreButton2.snp.bottom).offset(22)
+      $0.trailing.equalToSuperview().offset(-40)
+      $0.width.equalTo(32.adaptiveWidth)
+      $0.height.equalTo(18.adaptiveHeight)
     }
     
     nextButton.snp.makeConstraints {
