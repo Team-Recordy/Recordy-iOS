@@ -41,7 +41,7 @@
     <td><img src="https://github.com/user-attachments/assets/a5e29f62-1d4f-4449-a5f1-93a97d0307fe" width="300" /></td>
   </tr>
   <tr>
-    <td salign="center"><b>영상 기록</b></td>
+    <td align="center"><b>영상 기록</b></td>
     <td align="center"><b>내 기록 영상</b></td>
     <td align="center"><b>인기 영상</b></td>
     <td align="center"><b>영상 디테일</b></td>
