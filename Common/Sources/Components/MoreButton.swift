@@ -17,7 +17,7 @@ public final class MoreButton: UIButton {
   var termURL: String
   
   public init(url: String) {
-    self.termURL = ""
+    self.termURL = url
     super.init(frame: .zero)
     setStyle()
     setUI()

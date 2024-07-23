@@ -23,9 +23,9 @@ final class TermsView: UIView {
   let termButton1 = TermButton()
   let termButton2 = TermButton()
   let termButton3 = TermButton()
-  let moreButton1 = MoreButton(url: "www.naver.com")
-  let moreButton2 = MoreButton(url: "www.naver.com")
-  let moreButton3 = MoreButton(url: "www.naver.com")
+  let moreButton1 = MoreButton(url: "https://bohyunnkim.notion.site/e5c0a49d73474331a21b1594736ee0df")
+  let moreButton2 = MoreButton(url: "https://bohyunnkim.notion.site/c2bdf3572df1495c92aedd0437158cf0?pvs=74")
+  let moreButton3 = MoreButton(url: "https://bohyunnkim.notion.site/98d0fa7eac84431ab6f6dd63be0fb8ff?pvs=74")
   let nextButton = RecordyButton()
   
   public override init(frame: CGRect) {
