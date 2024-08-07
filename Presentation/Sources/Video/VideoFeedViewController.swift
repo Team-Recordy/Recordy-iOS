@@ -70,6 +70,16 @@ public class VideoFeedViewController: UIViewController {
       DispatchQueue.main.async {
         self.collectionView!.reloadData()
         self.isPlayed = false
+        if !self.viewModel.feedList.isEmpty {
+          self.collectionView!.scrollToItem(
+            at: IndexPath(
+              row: 0,
+              section: 0
+            ),
+            at: .top,
+            animated: false
+          )
+        }
       }
     }
   }
@@ -87,21 +97,6 @@ public class VideoFeedViewController: UIViewController {
     if self.type != .all {
       self.navigationController?.navigationBar.topItem?.title = ""
     }
-  }
-
-  func toggleButtonTapped(type: VideoFeedType) {
-    self.viewModel.type = type == .all ? .following : .all
-    self.viewModel.recordListCase(toggle: true)
-    self.isPlayed = false
-    collectionView!.reloadData()
-    collectionView!.scrollToItem(
-      at: IndexPath(
-        row: 0,
-        section: 0
-      ),
-      at: .top,
-      animated: false
-    )
   }
 
   private func setUI() {
@@ -149,6 +144,11 @@ public class VideoFeedViewController: UIViewController {
     let feed = viewModel.feedList[index]
     let userVC = OtherUserProfileViewController(id: feed.userId)
     self.navigationController?.pushViewController(userVC, animated: true)
+  }
+
+  func toggleButtonTapped(type: VideoFeedType) {
+    self.viewModel.type = type == .all ? .following : .all
+    self.viewModel.recordListCase(toggle: true)
   }
 }
 
