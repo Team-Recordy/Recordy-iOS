@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import AVKit
 
 import Core
 import Common
@@ -19,7 +18,6 @@ public class VideoFeedViewController: UIViewController {
 
   private var collectionView: UICollectionView? = nil
   private let recordyToggle = RecordyToggle()
-  private var isFetched = false
   private var isPlayed = false
 
   var type: VideoFeedType
@@ -62,26 +60,6 @@ public class VideoFeedViewController: UIViewController {
 
   public override func viewDidDisappear(_ animated: Bool) {
     removeAVPlayers()
-  }
-
-  private func bind() {
-    viewModel.onFeedListUpdate = { [weak self] in
-      guard let self = self else { return }
-      DispatchQueue.main.async {
-        self.collectionView!.reloadData()
-        self.isPlayed = false
-        if !self.viewModel.feedList.isEmpty {
-          self.collectionView!.scrollToItem(
-            at: IndexPath(
-              row: 0,
-              section: 0
-            ),
-            at: .top,
-            animated: false
-          )
-        }
-      }
-    }
   }
 
   private func setStyle() {
@@ -136,6 +114,26 @@ public class VideoFeedViewController: UIViewController {
     )
     self.collectionView!.delegate = self
     self.collectionView!.dataSource = self
+  }
+
+  private func bind() {
+    viewModel.onFeedListUpdate = { [weak self] in
+      guard let self = self else { return }
+      DispatchQueue.main.async {
+        self.collectionView!.reloadData()
+        self.isPlayed = false
+        if !self.viewModel.feedList.isEmpty {
+          self.collectionView!.scrollToItem(
+            at: IndexPath(
+              row: 0,
+              section: 0
+            ),
+            at: .top,
+            animated: false
+          )
+        }
+      }
+    }
   }
 
   @objc private func nicknameButtonTapped(_ sender: UIButton) {
@@ -226,10 +224,7 @@ extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDat
   ) -> CGSize {
     return collectionView.frame.size
   }
-}
 
-
-extension VideoFeedViewController {
   private func removeAVPlayers() {
     let visibleCells = collectionView?.visibleCells.compactMap { $0 as? FeedCell } ?? []
     for cell in visibleCells {
