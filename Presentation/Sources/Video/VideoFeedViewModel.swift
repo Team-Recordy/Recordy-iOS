@@ -53,7 +53,7 @@ class VideoFeedViewModel {
   func recordListCase(toggle: Bool? = nil) {
     switch type {
     case .all:
-      getRecordList(toggle: toggle ?? false)
+      getAllRecordList(toggle: toggle ?? false)
     case .following:
       getFollowRecordList()
     case .famous:
@@ -68,7 +68,48 @@ class VideoFeedViewModel {
     }
   }
 
-  func getRecordList(toggle: Bool) {
+  private func getRecordList<T: Codable>(endPoint: APITarget.Records, response: T) {
+    guard !isFetching else { return }
+    isFetching = true
+    apiProvider.requestResponsable(
+      endPoint,
+      T.self
+    ) { [weak self] result in
+      guard let self = self else { return }
+      self.isFetching = false
+      switch result {
+      case .success(let response):
+        print(response)
+      case .failure(let failure):
+        self.feedList = []
+        self.onFeedListUpdate?()
+      }
+    }
+  }
+
+  private func processResponse<T: Codable> (
+    response: T,
+    toggle: Bool
+  ) {
+    switch type {
+    case .all:
+      <#code#>
+    case .following:
+      <#code#>
+    case .famous:
+      <#code#>
+    case .recent:
+      <#code#>
+    case .userProfile:
+      <#code#>
+    case .myProfile:
+      <#code#>
+    case .bookmarked:
+      <#code#>
+    }
+  }
+
+  private func getAllRecordList(toggle: Bool) {
     guard !isFetching else { return }
     hasNext = false
     isFetching = true
@@ -94,7 +135,7 @@ class VideoFeedViewModel {
     }
   }
 
-  func getFollowRecordList() {
+  private func getFollowRecordList() {
     guard !isFetching,
           let cursorId = cursorId
     else { return }
@@ -121,7 +162,7 @@ class VideoFeedViewModel {
     }
   }
 
-  func getFamousRecordList() {
+  private func getFamousRecordList() {
     guard !isFetching else { return }
     isFetching = true
     var selectedKeyword: String?
@@ -159,7 +200,7 @@ class VideoFeedViewModel {
     }
   }
 
-  func getRecentRecordList() {
+  private func getRecentRecordList() {
     guard !isFetching,
           let cursorId = cursorId,
           let currentId = currentId
@@ -201,7 +242,7 @@ class VideoFeedViewModel {
     }
   }
 
-  func getUserProfileRecordList() {
+  private func getUserProfileRecordList() {
     guard !isFetching,
           let currentId = currentId,
           let userId = userId
@@ -230,7 +271,7 @@ class VideoFeedViewModel {
     }
   }
 
-  func getBookmarkedFeedList() {
+  private func getBookmarkedFeedList() {
     guard !isFetching,
           let currentId = currentId,
           hasNext
