@@ -6,6 +6,7 @@ import Core
 final class NicknameView: UIView {
   
   var textFieldCount = "0"
+  private var isUsernameTakenFlag = false
   
   let gradientView = RecordyGradientView()
   let nicknameText = UILabel()
@@ -14,15 +15,13 @@ final class NicknameView: UIView {
   let textFieldCountLabel = UILabel()
   let errorLabel = UILabel()
   
-  private var isUsernameTakenFlag = false
-  
   public override init(frame: CGRect) {
     super.init(frame: frame)
     setStyle()
     setUI()
     setAutoLayout()
-    setupTextFieldObserver()
-    nicknameTextField.delegate = self
+    setTextFieldObserver()
+    setTextFieldStateHandler()
   }
   
   deinit {
@@ -60,8 +59,6 @@ final class NicknameView: UIView {
       $0.font = RecordyFont.caption2.font
       $0.textColor = CommonAsset.recordyAlert.color
     }
-    
-    nicknameTextField.stateDelegate = self
   }
   
   func setUI() {
@@ -80,7 +77,7 @@ final class NicknameView: UIView {
       $0.top.horizontalEdges.equalToSuperview()
       $0.height.equalTo(400.adaptiveHeight)
     }
-
+    
     nicknameText.snp.makeConstraints {
       $0.top.equalToSuperview().offset(165)
       $0.leading.equalToSuperview().offset(20)
@@ -123,28 +120,44 @@ final class NicknameView: UIView {
     }
   }
   
-  @objc func textFieldDidChange(_ sender: Any?) {
+  @objc
+  func textFieldDidChange(_ sender: Any?) {
     let textCount = nicknameTextField.text?.count ?? 0
     textFieldCountLabel.text = "\(textCount) / 10"
     validateTextField()
   }
   
-  func setupTextFieldObserver() {
+  func setTextFieldObserver() {
     NotificationCenter.default.addObserver(self, selector: #selector(textFieldDidChange), name: UITextField.textDidChangeNotification, object: nicknameTextField)
+  }
+  
+  private func setTextFieldStateHandler() {
+    nicknameTextField.onStateChange = { [weak self] state in
+      guard let self = self else { return }
+      self.nicknameTextField.layer.borderColor = state.borderColor.cgColor
+      self.nicknameTextField.layer.borderWidth = state.borderWidth
+      
+      switch state {
+      case .unselected, .error:
+        self.nextButton.buttonState = .inactive
+      case .selected:
+        self.nextButton.buttonState = .active
+      }
+    }
   }
   
   private func validateTextField() {
     guard let text = nicknameTextField.text else {
-      state(.error)
+      nicknameTextField.onStateChange?(.error)
       return
     }
-
+    
     let pattern = "^[가-힣0-9._]{1,10}$"
     let regex = try! NSRegularExpression(pattern: pattern)
     let matches = regex.matches(in: text, range: NSRange(location: 0, length: text.utf16.count))
-
-    if matches.count == 0 {
-      state(.error)
+    
+    if matches.isEmpty {
+      nicknameTextField.onStateChange?(.error)
       errorLabel.text = "ⓘ 한글, 숫자, 밑줄 및 마침표만 사용할 수 있어요"
       errorLabel.textColor = CommonAsset.recordyAlert.color
     } else {
@@ -152,27 +165,13 @@ final class NicknameView: UIView {
         if isSuccess {
           self.errorLabel.text = "사용 가능한 닉네임이에요"
           self.errorLabel.textColor = CommonAsset.recordyGrey09.color
-          self.state(.selected)
+          self.nicknameTextField.onStateChange?(.selected)
         } else {
-          self.state(.error)
+          self.nicknameTextField.onStateChange?(.error)
           self.errorLabel.text = "ⓘ 이미 사용중인 닉네임이에요"
           self.errorLabel.textColor = CommonAsset.recordyAlert.color
         }
       }
-    }
-  }
-}
-
-extension NicknameView: RecordyTextFieldStateDelegate {
-  func state(_ currentState: Common.RecordyTextFieldState) {
-    nicknameTextField.layer.borderColor = currentState.borderColor.cgColor
-    nicknameTextField.layer.borderWidth = currentState.borderWidth
-    
-    switch currentState {
-    case .unselected, .error:
-      nextButton.buttonState = .inactive
-    case .selected:
-      nextButton.buttonState = .active
     }
   }
 }

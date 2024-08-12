@@ -6,7 +6,6 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 
-
 import UIKit
 
 import Core
@@ -21,11 +20,15 @@ public final class SignupViewController: UIViewController {
   let totalPages = 3
   var currentPage = 0
   
+  let signupView = SignupView()
+  let termsView = TermsView()
+  let nicknameView = NicknameView()
+  let completeView = CompleteView()
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
-    self.title = "회원가입"
     showTermsView()
-    SignupView().progressView.updateProgress(
+    signupView.progressView.updateProgress(
       currentPage: currentPage,
       totalPages: totalPages
     )
@@ -39,21 +42,23 @@ public final class SignupViewController: UIViewController {
       $0.edges.equalToSuperview()
     }
     rootView = newView
-    view.addSubview(SignupView().progressView)
-    SignupView().progressView.snp.remakeConstraints {
+    
+    view.addSubview(signupView.progressView)
+    signupView.progressView.snp.remakeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(12)
       $0.leading.trailing.equalToSuperview().inset(20)
       $0.height.equalTo(6)
     }
   }
   
+  @objc
   func showTermsView() {
-    let termsView = TermsView()
     termsView.nextButton.addTarget(
       self,
       action: #selector(showNicknameView),
       for: .touchUpInside
     )
+    self.title = "이용 약관"
     switchView(termsView)
   }
   
@@ -61,44 +66,41 @@ public final class SignupViewController: UIViewController {
   func showNicknameView() {
     if let termsView = rootView as? TermsView, termsView.areAllButtonsActive() {
       currentPage += 1
-      SignupView().progressView.updateProgress(
+      signupView.progressView.updateProgress(
         currentPage: currentPage,
         totalPages: totalPages
       )
-      NicknameView().nextButton.addTarget(
+      nicknameView.nextButton.addTarget(
         self,
         action: #selector(showCompleteView),
         for: .touchUpInside
       )
-      NicknameView().nicknameTextField.stateDelegate = self
-      switchView(NicknameView())
+      self.title = "닉네임 설정"
+      switchView(nicknameView)
     }
-    
   }
   
   @objc
   func showCompleteView() {
-    guard NicknameView().nextButton.buttonState == .active else { return }
+    guard nicknameView.nextButton.buttonState == .active else { return }
     currentPage += 1
-    SignupView().progressView.updateProgress(
+    signupView.progressView.updateProgress(
       currentPage: currentPage,
       totalPages: totalPages
     )
-    let completeView = CompleteView()
     completeView.completeButton.buttonState = .active
     completeView.completeButton.addTarget(
       self,
-      action: #selector(
-        completeSignup
-      ),
+      action: #selector(completeSignup),
       for: .touchUpInside
     )
+    self.title = "회원가입 완료"
     switchView(completeView)
   }
   
   @objc
   func completeSignup() {
-    guard let text = NicknameView().nicknameTextField.text else { return }
+    guard let text = nicknameView.nicknameTextField.text else { return }
     let apiProvider = APIProvider<APITarget.Users>()
     let userId = UserDefaults.standard.integer(forKey: "userId")
     let request = DTO.SignUpRequest(
@@ -112,16 +114,8 @@ public final class SignupViewController: UIViewController {
         tabBarController.modalPresentationStyle = .fullScreen
         self.present(tabBarController, animated: false)
       case .failure:
-        print("실패 팝업")
+        print("failed to login")
       }
     }
-  }
-}
-
-@available(iOS 16.0, *)
-extension SignupViewController: RecordyTextFieldStateDelegate {
-  public func state(_ currentState: Common.RecordyTextFieldState) {
-    self.textFieldState = currentState
-    nicknameView.state(currentState)
   }
 }
