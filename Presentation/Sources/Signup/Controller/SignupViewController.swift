@@ -12,47 +12,38 @@ import UIKit
 import Core
 import Common
 
+import SnapKit
+
 @available(iOS 16.0, *)
 public final class SignupViewController: UIViewController {
   
-  let gradientView = RecordyGradientView()
   var rootView: UIView = UIView()
-  let progressView = RecordyProgressView()
-  let nicknameView = NicknameView()
   let totalPages = 3
   var currentPage = 0
-  var textFieldState: RecordyTextFieldState = .unselected
-  var nickname = ""
-//  var titles = ["회원"]
-
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
-    setUI()
-    setAutoLayout()
+    self.title = "회원가입"
     showTermsView()
-    progressView.updateProgress(
+    SignupView().progressView.updateProgress(
       currentPage: currentPage,
       totalPages: totalPages
     )
     self.hideKeyboard()
   }
   
-  func setUI() {
-    self.title = "회원가입"
-    view.addSubview(progressView)
-    view.addSubview(gradientView)
-  }
-  
-  func setAutoLayout() {
-    progressView.snp.makeConstraints {
+  func switchView(_ newView: UIView) {
+    rootView.removeFromSuperview()
+    view.addSubview(newView)
+    newView.snp.makeConstraints {
+      $0.edges.equalToSuperview()
+    }
+    rootView = newView
+    view.addSubview(SignupView().progressView)
+    SignupView().progressView.snp.remakeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(12)
       $0.leading.trailing.equalToSuperview().inset(20)
-      $0.height.equalTo(6.adaptiveHeight)
-    }
-
-    gradientView.snp.makeConstraints {
-      $0.top.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(400.adaptiveHeight)
+      $0.height.equalTo(6)
     }
   }
   
@@ -60,39 +51,36 @@ public final class SignupViewController: UIViewController {
     let termsView = TermsView()
     termsView.nextButton.addTarget(
       self,
-      action: #selector(checkAndShowNicknameView),
+      action: #selector(showNicknameView),
       for: .touchUpInside
     )
     switchView(termsView)
   }
   
   @objc
-  func checkAndShowNicknameView() {
-    guard let termsView = rootView as? TermsView, termsView.areAllButtonsActive() else { return }
-    showNicknameView()
-  }
-  
-  @objc
   func showNicknameView() {
-    currentPage += 1
-    progressView.updateProgress(
-      currentPage: currentPage,
-      totalPages: totalPages
-    )
-    nicknameView.nextButton.addTarget(
-      self,
-      action: #selector(showCompleteView),
-      for: .touchUpInside
-    )
-    nicknameView.nicknameTextField.stateDelegate = self
-    switchView(nicknameView)
+    if let termsView = rootView as? TermsView, termsView.areAllButtonsActive() {
+      currentPage += 1
+      SignupView().progressView.updateProgress(
+        currentPage: currentPage,
+        totalPages: totalPages
+      )
+      NicknameView().nextButton.addTarget(
+        self,
+        action: #selector(showCompleteView),
+        for: .touchUpInside
+      )
+      NicknameView().nicknameTextField.stateDelegate = self
+      switchView(NicknameView())
+    }
+    
   }
   
   @objc
   func showCompleteView() {
-    guard nicknameView.nextButton.buttonState == .active else { return }
+    guard NicknameView().nextButton.buttonState == .active else { return }
     currentPage += 1
-    progressView.updateProgress(
+    SignupView().progressView.updateProgress(
       currentPage: currentPage,
       totalPages: totalPages
     )
@@ -110,7 +98,7 @@ public final class SignupViewController: UIViewController {
   
   @objc
   func completeSignup() {
-    guard let text = nicknameView.nicknameTextField.text else { return }
+    guard let text = NicknameView().nicknameTextField.text else { return }
     let apiProvider = APIProvider<APITarget.Users>()
     let userId = UserDefaults.standard.integer(forKey: "userId")
     let request = DTO.SignUpRequest(
@@ -126,21 +114,6 @@ public final class SignupViewController: UIViewController {
       case .failure:
         print("실패 팝업")
       }
-    }
-  }
-  
-  func switchView(_ newView: UIView) {
-    rootView.removeFromSuperview()
-    view.addSubview(newView)
-    newView.snp.makeConstraints {
-      $0.edges.equalToSuperview()
-    }
-    rootView = newView
-    view.addSubview(progressView)
-    progressView.snp.remakeConstraints {
-      $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(12)
-      $0.leading.trailing.equalToSuperview().inset(20)
-      $0.height.equalTo(6)
     }
   }
 }
