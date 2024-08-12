@@ -51,6 +51,7 @@ final class TermsView: UIView {
       $0.font = RecordyFont.title1.font
       $0.textColor = CommonAsset.recordyGrey01.color
       $0.numberOfLines = 0
+      $0.setLineSpacing(lineHeightMultiple: 1.3)
     }
     
     agreeToAllButton.do {

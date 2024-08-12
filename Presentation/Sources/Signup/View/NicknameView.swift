@@ -6,7 +6,6 @@ import Core
 final class NicknameView: UIView {
   
   var textFieldCount = "0"
-  private var isUsernameTakenFlag = false
   
   let gradientView = RecordyGradientView()
   let nicknameText = UILabel()
@@ -22,6 +21,8 @@ final class NicknameView: UIView {
     setAutoLayout()
     setTextFieldObserver()
     setTextFieldStateHandler()
+    
+    nicknameTextField.delegate = self
   }
   
   deinit {
@@ -41,6 +42,7 @@ final class NicknameView: UIView {
       $0.textColor = CommonAsset.recordyGrey01.color
       $0.numberOfLines = 0
       $0.textAlignment = .right
+      $0.setLineSpacing(lineHeightMultiple: 1.3)
     }
     
     nextButton.do {
