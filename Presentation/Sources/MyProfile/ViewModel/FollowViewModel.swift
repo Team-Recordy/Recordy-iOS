@@ -42,7 +42,7 @@ class FollowViewModel {
         guard let self = self else { return }
         switch result {
         case .success(let response):
-          let followerList = response.content.map {
+          var followerList = response.content.map {
             Follower(
               id: $0.userInfo.id,
               username: $0.userInfo.nickname,
@@ -50,7 +50,9 @@ class FollowViewModel {
               profileImage: $0.userInfo.profileImageUrl
             )
           }
+          followerList = self.filterSpecialAccount(in: followerList)
           self.followers.value = followerList
+          self.isEmpty.value = followerList.isEmpty
         case .failure(let failure):
           print(failure)
         }
@@ -64,7 +66,7 @@ class FollowViewModel {
       guard let self = self else { return }
       switch result {
       case .success(let response):
-        let followList = response.content.map {
+        var followList = response.content.map {
           Follower(
             id: $0.id,
             username: $0.nickname,
@@ -72,11 +74,20 @@ class FollowViewModel {
             profileImage: $0.profileImageUrl
           )
         }
-        self.followers.value = followList.reversed()
+        followList = self.filterSpecialAccount(in: followList)
+        self.followers.value = followList
+        self.isEmpty.value = followList.isEmpty
       case .failure(let failure):
         print(failure)
       }
     }
+  }
+  
+  func filterSpecialAccount(in list: [Follower]) -> [Follower] {
+    var updatedList = list.filter {$0.username != "유영"}
+    let specialAccount = Follower(id: 0, username: "유영", isFollowing: true, profileImage: "")
+    updatedList.append(specialAccount)
+    return updatedList
   }
 
   func toggleFollow(at index: Int) {
