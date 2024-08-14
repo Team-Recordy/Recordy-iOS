@@ -117,20 +117,19 @@ public class VideoFeedViewController: UIViewController {
   }
 
   private func bind() {
-    viewModel.onFeedListUpdate = { [weak self] in
+    viewModel.onFeedListUpdate = { [weak self] count in
       guard let self = self else { return }
       DispatchQueue.main.async {
-        self.collectionView!.reloadData()
-        self.isPlayed = false
-        if !self.viewModel.feedList.isEmpty {
-          self.collectionView!.scrollToItem(
-            at: IndexPath(
-              row: 0,
-              section: 0
-            ),
-            at: .top,
-            animated: false
-          )
+        if self.viewModel.isToggle {
+          //TODO: 토글 되었을 때 가능한 상황 추가적 고려 필요
+          self.isPlayed = false
+          self.collectionView!.reloadData()
+          self.viewModel.isToggle = false
+        } else {
+          let indexPaths = (self.viewModel.feedList.count - count..<self.viewModel.feedList.count).map {
+              IndexPath(item: $0, section: 0)
+          }
+          self.collectionView!.insertItems(at: indexPaths)
         }
       }
     }
@@ -147,6 +146,7 @@ public class VideoFeedViewController: UIViewController {
   func toggleButtonTapped(type: VideoFeedType) {
     self.viewModel.type = type == .all ? .following : .all
     self.viewModel.recordListCase(toggle: true)
+    self.viewModel.isToggle = true
   }
 }
 
