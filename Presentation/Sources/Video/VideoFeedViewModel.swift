@@ -32,7 +32,8 @@ class VideoFeedViewModel {
   var pageNumber = 0
   let apiProvider = APIProvider<APITarget.Records>()
   var isFetching = false
-  var onFeedListUpdate: (() -> ())?
+  var isToggle = false
+  var onFeedListUpdate: ((Int) -> ())?
   var isBookmarked: (() -> ())?
 
   init(
@@ -105,7 +106,7 @@ class VideoFeedViewModel {
         response: DTO.GetRecentRecordListResponse.self
       )
     case .userProfile:
-      guard let currentId, let userId else { return }
+      guard let userId else { return }
       getRecordList(
         endPoint: .getUserRecordList(
           DTO.GetUserRecordListRequest(
@@ -117,7 +118,6 @@ class VideoFeedViewModel {
         response: DTO.GetUserRecordListResponse.self
       )
     case .bookmarked:
-      guard let currentId, hasNext else { return }
       getRecordList(
         endPoint: .getBookmarkedRecordList(
           DTO.GetBookmarkedListRequest(
@@ -146,9 +146,9 @@ class VideoFeedViewModel {
       switch result {
       case .success(let response):
         processResponse(response: response)
-      case .failure(let failure):
+      case .failure(_):
         self.feedList = []
-        self.onFeedListUpdate?()
+        self.onFeedListUpdate?(0)
       }
     }
   }
@@ -191,12 +191,14 @@ class VideoFeedViewModel {
       cursorId = recentRecordListResponse.nextCursor
     } else if let userProfileRecordListResponse = response as? DTO.GetUserRecordListResponse {
       /// 유저 프로필 레코드 조회
+      guard let currentId else { return }
       if let index = userProfileRecordListResponse.feeds.firstIndex(where: { $0.id == currentId }) {
         let newFeeds = Array(userProfileRecordListResponse.feeds[index...])
         updateFeedList(newFeeds)
       }
     } else if let bookmarkedRecordListResponse = response as? DTO.GetBookmarkedListResponse {
       /// 유저 북마크 레코드 조회
+      guard let currentId, hasNext else { return }
       if let index = bookmarkedRecordListResponse.feeds.firstIndex(where: { $0.id == currentId }) {
         let newFeeds = Array(bookmarkedRecordListResponse.feeds[index...])
         self.hasNext = bookmarkedRecordListResponse.hasNext
@@ -206,12 +208,11 @@ class VideoFeedViewModel {
   }
 
   private func updateFeedList(_ newFeeds: [Feed]) {
-//    self.feedList += newFeeds
-//    self.onFeedListUpdate?()
     cacheVideos(feeds: newFeeds) { [weak self] feed in
       guard let self else { return }
+      print("@Cached - \(feed)")
       self.feedList += feed
-      self.onFeedListUpdate?()
+      self.onFeedListUpdate?(feed.count)
     }
   }
 
@@ -239,15 +240,11 @@ class VideoFeedViewModel {
             thumbnailLink: feed.thumbnailLink,
             isMine: feed.isMine
           )
-          print("wltjr - \(url)")
           cachedFeeds.append(cachedFeed)
           dispatchGroup.leave()
         }
       }
-
-      dispatchGroup.notify(queue: .main) { [weak self] in
-        guard let self = self else { return }
-        print("@Kozi cached - \(cachedFeeds)")
+      dispatchGroup.notify(queue: .main) {
         completion(cachedFeeds)
       }
     }
