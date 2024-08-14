@@ -156,7 +156,6 @@ class VideoFeedViewModel {
   private func processResponse<T: Codable> (response: T) {
     if let allRecordListResponse = response as? DTO.RecordList {
       /// 전체 레코드 랜덤 조회
-      print("@Process - \(#function)")
       updateFeedList(allRecordListResponse.feeds)
     } else if let followRecordListResponse = response as? DTO.GetFollowingRecordListResponse {
       /// 팔로잉 레코드 조회
@@ -210,7 +209,6 @@ class VideoFeedViewModel {
   private func updateFeedList(_ newFeeds: [Feed]) {
     cacheVideos(feeds: newFeeds) { [weak self] feed in
       guard let self else { return }
-      print("@Cached - \(feed)")
       self.feedList += feed
       self.onFeedListUpdate?(feed.count)
     }
