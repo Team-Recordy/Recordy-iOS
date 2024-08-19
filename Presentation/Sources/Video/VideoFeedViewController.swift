@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import AVKit
 
 import Core
 import Common
@@ -19,7 +18,6 @@ public class VideoFeedViewController: UIViewController {
 
   private var collectionView: UICollectionView? = nil
   private let recordyToggle = RecordyToggle()
-  private var isFetched = false
   private var isPlayed = false
 
   var type: VideoFeedType
@@ -64,16 +62,6 @@ public class VideoFeedViewController: UIViewController {
     removeAVPlayers()
   }
 
-  private func bind() {
-    viewModel.onFeedListUpdate = { [weak self] in
-      guard let self = self else { return }
-      DispatchQueue.main.async {
-        self.collectionView!.reloadData()
-        self.isPlayed = false
-      }
-    }
-  }
-
   private func setStyle() {
     self.navigationController?.navigationBar.isHidden = self.type == .all || self.type == .following
     self.view.backgroundColor = CommonAsset.recordyBG.color
@@ -87,21 +75,6 @@ public class VideoFeedViewController: UIViewController {
     if self.type != .all {
       self.navigationController?.navigationBar.topItem?.title = ""
     }
-  }
-
-  func toggleButtonTapped(type: VideoFeedType) {
-    self.viewModel.type = type == .all ? .following : .all
-    self.viewModel.recordListCase(toggle: true)
-    self.isPlayed = false
-    collectionView!.reloadData()
-    collectionView!.scrollToItem(
-      at: IndexPath(
-        row: 0,
-        section: 0
-      ),
-      at: .top,
-      animated: false
-    )
   }
 
   private func setUI() {
@@ -143,12 +116,37 @@ public class VideoFeedViewController: UIViewController {
     self.collectionView!.dataSource = self
   }
 
+  private func bind() {
+    viewModel.onFeedListUpdate = { [weak self] count in
+      guard let self = self else { return }
+      DispatchQueue.main.async {
+        if self.viewModel.isToggle {
+          //TODO: 토글 되었을 때 가능한 상황 추가적 고려 필요
+          self.isPlayed = false
+          self.collectionView!.reloadData()
+          self.viewModel.isToggle = false
+        } else {
+          let indexPaths = (self.viewModel.feedList.count - count..<self.viewModel.feedList.count).map {
+              IndexPath(item: $0, section: 0)
+          }
+          self.collectionView!.insertItems(at: indexPaths)
+        }
+      }
+    }
+  }
+
   @objc private func nicknameButtonTapped(_ sender: UIButton) {
     guard type != .userProfile && type != .myProfile else { return }
     let index = sender.tag
     let feed = viewModel.feedList[index]
     let userVC = OtherUserProfileViewController(id: feed.userId)
     self.navigationController?.pushViewController(userVC, animated: true)
+  }
+
+  func toggleButtonTapped(type: VideoFeedType) {
+    self.viewModel.type = type == .all ? .following : .all
+    self.viewModel.recordListCase(toggle: true)
+    self.viewModel.isToggle = true
   }
 }
 
@@ -226,10 +224,7 @@ extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDat
   ) -> CGSize {
     return collectionView.frame.size
   }
-}
 
-
-extension VideoFeedViewController {
   private func removeAVPlayers() {
     let visibleCells = collectionView?.visibleCells.compactMap { $0 as? FeedCell } ?? []
     for cell in visibleCells {

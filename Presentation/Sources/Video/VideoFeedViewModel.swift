@@ -10,8 +10,6 @@ import Foundation
 
 import Core
 
-import RxSwift
-
 enum VideoFeedType {
   case all
   case following
@@ -33,9 +31,9 @@ class VideoFeedViewModel {
   var hasNext = true
   var pageNumber = 0
   let apiProvider = APIProvider<APITarget.Records>()
-  let disposeBag = DisposeBag()
   var isFetching = false
-  var onFeedListUpdate: (() -> ())?
+  var isToggle = false
+  var onFeedListUpdate: ((Int) -> ())?
   var isBookmarked: (() -> ())?
 
   init(
@@ -54,225 +52,198 @@ class VideoFeedViewModel {
   }
 
   func recordListCase(toggle: Bool? = nil) {
+    guard !isFetching else { return }
     switch type {
     case .all:
-      getRecordList(toggle: toggle ?? false)
-    case .famous:
-      getFamousRecordList()
-    case .recent:
-      getRecentRecordList()
-    case .userProfile:
-      getUserProfileRecordList()
-    case .bookmarked:
-      getBookmarkedFeedList()
+      getRecordList(
+        endPoint: .getRecordList(DTO.GetRecordListRequest(size: 15)),
+        response: DTO.RecordList.self
+      )
     case .following:
-      getFollowRecordList()
+      guard let cursorId else { return }
+      getRecordList(
+        endPoint: .getFollowingRecordList(
+          DTO.GetFollowingRecordListRequest(
+            cursorId: cursorId,
+            size: 15
+          )
+        ),
+        response: DTO.GetFollowingRecordListResponse.self
+      )
+    case .famous:
+      var selectedKeyword: String?
+      if keyword != .all {
+        selectedKeyword = keyword?.title.keywordEncode()
+      } else {
+        selectedKeyword = nil
+      }
+      getRecordList(
+        endPoint: .getFamousRecordList(
+          DTO.GetFamousRecordListRequest(
+            keywords: selectedKeyword,
+            pageNumber: pageNumber,
+            pageSize: 15
+          )
+        ),
+        response: DTO.GetFamousRecordListResponse.self
+      )
+    case .recent:
+      guard let cursorId, let currentId else { return }
+      var selectedKeyword: String?
+      if keyword != .all {
+        selectedKeyword = keyword?.title.keywordEncode()
+      } else {
+        selectedKeyword = nil
+      }
+      getRecordList(
+        endPoint: .getRecentRecordList(
+          DTO.GetRecentRecordListRequest(
+            keywords: selectedKeyword,
+            cursorId: cursorId,
+            size: 15
+          )
+        ),
+        response: DTO.GetRecentRecordListResponse.self
+      )
+    case .userProfile:
+      guard let userId else { return }
+      getRecordList(
+        endPoint: .getUserRecordList(
+          DTO.GetUserRecordListRequest(
+            otherUserId: userId,
+            cursorId: 0,
+            size: 100
+          )
+        ),
+        response: DTO.GetUserRecordListResponse.self
+      )
+    case .bookmarked:
+      getRecordList(
+        endPoint: .getBookmarkedRecordList(
+          DTO.GetBookmarkedListRequest(
+            cursorId: 0,
+            size: 100
+          )
+        ),
+        response: DTO.GetBookmarkedListResponse.self
+      )
     default: return
     }
   }
 
-  func getRecordList(toggle: Bool) {
-    guard !isFetching else { return }
-    hasNext = false
-    isFetching = true
-    let request = DTO.GetRecordListRequest(size: 15)
-    apiProvider.requestResponsable(
-      .getRecordList(
-        request
-      ),
-      DTO.RecordList.self
-    ) { result in
-      self.isFetching = false
-      switch result {
-      case .success(let response):
-        if toggle {
-          self.feedList = response.feeds
-        } else {
-          self.feedList += response.feeds
-        }
-        self.onFeedListUpdate?()
-      case .failure(let error):
-        print(error)
-      }
-    }
-  }
-
-  func getFamousRecordList() {
+  private func getRecordList<T: Codable>(
+    endPoint: APITarget.Records,
+    response: T.Type
+  ) {
     guard !isFetching else { return }
     isFetching = true
-    var selectedKeyword: String?
-    if keyword != .all {
-      selectedKeyword = keyword?.title.keywordEncode()
-    } else {
-      selectedKeyword = nil
-    }
-    let request = DTO.GetFamousRecordListRequest(
-      keywords: selectedKeyword,
-      pageNumber: pageNumber,
-      pageSize: 15
-    )
     apiProvider.requestResponsable(
-      .getFamousRecordList(request),
-      DTO.GetFamousRecordListResponse.self
-    ) { result in
-      self.isFetching = false
-      switch result {
-      case .success(let response):
-        if self.pageNumber == 0 {
-          if let index = response.feeds.firstIndex(where: { $0.id == self.currentId }) {
-            let newFeeds = Array(response.feeds[index...])
-            self.feedList += newFeeds
-          }
-        } else {
-          self.feedList += response.feeds
-        }
-        self.pageNumber += 1
-        self.onFeedListUpdate?()
-      case .failure(let failure):
-        print(failure)
-      }
-    }
-  }
-
-  func getRecentRecordList() {
-    guard !isFetching,
-          let cursorId = cursorId,
-          let currentId = currentId
-    else { return }
-    isFetching = true
-    var selectedKeyword: String?
-    if keyword != .all {
-      selectedKeyword = keyword?.title.keywordEncode()
-    } else {
-      selectedKeyword = nil
-    }
-    let request = DTO.GetRecentRecordListRequest(
-      keywords: selectedKeyword,
-      cursorId: cursorId,
-      size: 15
-    )
-    apiProvider.requestResponsable(
-      .getRecentRecordList(request),
-      DTO.GetRecentRecordListResponse.self
+      endPoint,
+      response
     ) { [weak self] result in
       guard let self = self else { return }
       self.isFetching = false
       switch result {
       case .success(let response):
-        if cursorId == 0 {
-          if let index = response.feeds.firstIndex(where: { $0.id == currentId }) {
-            let newFeeds = Array(response.feeds[index...])
-            self.feedList += newFeeds
-          }
-        } else {
-          self.feedList += response.feeds
-        }
-        self.cursorId = response.nextCursor
-        self.onFeedListUpdate?()
-      case .failure(let failure):
-        print(failure)
+        processResponse(response: response)
+      case .failure(_):
+        self.feedList = []
+        self.onFeedListUpdate?(0)
       }
     }
   }
 
-  func getUserProfileRecordList() {
-    guard !isFetching,
-          let currentId = currentId,
-          let userId = userId
-    else {
-      return
-    }
-    let request = DTO.GetUserRecordListRequest(
-      otherUserId: userId,
-      cursorId: 0,
-      size: 100
-    )
-    apiProvider.requestResponsable(.getUserRecordList(request), DTO.GetUserRecordListResponse.self) { [weak self] result in
-      guard let self = self else { return }
-      self.isFetching = false
-      switch result {
-      case .success(let response):
-        if let index = response.feeds.firstIndex(where: { $0.id == currentId }) {
-          let newFeeds = Array(response.feeds[index...])
-          self.feedList = newFeeds
-          self.onFeedListUpdate?()
+  private func processResponse<T: Codable> (response: T) {
+    if let allRecordListResponse = response as? DTO.RecordList {
+      /// 전체 레코드 랜덤 조회
+      updateFeedList(allRecordListResponse.feeds)
+    } else if let followRecordListResponse = response as? DTO.GetFollowingRecordListResponse {
+      /// 팔로잉 레코드 조회
+      updateFeedList(followRecordListResponse.feeds)
+      hasNext = followRecordListResponse.hasNext
+      cursorId = followRecordListResponse.nextCursor
+    } else if let famousRecordListResponse = response as? DTO.GetFamousRecordListResponse {
+      /// 인기 레코드 조회 - n번째 게시물 클릭 가능
+      var newFeeds: [Feed] = []
+      if pageNumber == 0 {
+        if let index = famousRecordListResponse.feeds.firstIndex(where: { $0.id == currentId }) {
+          newFeeds = Array(famousRecordListResponse.feeds[index...])
         }
-      case .failure(let failure):
-        print(failure)
+      } else {
+        newFeeds = famousRecordListResponse.feeds
+      }
+      updateFeedList(newFeeds)
+      hasNext = famousRecordListResponse.hasNext
+      pageNumber += 1
+    } else if let recentRecordListResponse = response as? DTO.GetRecentRecordListResponse {
+      /// 최신 레코드 조회
+      var newFeeds: [Feed] = []
+      if cursorId == 0 {
+        if let index = recentRecordListResponse.feeds.firstIndex(where: { $0.id == currentId }) {
+          newFeeds = Array(recentRecordListResponse.feeds[index...])
+        }
+      } else {
+        newFeeds = recentRecordListResponse.feeds
+      }
+      updateFeedList(newFeeds)
+      hasNext = recentRecordListResponse.hasNext
+      cursorId = recentRecordListResponse.nextCursor
+    } else if let userProfileRecordListResponse = response as? DTO.GetUserRecordListResponse {
+      /// 유저 프로필 레코드 조회
+      guard let currentId else { return }
+      if let index = userProfileRecordListResponse.feeds.firstIndex(where: { $0.id == currentId }) {
+        let newFeeds = Array(userProfileRecordListResponse.feeds[index...])
+        updateFeedList(newFeeds)
+      }
+    } else if let bookmarkedRecordListResponse = response as? DTO.GetBookmarkedListResponse {
+      /// 유저 북마크 레코드 조회
+      guard let currentId, hasNext else { return }
+      if let index = bookmarkedRecordListResponse.feeds.firstIndex(where: { $0.id == currentId }) {
+        let newFeeds = Array(bookmarkedRecordListResponse.feeds[index...])
+        self.hasNext = bookmarkedRecordListResponse.hasNext
+        updateFeedList(newFeeds)
       }
     }
   }
 
-  func getBookmarkedFeedList() {
-    guard !isFetching,
-          let currentId = currentId,
-          hasNext
-    else { return }
-    let request = DTO.GetBookmarkedListRequest(
-      cursorId: 0,
-      size: 100
-    )
-    apiProvider.requestResponsable(.getBookmarkedRecordList(request), DTO.GetBookmarkedListResponse.self) { result in
-      self.isFetching = false
-      switch result {
-      case .success(let response):
-        if let index = response.feeds.firstIndex(where: { $0.id == currentId }) {
-          let newFeeds = Array(response.feeds[index...])
-          self.hasNext = response.hasNext
-          self.feedList = newFeeds
-          self.onFeedListUpdate?()
-        }
-      case .failure(let failure):
-        print(failure)
-      }
-    }
-  }
-
-  func getFollowRecordList() {
-    guard !isFetching
-    else { return }
-    let request = DTO.GetFollowingRecordListRequest(
-      cursorId: 0,
-      size: 100
-    )
-    apiProvider.requestResponsable(.getFollowingRecordList(request), DTO.GetFollowingRecordListResponse.self) { result in
-      self.isFetching = false
-      switch result {
-      case .success(let response):
-        self.feedList = response.feeds
-        self.onFeedListUpdate?()
-      case .failure(let failure):
-        print(failure)
-      }
+  private func updateFeedList(_ newFeeds: [Feed]) {
+    cacheVideos(feeds: newFeeds) { [weak self] feed in
+      guard let self else { return }
+      self.feedList += feed
+      self.onFeedListUpdate?(feed.count)
     }
   }
 
   func cacheVideos(
     feeds: [Feed],
-    completion: @escaping () -> Void) {
+    completion: @escaping ([Feed]) -> Void) {
       let dispatchGroup = DispatchGroup()
       var cachedFeeds: [Feed] = []
-
       for feed in feeds {
         dispatchGroup.enter()
-
         VideoCacheManager.shared.downloadAndCacheURL(url: URL(string: feed.videoLink)!) { url in
           guard url != nil else {
             dispatchGroup.leave()
             return
           }
-          cachedFeeds.append(feed)
+          let cachedFeed = Feed(
+            id: feed.id,
+            userId: feed.userId,
+            location: feed.location,
+            nickname: feed.nickname,
+            description: feed.description,
+            bookmarkCount: feed.bookmarkCount,
+            isBookmarked: feed.isMine,
+            videoLink: String(describing: url!),
+            thumbnailLink: feed.thumbnailLink,
+            isMine: feed.isMine
+          )
+          cachedFeeds.append(cachedFeed)
           dispatchGroup.leave()
         }
       }
-
-      dispatchGroup.notify(queue: .main) { [weak self] in
-        guard let self = self else { return }
-        let newFeeds = cachedFeeds.filter { newFeed in
-          !self.feedList.contains(where: { $0.id == newFeed.id })
-        }
-        self.feedList += newFeeds
-        completion()
+      dispatchGroup.notify(queue: .main) {
+        completion(cachedFeeds)
       }
     }
 
@@ -290,7 +261,6 @@ class VideoFeedViewModel {
 
   func deleteFeed(_ index: Int) {
     let feed = self.feedList[index]
-    let deleteIndex = self.feedList.firstIndex { $0 == feed }
     let request = DTO.DeleteRecordRequest(record_id: feed.id)
     apiProvider.justRequest(.deleteRecord(request)) { result in
       switch result {
@@ -318,146 +288,3 @@ class VideoFeedViewModel {
     }
   }
 }
-
-//
-//  func fetchMoreVideos(completion: @escaping () -> Void) {
-//    let feeds: [Feed] = Feed.mockdata1
-//    let dispatchGroup = DispatchGroup()
-//    var cachedFeeds: [Feed] = []
-//
-//    for feed in feeds {
-//      dispatchGroup.enter()
-//      VideoCacheManager.shared.downloadAndCacheURL(url: feed.videoLink) { url in
-//        guard url != nil else {
-//          dispatchGroup.leave()
-//          return
-//        }
-//        cachedFeeds.append(feed)
-//        dispatchGroup.leave()
-//      }
-//    }
-//    dispatchGroup.notify(queue: .main) { [weak self] in
-//      guard let self = self else { return }
-//      let newFeeds = cachedFeeds.filter { newFeed in
-//        !self.feedList.contains(where: { $0.id == newFeed.id })
-//      }
-//      self.feedList.append(contentsOf: newFeeds)
-//      completion()
-//    }
-//  }
-//class VideoFeedViewModel {
-//
-//  struct Input {
-//    let fetchVideos = PublishRelay<Void>()
-//    let currentIndex = BehaviorRelay<Int?>(value: nil)
-//    let bookmarkTapped = PublishRelay<Int>()
-//    let playRequest = PublishRelay<Int>()
-//    let fetchMoreVideos = PublishRelay<Void>()
-//  }
-//
-//  struct Output {
-//    let feedList = BehaviorRelay<[Feed]>(value: [])
-//    let currentFeed = BehaviorRelay<Feed?>(value: nil)
-//  }
-//
-//  private let disposeBag = DisposeBag()
-//  let input = Input()
-//  let output = Output()
-//
-//  init() {
-//    self.bind()
-//  }
-//
-//  func bind() {
-//    self.input.fetchVideos
-//      .subscribe { [weak self] _ in
-//        guard let self = self else { return }
-//        self.getVideos()
-//      }.disposed(by: disposeBag)
-//
-//    self.input.currentIndex
-//      .subscribe { [weak self] index in
-//        guard let self = self,
-//              let index = index
-//        else { return }
-//        let currentFeed = self.output.feedList.value[index]
-//        self.output.currentFeed.accept(currentFeed)
-//      }.disposed(by: disposeBag)
-//
-//    self.input.bookmarkTapped
-//      .subscribe { [weak self] index in
-//        guard let self = self else { return }
-//        self.bookmarkButtonTapped(index)
-//      }.disposed(by: disposeBag)
-//
-//    self.input.fetchMoreVideos
-//      .subscribe { [weak self] _ in
-//        guard let self = self else { return }
-//        self.getMoreVideos()
-//      }
-//      .disposed(by: disposeBag)
-//
-//
-//    self.input.fetchVideos.accept(())
-//  }
-//
-//  func getVideos() {
-//    let feeds: [Feed] = Feed.mockdata
-//    let dispatchGroup = DispatchGroup()
-//    var cachedFeeds: [Feed] = []
-//
-//    for feed in feeds {
-//      dispatchGroup.enter()
-//      VideoCacheManager
-//        .shared
-//        .downloadAndCacheURL(url: feed.videoLink) { url in
-//          guard url != nil else {
-//            dispatchGroup.leave()
-//            return
-//          }
-//          cachedFeeds.append(feed)
-//          dispatchGroup.leave()
-//        }
-//    }
-//    dispatchGroup.notify(queue: .main) { [weak self] in
-//      guard let self = self else { return }
-//      let newFeeds = cachedFeeds.filter { newFeed in
-//        !self.output.feedList.value.contains(where: { $0.id == newFeed.id })
-//      }
-//      self.output.feedList.accept(newFeeds)
-//      self.input.currentIndex.accept(0)
-//    }
-//  }
-//
-//  func getMoreVideos() {
-//    print(#function)
-//    let feeds: [Feed] = Feed.mockdata1
-//    let dispatchGroup = DispatchGroup()
-//    var cachedFeeds: [Feed] = []
-//
-//    for feed in feeds {
-//      dispatchGroup.enter()
-//      VideoCacheManager
-//        .shared
-//        .downloadAndCacheURL(url: feed.videoLink) { url in
-//          guard url != nil else {
-//            dispatchGroup.leave()
-//            return
-//          }
-//          cachedFeeds.append(feed)
-//          dispatchGroup.leave()
-//        }
-//    }
-//    print(cachedFeeds)
-//    dispatchGroup.notify(queue: .main) { [weak self] in
-//      guard let self = self else { return }
-//      self.output.feedList.accept(cachedFeeds)
-//    }
-//  }
-//
-//  private func bookmarkButtonTapped(_ index: Int) {
-//    var feeds = self.output.feedList.value
-//    feeds[index].isBookmarked.toggle()
-//    self.output.feedList.accept(feeds)
-//  }
-//}
