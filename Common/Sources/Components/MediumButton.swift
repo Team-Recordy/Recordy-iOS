@@ -35,9 +35,11 @@ public class MediumButton: UIButton {
     case .active:
       backgroundColor = CommonAsset.recordyWhite.color
       setTitleColor(CommonAsset.recordyGrey09.color, for: .normal)
+      setTitle("팔로우", for: .normal)
     case .inactive:
       backgroundColor = CommonAsset.recordyGrey08.color
       setTitleColor(CommonAsset.recordyGrey01.color, for: .normal)
+      setTitle("팔로잉", for: .normal)
     }
   }
 }
