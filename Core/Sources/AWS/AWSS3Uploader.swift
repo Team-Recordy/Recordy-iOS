@@ -25,19 +25,25 @@ public class AWSS3Uploader {
     var request = URLRequest(url: remoteURL)
     request.cachePolicy = .reloadIgnoringLocalCacheData
     request.httpMethod = "PUT"
-    request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+    request.setValue(
+      "application/octet-stream",
+      forHTTPHeaderField: "Content-Type"
+    )
 
-    let uploadTask = session.uploadTask(with: request, from: data, completionHandler: { (data, response, error) in
-        if let error = error {
-            completion(.failure(error))
-            return
-        }
-        guard response != nil, data != nil else {
-            completion(.success(nil))
-            return
-        }
-        completion(.success(String(describing: remoteURL)))
-    })
+    let uploadTask = session.uploadTask(
+      with: request,
+      from: data
+    ) { data, response, error in
+      if let error = error {
+        completion(.failure(error))
+        return
+      }
+      guard response != nil, data != nil else {
+        completion(.success(nil))
+        return
+      }
+      completion(.success(String(describing: remoteURL)))
+    }
     uploadTask.resume()
   }
 }

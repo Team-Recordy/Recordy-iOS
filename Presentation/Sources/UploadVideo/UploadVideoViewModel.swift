@@ -16,7 +16,6 @@ import Common
 import RxSwift
 import RxCocoa
 
-/// 시스템 권한을 이 뷰모델에서 판단하여야 함
 final class UploadVideoViewModel {
 
   struct Input {
@@ -152,7 +151,10 @@ final class UploadVideoViewModel {
               )
               return
             }
-            self.createRecord(videoUrl: videoUrl!, thumbnailUrl: thumbnailUrl!)
+            self.createRecord(
+              videoUrl: videoUrl!,
+              thumbnailUrl: thumbnailUrl!
+            )
           }
 
         case .failure(let failure):
@@ -183,13 +185,13 @@ final class UploadVideoViewModel {
     )
     apiProvider.justRequest(.createRecord(request)) { result in
       switch result {
-      case .success(let success):
+      case .success:
         NotificationCenter.default.post(
           name: .updateDidComplete,
           object: nil,
           userInfo: ["message": "업로드가 완료되었어요!", "state": "success"]
         )
-      case .failure(let failure):
+      case .failure:
         NotificationCenter.default.post(
           name: .updateDidComplete,
           object: nil,
