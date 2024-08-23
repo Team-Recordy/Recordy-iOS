@@ -37,6 +37,7 @@ final class UploadVideoViewModel {
   let input = Input()
   let output = Output()
   let apiProvider = APIProvider<APITarget.Records>()
+  let awsUploader = AWSS3Uploader()
 
   init() {
     self.bind()
@@ -83,83 +84,27 @@ final class UploadVideoViewModel {
   }
 
   func getPhotoPermission(completionHandler: @escaping (Bool) -> Void) {
-    guard PHPhotoLibrary.authorizationStatus() != .authorized else {
-      completionHandler(true)
-      return
-    }
-    PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-      switch status {
-      case .authorized, .limited:
-        completionHandler(true)
-      default:
-        completionHandler(false)
-      }
-    }
+    PhotoKitManager.getPhotoPermission(completionHandler: completionHandler)
   }
 
   func uploadButtonTapped() {
-    guard let asset = input.selectedAsset.value else { return }
+    guard let asset = input.selectedAsset.value,
+          let thumbnailData = PhotoKitManager.getAssetThumbnailData(asset: asset)
+    else { return }
 
-    let thumbnailData = PhotoKitManager.getAssetThumbnailData(asset: asset)
-    let dispatchGroup = DispatchGroup()
-    var videoUrl: String?
-    var thumbnailUrl: String?
-    var uploadError: Error?
-
-    PhotoKitManager.getData(of: asset) { [weak self] binaryData in
-      guard let self = self else { return }
-      self.apiProvider.requestResponsable(
-        .getPresignedUrl,
-        DTO.GetPresignedUrlResponse.self
-      ) { result in
-        switch result {
-        case .success(let response):
-          dispatchGroup.enter()
-          AWSS3Uploader.upload(
-            binaryData!,
-            toPresignedURL: URL(string: response.videoUrl)!
-          ) { result in
-            switch result {
-            case .success(let success):
-              videoUrl = success?.removeQueryParameters()
-            case .failure(let failure):
-              uploadError = failure
-            }
-            dispatchGroup.leave()
-          }
-
-          dispatchGroup.enter()
-          AWSS3Uploader.upload(
-            thumbnailData!,
-            toPresignedURL: URL(string: response.thumbnailUrl)!
-          ) { result in
-            switch result {
-            case .success(let success):
-              thumbnailUrl = success?.removeQueryParameters()
-            case .failure(let failure):
-              uploadError = failure
-            }
-            dispatchGroup.leave()
-          }
-
-          dispatchGroup.notify(queue: .global()) {
-            guard uploadError == nil, videoUrl != nil, thumbnailUrl != nil else {
-              NotificationCenter.default.post(
-                name: .updateDidComplete,
-                object: nil,
-                userInfo: ["message": "업로드에 실패했어요!", "state": "failure"]
-              )
-              return
-            }
-            self.createRecord(
-              videoUrl: videoUrl!,
-              thumbnailUrl: thumbnailUrl!
-            )
-          }
-
-        case .failure(let failure):
-          print(failure)
-        }
+    awsUploader.upload(
+      asset: asset,
+      thumbnailData: thumbnailData
+    ) { [weak self] result in
+      guard let self else { return }
+      switch result {
+      case .success(let response):
+        self.createRecord(
+          videoUrl: response.videoUrl,
+          thumbnailUrl: response.thumbnailUrl
+        )
+      case .failure(let error):
+        print("error")
       }
     }
   }
@@ -195,7 +140,7 @@ final class UploadVideoViewModel {
         NotificationCenter.default.post(
           name: .updateDidComplete,
           object: nil,
-          userInfo: ["message": "업로드가 완료되었어요!", "state": "failure"]
+          userInfo: ["message": "업로드에 실패했어요!", "state": "failure"]
         )
       }
     }
