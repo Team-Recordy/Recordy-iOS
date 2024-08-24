@@ -199,7 +199,6 @@ final class TermsView: UIView {
   private func updateNextButtonState() {
     let allTermsAgreed = termButton1.currentState == .agree && termButton2.currentState == .agree && termButton3.currentState == .agree
     nextButton.buttonState = allTermsAgreed ? .active : .inactive
-    print("updatenextButtonState")
   }
   
   func areAllButtonsActive() -> Bool {

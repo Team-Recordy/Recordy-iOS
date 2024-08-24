@@ -15,11 +15,11 @@ import SnapKit
 
 @available(iOS 16.0, *)
 public final class SignupViewController: UIViewController {
-  
-  var rootView: UIView = UIView()
+
   let totalPages = 3
   var currentPage = 0
   
+  var rootView: UIView = UIView()
   let signupView = SignupView()
   let termsView = TermsView()
   let nicknameView = NicknameView()

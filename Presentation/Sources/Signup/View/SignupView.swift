@@ -11,7 +11,6 @@ import UIKit
 import Core
 import Common
 
-import UIKit
 import SnapKit
 
 class SignupView: UIView {

@@ -16,8 +16,8 @@ public final class RecordyProgressView: UIView {
     didSet {
       self.progressBarView.snp.remakeConstraints {
         $0.leading.equalToSuperview()
-        $0.top.equalToSuperview().offset(-1)
-        $0.bottom.equalToSuperview().offset(1)
+        $0.top.equalToSuperview().offset(-2)
+        $0.bottom.equalToSuperview().offset(2)
         $0.width.equalToSuperview().multipliedBy(self.ratio)
       }
       
