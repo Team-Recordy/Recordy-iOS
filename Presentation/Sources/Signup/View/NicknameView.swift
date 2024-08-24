@@ -21,8 +21,6 @@ final class NicknameView: UIView {
     setAutoLayout()
     setTextFieldObserver()
     setTextFieldStateHandler()
-    
-    nicknameTextField.delegate = self
   }
   
   deinit {
@@ -61,6 +59,8 @@ final class NicknameView: UIView {
       $0.font = RecordyFont.caption2.font
       $0.textColor = CommonAsset.recordyAlert.color
     }
+    
+    nicknameTextField.delegate = self
   }
   
   func setUI() {
