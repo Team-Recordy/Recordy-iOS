@@ -148,21 +148,15 @@ final class NicknameView: UIView {
     }
   }
   
-  private func validateTextField() {
+  func validateTextField() {
     guard let text = nicknameTextField.text else {
       nicknameTextField.onStateChange?(.error)
       return
     }
     
     let pattern = "^[가-힣0-9._]{1,10}$"
-    let regex = try! NSRegularExpression(pattern: pattern)
-    let matches = regex.matches(in: text, range: NSRange(location: 0, length: text.utf16.count))
     
-    if matches.isEmpty {
-      nicknameTextField.onStateChange?(.error)
-      errorLabel.text = "ⓘ 한글, 숫자, 밑줄 및 마침표만 사용할 수 있어요"
-      errorLabel.textColor = CommonAsset.recordyAlert.color
-    } else {
+    if text.matches(pattern: pattern) {
       getCheckNicknameRequest { isSuccess in
         if isSuccess {
           self.errorLabel.text = "사용 가능한 닉네임이에요"
@@ -174,6 +168,10 @@ final class NicknameView: UIView {
           self.errorLabel.textColor = CommonAsset.recordyAlert.color
         }
       }
+    } else {
+      nicknameTextField.onStateChange?(.error)
+      errorLabel.text = "ⓘ 한글, 숫자, 밑줄 및 마침표만 사용할 수 있어요"
+      errorLabel.textColor = CommonAsset.recordyAlert.color
     }
   }
 }
