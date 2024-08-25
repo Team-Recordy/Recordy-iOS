@@ -8,23 +8,18 @@
 
 import UIKit
 
-public protocol RecordyTextFieldStateDelegate: AnyObject {
-  func state(_ currentState: RecordyTextFieldState)
-}
-
-
 public final class RecordyTextField: UITextField {
   
-  public weak var stateDelegate: RecordyTextFieldStateDelegate?
-  var style: RecordyTextFieldStyle {
+  public var onStateChange: ((RecordyTextFieldState) -> Void)?
+  public var style: RecordyTextFieldStyle {
     didSet { setStyle(style) }
   }
   public var textState: RecordyTextFieldState = .unselected {
-     didSet {
-       setState(textState)
-     }
-   }
-
+    didSet {
+      setState(textState)
+    }
+  }
+  
   public init(
     frame: CGRect = .zero,
     style: RecordyTextFieldStyle = .unselected,
@@ -41,12 +36,13 @@ public final class RecordyTextField: UITextField {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
-  private func setState(_ style: RecordyTextFieldState) {
+  
+  func setState(_ style: RecordyTextFieldState) {
     self.layer.borderColor = style.borderColor.cgColor
     self.layer.borderWidth = style.borderWidth
+    onStateChange?(style)
   }
-
+  
   func setStyle(_ style: RecordyTextFieldStyle) {
     self.setLayer(
       borderColor: style.borderColor,
@@ -83,9 +79,9 @@ extension RecordyTextField: UITextFieldDelegate {
     let matches = regex.matches(in: updatedText, range: NSRange(location: 0, length: updatedText.utf16.count))
     
     if matches.isEmpty {
-      stateDelegate?.state(.error)
+      onStateChange?(.error)
     } else {
-      stateDelegate?.state(.selected)
+      onStateChange?(.selected)
     }
     return true
   }
@@ -95,13 +91,13 @@ extension RecordyTextField: UITextFieldDelegate {
   }
   
   public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-    stateDelegate?.state(.unselected)
+    onStateChange?(.unselected)
     return true
   }
   
   public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     textField.resignFirstResponder()
-    stateDelegate?.state(.unselected)
+    onStateChange?(.unselected)
     return true
   }
 }

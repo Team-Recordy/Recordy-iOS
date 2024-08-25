@@ -25,7 +25,7 @@ extension String {
     )
     return boundingBox.height
   }
-
+  
   public func timeStringToSeconds() -> Int {
     let components = self.split(separator: ":")
     guard components.count == 2,
@@ -35,7 +35,7 @@ extension String {
     }
     return (minutes * 60) + seconds
   }
-
+  
   public func removeQueryParameters() -> String? {
     if let urlComponents = URLComponents(string: self) {
       var modifiedComponents = urlComponents
@@ -44,9 +44,16 @@ extension String {
     }
     return nil
   }
-
+  
   public func keywordEncode() -> String? {
     guard let data = self.data(using: .utf8) else { return nil }
     return data.base64EncodedString()
+  }
+  
+  public func matches(pattern: String) -> Bool {
+    guard let regex = try? NSRegularExpression(pattern: pattern) else { return false }
+    let range = NSRange(location: 0, length: self.utf16.count)
+    let matches = regex.matches(in: self, range: range)
+    return !matches.isEmpty
   }
 }
