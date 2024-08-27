@@ -10,6 +10,21 @@ import UIKit
 import Photos
 
 public final class PhotoKitManager {
+  static public func getPhotoPermission(completionHandler: @escaping (Bool) -> Void) {
+    guard PHPhotoLibrary.authorizationStatus() != .authorized else {
+      completionHandler(true)
+      return
+    }
+    PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+      switch status {
+      case .authorized, .limited:
+        completionHandler(true)
+      default:
+        completionHandler(false)
+      }
+    }
+  }
+
   static public func getAssetThumbnail(
     asset: PHAsset,
     size: CGSize
@@ -45,7 +60,7 @@ public final class PhotoKitManager {
     options.resizeMode = .none
 
     var thumbnailData: Data?
-    
+
     manager.requestImage(
       for: asset,
       targetSize: PHImageManagerMaximumSize,
@@ -104,15 +119,15 @@ public final class PhotoKitManager {
   }
 
   static public func saveImageDataToLocalFile(data: Data, filename: String) -> URL? {
-      let tempDirectory = FileManager.default.temporaryDirectory
-      let fileURL = tempDirectory.appendingPathComponent("\(filename).jpeg")
+    let tempDirectory = FileManager.default.temporaryDirectory
+    let fileURL = tempDirectory.appendingPathComponent("\(filename).jpeg")
 
-      do {
-          try data.write(to: fileURL)
-          return fileURL
-      } catch {
-          print("Error saving image data to local file: \(error)")
-          return nil
-      }
+    do {
+      try data.write(to: fileURL)
+      return fileURL
+    } catch {
+      print("Error saving image data to local file: \(error)")
+      return nil
+    }
   }
 }
