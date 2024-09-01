@@ -1,7 +1,6 @@
 import UIKit
 
 import Common
-import Core
 
 final class NicknameView: UIView {
   
@@ -14,17 +13,13 @@ final class NicknameView: UIView {
   let textFieldCountLabel = UILabel()
   let errorLabel = UILabel()
   
+  var onTextChange: ((String) -> Void)?
+    
   public override init(frame: CGRect) {
     super.init(frame: frame)
     setStyle()
     setUI()
     setAutoLayout()
-    setTextFieldObserver()
-    setTextFieldStateHandler()
-  }
-  
-  deinit {
-    NotificationCenter.default.removeObserver(self, name: UITextField.textDidChangeNotification, object: nicknameTextField)
   }
   
   required init?(coder: NSCoder) {
@@ -59,8 +54,6 @@ final class NicknameView: UIView {
       $0.font = RecordyFont.caption2.font
       $0.textColor = CommonAsset.recordyAlert.color
     }
-    
-    nicknameTextField.delegate = self
   }
   
   func setUI() {
@@ -107,80 +100,5 @@ final class NicknameView: UIView {
       $0.leading.equalToSuperview().offset(20)
     }
   }
-  
-  func getCheckNicknameRequest(completion: @escaping (Bool) -> Void) {
-    print("getCheckNicknameRequest")
-    let apiProvider = APIProvider<APITarget.Users>()
-    let request = DTO.CheckNicknameRequest(nickname: nicknameTextField.text!)
-    apiProvider.justRequest(.checkNickname(request)) { result in
-      switch result {
-      case .success:
-        completion(true)
-      case .failure:
-        completion(false)
-      }
-    }
-  }
-  
-  @objc
-  func textFieldDidChange(_ sender: Any?) {
-    let textCount = nicknameTextField.text?.count ?? 0
-    textFieldCountLabel.text = "\(textCount) / 10"
-    validateTextField()
-  }
-  
-  func setTextFieldObserver() {
-    NotificationCenter.default.addObserver(self, selector: #selector(textFieldDidChange), name: UITextField.textDidChangeNotification, object: nicknameTextField)
-  }
-  
-  private func setTextFieldStateHandler() {
-    nicknameTextField.onStateChange = { [weak self] state in
-      guard let self = self else { return }
-      self.nicknameTextField.layer.borderColor = state.borderColor.cgColor
-      self.nicknameTextField.layer.borderWidth = state.borderWidth
-      
-      switch state {
-      case .unselected, .error:
-        self.nextButton.buttonState = .inactive
-      case .selected:
-        self.nextButton.buttonState = .active
-      }
-    }
-  }
-  
-  func validateTextField() {
-    guard let text = nicknameTextField.text else {
-      nicknameTextField.onStateChange?(.error)
-      return
-    }
-    
-    let pattern = "^[가-힣0-9._]{1,10}$"
-    
-    if text.matches(pattern: pattern) {
-      getCheckNicknameRequest { isSuccess in
-        if isSuccess {
-          self.errorLabel.text = "사용 가능한 닉네임이에요"
-          self.errorLabel.textColor = CommonAsset.recordyGrey09.color
-          self.nicknameTextField.onStateChange?(.selected)
-        } else {
-          self.nicknameTextField.onStateChange?(.error)
-          self.errorLabel.text = "ⓘ 이미 사용중인 닉네임이에요"
-          self.errorLabel.textColor = CommonAsset.recordyAlert.color
-        }
-      }
-    } else {
-      nicknameTextField.onStateChange?(.error)
-      errorLabel.text = "ⓘ 한글, 숫자, 밑줄 및 마침표만 사용할 수 있어요"
-      errorLabel.textColor = CommonAsset.recordyAlert.color
-    }
-  }
 }
 
-extension NicknameView: UITextFieldDelegate {
-  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-    let currentText = textField.text ?? ""
-    guard let stringRange = Range(range, in: currentText) else { return false }
-    let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
-    return updatedText.count <= 10
-  }
-}

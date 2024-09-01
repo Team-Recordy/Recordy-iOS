@@ -8,57 +8,52 @@
 
 import UIKit
 
-public final class RecordyTextField: UITextField {
-  
-  public var onStateChange: ((RecordyTextFieldState) -> Void)?
-  public var style: RecordyTextFieldStyle {
-    didSet { setStyle(style) }
-  }
-  public var textState: RecordyTextFieldState = .unselected {
-    didSet {
-      setState(textState)
-    }
-  }
+public enum RecordyTextFieldState {
+  case unselected
+  case selected
+  case error
+}
+
+public class RecordyTextField: UITextField {
   
   public init(
     frame: CGRect = .zero,
-    style: RecordyTextFieldStyle = .unselected,
     placeholder: String
   ) {
-    self.style = style
     super.init(frame: frame)
     self.placeholder = placeholder
-    self.delegate = self
-    setStyle(style)
-    self.textState = .unselected
+    setStyle()
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
-  func setState(_ style: RecordyTextFieldState) {
-    self.layer.borderColor = style.borderColor.cgColor
-    self.layer.borderWidth = style.borderWidth
-    onStateChange?(style)
-  }
-  
-  func setStyle(_ style: RecordyTextFieldStyle) {
-    self.setLayer(
-      borderColor: style.borderColor,
-      borderWidth: style.borderWidth,
-      cornerRadius: 8
-    )
-    
+  private func setStyle() {
+    layer.cornerRadius = 8
+    font = RecordyFont.body2.font
+    addPadding(left: 18, right: 18)
+    backgroundColor = CommonAsset.recordyGrey08.color
+    textColor = CommonAsset.recordyGrey01.color
     self.setPlaceholder(
       placeholder: self.placeholder ?? "",
       placeholderColor: CommonAsset.recordyGrey04,
       font: .body2
     )
-    
-    self.addPadding(left: 18, right: 18)
-    self.backgroundColor = CommonAsset.recordyGrey08.color
-    self.textColor = CommonAsset.recordyGrey01.color
+  }
+  
+  public func updateTextFieldStyle(for state: RecordyTextFieldState) {
+    switch state {
+    case .unselected:
+      layer.borderColor = UIColor.clear.cgColor
+      layer.borderWidth = 0
+    case .selected:
+      layer.borderColor = CommonAsset.recordyMain.color.cgColor
+      layer.borderWidth = 1
+    case .error:
+      layer.borderColor = CommonAsset.recordyAlert.color.cgColor
+      layer.borderWidth = 1
+    }
   }
 }
 
@@ -74,30 +69,6 @@ extension RecordyTextField: UITextFieldDelegate {
     }
     let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
     
-    let pattern = "^[가-힣0-9._]{1,10}$"
-    let regex = try! NSRegularExpression(pattern: pattern)
-    let matches = regex.matches(in: updatedText, range: NSRange(location: 0, length: updatedText.utf16.count))
-    
-    if matches.isEmpty {
-      onStateChange?(.error)
-    } else {
-      onStateChange?(.selected)
-    }
-    return true
-  }
-  
-  public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-    return true
-  }
-  
-  public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-    onStateChange?(.unselected)
-    return true
-  }
-  
-  public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    textField.resignFirstResponder()
-    onStateChange?(.unselected)
-    return true
+    return updatedText.count <= 10
   }
 }
