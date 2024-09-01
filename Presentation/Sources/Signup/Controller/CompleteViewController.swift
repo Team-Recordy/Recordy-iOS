@@ -6,4 +6,46 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 
-import Foundation
+import UIKit
+
+import Core
+import Common
+
+@available(iOS 16.0, *)
+final class CompleteViewController: UIViewController{
+  
+  private let completeView = CompleteView()
+  private let nicknameView = NicknameView()
+  
+  override func loadView() {
+    self.view = CompleteView()
+  }
+  
+  public override func viewDidLoad() {
+    super.viewDidLoad()
+  }
+  
+  private func setTarget() {
+    completeView.completeButton.addTarget(self, action: #selector(completeButtonTapped), for: .touchUpInside)
+  }
+  
+  @objc private func completeButtonTapped() {
+    guard let text = nicknameView.nicknameTextField.text else { return }
+    let apiProvider = APIProvider<APITarget.Users>()
+    let userId = UserDefaults.standard.integer(forKey: "userId")
+    let request = DTO.SignUpRequest(
+      nickname: text,
+      termsAgreement: DTO.SignUpRequest.TermsAgreement()
+    )
+    apiProvider.justRequest(.signUp(request)) { result in
+      switch result {
+      case .success:
+        let tabBarController = RecordyTabBarController()
+        tabBarController.modalPresentationStyle = .fullScreen
+        self.present(tabBarController, animated: false)
+      case .failure:
+        print("failed to login")
+      }
+    }
+  }
+}

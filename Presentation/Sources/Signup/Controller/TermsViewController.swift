@@ -73,4 +73,9 @@ public final class TermsViewController: UIViewController {
     termsView.agreeAllTermButton.updateState(isAllTermsAgreed ? .activate : .deactivate)
     termsView.nextButton.buttonState = isAllTermsAgreed ? .active : .inactive
   }
+  
+  private func nextButtonTapped() {
+    let nicknameViewController = NicknameViewController()
+        self.navigationController?.pushViewController(nicknameViewController, animated: true)
+  }
 }

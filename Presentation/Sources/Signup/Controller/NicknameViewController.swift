@@ -11,7 +11,7 @@ import UIKit
 import Common
 import Core
 
-
+@available(iOS 16.0, *)
 public final class NicknameViewController: UIViewController {
   
   private let nicknameView = NicknameView()
@@ -102,8 +102,14 @@ public final class NicknameViewController: UIViewController {
     )
     view.addGestureRecognizer(tapGesture)
   }
+  
+  private func nextButtonTapped() {
+    let completeViewController = CompleteViewController()
+        self.navigationController?.pushViewController(completeViewController, animated: true)
+  }
 }
 
+@available(iOS 16.0, *)
 extension NicknameViewController: UITextFieldDelegate {
   @objc public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
     let currentText = textField.text ?? ""
@@ -121,11 +127,12 @@ extension NicknameViewController: UITextFieldDelegate {
     updateTextFieldState(textField.text ?? "")
   }
   
+  
   public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     textField.resignFirstResponder()
     
     if nicknameView.nextButton.buttonState == .active {
-      print("nextButtonTapped()")
+      nextButtonTapped()
     }
     
     return true
