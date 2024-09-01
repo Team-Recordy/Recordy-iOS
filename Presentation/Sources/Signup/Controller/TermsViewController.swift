@@ -10,6 +10,7 @@ import UIKit
 
 import Common
 
+@available(iOS 16.0, *)
 public final class TermsViewController: UIViewController {
   
   private let termsView = TermsView()
@@ -30,6 +31,8 @@ public final class TermsViewController: UIViewController {
     super.viewDidLoad()
     setTarget()
     updateUI()
+    setProgressView()
+    RecordyProgressView.shared.updateProgress(currentPage: 0, totalPages: 3)
   }
   
   private func setTarget() {
@@ -37,6 +40,18 @@ public final class TermsViewController: UIViewController {
     termsView.termButton1.addTarget(self, action: #selector(termButtonTapped(_:)), for: .touchUpInside)
     termsView.termButton2.addTarget(self, action: #selector(termButtonTapped(_:)), for: .touchUpInside)
     termsView.termButton3.addTarget(self, action: #selector(termButtonTapped(_:)), for: .touchUpInside)
+    termsView.nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+  }
+  
+  private func setProgressView() {
+    let progressView = RecordyProgressView.shared
+    self.view.addSubview(progressView)
+    
+    progressView.snp.makeConstraints { make in
+      make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top).offset(10)
+      make.leading.trailing.equalToSuperview().inset(20)
+      make.height.equalTo(6)
+    }
   }
   
   @objc private func agreeAllTermButtonTapped() {
@@ -74,7 +89,7 @@ public final class TermsViewController: UIViewController {
     termsView.nextButton.buttonState = isAllTermsAgreed ? .active : .inactive
   }
   
-  private func nextButtonTapped() {
+  @objc private func nextButtonTapped() {
     let nicknameViewController = NicknameViewController()
         self.navigationController?.pushViewController(nicknameViewController, animated: true)
   }

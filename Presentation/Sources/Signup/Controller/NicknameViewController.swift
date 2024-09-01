@@ -30,8 +30,22 @@ public final class NicknameViewController: UIViewController {
   
   public override func viewDidLoad() {
     super.viewDidLoad()
+    setTarget()
     bind()
     setTapGesture()
+    setProgressView()
+    RecordyProgressView.shared.updateProgress(currentPage: 1, totalPages: 3)
+  }
+  
+  private func setProgressView() {
+    let progressView = RecordyProgressView.shared
+    self.view.addSubview(progressView)
+    
+    progressView.snp.makeConstraints { make in
+      make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top).offset(10)
+      make.leading.trailing.equalToSuperview().inset(20)
+      make.height.equalTo(6)
+    }
   }
   
   private func isNicknamePatternValid(_ nickname: String) -> Bool {
@@ -93,6 +107,11 @@ public final class NicknameViewController: UIViewController {
     }
   }
   
+  private func setTarget() {
+    nicknameView.nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+  }
+
+  
   private func setTapGesture() {
     let tapGesture = UITapGestureRecognizer(
       target: self,
@@ -103,7 +122,7 @@ public final class NicknameViewController: UIViewController {
     view.addGestureRecognizer(tapGesture)
   }
   
-  private func nextButtonTapped() {
+  @objc private func nextButtonTapped() {
     let completeViewController = CompleteViewController()
         self.navigationController?.pushViewController(completeViewController, animated: true)
   }

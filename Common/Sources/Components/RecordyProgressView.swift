@@ -8,7 +8,8 @@ protocol RecordyProgressViewDelegate: AnyObject {
 
 public final class RecordyProgressView: UIView {
   
-  weak var delegate: RecordyProgressViewDelegate?
+  public static let shared = RecordyProgressView()
+  
   private var totalPages: Int = 0
   private var currentPage: Int = 0
   
@@ -16,8 +17,8 @@ public final class RecordyProgressView: UIView {
     didSet {
       self.progressBarView.snp.remakeConstraints {
         $0.leading.equalToSuperview()
-        $0.top.equalToSuperview().offset(-2)
-        $0.bottom.equalToSuperview().offset(2)
+        $0.centerY.equalToSuperview()
+        $0.height.equalTo(6)
         $0.width.equalToSuperview().multipliedBy(self.ratio)
       }
       
