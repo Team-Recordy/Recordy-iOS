@@ -16,7 +16,7 @@ public enum ToggleButtonState {
   case deactivate
 }
 
-public class TermButton: UIButton {
+public class RecordyTermButton: UIButton {
   
   public let agreeImageView = UIImageView()
   public let agreeLabel = UILabel()

@@ -11,7 +11,11 @@ import UIKit
 import SnapKit
 import Then
 
-public class AgreeAllTermButton: TermButton {
+import UIKit
+import SnapKit
+import Then
+
+public class AgreeAllTermButton: RecordyTermButton {
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -25,7 +29,7 @@ public class AgreeAllTermButton: TermButton {
   
   private func setStyle() {
     self.backgroundColor = CommonAsset.recordyGrey09.color
-    self.cornerRadius(8)
+    self.layer.cornerRadius = 8
     
     agreeLabel.do {
       $0.text = "전체동의"
