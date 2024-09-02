@@ -20,7 +20,6 @@ import Then
 @available(iOS 16.0, *)
 public class UploadVideoViewController: UIViewController {
 
-  private let popUpView = RecordyPopUpView(type: .permission)
   private let gradientView = RecordyGradientView()
   private let warningLabel = UILabel()
   private let scrollView = UIScrollView()
@@ -28,8 +27,8 @@ public class UploadVideoViewController: UIViewController {
   private let videoThumbnailLabel = RecordySubtitleLabel(subtitle: "영상")
   let videoThumbnailView = UIView()
   let videoThumbnailSelectButton = UIButton()
-  private let videoThumbnailImageView = UIImageView()
   let videoThumbnailAlertLabel = UILabel()
+  private let videoThumbnailImageView = UIImageView()
   private let selectedKeywordLabel = RecordySubtitleLabel(subtitle: "키워드")
   private let selectKeywordStackView = RecordySelectKeywordStackView()
   private let firstKeywordLabel = RecordyKeywordLabel()
@@ -51,21 +50,18 @@ public class UploadVideoViewController: UIViewController {
     setUI()
     setAutolayout()
     bind()
-    self.hideKeyboard()
+    hideKeyboard()
   }
 
   private func setStyle() {
-    self.title = "내용 작성"
-    self.view.backgroundColor = CommonAsset.recordyBG.color
+    title = "내용 작성"
+    view.backgroundColor = CommonAsset.recordyBG.color
     let rightButton = UIButton(type: .system)
     rightButton.setImage(UIImage(systemName: "xmark"), for: .normal)
     rightButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
     let rightBarButtonItem = UIBarButtonItem(customView: rightButton)
-    self.navigationItem.rightBarButtonItem = rightBarButtonItem
+    navigationItem.rightBarButtonItem = rightBarButtonItem
 
-    popUpView.do {
-      $0.isHidden = true
-    }
     scrollView.do {
       $0.backgroundColor = .clear
     }
@@ -117,16 +113,17 @@ public class UploadVideoViewController: UIViewController {
   }
 
   private func setUI() {
-    self.view.addSubview(popUpView)
-    self.view.addSubview(gradientView)
-    self.view.addSubview(scrollView)
-    self.scrollView.addSubview(contentView)
-    self.videoThumbnailView.addSubviews(
+    view.addSubviews(
+      gradientView,
+      scrollView
+    )
+    scrollView.addSubview(contentView)
+    videoThumbnailView.addSubviews(
       videoThumbnailImageView,
       videoThumbnailSelectButton,
       videoThumbnailAlertLabel
     )
-    self.contentView.addSubviews(
+    contentView.addSubviews(
       warningLabel,
       videoThumbnailLabel,
       videoThumbnailView,
@@ -142,89 +139,100 @@ public class UploadVideoViewController: UIViewController {
   }
 
   private func setAutolayout() {
-    self.popUpView.snp.makeConstraints {
-      $0.top.equalTo(180.adaptiveHeight)
-      $0.horizontalEdges.equalToSuperview().inset(40.adaptiveWidth)
-      $0.height.equalTo(252.adaptiveHeight)
-    }
-    self.gradientView.snp.makeConstraints {
+    gradientView.snp.makeConstraints {
       $0.top.horizontalEdges.equalToSuperview()
       $0.height.equalTo(400.adaptiveHeight)
     }
-    self.scrollView.snp.makeConstraints {
+
+    scrollView.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide)
       $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
       $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-12.adaptiveHeight)
     }
-    self.contentView.snp.makeConstraints {
-      $0.edges.equalTo(self.scrollView.snp.edges)
-      $0.width.equalTo(self.scrollView.snp.width)
+
+    contentView.snp.makeConstraints {
+      $0.edges.equalTo(scrollView.snp.edges)
+      $0.width.equalTo(scrollView.snp.width)
       $0.height.greaterThanOrEqualToSuperview().priority(.low)
     }
-    self.warningLabel.snp.makeConstraints {
+
+    warningLabel.snp.makeConstraints {
       $0.top.equalTo(contentView.snp.top).offset(40.adaptiveHeight)
       $0.centerX.equalTo(contentView.snp.centerX)
       $0.height.equalTo(18.adaptiveHeight)
     }
-    self.videoThumbnailLabel.snp.makeConstraints {
+
+    videoThumbnailLabel.snp.makeConstraints {
       $0.top.equalTo(contentView.snp.top).offset(70.adaptiveHeight)
       $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
       $0.height.equalTo(28.adaptiveHeight)
     }
-    self.videoThumbnailView.snp.makeConstraints {
+
+    videoThumbnailView.snp.makeConstraints {
       $0.top.equalTo(videoThumbnailLabel.snp.bottom).offset(12.adaptiveHeight)
       $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
       $0.width.equalTo(180.adaptiveWidth)
       $0.height.equalTo(284.adaptiveHeight)
     }
-    self.selectedKeywordLabel.snp.makeConstraints {
+
+    selectedKeywordLabel.snp.makeConstraints {
       $0.top.equalTo(videoThumbnailImageView.snp.bottom).offset(20.adaptiveHeight)
       $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
       $0.height.equalTo(28.adaptiveHeight)
     }
-    self.selectKeywordStackView.snp.makeConstraints {
+
+    selectKeywordStackView.snp.makeConstraints {
       $0.top.equalTo(selectedKeywordLabel.snp.bottom).offset(10.adaptiveHeight)
       $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
       $0.height.equalTo(36.adaptiveHeight)
     }
-    self.locationLabel.snp.makeConstraints {
+
+    locationLabel.snp.makeConstraints {
       $0.top.equalTo(selectKeywordStackView.snp.bottom).offset(24.adaptiveHeight)
       $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
       $0.height.equalTo(28.adaptiveHeight)
     }
-    self.locationTextField.snp.makeConstraints {
+
+    locationTextField.snp.makeConstraints {
       $0.top.equalTo(locationLabel.snp.bottom).offset(12.adaptiveHeight)
       $0.horizontalEdges.equalTo(contentView.snp.horizontalEdges).inset(20.adaptiveWidth)
       $0.height.equalTo(52.adaptiveHeight)
     }
-    self.locationTextCountLabel.snp.makeConstraints {
+
+    locationTextCountLabel.snp.makeConstraints {
       $0.top.equalTo(locationTextField.snp.bottom).offset(8.adaptiveHeight)
       $0.trailing.equalTo(contentView.snp.trailing).offset(-20.adaptiveWidth)
       $0.height.equalTo(18.adaptiveHeight)
     }
-    self.contentsLabel.snp.makeConstraints {
+
+    contentsLabel.snp.makeConstraints {
       $0.top.equalTo(locationTextCountLabel.snp.bottom)
       $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
       $0.height.equalTo(28.adaptiveHeight)
     }
-    self.contentsTextView.snp.makeConstraints {
+    
+    contentsTextView.snp.makeConstraints {
       $0.top.equalTo(contentsLabel.snp.bottom).offset(12.adaptiveHeight)
       $0.horizontalEdges.equalTo(contentView.snp.horizontalEdges).inset(20.adaptiveWidth)
       $0.height.greaterThanOrEqualTo(174.adaptiveHeight)
     }
-    self.uploadButton.snp.makeConstraints {
+
+    uploadButton.snp.makeConstraints {
       $0.top.equalTo(contentsTextView.snp.bottom).offset(18.adaptiveHeight)
       $0.horizontalEdges.equalToSuperview().inset(20.adaptiveWidth)
       $0.height.equalTo(54.adaptiveHeight)
       $0.bottom.equalTo(contentView.snp.bottom).inset(82.adaptiveHeight)
     }
-    self.videoThumbnailImageView.snp.makeConstraints {
+
+    videoThumbnailImageView.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
-    self.videoThumbnailSelectButton.snp.makeConstraints {
+
+    videoThumbnailSelectButton.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
-    self.videoThumbnailAlertLabel.snp.makeConstraints {
+
+    videoThumbnailAlertLabel.snp.makeConstraints {
       $0.bottom.equalToSuperview().offset(-16.adaptiveHeight)
       $0.centerX.equalToSuperview()
     }
@@ -232,7 +240,7 @@ public class UploadVideoViewController: UIViewController {
 
   func bind() {
     viewModel.output.thumbnailImage
-      .bind(to: self.videoThumbnailImageView.rx.image)
+      .bind(to: videoThumbnailImageView.rx.image)
       .disposed(by: disposeBag)
 
     viewModel.output.locationTextCount
