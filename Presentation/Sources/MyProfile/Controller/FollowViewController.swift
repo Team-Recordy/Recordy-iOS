@@ -9,6 +9,7 @@ enum FollowType {
   case follower
   case following
 }
+
 public class FollowViewController: UIViewController {
   
   let followType: FollowType
@@ -34,6 +35,8 @@ public class FollowViewController: UIViewController {
     setTableView()
     bindViewModel()
     setTitle()
+    
+    self.navigationController?.navigationBar.topItem?.title = ""
   }
   
   public func setStyle() {
