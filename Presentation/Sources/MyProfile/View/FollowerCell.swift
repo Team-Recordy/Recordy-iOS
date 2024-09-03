@@ -37,7 +37,10 @@ class FollowerCell: UITableViewCell {
   }
   
   private func setStyle() {
-    profileImageView.cornerRadius(10)
+    profileImageView.layer.cornerRadius = 54/2
+    profileImageView.clipsToBounds = true
+    profileImageView.contentMode = .scaleAspectFit
+    
     usernameLabel.font = RecordyFont.body2Bold.font
     usernameLabel.textColor = CommonAsset.recordyGrey01.color
     contentView.backgroundColor = .black
@@ -79,6 +82,5 @@ class FollowerCell: UITableViewCell {
   
   func updateFollowButton(isFollowed: Bool) {
     followButton.mediumState = isFollowed ? .active : .inactive
-//    followButton.setTitle(isFollowed ? "팔로우" : "팔로잉", for: .normal)
   }
 }
