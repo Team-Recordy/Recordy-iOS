@@ -54,6 +54,7 @@ public class ProfileViewController: UIViewController {
     getMyRecordList()
     getUserProfile()
     setObserver()
+    self.title = "프로필"
   }
 
   public override func viewWillDisappear(_ animated: Bool) {
