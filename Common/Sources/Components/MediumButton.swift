@@ -9,7 +9,7 @@ public enum MediumState {
 
 public class MediumButton: UIButton {
   
-  public var mediumState: MediumState = .inactive {
+  public var mediumState: MediumState = .active {
     didSet {
       mediumButtonAppearance()
     }
@@ -33,13 +33,13 @@ public class MediumButton: UIButton {
   private func mediumButtonAppearance() {
     switch mediumState {
     case .active:
-      backgroundColor = CommonAsset.recordyWhite.color
-      setTitleColor(CommonAsset.recordyGrey09.color, for: .normal)
-      setTitle("팔로우", for: .normal)
-    case .inactive:
       backgroundColor = CommonAsset.recordyGrey08.color
       setTitleColor(CommonAsset.recordyGrey01.color, for: .normal)
       setTitle("팔로잉", for: .normal)
+    case .inactive:
+      backgroundColor = CommonAsset.recordyWhite.color
+      setTitleColor(CommonAsset.recordyGrey09.color, for: .normal)
+      setTitle("팔로우", for: .normal)
     }
   }
 }
