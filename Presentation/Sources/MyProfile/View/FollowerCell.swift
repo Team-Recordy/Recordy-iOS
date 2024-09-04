@@ -26,7 +26,6 @@ class FollowerCell: UITableViewCell {
     setStyle()
     setUI()
     setAutoLayout()
-    followButton.addTarget(self, action: #selector(followButtonTapped), for: .touchUpInside)
   }
   
   required init?(coder: NSCoder) {
@@ -35,26 +34,25 @@ class FollowerCell: UITableViewCell {
   
   private func setStyle() {
     profileImageView.do {
-      $0.layer.cornerRadius = 54/2
+      $0.layer.cornerRadius = 54 / 2
       $0.clipsToBounds = true
       $0.contentMode = .scaleAspectFit
     }
+    
     usernameLabel.do {
       $0.font = RecordyFont.body2Bold.font
       $0.textColor = CommonAsset.recordyGrey01.color
     }
     
-    contentView.do{
-      $0.backgroundColor = .black
-    }
+    contentView.backgroundColor = .black
+    
+    followButton.addTarget(self, action: #selector(followButtonTapped), for: .touchUpInside)
   }
   
   private func setUI() {
-    contentView.do {
-      $0.addSubview(profileImageView)
-      $0.addSubview(usernameLabel)
-      $0.addSubview(followButton)
-    }
+    contentView.addSubview(profileImageView)
+    contentView.addSubview(usernameLabel)
+    contentView.addSubview(followButton)
   }
   
   private func setAutoLayout() {

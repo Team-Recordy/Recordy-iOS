@@ -9,7 +9,7 @@ enum FollowType {
   case follower
   case following
   
-  var title: String{
+  var title: String {
     switch self {
     case .follower:
       return "팔로워"
@@ -23,7 +23,10 @@ public class FollowViewController: UIViewController {
   
   private let followType: FollowType
   private let viewModel: FollowViewModel
-  private let tableView = UITableView()
+  private let tableView = UITableView().then {
+    $0.backgroundColor = .black
+    $0.separatorStyle = .none
+  }
   private let emptyView = FollowerEmptyView()
   
   init(followType: FollowType) {
@@ -47,19 +50,24 @@ public class FollowViewController: UIViewController {
   }
   
   private func setStyle() {
-    view.backgroundColor = .black
-    tableView.dataSource = self
-    tableView.delegate = self
-    tableView.backgroundColor = .black
-    tableView.register(FollowerCell.self, forCellReuseIdentifier: "FollowerCell")
-    tableView.separatorStyle = .none
+    view.do {
+      $0.backgroundColor = .black
+    }
+    
+    tableView.do {
+      $0.dataSource = self
+      $0.delegate = self
+      $0.register(FollowerCell.self, forCellReuseIdentifier: "FollowerCell")
+    }
     
     self.title = followType.title
   }
   
   private func setUI() {
-    view.addSubview(tableView)
-    view.addSubview(emptyView)
+    view.do {
+      $0.addSubview(tableView)
+      $0.addSubview(emptyView)
+    }
   }
   
   private func setAutoLayout() {
@@ -71,7 +79,6 @@ public class FollowViewController: UIViewController {
       $0.edges.equalTo(view.safeAreaLayoutGuide)
     }
   }
-  
   
   private func bind() {
     viewModel.followers.bind { [weak self] _ in
@@ -102,11 +109,13 @@ extension FollowViewController: UITableViewDataSource, UITableViewDelegate {
     let follower = viewModel.followers.value[indexPath.row]
     cell.configure(with: follower)
     
-    if indexPath.row == 0 && followType == .following {
-      cell.followButton.isHidden = true
-    } else {
-      cell.followButton.isHidden = false
-      cell.updateFollowButton(isFollowed: follower.isFollowing)
+    cell.followButton.do {
+      if indexPath.row == 0 && followType == .following {
+        $0.isHidden = true
+      } else {
+        $0.isHidden = false
+        cell.updateFollowButton(isFollowed: follower.isFollowing)
+      }
     }
     
     cell.followButtonEvent = { [weak self] in
