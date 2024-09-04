@@ -44,7 +44,7 @@ public class FollowViewController: UIViewController {
     setStyle()
     setUI()
     setAutoLayout()
-    bind()
+    bindViewModel()
     
     self.navigationController?.navigationBar.topItem?.title = ""
   }
@@ -80,13 +80,13 @@ public class FollowViewController: UIViewController {
     }
   }
   
-  private func bind() {
-    viewModel.followers.bind { [weak self] _ in
+  private func bindViewModel() {
+    viewModel.followersDidChange = { [weak self] followers in
       guard let self = self else { return }
       self.tableView.reloadData()
     }
     
-    viewModel.isEmpty.bind { [weak self] isEmpty in
+    viewModel.isEmptyDidChange = { [weak self] isEmpty in
       guard let self = self else { return }
       self.tableView.isHidden = isEmpty
       self.emptyView.isHidden = !isEmpty
@@ -97,7 +97,7 @@ public class FollowViewController: UIViewController {
 extension FollowViewController: UITableViewDataSource, UITableViewDelegate {
   
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return viewModel.followers.value.count
+    return viewModel.followers.count
   }
   
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -106,7 +106,7 @@ extension FollowViewController: UITableViewDataSource, UITableViewDelegate {
       for: indexPath
     ) as! FollowerCell
     
-    let follower = viewModel.followers.value[indexPath.row]
+    let follower = viewModel.followers[indexPath.row]
     cell.configure(with: follower)
     
     cell.followButton.do {
@@ -126,7 +126,7 @@ extension FollowViewController: UITableViewDataSource, UITableViewDelegate {
   }
   
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let userVC = OtherUserProfileViewController(id: viewModel.followers.value[indexPath.row].id)
+    let userVC = OtherUserProfileViewController(id: viewModel.followers[indexPath.row].id)
     self.navigationController?.pushViewController(userVC, animated: true)
   }
 }

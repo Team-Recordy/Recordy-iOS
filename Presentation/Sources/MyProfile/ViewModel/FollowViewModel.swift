@@ -12,12 +12,18 @@ import Core
 class FollowViewModel {
   
   let followType: FollowType
-  var followers: Bindable<[Follower]> = Bindable([])
-  var isEmpty: Bindable<Bool> = Bindable(false)
-  
+  var followers: [Follower] = [] {
+    didSet {
+      followersDidChange?(followers)
+      isEmptyDidChange?(followers.isEmpty)
+    }
+  }
   var cursorId: Int? = nil
   
   let apiProvider = APIProvider<APITarget.Users>()
+  
+  var followersDidChange: (([Follower]) -> Void)?
+  var isEmptyDidChange: ((Bool) -> Void)?
   
   init(followType: FollowType) {
     self.followType = followType
@@ -72,9 +78,7 @@ class FollowViewModel {
         profileImage: $0.userInfo.profileImageUrl
       )
     }
-    self.followers.value = followerList
-    self.isEmpty.value = followerList.isEmpty
-    
+    self.followers = followerList
   }
   
   private func handleFollowingResponse(response: DTO.GetFollowListResponse) {
@@ -86,19 +90,18 @@ class FollowViewModel {
         profileImage: $0.profileImageUrl
       )
     }
-    
-    self.followers.value = followList.reversed()
-    }
+    self.followers = followList.reversed()
+  }
   
   func toggleFollow(at index: Int) {
-    guard index < followers.value.count else { return }
-    followers.value[index].isFollowing.toggle()
-    followers.value = followers.value
+    guard index < followers.count else { return }
+    followers[index].isFollowing.toggle()
+    followersDidChange?(followers)
   }
   
   func postFollowRequest(at index: Int) {
-    guard index < followers.value.count else { return }
-    let follower = followers.value[index]
+    guard index < followers.count else { return }
+    let follower = followers[index]
     let request = DTO.FollowRequest(followingId: follower.id)
     
     toggleFollow(at: index)
