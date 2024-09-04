@@ -8,14 +8,23 @@ import Common
 enum FollowType {
   case follower
   case following
+  
+  var title: String{
+    switch self {
+    case .follower:
+      return "팔로워"
+    case .following:
+      return "팔로우"
+    }
+  }
 }
 
 public class FollowViewController: UIViewController {
   
-  let followType: FollowType
-  let viewModel: FollowViewModel
-  let tableView = UITableView()
-  let emptyView = FollowerEmptyView()
+  private let followType: FollowType
+  private let viewModel: FollowViewModel
+  private let tableView = UITableView()
+  private let emptyView = FollowerEmptyView()
   
   init(followType: FollowType) {
     self.followType = followType
@@ -32,15 +41,20 @@ public class FollowViewController: UIViewController {
     setStyle()
     setUI()
     setAutoLayout()
-    setTableView()
-    bindViewModel()
-    setTitle()
+    bind()
     
     self.navigationController?.navigationBar.topItem?.title = ""
   }
   
-  public func setStyle() {
+  private func setStyle() {
     view.backgroundColor = .black
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.backgroundColor = .black
+    tableView.register(FollowerCell.self, forCellReuseIdentifier: "FollowerCell")
+    tableView.separatorStyle = .none
+    
+    self.title = followType.title
   }
   
   private func setUI() {
@@ -58,15 +72,8 @@ public class FollowViewController: UIViewController {
     }
   }
   
-  private func setTableView() {
-    tableView.dataSource = self
-    tableView.delegate = self
-    tableView.backgroundColor = .black
-    tableView.register(FollowerCell.self, forCellReuseIdentifier: "FollowerCell")
-    tableView.separatorStyle = .none
-  }
   
-  private func bindViewModel() {
+  private func bind() {
     viewModel.followers.bind { [weak self] _ in
       guard let self = self else { return }
       self.tableView.reloadData()
@@ -76,15 +83,6 @@ public class FollowViewController: UIViewController {
       guard let self = self else { return }
       self.tableView.isHidden = isEmpty
       self.emptyView.isHidden = !isEmpty
-    }
-  }
-  
-  private func setTitle(){
-    switch followType {
-    case .follower:
-      self.title = "팔로워"
-    case .following:
-      self.title = "팔로우"
     }
   }
 }

@@ -44,7 +44,6 @@ public class ProfileViewController: UIViewController {
     setAutoLayout()
     setDelegate()
     controlTypeChanged()
-    setTitle()
   }
 
   public override func viewWillAppear(_ animated: Bool) {
@@ -191,10 +190,6 @@ public class ProfileViewController: UIViewController {
     self.profileInfoView.userName.text = user.nickname
     let url = URL(string: user.profileImage)!
     self.profileInfoView.profileImage.kf.setImage(with: url)
-  }
-  
-  func setTitle(){
-    self.title = "프로필"
   }
   
   func getUserProfile() {
