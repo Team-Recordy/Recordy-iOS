@@ -11,15 +11,15 @@ import Foundation
 extension DTO {
   public struct GetFollowListRequest: BaseRequest {
     /// 페이지네이션 커서 ID?
-    let cursorId: Int
+//    let cursorId: Int?
     /// 가져올 데이터 갯수
     let size: Int
 
     public init(
-      cursorId: Int,
+//      cursorId: Int?,
       size: Int
     ) {
-      self.cursorId = cursorId
+//      self.cursorId = cursorId
       self.size = size
     }
   }

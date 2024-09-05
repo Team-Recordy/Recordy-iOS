@@ -8,16 +8,27 @@ import Common
 enum FollowType {
   case follower
   case following
+  
+  var title: String {
+    switch self {
+    case .follower:
+      return "팔로워"
+    case .following:
+      return "팔로우"
+    }
+  }
 }
 
-public class FollowViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+public class FollowViewController: UIViewController {
   
-  let followType: FollowType
+  private let followType: FollowType
   private let viewModel: FollowViewModel
-  private let tableView = UITableView()
+  private let tableView = UITableView().then {
+    $0.backgroundColor = .black
+    $0.separatorStyle = .none
+  }
   private let emptyView = FollowerEmptyView()
-  let settingButton = UIButton()
-
+  
   init(followType: FollowType) {
     self.followType = followType
     self.viewModel = FollowViewModel(followType: followType)
@@ -33,47 +44,60 @@ public class FollowViewController: UIViewController, UITableViewDataSource, UITa
     setStyle()
     setUI()
     setAutoLayout()
-    setTableView()
-    bindViewModel()
-    viewModel.fetchUsers()
+    bind()
+    
+    self.navigationController?.navigationBar.topItem?.title = ""
   }
   
   private func setStyle() {
-    view.backgroundColor = .black
+    view.do {
+      $0.backgroundColor = .black
+    }
+    
+    tableView.do {
+      $0.dataSource = self
+      $0.delegate = self
+      $0.register(FollowerCell.self, forCellReuseIdentifier: "FollowerCell")
+    }
+    
+    self.title = followType.title
   }
   
   private func setUI() {
-    view.addSubview(emptyView)
-    view.addSubview(tableView)
+    view.do {
+      $0.addSubview(tableView)
+      $0.addSubview(emptyView)
+    }
   }
   
   private func setAutoLayout() {
     emptyView.snp.makeConstraints {
       $0.edges.equalTo(view.safeAreaLayoutGuide)
     }
+    
     tableView.snp.makeConstraints {
       $0.edges.equalTo(view.safeAreaLayoutGuide)
     }
   }
   
-  private func setTableView() {
-    tableView.dataSource = self
-    tableView.delegate = self
-    tableView.backgroundColor = .black
-    tableView.register(FollowerCell.self, forCellReuseIdentifier: "FollowerCell")
-    tableView.separatorStyle = .none
-  }
-  
-  public func bindViewModel() {
-    viewModel.followers.bind { [weak self] _ in
+  private func bind() {
+    viewModel.followersDidChange = { [weak self] followers in
       guard let self = self else { return }
       self.tableView.reloadData()
-      self.tableView.isHidden = viewModel.followers.value.isEmpty
+    }
+    
+    viewModel.isEmptyDidChange = { [weak self] isEmpty in
+      guard let self = self else { return }
+      self.tableView.isHidden = isEmpty
+      self.emptyView.isHidden = !isEmpty
     }
   }
+}
+
+extension FollowViewController: UITableViewDataSource, UITableViewDelegate {
   
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return viewModel.followers.value.count
+    return viewModel.followers.count
   }
   
   public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -81,105 +105,28 @@ public class FollowViewController: UIViewController, UITableViewDataSource, UITa
       withIdentifier: "FollowerCell",
       for: indexPath
     ) as! FollowerCell
-    let follower = viewModel.followers.value[indexPath.row]
+    
+    let follower = viewModel.followers[indexPath.row]
     cell.configure(with: follower)
+    
+    cell.followButton.do {
+      if indexPath.row == 0 && followType == .following {
+        $0.isHidden = true
+      } else {
+        $0.isHidden = false
+        cell.updateFollowButton(isFollowed: follower.isFollowing)
+      }
+    }
+    
     cell.followButtonEvent = { [weak self] in
       guard let self = self else { return }
-      postFollowRequest(index: indexPath.row)
-      cell.updateFollowButton(isFollowed: follower.isFollowing)
+      self.viewModel.postFollowRequest(at: indexPath.row)
     }
     return cell
   }
   
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let userVC = OtherUserProfileViewController(id: viewModel.followers.value[indexPath.row].id)
+    let userVC = OtherUserProfileViewController(id: viewModel.followers[indexPath.row].id)
     self.navigationController?.pushViewController(userVC, animated: true)
-  }
-  
-  func postFollowRequest(index: Int) {
-    self.viewModel.followers.value[index].isFollowing.toggle()
-    let apiProvider = APIProvider<APITarget.Users>()
-    let request = DTO.FollowRequest(followingId: viewModel.followers.value[index].id)
-    apiProvider.justRequest(.follow(request)) { result in
-      switch result {
-      case .success(let success):
-        print(success)
-      case .failure(let failure):
-        print(failure)
-      }
-    }
-  }
-}
-
-public class FollowerCell: UITableViewCell {
-  let profileImageView = UIImageView()
-  let usernameLabel = UILabel()
-  let followButton = MediumButton()
-  
-  var followButtonEvent: (() -> Void)?
-  
-  public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-    super.init(style: style, reuseIdentifier: reuseIdentifier)
-    
-    contentView.addSubview(profileImageView)
-    contentView.addSubview(usernameLabel)
-    contentView.addSubview(followButton)
-    
-    setStyle()
-    setAutoLayout()
-    followButton.addTarget(self, action: #selector(followButtonTapped), for: .touchUpInside)
-  }
-  
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-  
-  private func setStyle() {
-    profileImageView.cornerRadius(10)
-    usernameLabel.font = RecordyFont.body2Bold.font
-    usernameLabel.textColor = CommonAsset.recordyGrey01.color
-    contentView.backgroundColor = .black
-  }
-  
-  private func setAutoLayout() {
-    profileImageView.snp.makeConstraints {
-      $0.top.equalTo(contentView.snp.top).offset(10)
-      $0.leading.equalTo(contentView.snp.leading).offset(20)
-      $0.centerY.equalTo(contentView.snp.centerY)
-      $0.width.equalTo(54)
-      $0.height.equalTo(54)
-    }
-    
-    usernameLabel.snp.makeConstraints {
-      $0.leading.equalTo(profileImageView.snp.trailing).offset(20)
-      $0.centerY.equalTo(contentView.snp.centerY)
-    }
-    
-    followButton.snp.makeConstraints {
-      $0.trailing.equalTo(contentView.snp.trailing).offset(-20)
-      $0.centerY.equalTo(contentView.snp.centerY)
-      $0.width.equalTo(76.adaptiveWidth)
-      $0.height.equalTo(36.adaptiveHeight)
-    }
-  }
-  
-  @objc private func followButtonTapped() {
-    self.followButtonEvent?()
-  }
-  
-  public func updateFollowButton(isFollowed: Bool) {
-    followButton.mediumState = isFollowed ? .active : .inactive
-    followButton.setTitle(isFollowed ? "팔로우" : "팔로잉", for: .normal)
-  }
-  
-  func configure(with follower: Follower) {
-    let url = URL(string: follower.profileImage)
-    profileImageView.kf.setImage(with: url)
-    usernameLabel.text = follower.username
-    if follower.username == "유영" {
-      followButton.isHidden = true
-    } else {
-      updateFollowButton(isFollowed: follower.isFollowing)
-    }
   }
 }

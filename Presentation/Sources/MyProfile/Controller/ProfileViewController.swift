@@ -53,6 +53,7 @@ public class ProfileViewController: UIViewController {
     getMyRecordList()
     getUserProfile()
     setObserver()
+    self.title = "프로필"
   }
 
   public override func viewWillDisappear(_ animated: Bool) {
@@ -82,7 +83,6 @@ public class ProfileViewController: UIViewController {
   }
 
   func setStyle() {
-    self.title = "프로필"
     let rightButton = UIButton(type: .system)
     rightButton.setImage(CommonAsset.settingIcon.image, for: .normal)
     rightButton.addTarget(
@@ -191,7 +191,7 @@ public class ProfileViewController: UIViewController {
     let url = URL(string: user.profileImage)!
     self.profileInfoView.profileImage.kf.setImage(with: url)
   }
-
+  
   func getUserProfile() {
     let apiProvider = APIProvider<APITarget.Users>()
     let userId = UserDefaults.standard.integer(forKey: "userId")

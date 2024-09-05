@@ -98,7 +98,7 @@ extension APITarget.Users: TargetType {
     case .getfollowList(let getFollowListRequest):
       return .requestParameters(
         parameters: [
-          "cursorId": getFollowListRequest.cursorId,
+//          "cursorId": getFollowListRequest.cursorId,
           "size": getFollowListRequest.size
         ],
         encoding: URLEncoding.queryString
@@ -106,7 +106,7 @@ extension APITarget.Users: TargetType {
     case .getfollowerList(let getFollowerListRequest):
       return .requestParameters(
         parameters: [
-          "cursorId": getFollowerListRequest.cursorId,
+//          "cursorId": getFollowerListRequest.cursorId,
           "size": getFollowerListRequest.size
         ],
         encoding: URLEncoding.queryString
