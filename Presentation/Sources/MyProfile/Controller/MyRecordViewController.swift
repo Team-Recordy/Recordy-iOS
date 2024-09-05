@@ -132,6 +132,9 @@ public class MyRecordViewController: UIViewController {
       $0.leading.trailing.bottom.equalToSuperview()
     }
   }
+  @objc private func didTapRecordButton() {
+    
+  }
   
   private func bindViewModel() {
     viewModel.isEmpty.bind { [weak self] isEmpty in
