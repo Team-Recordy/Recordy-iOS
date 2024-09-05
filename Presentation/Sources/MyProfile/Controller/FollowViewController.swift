@@ -44,7 +44,7 @@ public class FollowViewController: UIViewController {
     setStyle()
     setUI()
     setAutoLayout()
-    bindViewModel()
+    bind()
     
     self.navigationController?.navigationBar.topItem?.title = ""
   }
@@ -80,7 +80,7 @@ public class FollowViewController: UIViewController {
     }
   }
   
-  private func bindViewModel() {
+  private func bind() {
     viewModel.followersDidChange = { [weak self] followers in
       guard let self = self else { return }
       self.tableView.reloadData()
