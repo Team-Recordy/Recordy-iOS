@@ -46,20 +46,20 @@ public class RecordyTermButton: UIButton {
   }
   
   private func setUI() {
-    self.addSubviews(
+    addSubviews(
       agreeImageView,
       agreeLabel
     )
   }
   
   private func setAutolayout() {
-    self.agreeImageView.snp.makeConstraints {
+    agreeImageView.snp.makeConstraints {
       $0.leading.equalToSuperview().offset(24)
       $0.width.height.equalTo(16)
       $0.centerY.equalToSuperview()
     }
     
-    self.agreeLabel.snp.makeConstraints {
+    agreeLabel.snp.makeConstraints {
       $0.leading.equalTo(agreeImageView.snp.trailing).offset(20)
       $0.centerY.equalToSuperview()
     }
@@ -71,6 +71,6 @@ public class RecordyTermButton: UIButton {
   }
   
   private func updateToggleButton() {
-    self.agreeImageView.image = (currentState == .activate) ? CommonAsset.activateCheck.image : CommonAsset.deactivateCheck.image
+    agreeImageView.image = (currentState == .activate) ? CommonAsset.activateCheck.image : CommonAsset.deactivateCheck.image
   }
 }

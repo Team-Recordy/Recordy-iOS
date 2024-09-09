@@ -55,7 +55,7 @@ final class CompleteView: UIView {
   }
   
   func setUI() {
-    self.addSubviews(
+    addSubviews(
       gradientView,
       completeImage,
       completeText1,

@@ -56,4 +56,9 @@ extension String {
     let matches = regex.matches(in: self, range: range)
     return !matches.isEmpty
   }
+  
+  public func isNicknamePatternValid(_ nickname: String) -> Bool {
+    let pattern = "^[가-힣0-9._]{1,10}$"
+    return nickname.matches(pattern: pattern)
+  }
 }

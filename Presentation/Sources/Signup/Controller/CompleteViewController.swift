@@ -33,10 +33,10 @@ final class CompleteViewController: UIViewController{
   
   private func setProgressView() {
     let progressView = RecordyProgressView.shared
-    self.view.addSubview(progressView)
+    view.addSubview(progressView)
     
     progressView.snp.makeConstraints { make in
-      make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top).offset(10)
+      make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
       make.leading.trailing.equalToSuperview().inset(20)
       make.height.equalTo(6)
     }
@@ -55,7 +55,7 @@ final class CompleteViewController: UIViewController{
       case .success:
         let tabBarController = RecordyTabBarController()
         tabBarController.modalPresentationStyle = .fullScreen
-        self.present(tabBarController, animated: false)
+        present(tabBarController, animated: false)
       case .failure:
         print("failed to login")
       }

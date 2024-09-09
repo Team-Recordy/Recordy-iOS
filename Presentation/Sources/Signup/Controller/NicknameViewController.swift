@@ -15,42 +15,34 @@ import Core
 public final class NicknameViewController: UIViewController {
   
   private let nicknameView = NicknameView()
+  
   private var errorMessage: String?
   
   private var currentState: RecordyTextFieldState = .unselected {
     didSet {
-      nicknameView.nicknameTextField.updateTextFieldStyle(for: currentState)
-      updateUI(for: currentState)
+      nicknameView.updateUI(currentState, errorMessage)
     }
   }
   
   public override func loadView() {
-    self.view = nicknameView
+    view = nicknameView
   }
   
   public override func viewDidLoad() {
     super.viewDidLoad()
-    setTarget()
-    bind()
-    setTapGesture()
-    setProgressView()
+    setStyle()
+    setDelegate()
     RecordyProgressView.shared.updateProgress(currentPage: 1, totalPages: 3)
   }
   
-  private func setProgressView() {
-    let progressView = RecordyProgressView.shared
-    self.view.addSubview(progressView)
-    
-    progressView.snp.makeConstraints { make in
-      make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top).offset(10)
-      make.leading.trailing.equalToSuperview().inset(20)
-      make.height.equalTo(6)
-    }
+  func setStyle() {
+    nicknameView.nicknameTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+    nicknameView.nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+    setTapGesture()
   }
   
-  private func isNicknamePatternValid(_ nickname: String) -> Bool {
-    let pattern = "^[가-힣0-9._]{1,10}$"
-    return nickname.matches(pattern: pattern)
+  private func setDelegate() {
+    nicknameView.nicknameTextField.delegate = self
   }
   
   private func getNicknameRequest(completion: @escaping (Bool) -> Void) {
@@ -66,11 +58,6 @@ public final class NicknameViewController: UIViewController {
     }
   }
   
-  private func bind() {
-    nicknameView.nicknameTextField.delegate = self
-    nicknameView.nicknameTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-  }
-  
   private func updateTextFieldState(_ text: String) {
     if text.isEmpty {
       currentState = .unselected
@@ -78,39 +65,20 @@ public final class NicknameViewController: UIViewController {
       getNicknameRequest { [weak self] isAvailable in
         guard let self = self else { return }
         if isAvailable {
-          self.currentState = .selected
+          currentState = .selected
+          nextButton.buttonState = .active
         } else {
-          self.errorMessage = "이미 사용 중인 닉네임입니다."
-          self.currentState = .error
+          currentState = .error
+          errorMessage = "닉네임 중복"
+          nextButton.buttonState = .inactive
         }
       }
     } else {
-      self.errorMessage = "닉네임은 한글, 숫자, 밑줄, 마침표만 사용할 수 있습니다."
-      self.currentState = .error
-    }  }
-  
-  private func updateUI(for state: RecordyTextFieldState) {
-    switch state {
-    case .selected:
-      nicknameView.errorLabel.text = "사용 가능한 닉네임입니다."
-      nicknameView.errorLabel.textColor = CommonAsset.recordyMain.color
-      nicknameView.nextButton.buttonState = .active
-      
-    case .error:
-      nicknameView.errorLabel.text = errorMessage
-      nicknameView.errorLabel.textColor = CommonAsset.recordyAlert.color
-      nicknameView.nextButton.buttonState = .inactive
-      
-    case .unselected:
-      nicknameView.errorLabel.text = ""
-      nicknameView.nextButton.buttonState = .inactive
+      currentState = .error
+      errorMessage = "닉네임 정규식 맞지 않음"
+      nextButton.buttonState = .inactive
     }
   }
-  
-  private func setTarget() {
-    nicknameView.nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
-  }
-
   
   private func setTapGesture() {
     let tapGesture = UITapGestureRecognizer(
@@ -119,12 +87,12 @@ public final class NicknameViewController: UIViewController {
         dismissKeyboard
       )
     )
-    view.addGestureRecognizer(tapGesture)
+    addGestureRecognizer(tapGesture)
   }
   
   @objc private func nextButtonTapped() {
     let completeViewController = CompleteViewController()
-        self.navigationController?.pushViewController(completeViewController, animated: true)
+        navigationController?.pushViewController(completeViewController, animated: true)
   }
 }
 
@@ -146,14 +114,12 @@ extension NicknameViewController: UITextFieldDelegate {
     updateTextFieldState(textField.text ?? "")
   }
   
-  
   public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     textField.resignFirstResponder()
     
     if nicknameView.nextButton.buttonState == .active {
       nextButtonTapped()
     }
-    
     return true
   }
   

@@ -28,8 +28,8 @@ public class AgreeAllTermButton: RecordyTermButton {
   }
   
   private func setStyle() {
-    self.backgroundColor = CommonAsset.recordyGrey09.color
-    self.layer.cornerRadius = 8
+    backgroundColor = CommonAsset.recordyGrey09.color
+    layer.cornerRadius = 8
     
     agreeLabel.do {
       $0.text = "전체동의"
@@ -40,7 +40,7 @@ public class AgreeAllTermButton: RecordyTermButton {
   
   private func setAutolayout() {
     self.agreeImageView.snp.makeConstraints {
-      $0.leading.equalTo(self.snp.leading).offset(20)
+      $0.leading.equalTo(snp.leading).offset(20)
       $0.centerY.equalToSuperview()
       $0.width.height.equalTo(24)
     }

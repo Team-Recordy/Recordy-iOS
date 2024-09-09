@@ -1,4 +1,5 @@
 import UIKit
+
 import SnapKit
 import Then
 
@@ -15,11 +16,11 @@ public final class RecordyProgressView: UIView {
   
   var ratio: CGFloat = 0.0 {
     didSet {
-      self.progressBarView.snp.remakeConstraints {
+      progressBarView.snp.remakeConstraints {
         $0.leading.equalToSuperview()
         $0.centerY.equalToSuperview()
         $0.height.equalTo(6)
-        $0.width.equalToSuperview().multipliedBy(self.ratio)
+        $0.width.equalToSuperview().multipliedBy(ratio)
       }
       
       UIView.animate(
@@ -27,7 +28,7 @@ public final class RecordyProgressView: UIView {
         delay: 0,
         options: .curveEaseInOut,
         animations: {
-          self.layoutIfNeeded()
+          layoutIfNeeded()
         },
         completion: nil
       )
@@ -49,20 +50,20 @@ public final class RecordyProgressView: UIView {
   }
   
   func setStyle() {
-    self.isUserInteractionEnabled = false
-    self.backgroundColor = CommonAsset.recordySub01.color
-    self.layer.cornerRadius = 4
-    self.clipsToBounds = true
+    isUserInteractionEnabled = false
+    backgroundColor = CommonAsset.recordySub01.color
+    layer.cornerRadius = 4
+    clipsToBounds = true
     progressBarView.layer.cornerRadius = 6
     progressBarView.clipsToBounds = true
   }
   
   func setUI() {
-    self.addSubview(progressBarView)
+    addSubview(progressBarView)
   }
   
   public func updateProgress(currentPage: Int, totalPages: Int) {
     let newRatio = CGFloat(currentPage + 1) / CGFloat(totalPages)
-    self.ratio = newRatio
+    ratio = newRatio
   }
 }

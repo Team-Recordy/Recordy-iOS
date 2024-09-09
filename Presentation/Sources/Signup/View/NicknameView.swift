@@ -1,5 +1,8 @@
 import UIKit
 
+import SnapKit
+import Then
+
 import Common
 
 final class NicknameView: UIView {
@@ -7,6 +10,7 @@ final class NicknameView: UIView {
   var textFieldCount = "0"
   
   let gradientView = RecordyGradientView()
+  let progressView = RecordyProgressView.shared
   let nicknameText = UILabel()
   let nicknameTextField = RecordyTextField(placeholder: "EX) 레코디둥이들")
   let nextButton = RecordyButton()
@@ -27,7 +31,7 @@ final class NicknameView: UIView {
   }
   
   func setStyle() {
-    self.backgroundColor = CommonAsset.recordyBG.color
+    backgroundColor = CommonAsset.recordyBG.color
     
     nicknameText.do {
       $0.text = "당신의 첫 번째 기록,\n닉네임을 정해주세요"
@@ -57,13 +61,14 @@ final class NicknameView: UIView {
   }
   
   func setUI() {
-    self.addSubviews(
+    addSubviews(
       gradientView,
       nicknameText,
       nicknameTextField,
       nextButton,
       textFieldCountLabel,
-      errorLabel
+      errorLabel,
+      progressView
     )
   }
   
@@ -98,6 +103,28 @@ final class NicknameView: UIView {
     errorLabel.snp.makeConstraints {
       $0.top.equalTo(nicknameTextField.snp.bottom).offset(8)
       $0.leading.equalToSuperview().offset(20)
+    }
+    
+    progressView.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
+      $0.leading.trailing.equalToSuperview().inset(20)
+      $0.height.equalTo(6)
+    }
+  }
+  
+  private func updateUI(state: RecordyTextFieldState, errorMessage: String) {
+    switch state {
+    case .selected:
+      errorLabel.text = "사용 가능한 닉네임입니다."
+      errorLabel.textColor = CommonAsset.recordyMain.color
+            
+    case .error:
+      errorLabel.text = errorMessage
+      errorLabel.textColor = CommonAsset.recordyAlert.color
+      
+    case .unselected:
+      nicknameView.errorLabel.text = ""
+      nextButton.buttonState = .inactive
     }
   }
 }
