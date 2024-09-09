@@ -65,12 +65,7 @@ public class RecordyTermButton: UIButton {
     }
   }
   
-  public func updateState(_ state: ToggleButtonState) {
-    currentState = state
-    updateToggleButton()
-  }
-  
-  private func updateToggleButton() {
-    agreeImageView.image = (currentState == .activate) ? CommonAsset.activateCheck.image : CommonAsset.deactivateCheck.image
+  public func updateUI(_ state: ToggleButtonState) {
+    agreeImageView.image = (state == .activate) ? CommonAsset.activateCheck.image : CommonAsset.deactivateCheck.image
   }
 }

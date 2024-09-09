@@ -20,7 +20,7 @@ public final class NicknameViewController: UIViewController {
   
   private var currentState: RecordyTextFieldState = .unselected {
     didSet {
-      nicknameView.updateUI(currentState, errorMessage)
+      nicknameView.updateUI(state: currentState, errorMessage: (currentState == .error) ? errorMessage : nil)
     }
   }
   
@@ -32,7 +32,6 @@ public final class NicknameViewController: UIViewController {
     super.viewDidLoad()
     setStyle()
     setDelegate()
-    RecordyProgressView.shared.updateProgress(currentPage: 1, totalPages: 3)
   }
   
   func setStyle() {
@@ -66,17 +65,17 @@ public final class NicknameViewController: UIViewController {
         guard let self = self else { return }
         if isAvailable {
           currentState = .selected
-          nextButton.buttonState = .active
+          nicknameView.nextButton.buttonState = .active
         } else {
           currentState = .error
-          errorMessage = "닉네임 중복"
-          nextButton.buttonState = .inactive
+          errorMessage = "ⓘ 이미 사용 중인 닉네임이에요."
+          nicknameView.nextButton.buttonState = .inactive
         }
       }
     } else {
       currentState = .error
-      errorMessage = "닉네임 정규식 맞지 않음"
-      nextButton.buttonState = .inactive
+      errorMessage = "ⓘ 한글, 숫자, 밑줄 및 마침표만 사용할 수 있어요."
+      nicknameView.nextButton.buttonState = .inactive
     }
   }
   
@@ -92,7 +91,7 @@ public final class NicknameViewController: UIViewController {
   
   @objc private func nextButtonTapped() {
     let completeViewController = CompleteViewController()
-        navigationController?.pushViewController(completeViewController, animated: true)
+    navigationController?.pushViewController(completeViewController, animated: true)
   }
 }
 
@@ -103,6 +102,7 @@ extension NicknameViewController: UITextFieldDelegate {
     guard let stringRange = Range(range, in: currentText) else {
       return false
     }
+    
     let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
     
     updateTextFieldState(updatedText)

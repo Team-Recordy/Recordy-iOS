@@ -15,31 +15,18 @@ import Common
 final class CompleteViewController: UIViewController{
   
   private let completeView = CompleteView()
-  private let nicknameView = NicknameView()
   
   override func loadView() {
-    self.view = CompleteView()
+    view = completeView
   }
   
   public override func viewDidLoad() {
     super.viewDidLoad()
-    setProgressView()
-    RecordyProgressView.shared.updateProgress(currentPage: 2, totalPages: 3)
+    setStyle()
   }
   
-  private func setTarget() {
+  private func setStyle() {
     completeView.completeButton.addTarget(self, action: #selector(completeButtonTapped), for: .touchUpInside)
-  }
-  
-  private func setProgressView() {
-    let progressView = RecordyProgressView.shared
-    view.addSubview(progressView)
-    
-    progressView.snp.makeConstraints { make in
-      make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
-      make.leading.trailing.equalToSuperview().inset(20)
-      make.height.equalTo(6)
-    }
   }
   
   @objc private func completeButtonTapped() {

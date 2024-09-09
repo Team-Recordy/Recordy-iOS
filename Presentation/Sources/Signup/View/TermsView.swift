@@ -39,7 +39,7 @@ final class TermsView: UIView {
   }
   
   func setStyle() {
-    self.backgroundColor = CommonAsset.recordyBG.color
+    backgroundColor = CommonAsset.recordyBG.color
     
     termImage.do {
       $0.image = CommonAsset.signupImage.image
@@ -73,7 +73,7 @@ final class TermsView: UIView {
   }
   
   func setUI() {
-    self.addSubviews(
+    addSubviews(
       gradientView,
       termImage,
       termText,

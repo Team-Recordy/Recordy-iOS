@@ -10,7 +10,6 @@ final class NicknameView: UIView {
   var textFieldCount = "0"
   
   let gradientView = RecordyGradientView()
-  let progressView = RecordyProgressView.shared
   let nicknameText = UILabel()
   let nicknameTextField = RecordyTextField(placeholder: "EX) 레코디둥이들")
   let nextButton = RecordyButton()
@@ -18,7 +17,7 @@ final class NicknameView: UIView {
   let errorLabel = UILabel()
   
   var onTextChange: ((String) -> Void)?
-    
+  
   public override init(frame: CGRect) {
     super.init(frame: frame)
     setStyle()
@@ -67,8 +66,7 @@ final class NicknameView: UIView {
       nicknameTextField,
       nextButton,
       textFieldCountLabel,
-      errorLabel,
-      progressView
+      errorLabel
     )
   }
   
@@ -104,20 +102,14 @@ final class NicknameView: UIView {
       $0.top.equalTo(nicknameTextField.snp.bottom).offset(8)
       $0.leading.equalToSuperview().offset(20)
     }
-    
-    progressView.snp.makeConstraints {
-      $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
-      $0.leading.trailing.equalToSuperview().inset(20)
-      $0.height.equalTo(6)
-    }
   }
   
-  private func updateUI(state: RecordyTextFieldState, errorMessage: String) {
+  public func updateUI(state: RecordyTextFieldState, errorMessage: String? = nil) {
     switch state {
     case .selected:
-      errorLabel.text = "사용 가능한 닉네임입니다."
+      errorLabel.text = "사용 가능한 닉네임이에요!"
       errorLabel.textColor = CommonAsset.recordyMain.color
-            
+      
     case .error:
       errorLabel.text = errorMessage
       errorLabel.textColor = CommonAsset.recordyAlert.color

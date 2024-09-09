@@ -69,7 +69,7 @@ final class CompleteView: UIView {
       $0.top.horizontalEdges.equalToSuperview()
       $0.height.equalTo(400.adaptiveHeight)
     }
-
+    
     completeImage.snp.makeConstraints {
       $0.top.equalToSuperview().offset(294)
       $0.width.equalTo(100.adaptiveWidth)
