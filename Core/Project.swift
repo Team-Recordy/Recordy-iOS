@@ -22,7 +22,8 @@ let project = Project.makeModule(
     .external(name: "Moya", condition: .none),
     .external(name: "RxSwift", condition: .none),
     .external(name: "RxMoya", condition: .none),
-    .external(name: "AWSS3", condition: .none),
-    .Project.Common
+    .external(name: "RxSwift", condition: .none),
+    .external(name: "RxCocoa", condition: .none),
+    .external(name: "AWSS3", condition: .none)
   ]
 )

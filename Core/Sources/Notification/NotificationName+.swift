@@ -1,8 +1,8 @@
 //
 //  NotificationName+.swift
-//  Common
+//  Core
 //
-//  Created by 한지석 on 7/19/24.
+//  Created by 한지석 on 9/13/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 

@@ -41,11 +41,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     window = UIWindow(frame: windowScene.coordinateSpace.bounds)
     window?.windowScene = windowScene
-//    let rootViewController = SignupViewController()
-//    self.window?.rootViewController = rootViewController
-//    self.window?.makeKeyAndVisible()
-//    KeychainManager.shared.delete(token: .AccessToken)
-//    KeychainManager.shared.delete(token: .RefreshToken)
     APIProvider<APITarget.Users>.validateToken { login in
       DispatchQueue.main.async {
         var rootViewController: UIViewController

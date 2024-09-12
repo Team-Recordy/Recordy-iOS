@@ -19,8 +19,7 @@ let project = Project.makeModule(
   dependencies: [
     .external(name: "SnapKit", condition: .none),
     .external(name: "Then", condition: .none),
-    .external(name: "RxSwift", condition: .none),
-    .external(name: "RxCocoa", condition: .none),
-    .external(name: "Kingfisher", condition: .none)
+    .external(name: "Kingfisher", condition: .none),
+    .Project.Core
   ]
 )
