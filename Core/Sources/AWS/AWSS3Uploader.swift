@@ -9,7 +9,7 @@
 import Foundation
 import Photos
 
-import Common
+//import Common
 
 import AWSS3
 
@@ -43,7 +43,7 @@ public class AWSS3Uploader {
           ) { result in
             switch result {
             case .success(let url):
-              videoUrl = url?.removeQueryParameters()
+              videoUrl = self.removeQueryParameters(url: url)
             case .failure(let failure):
               uploadError = failure
             }
@@ -56,7 +56,7 @@ public class AWSS3Uploader {
           ) { result in
             switch result {
             case .success(let url):
-              thumbnailUrl = url?.removeQueryParameters()
+              thumbnailUrl = self.removeQueryParameters(url: url)
             case .failure(let failure):
               uploadError = failure
             }
@@ -125,5 +125,15 @@ public class AWSS3Uploader {
       completion(.success(String(describing: remoteURL)))
     }
     uploadTask.resume()
+  }
+
+  private func removeQueryParameters(url: String?) -> String? {
+    guard let urlString = url else { return nil }
+    if let urlComponents = URLComponents(string: urlString) {
+      var modifiedComponents = urlComponents
+      modifiedComponents.query = nil
+      return modifiedComponents.string
+    }
+    return nil
   }
 }
