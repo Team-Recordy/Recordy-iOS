@@ -276,7 +276,7 @@ public class UploadVideoViewController: UIViewController {
         guard let self = self else { return }
         if text.count > 20 {
           self.locationTextField.text = String(text.prefix(20))
-          self.locationTextField.textState = .error
+          self.locationTextField.updateTextFieldStyle(for: .error)
         }
       })
       .disposed(by: disposeBag)
@@ -383,7 +383,7 @@ extension Reactive where Base: UploadVideoViewController {
 extension Reactive where Base: RecordyTextField {
   var state: Binder<RecordyTextFieldState> {
     return Binder(self.base) { textField, state in
-      textField.textState = state
+      textField.updateTextFieldStyle(for: state)
     }
   }
 }

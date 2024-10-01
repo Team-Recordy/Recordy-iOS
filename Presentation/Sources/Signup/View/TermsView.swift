@@ -18,11 +18,10 @@ final class TermsView: UIView {
   let gradientView = RecordyGradientView()
   let termImage = UIImageView()
   let termText = UILabel()
-  
-  let agreeToAllButton = AgreeToAllButton()
-  let termButton1 = TermButton()
-  let termButton2 = TermButton()
-  let termButton3 = TermButton()
+  let agreeAllTermButton = AgreeAllTermButton()
+  let termButton1 = RecordyTermButton()
+  let termButton2 = RecordyTermButton()
+  let termButton3 = RecordyTermButton()
   let moreButton1 = MoreButton(url: "https://bohyunnkim.notion.site/e5c0a49d73474331a21b1594736ee0df")
   let moreButton2 = MoreButton(url: "https://bohyunnkim.notion.site/c2bdf3572df1495c92aedd0437158cf0?pvs=74")
   let moreButton3 = MoreButton(url: "https://bohyunnkim.notion.site/98d0fa7eac84431ab6f6dd63be0fb8ff?pvs=74")
@@ -30,8 +29,8 @@ final class TermsView: UIView {
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
-    setStyle()
     setUI()
+    setStyle()
     setAutoLayout()
   }
   
@@ -40,12 +39,13 @@ final class TermsView: UIView {
   }
   
   func setStyle() {
-    self.backgroundColor = CommonAsset.recordyBG.color
+    backgroundColor = CommonAsset.recordyBG.color
     
     termImage.do {
       $0.image = CommonAsset.signupImage.image
       $0.contentMode = .scaleAspectFit
     }
+    
     termText.do {
       $0.text = "유영하러 오신 것을\n환영합니다!"
       $0.font = RecordyFont.title1.font
@@ -54,23 +54,16 @@ final class TermsView: UIView {
       $0.setLineSpacing(lineHeightMultiple: 1.3)
     }
     
-    agreeToAllButton.do {
-      $0.addTarget(self, action: #selector(agreeToAllButtonTapped), for: .touchUpInside)
-    }
-    
     termButton1.do {
       $0.agreeLabel.text = "(필수) 서비스 이용약관 동의"
-      $0.addTarget(self, action: #selector(termButtonTapped), for: .touchUpInside)
     }
     
     termButton2.do {
       $0.agreeLabel.text = "(필수) 개인정보 수집·이용 동의"
-      $0.addTarget(self, action: #selector(termButtonTapped), for: .touchUpInside)
     }
     
     termButton3.do {
       $0.agreeLabel.text = "(필수) 만 14세 이상입니다"
-      $0.addTarget(self, action: #selector(termButtonTapped), for: .touchUpInside)
     }
     
     nextButton.do {
@@ -80,11 +73,11 @@ final class TermsView: UIView {
   }
   
   func setUI() {
-    self.addSubviews(
+    addSubviews(
       gradientView,
       termImage,
       termText,
-      agreeToAllButton,
+      agreeAllTermButton,
       termButton1,
       termButton2,
       termButton3,
@@ -100,7 +93,7 @@ final class TermsView: UIView {
       $0.top.horizontalEdges.equalToSuperview()
       $0.height.equalTo(400.adaptiveHeight)
     }
-
+    
     termImage.snp.makeConstraints {
       $0.top.equalToSuperview().offset(148)
       $0.leading.equalToSuperview().offset(20)
@@ -113,14 +106,14 @@ final class TermsView: UIView {
       $0.leading.equalToSuperview().offset(20)
     }
     
-    agreeToAllButton.snp.makeConstraints {
+    agreeAllTermButton.snp.makeConstraints {
       $0.top.equalTo(termText.snp.bottom).offset(32)
       $0.horizontalEdges.equalToSuperview().inset(20)
       $0.height.equalTo(48)
     }
     
     termButton1.snp.makeConstraints {
-      $0.top.equalTo(agreeToAllButton.snp.bottom).offset(8)
+      $0.top.equalTo(agreeAllTermButton.snp.bottom).offset(8)
       $0.leading.equalToSuperview().offset(20)
       $0.trailing.equalTo(moreButton1.snp.leading).offset(-10)
       $0.height.equalTo(40)
@@ -141,7 +134,7 @@ final class TermsView: UIView {
     }
     
     moreButton1.snp.makeConstraints {
-      $0.top.equalTo(agreeToAllButton.snp.bottom).offset(17)
+      $0.top.equalTo(agreeAllTermButton.snp.bottom).offset(17)
       $0.trailing.equalToSuperview().offset(-40)
       $0.width.equalTo(32.adaptiveWidth)
       $0.height.equalTo(18.adaptiveHeight)
@@ -166,42 +159,5 @@ final class TermsView: UIView {
       $0.bottom.equalTo(safeAreaLayoutGuide).inset(14)
       $0.height.equalTo(54.adaptiveHeight)
     }
-  }
-  
-  @objc private func agreeToAllButtonTapped(_ sender: AgreeToAllButton) {
-    sender.toggleState()
-    updateAllTermButtonsState(sender.currentState == .agree)
-    updateNextButtonState()
-  }
-  
-  @objc private func termButtonTapped(_ sender: TermButton) {
-    sender.toggleState()
-    updateAgreeToAllButtonState()
-    updateNextButtonState()
-  }
-  
-  private func updateAllTermButtonsState(_ isActive: Bool) {
-    let state: TermButtonState = isActive ? .agree : .disagree
-    termButton1.updateState(state)
-    termButton2.updateState(state)
-    termButton3.updateState(state)
-  }
-  
-  private func updateAgreeToAllButtonState() {
-    if termButton1.currentState == .agree && termButton2.currentState == .agree && termButton3.currentState == .agree {
-      agreeToAllButton.currentState = .agree
-    } else {
-      agreeToAllButton.currentState = .disagree
-    }
-    agreeToAllButton.updateAgreeToggleButton()
-  }
-  
-  private func updateNextButtonState() {
-    let allTermsAgreed = termButton1.currentState == .agree && termButton2.currentState == .agree && termButton3.currentState == .agree
-    nextButton.buttonState = allTermsAgreed ? .active : .inactive
-  }
-  
-  func areAllButtonsActive() -> Bool {
-    return termButton1.currentState == .agree && termButton2.currentState == .agree && termButton3.currentState == .agree && nextButton.buttonState == .active
   }
 }
