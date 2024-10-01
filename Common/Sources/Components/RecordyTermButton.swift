@@ -6,23 +6,22 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 
-public enum TermButtonState {
-  case agree
-  case disagree
-}
-
-
 import UIKit
 
 import SnapKit
 import Then
 
-public class TermButton: UIButton {
+public enum ToggleButtonState {
+  case activate
+  case deactivate
+}
+
+public class RecordyTermButton: UIButton {
   
   public let agreeImageView = UIImageView()
   public let agreeLabel = UILabel()
   
-  public var currentState: TermButtonState = .disagree
+  public var currentState: ToggleButtonState = .deactivate
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -47,37 +46,26 @@ public class TermButton: UIButton {
   }
   
   private func setUI() {
-    self.addSubviews(
+    addSubviews(
       agreeImageView,
       agreeLabel
     )
   }
   
   private func setAutolayout() {
-    self.agreeImageView.snp.makeConstraints {
+    agreeImageView.snp.makeConstraints {
       $0.leading.equalToSuperview().offset(24)
       $0.width.height.equalTo(16)
       $0.centerY.equalToSuperview()
     }
     
-    self.agreeLabel.snp.makeConstraints {
+    agreeLabel.snp.makeConstraints {
       $0.leading.equalTo(agreeImageView.snp.trailing).offset(20)
       $0.centerY.equalToSuperview()
     }
   }
   
-  public func toggleState() {
-    currentState = (currentState == .agree) ? .disagree : .agree
-    updateAgreeToggleButton()
-  }
-  
-  public func updateAgreeToggleButton() {
-    self.agreeImageView.image = (currentState == .agree) ? CommonAsset.activateCheck.image : CommonAsset.deactivateCheck.image
-  }
-  
-  public func updateState(_ state: TermButtonState) {
-    currentState = state
-    updateAgreeToggleButton()
+  public func updateUI(_ state: ToggleButtonState) {
+    agreeImageView.image = (state == .activate) ? CommonAsset.activateCheck.image : CommonAsset.deactivateCheck.image
   }
 }
-

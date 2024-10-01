@@ -115,7 +115,7 @@ public final class LoginViewController: UIViewController {
           tabBarController.modalPresentationStyle = .fullScreen
           self.present(tabBarController, animated: false)
         } else {
-          let signUpViewController = BaseNavigationController(rootViewController: SignupViewController())
+          let signUpViewController = BaseNavigationController(rootViewController: TermsViewController())
           signUpViewController.modalPresentationStyle = .fullScreen
           self.present(signUpViewController, animated: false)
         }
