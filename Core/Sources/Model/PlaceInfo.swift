@@ -7,3 +7,25 @@
 //
 
 import Foundation
+
+public struct PlaceInfo: Equatable {
+  let feature: PlaceFeature
+  let title: String
+  let duration: String
+
+  public init(
+    feature: PlaceFeature,
+    title: String,
+    duration: String
+  ) {
+    self.feature = feature
+    self.title = title
+    self.duration = duration
+  }
+}
+
+public enum PlaceFeature {
+  case all
+  case free
+  case closingSoon
+}
