@@ -1,5 +1,5 @@
 //
-//  Location.swift
+//  Place.swift
 //  Core
 //
 //  Created by 한지석 on 9/29/24.
@@ -8,8 +8,11 @@
 
 import Foundation
 
-struct Location {
-  let location
+struct Place {
+  let shortenLocation: String
+  let detailLocation: String
   let title: String
-
+  let reviewFeeds: [String]
+  let placeInfoList: [PlaceInfo]
+  let placeReview: PlaceReview
 }
