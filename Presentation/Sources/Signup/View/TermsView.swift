@@ -19,12 +19,12 @@ final class TermsView: UIView {
   let termImage = UIImageView()
   let termText = UILabel()
   let agreeAllTermButton = AgreeAllTermButton()
-  let termButton1 = RecordyTermButton()
-  let termButton2 = RecordyTermButton()
-  let termButton3 = RecordyTermButton()
-  let moreButton1 = MoreButton(url: "https://bohyunnkim.notion.site/e5c0a49d73474331a21b1594736ee0df")
-  let moreButton2 = MoreButton(url: "https://bohyunnkim.notion.site/c2bdf3572df1495c92aedd0437158cf0?pvs=74")
-  let moreButton3 = MoreButton(url: "https://bohyunnkim.notion.site/98d0fa7eac84431ab6f6dd63be0fb8ff?pvs=74")
+  let serviceTermButton = RecordyTermButton()
+  let infoTermButton = RecordyTermButton()
+  let ageTermButton = RecordyTermButton()
+  let serviceMoreButton = MoreButton(url: "https://bohyunnkim.notion.site/e5c0a49d73474331a21b1594736ee0df")
+  let infoMoreButton = MoreButton(url: "https://bohyunnkim.notion.site/c2bdf3572df1495c92aedd0437158cf0?pvs=74")
+  let ageMoreButton = MoreButton(url: "https://bohyunnkim.notion.site/98d0fa7eac84431ab6f6dd63be0fb8ff?pvs=74")
   let nextButton = RecordyButton()
   
   public override init(frame: CGRect) {
@@ -54,15 +54,15 @@ final class TermsView: UIView {
       $0.setLineSpacing(lineHeightMultiple: 1.3)
     }
     
-    termButton1.do {
+    serviceTermButton.do {
       $0.agreeLabel.text = "(필수) 서비스 이용약관 동의"
     }
     
-    termButton2.do {
+    infoTermButton.do {
       $0.agreeLabel.text = "(필수) 개인정보 수집·이용 동의"
     }
     
-    termButton3.do {
+    ageTermButton.do {
       $0.agreeLabel.text = "(필수) 만 14세 이상입니다"
     }
     
@@ -78,12 +78,12 @@ final class TermsView: UIView {
       termImage,
       termText,
       agreeAllTermButton,
-      termButton1,
-      termButton2,
-      termButton3,
-      moreButton1,
-      moreButton2,
-      moreButton3,
+      serviceTermButton,
+      infoTermButton,
+      ageTermButton,
+      serviceMoreButton,
+      infoMoreButton,
+      ageMoreButton,
       nextButton
     )
   }
@@ -112,43 +112,43 @@ final class TermsView: UIView {
       $0.height.equalTo(48)
     }
     
-    termButton1.snp.makeConstraints {
+    serviceTermButton.snp.makeConstraints {
       $0.top.equalTo(agreeAllTermButton.snp.bottom).offset(8)
       $0.leading.equalToSuperview().offset(20)
-      $0.trailing.equalTo(moreButton1.snp.leading).offset(-10)
+      $0.trailing.equalTo(serviceMoreButton.snp.leading).offset(-10)
       $0.height.equalTo(40)
     }
     
-    termButton2.snp.makeConstraints {
-      $0.top.equalTo(termButton1.snp.bottom)
+    infoTermButton.snp.makeConstraints {
+      $0.top.equalTo(serviceTermButton.snp.bottom)
       $0.leading.equalToSuperview().offset(20)
-      $0.trailing.equalTo(moreButton2.snp.leading).offset(-10)
+      $0.trailing.equalTo(infoMoreButton.snp.leading).offset(-10)
       $0.height.equalTo(40)
     }
     
-    termButton3.snp.makeConstraints {
-      $0.top.equalTo(termButton2.snp.bottom)
+    ageTermButton.snp.makeConstraints {
+      $0.top.equalTo(infoTermButton.snp.bottom)
       $0.leading.equalToSuperview().offset(20)
-      $0.trailing.equalTo(moreButton3.snp.leading).offset(-10)
+      $0.trailing.equalTo(ageMoreButton.snp.leading).offset(-10)
       $0.height.equalTo(40)
     }
     
-    moreButton1.snp.makeConstraints {
+    serviceMoreButton.snp.makeConstraints {
       $0.top.equalTo(agreeAllTermButton.snp.bottom).offset(17)
       $0.trailing.equalToSuperview().offset(-40)
       $0.width.equalTo(32.adaptiveWidth)
       $0.height.equalTo(18.adaptiveHeight)
     }
     
-    moreButton2.snp.makeConstraints {
-      $0.top.equalTo(moreButton1.snp.bottom).offset(22)
+    infoMoreButton.snp.makeConstraints {
+      $0.top.equalTo(serviceMoreButton.snp.bottom).offset(22)
       $0.trailing.equalToSuperview().offset(-40)
       $0.width.equalTo(32.adaptiveWidth)
       $0.height.equalTo(18.adaptiveHeight)
     }
     
-    moreButton3.snp.makeConstraints {
-      $0.top.equalTo(moreButton2.snp.bottom).offset(22)
+    ageMoreButton.snp.makeConstraints {
+      $0.top.equalTo(infoMoreButton.snp.bottom).offset(22)
       $0.trailing.equalToSuperview().offset(-40)
       $0.width.equalTo(32.adaptiveWidth)
       $0.height.equalTo(18.adaptiveHeight)
