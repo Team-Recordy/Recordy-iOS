@@ -15,6 +15,7 @@ import Common
 final class CompleteViewController: UIViewController{
   
   private let completeView = CompleteView()
+  private let nicknameView = NicknameView()
   
   override func loadView() {
     view = completeView
@@ -42,7 +43,7 @@ final class CompleteViewController: UIViewController{
       case .success:
         let tabBarController = RecordyTabBarController()
         tabBarController.modalPresentationStyle = .fullScreen
-        present(tabBarController, animated: false)
+        self.present(tabBarController, animated: false)
       case .failure:
         print("failed to login")
       }

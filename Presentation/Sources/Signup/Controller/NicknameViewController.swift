@@ -60,7 +60,7 @@ public final class NicknameViewController: UIViewController {
   private func updateTextFieldState(_ text: String) {
     if text.isEmpty {
       currentState = .unselected
-    } else if isNicknamePatternValid(text) {
+    } else if text.isNicknamePatternValid(text) {
       getNicknameRequest { [weak self] isAvailable in
         guard let self = self else { return }
         if isAvailable {
@@ -86,7 +86,7 @@ public final class NicknameViewController: UIViewController {
         dismissKeyboard
       )
     )
-    addGestureRecognizer(tapGesture)
+    view.addGestureRecognizer(tapGesture)
   }
   
   @objc private func nextButtonTapped() {
