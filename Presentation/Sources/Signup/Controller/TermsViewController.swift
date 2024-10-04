@@ -15,12 +15,12 @@ public final class TermsViewController: UIViewController {
   
   private let termsView = TermsView()
   
-  private var firstTermButtonState: ToggleButtonState = .deactivate
-  private var secondTermButtonState: ToggleButtonState = .deactivate
-  private var thirdTermButtonState: ToggleButtonState = .deactivate
+  private var serviceTermButtonState: ToggleButtonState = .deactivate
+  private var infoTermButtonState: ToggleButtonState = .deactivate
+  private var ageTermButtonState: ToggleButtonState = .deactivate
   
   private var isAllTermsAgreed: Bool {
-    return term1State == .activate && term2State == .activate && term3State == .activate
+    return serviceTermButtonState == .activate && infoTermButtonState == .activate && ageTermButtonState == .activate
   }
   
   public override func loadView() {
@@ -34,9 +34,9 @@ public final class TermsViewController: UIViewController {
   
   private func setStyle() {
     termsView.agreeAllTermButton.addTarget(self, action: #selector(agreeAllTermButtonTapped), for: .touchUpInside)
-    termsView.termButton1.addTarget(self, action: #selector(termButtonTapped(_:)), for: .touchUpInside)
-    termsView.termButton2.addTarget(self, action: #selector(termButtonTapped(_:)), for: .touchUpInside)
-    termsView.termButton3.addTarget(self, action: #selector(termButtonTapped(_:)), for: .touchUpInside)
+    termsView.serviceTermButton.addTarget(self, action: #selector(termButtonTapped(_:)), for: .touchUpInside)
+    termsView.infoTermButton.addTarget(self, action: #selector(termButtonTapped(_:)), for: .touchUpInside)
+    termsView.ageTermButton.addTarget(self, action: #selector(termButtonTapped(_:)), for: .touchUpInside)
     termsView.nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
   }
   
@@ -52,25 +52,25 @@ public final class TermsViewController: UIViewController {
   
   private func toggleAllTerms() {
     let newState: ToggleButtonState = isAllTermsAgreed ? .deactivate : .activate
-    firstTermButtonState = newState
-    secondTermButtonState = newState
-    thirdTermButtonState = newState
+    serviceTermButtonState = newState
+    infoTermButtonState = newState
+    ageTermButtonState = newState
   }
   
   private func toggleTerm(for button: RecordyTermButton) {
-    if button == termsView.termButton1 {
-      firstTermButtonState = firstTermButtonState == .activate ? .deactivate : .activate
-    } else if button == termsView.termButton2 {
-      secondTermButtonState = secondTermButtonState == .activate ? .deactivate : .activate
-    } else if button == termsView.termButton3 {
-      thirdTermButtonState = thirdTermButtonState == .activate ? .deactivate : .activate
+    if button == termsView.serviceTermButton {
+      serviceTermButtonState = serviceTermButtonState == .activate ? .deactivate : .activate
+    } else if button == termsView.infoTermButton {
+      infoTermButtonState = infoTermButtonState == .activate ? .deactivate : .activate
+    } else if button == termsView.ageTermButton {
+      ageTermButtonState = ageTermButtonState == .activate ? .deactivate : .activate
     }
   }
   
   private func updateButtonState() {
-    termsView.termButton1.updateUI(firstTermButtonState)
-    termsView.termButton2.updateUI(secondTermButtonState)
-    termsView.termButton3.updateUI(thirdTermButtonState)
+    termsView.serviceTermButton.updateUI(serviceTermButtonState)
+    termsView.infoTermButton.updateUI(infoTermButtonState)
+    termsView.ageTermButton.updateUI(ageTermButtonState)
     termsView.agreeAllTermButton.updateUI(isAllTermsAgreed ? .activate : .deactivate)
     termsView.nextButton.buttonState = isAllTermsAgreed ? .active : .inactive
   }
