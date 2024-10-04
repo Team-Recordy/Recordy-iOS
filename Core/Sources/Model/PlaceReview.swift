@@ -7,3 +7,10 @@
 //
 
 import Foundation
+
+struct PlaceReview {
+  let author: String
+  let content: String
+  let rating: Double
+  let createdAt: String
+}
