@@ -8,6 +8,6 @@
 
 import Foundation
 
-struct Overview {
+public struct Overview {
   let places: [Place]
 }
