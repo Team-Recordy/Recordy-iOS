@@ -5,7 +5,6 @@
 //  Created by 한지석 on 7/19/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
-
 import Foundation
 
 public struct User {
@@ -19,6 +18,12 @@ public struct User {
   public let feeds: [Feed]
   public let bookmarkedFeeds: [Feed]?
   public let loginState: LoginState
+  
+  // 새로 추가된 필드들
+  public let recordCount: Int
+  public let followerCount: Int
+  public let followingCount: Int
+  public let bookmarkCount: Int
 
   public init(
     isMine: Bool,
@@ -30,7 +35,11 @@ public struct User {
     profileImage: String,
     feeds: [Feed],
     bookmarkedFeeds: [Feed]?,
-    loginState: LoginState
+    loginState: LoginState,
+    recordCount: Int,
+    followerCount: Int,
+    followingCount: Int,
+    bookmarkCount: Int
   ) {
     self.isMine = isMine
     self.id = id
@@ -42,6 +51,10 @@ public struct User {
     self.feeds = feeds
     self.bookmarkedFeeds = bookmarkedFeeds
     self.loginState = loginState
+    self.recordCount = recordCount
+    self.followerCount = followerCount
+    self.followingCount = followingCount
+    self.bookmarkCount = bookmarkCount
   }
 }
 

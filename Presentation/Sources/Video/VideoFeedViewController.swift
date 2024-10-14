@@ -25,7 +25,6 @@ public class VideoFeedViewController: UIViewController {
 
   init(
     type: VideoFeedType,
-    keyword: Keyword? = nil,
     currentId: Int? = nil,
     cursorId: Int? = nil,
     userId: Int? = nil
@@ -33,7 +32,6 @@ public class VideoFeedViewController: UIViewController {
     self.type = type
     self.viewModel = VideoFeedViewModel(
       type: type,
-      keyword: keyword,
       currentId: currentId,
       cursorId: cursorId,
       userId: userId
