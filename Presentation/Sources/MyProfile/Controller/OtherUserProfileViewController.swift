@@ -179,12 +179,12 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
       switch result {
       case .success(let response):
         self.user = User(
-          id: response.id,
-          nickname: response.nickname,
-          followerCount: response.followerCount,
-          followingCount: response.followingCount,
-          isFollowing: response.isFollowing,
-          profileImage: response.profileImageUrl
+          isMine: response.id,
+          id: response.nickname,
+          nickname: response.followerCount,
+          follower: response.followingCount,
+          following: response.isFollowing,
+          isFollowing: response.profileImageUrl
         )
         self.setUserProfile()
       case .failure(let failure):
@@ -209,11 +209,10 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
           Feed(
             id: $0.recordInfo.id,
             userId: $0.recordInfo.uploaderId,
-            location: $0.recordInfo.location,
+            location: $0.recordInfo.location, placeInfo: <#PlaceInfo#>,
             nickname: $0.recordInfo.uploaderNickname,
             description: $0.recordInfo.content,
-            bookmarkCount: $0.recordInfo.bookmarkCount,
-            isBookmarked: $0.isBookmark,
+            isBookmarked: $0.isBookmark, bookmarkCount: $0.recordInfo.bookmarkCount,
             videoLink: $0.recordInfo.fileUrl.videoUrl,
             thumbnailLink: $0.recordInfo.fileUrl.thumbnailUrl,
             isMine: $0.recordInfo.isMine

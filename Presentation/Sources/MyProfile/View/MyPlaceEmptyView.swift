@@ -18,7 +18,7 @@ protocol TasteViewDelegate: AnyObject {
   func tasteViewUploadFeedTapped()
 }
 
-class TasteEmptyView: UIView {
+class MyPlaceEmptyView: UIView {
 
   let emptyImageView = UIImageView()
   let emptyLabel = UIImageView()
