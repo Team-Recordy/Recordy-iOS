@@ -21,12 +21,9 @@ enum RecordType {
 @available(iOS 16.0, *)
 public final class HomeViewController: UIViewController {
 
-  var selectedKeywords: [Keyword] = [.all]
-  var famousRecords: [MainRecord] = []
-  var recentRecords: [MainRecord] = []
+  var famousRecords: [Feed] = []
+  var recentRecords: [Feed] = []
   struct EmptyResponse: Codable { }
-
-  let keywords = Keyword.allCases
 
   private let navigationImage = UIImageView()
   private var lottieView = LottieAnimationView()
@@ -64,8 +61,8 @@ public final class HomeViewController: UIViewController {
     setStyle()
     setUI()
     setAutoLayout()
-    getFamousRecordList(selectedKeyword: .all)
-    getRecentRecordList(selectedKeyword: .all)
+    getFamousRecordList()
+    getRecentRecordList()
   }
 
   public override func viewWillAppear(_ animated: Bool) {
@@ -94,10 +91,8 @@ public final class HomeViewController: UIViewController {
     }
     if state == "success" {
       showToast(status: .complete, message: message, height: 44)
-      if let keyword = selectedKeywords.first {
-        getFamousRecordList(selectedKeyword: keyword)
-        getRecentRecordList(selectedKeyword: keyword)
-      }
+      getFamousRecordList()
+      getRecentRecordList()
     } else {
       showToast(status: .warning, message: message, height: 44)
     }
@@ -367,31 +362,9 @@ public final class HomeViewController: UIViewController {
     present(navigationController, animated: true)
   }
 
-  @objc
-  func styleButtonTapped(_ sender: UIButton) {
-    UIView.animate(withDuration: 0.3) {
-      self.scrollView.setContentOffset(CGPoint(x: 0, y: 155), animated: false)
-    }
-    let index = sender.tag
-    let keyword = keywords[index]
-
-    if selectedKeywords.first != keyword {
-      selectedKeywords.removeAll()
-      selectedKeywords.append(keyword)
-      getFamousRecordList(selectedKeyword: keyword)
-      getRecentRecordList(selectedKeyword: keyword)
-    }
-    self.keywordCollectionView!.reloadData()
-  }
-
-  func getFamousRecordList(selectedKeyword: Keyword) {
+  func getFamousRecordList() {
     let apiProvider = APIProvider<APITarget.Records>()
-    var keyword: String
-    if selectedKeyword != .all {
-      keyword = selectedKeyword.title.keywordEncode() ?? ""
-    } else {
-      keyword = ""
-    }
+    var keyword: String = ""
     let request = DTO.GetFamousRecordListRequest(
       keywords: keyword,
       pageNumber: 0,
@@ -402,12 +375,20 @@ public final class HomeViewController: UIViewController {
       switch result {
       case .success(let response):
         self.famousRecords = response.content.map {
-          MainRecord(
-            id: $0.recordInfo.id,
-            thumbnailUrl: $0.recordInfo.fileUrl.thumbnailUrl,
-            location: $0.recordInfo.location,
-            isBookmarked: $0.isBookmark
+          Feed(
+              id: $0.recordInfo.id,
+              userId: $0.recordInfo.uploaderId,
+              location: $0.recordInfo.location,
+              placeInfo: PlaceInfo(feature: .all, title: "", duration: ""),
+              nickname: $0.recordInfo.uploaderNickname,
+              description: $0.recordInfo.content,
+              isBookmarked: $0.isBookmark,
+              bookmarkCount: $0.recordInfo.bookmarkCount,
+              videoLink: $0.recordInfo.fileUrl.videoUrl,
+              thumbnailLink: $0.recordInfo.fileUrl.thumbnailUrl,
+              isMine: $0.recordInfo.isMine
           )
+
         }
         DispatchQueue.main.async {
           self.popularCollectionView.reloadData()
@@ -418,25 +399,27 @@ public final class HomeViewController: UIViewController {
     }
   }
 
-  func getRecentRecordList(selectedKeyword: Keyword) {
+  func getRecentRecordList() {
     let apiProvider = APIProvider<APITarget.Records>()
-    var keyword: String?
-    if selectedKeyword != .all {
-      keyword = selectedKeyword.title.keywordEncode() ?? ""
-    } else {
-      keyword = nil
-    }
+    var keyword: String? = ""
     let request = DTO.GetRecentRecordListRequest(keywords: keyword, cursorId: 0, size: 10)
     apiProvider.requestResponsable(.getRecentRecordList(request), DTO.GetRecentRecordListResponse.self) { [weak self] result in
       guard let self = self else { return }
       switch result {
       case .success(let response):
         self.recentRecords = response.content.map {
-          MainRecord(
-            id: $0.recordInfo.id,
-            thumbnailUrl: $0.recordInfo.fileUrl.thumbnailUrl,
-            location: $0.recordInfo.location,
-            isBookmarked: $0.isBookmark
+          Feed(
+              id: $0.recordInfo.id,
+              userId: $0.recordInfo.uploaderId,
+              location: $0.recordInfo.location,
+              placeInfo: PlaceInfo(feature: .all, title: "", duration: ""),
+              nickname: $0.recordInfo.uploaderNickname,
+              description: $0.recordInfo.content,
+              isBookmarked: $0.isBookmark,
+              bookmarkCount: $0.recordInfo.bookmarkCount,
+              videoLink: $0.recordInfo.fileUrl.videoUrl,
+              thumbnailLink: $0.recordInfo.fileUrl.thumbnailUrl,
+              isMine: $0.recordInfo.isMine
           )
         }
         DispatchQueue.main.async {
@@ -479,8 +462,6 @@ extension HomeViewController: UICollectionViewDataSource {
       return famousRecords.count
     case recentCollectionView:
       return recentRecords.count
-    case keywordCollectionView:
-      return keywords.count
     default:
       return 0
     }
@@ -497,7 +478,7 @@ extension HomeViewController: UICollectionViewDataSource {
         for: indexPath
       ) as! ThumbnailCollectionViewCell
       let famousRecord = famousRecords[indexPath.row]
-      cell.configure(with: famousRecord)
+      cell.configure(feed: famousRecord)
       cell.bookmarkButtonEvent = { [weak self] in
         guard let self = self else { return }
         self.postBookmarkRequest(
@@ -513,7 +494,7 @@ extension HomeViewController: UICollectionViewDataSource {
         for: indexPath
       ) as! ThumbnailCollectionViewCell
       let recentRecord = recentRecords[indexPath.row]
-      cell.configure(with: recentRecord)
+      cell.configure(feed: recentRecord)
       cell.bookmarkButtonEvent = { [weak self] in
         guard let self = self else { return }
         self.postBookmarkRequest(
@@ -522,21 +503,6 @@ extension HomeViewController: UICollectionViewDataSource {
         )
         cell.updateBookmarkButton(isBookmarked: recentRecords[indexPath.row].isBookmarked)
       }
-      return cell
-    case keywordCollectionView:
-      let cell = collectionView.dequeueReusableCell(
-        withReuseIdentifier: RecordyFilteringCell.cellIdentifier,
-        for: indexPath
-      ) as! RecordyFilteringCell
-      let keyword = keywords[indexPath.item]
-      let isSelected = selectedKeywords.contains(keyword)
-      cell.bind(keyword: keyword, isSelected: isSelected)
-      cell.chipButton.tag = indexPath.item
-      cell.chipButton.addTarget(
-        self,
-        action: #selector(styleButtonTapped),
-        for: .touchUpInside
-      )
       return cell
     default:
       fatalError("Unexpected collection view")
@@ -559,9 +525,9 @@ extension HomeViewController: UICollectionViewDataSource {
     }
     let videoFeedViewController = VideoFeedViewController(
       type: nextType,
-      keyword: selectedKeywords.first,
       currentId: currentId,
-      cursorId: 0
+      cursorId: 0,
+      userId: 0
     )
     self.navigationController?.pushViewController(
       videoFeedViewController,
@@ -580,11 +546,6 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
     switch collectionView {
     case popularCollectionView, recentCollectionView:
       return CGSize(width: 135.adaptiveWidth, height: 240.adaptiveHeight)
-    case keywordCollectionView:
-      let keyword = keywords[indexPath.item]
-      let width = keyword.width
-      let height = collectionView.frame.height
-      return CGSize(width: width.adaptiveWidth, height: height.adaptiveHeight)
     default:
       return CGSize.zero
     }

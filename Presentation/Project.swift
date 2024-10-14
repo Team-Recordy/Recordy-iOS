@@ -16,13 +16,7 @@ let project = Project.makeModule(
   product: .staticFramework,
   bundleId: moduleName,
   dependencies: [
-    .Project.Core,
     .Project.Common,
-    .external(name: "SnapKit", condition: .none),
-    .external(name: "Then", condition: .none),
-    .external(name: "RxSwift", condition: .none),
-    .external(name: "RxCocoa", condition: .none),
     .external(name: "Lottie", condition: .none),
-    .external(name: "Kingfisher", condition: .none)
   ]
 )

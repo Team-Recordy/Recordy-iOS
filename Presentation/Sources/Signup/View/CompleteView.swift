@@ -17,8 +17,8 @@ final class CompleteView: UIView {
   
   let gradientView = RecordyGradientView()
   let completeImage = UIImageView()
-  let completeText1 = UILabel()
-  let completeText2 = UILabel()
+  let primaryCompleteText = UILabel()
+  let secondaryCompleteText = UILabel()
   let completeButton = RecordyButton()
   
   public override init(frame: CGRect) {
@@ -37,13 +37,13 @@ final class CompleteView: UIView {
       $0.image = CommonAsset.signupComplete.image
     }
     
-    completeText1.do {
+    primaryCompleteText.do {
       $0.text = "회원가입이 완료되었어요!"
       $0.font = RecordyFont.title1.font
       $0.textColor = CommonAsset.recordyGrey01.color
     }
     
-    completeText2.do {
+    secondaryCompleteText.do {
       $0.text = "지금 영상을 둘러보고 나만의 공간 취향을 발견해 보세요"
       $0.font = RecordyFont.body2.font
       $0.textColor = CommonAsset.recordyGrey03.color
@@ -55,11 +55,11 @@ final class CompleteView: UIView {
   }
   
   func setUI() {
-    self.addSubviews(
+    addSubviews(
       gradientView,
       completeImage,
-      completeText1,
-      completeText2,
+      primaryCompleteText,
+      secondaryCompleteText,
       completeButton
     )
   }
@@ -69,7 +69,7 @@ final class CompleteView: UIView {
       $0.top.horizontalEdges.equalToSuperview()
       $0.height.equalTo(400.adaptiveHeight)
     }
-
+    
     completeImage.snp.makeConstraints {
       $0.top.equalToSuperview().offset(294)
       $0.width.equalTo(100.adaptiveWidth)
@@ -77,13 +77,13 @@ final class CompleteView: UIView {
       $0.centerX.equalToSuperview()
     }
     
-    completeText1.snp.makeConstraints {
+    primaryCompleteText.snp.makeConstraints {
       $0.top.equalTo(completeImage.snp.bottom).offset(16)
       $0.centerX.equalToSuperview()
     }
     
-    completeText2.snp.makeConstraints {
-      $0.top.equalTo(completeText1.snp.bottom).offset(10)
+    secondaryCompleteText.snp.makeConstraints {
+      $0.top.equalTo(primaryCompleteText.snp.bottom).offset(10)
       $0.centerX.equalToSuperview()
     }
     

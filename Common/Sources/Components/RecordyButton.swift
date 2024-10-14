@@ -19,7 +19,7 @@ public class RecordyButton: UIButton {
   
   public var buttonState: ButtonState = .inactive {
     didSet {
-      updateButtonAppearance()
+      updateButtonStyle()
     }
   }
 
@@ -35,10 +35,10 @@ public class RecordyButton: UIButton {
   private func setUI() {
     layer.cornerRadius = 12
     titleLabel?.font = RecordyFont.button1.font
-    updateButtonAppearance()
+    updateButtonStyle()
   }
   
-  private func updateButtonAppearance() {
+  private func updateButtonStyle() {
     switch buttonState {
     case .active:
       backgroundColor = CommonAsset.recordyMain.color
