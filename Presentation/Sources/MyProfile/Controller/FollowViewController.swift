@@ -81,7 +81,7 @@ public class FollowViewController: UIViewController {
   }
   
   private func bind() {
-    viewModel.followersDidChange = { [weak self] followers in
+    viewModel.followersDidChange = { [weak self] (followers: [Follow]) in
       guard let self = self else { return }
       self.tableView.reloadData()
     }
@@ -126,7 +126,9 @@ extension FollowViewController: UITableViewDataSource, UITableViewDelegate {
   }
   
   public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let userVC = OtherUserProfileViewController(id: viewModel.followers[indexPath.row].id)
+    let follow = viewModel.followers[indexPath.row]
+    let userId = Int(follow.userId) ?? 0
+    let userVC = OtherUserProfileViewController(id: userId)
     self.navigationController?.pushViewController(userVC, animated: true)
   }
 }

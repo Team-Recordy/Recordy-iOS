@@ -12,7 +12,7 @@ import Core
 class FollowViewModel {
   
   let followType: FollowType
-  var followers: [Follower] = [] {
+  var followers: [Follow] = [] {
     didSet {
       followersDidChange?(followers)
       isEmptyDidChange?(followers.isEmpty)
@@ -22,7 +22,7 @@ class FollowViewModel {
   
   let apiProvider = APIProvider<APITarget.Users>()
   
-  var followersDidChange: (([Follower]) -> Void)?
+  var followersDidChange: (([Follow]) -> Void)?
   var isEmptyDidChange: ((Bool) -> Void)?
   
   init(followType: FollowType) {
@@ -71,11 +71,12 @@ class FollowViewModel {
   
   private func handleFollowerResponse(response: DTO.GetFollowerListResponse) {
     let followerList = response.content.map {
-      Follower(
-        id: $0.userInfo.id,
-        username: $0.userInfo.nickname,
-        isFollowing: $0.following,
-        profileImage: $0.userInfo.profileImageUrl
+      Follow(
+        followState: .follower,
+        userId: String($0.userInfo.id),
+        profileImage: $0.userInfo.profileImageUrl,
+        nickname: $0.userInfo.nickname,
+        isFollowing: $0.following
       )
     }
     self.followers = followerList
@@ -83,11 +84,12 @@ class FollowViewModel {
   
   private func handleFollowingResponse(response: DTO.GetFollowListResponse) {
     let followList = response.content.map {
-      Follower(
-        id: $0.id,
-        username: $0.nickname,
-        isFollowing: true,
-        profileImage: $0.profileImageUrl
+      Follow(
+        followState: .following,
+        userId: String($0.id),
+        profileImage: $0.profileImageUrl,
+        nickname: $0.nickname,
+        isFollowing: true
       )
     }
     self.followers = followList.reversed()
@@ -102,7 +104,7 @@ class FollowViewModel {
   func postFollowRequest(at index: Int) {
     guard index < followers.count else { return }
     let follower = followers[index]
-    let request = DTO.FollowRequest(followingId: follower.id)
+    let request = DTO.FollowRequest(followingId: Int(follower.userId) ?? 0)
     
     toggleFollow(at: index)
     

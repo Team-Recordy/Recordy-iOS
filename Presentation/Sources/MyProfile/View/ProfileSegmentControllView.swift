@@ -5,7 +5,6 @@
 //  Created by 송여경 on 7/10/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 // setStyle() -> setUI() -> setAutoLayout()
-
 import UIKit
 
 import SnapKit
@@ -19,7 +18,7 @@ protocol ControlTypeDelegate: AnyObject {
 
 public final class ProfileSegmentControllView: UIView {
   
-  private var selectedTab: ControlType = .taste {
+  private var selectedTab: ControlType = .record {
     didSet {
       setStyle()
       setTabUI()
@@ -27,7 +26,6 @@ public final class ProfileSegmentControllView: UIView {
   }
   weak var delegate: ControlTypeDelegate?
   private let barStack = UIStackView()
-  private let tasteButton = UIButton()
   private let recordButton = UIButton()
   private let bookmarkButton = UIButton()
   private let underDivider = UIView()
@@ -35,9 +33,6 @@ public final class ProfileSegmentControllView: UIView {
   private lazy var tapAction = UIAction { [weak self] action in
     guard let self, let sender = action.sender as? UIButton else { return }
     switch sender {
-    case self.tasteButton:
-      self.selectedTab = .taste
-      delegate?.sendControlType(.taste)
     case self.recordButton:
       self.selectedTab = .record
       delegate?.sendControlType(.record)
@@ -62,7 +57,7 @@ public final class ProfileSegmentControllView: UIView {
   }
   
   private func setUI() {
-    [tasteButton, recordButton, bookmarkButton].forEach { barStack.addArrangedSubview($0) }
+    [recordButton, bookmarkButton].forEach { barStack.addArrangedSubview($0) }
     [barStack, underDivider].forEach { addSubview($0) }
   }
   
@@ -71,11 +66,6 @@ public final class ProfileSegmentControllView: UIView {
       $0.axis = .horizontal
       $0.spacing = 50.adaptiveWidth
       $0.distribution = .equalSpacing
-    }
-    
-    tasteButton.do {
-      $0.setTitle(ControlType.taste.rawValue, for: .normal)
-      applySelectUI(to: $0, type: .taste)
     }
     
     recordButton.do {
@@ -101,7 +91,6 @@ public final class ProfileSegmentControllView: UIView {
   }
   
   private func setTabViews() {
-    tasteButton.addAction(tapAction, for: .touchUpInside)
     recordButton.addAction(tapAction, for: .touchUpInside)
     bookmarkButton.addAction(tapAction, for: .touchUpInside)
   }
