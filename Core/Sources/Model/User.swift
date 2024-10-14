@@ -15,11 +15,10 @@ public struct User {
   public let following: [Follow]?
   public var isFollowing: Bool
   public let profileImage: String
-  public let feeds: [Feed]
-  public let bookmarkedFeeds: [Feed]?
+  public var feeds: [Feed]
+  public var bookmarkedFeeds: [Feed]?
   public let loginState: LoginState
   
-  // 새로 추가된 필드들
   public let recordCount: Int
   public let followerCount: Int
   public let followingCount: Int
