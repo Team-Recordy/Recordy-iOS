@@ -56,8 +56,5 @@ class VideoCell: UICollectionViewCell {
     previewImageView.image = assetImage
     playtimeLabel.text = localVideo.playtime
   }
-
-//  func setSelected(_ selected: Bool) {
-//    contentView.backgroundColor = selected ? UIColor.black.withAlphaComponent(0.3) : UIColor.clear
-//  }
+  
 }

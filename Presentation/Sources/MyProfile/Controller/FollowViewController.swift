@@ -107,7 +107,7 @@ extension FollowViewController: UITableViewDataSource, UITableViewDelegate {
     ) as! FollowerCell
     
     let follower = viewModel.followers[indexPath.row]
-    cell.configure(with: follower)
+//    cell.configure(with: follower)
     
     cell.followButton.do {
       if indexPath.row == 0 && followType == .following {

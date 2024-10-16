@@ -20,7 +20,7 @@ final class UploadVideoViewModel {
 
   struct Input {
     let selectedAsset = BehaviorRelay<PHAsset?>(value: nil)
-    let selectedKeywords = BehaviorRelay<[Keyword]>(value: [])
+//    let selectedKeywords = BehaviorRelay<[Keyword]>(value: [])
     let location = BehaviorRelay<String>(value: "")
     let contents = BehaviorRelay<String>(value: "")
   }
@@ -73,11 +73,10 @@ final class UploadVideoViewModel {
 
     Observable.combineLatest(
       input.selectedAsset,
-      input.selectedKeywords,
       input.location,
       input.contents
-    ).map { asset, keywords, location, contents in
-      return asset != nil && keywords.count >= 1 && location.count > 0 && contents.count > 0 && contents != "공간에 대한 나의 생각을 자유롭게 적어주세요!"
+    ).map { asset, location, contents in
+      return asset != nil && location.count > 0 && contents.count > 0 && contents != "공간에 대한 나의 생각을 자유롭게 적어주세요!"
     }
     .bind(to: output.uploadEnabled)
     .disposed(by: disposeBag)
@@ -114,11 +113,6 @@ final class UploadVideoViewModel {
     thumbnailUrl: String
   ) {
     var encodedString = ""
-    let titles = input.selectedKeywords.value.map { $0.title }
-    let concatenatedString = titles.joined(separator: ",")
-    if let data = concatenatedString.data(using: .utf8) {
-      encodedString = data.base64EncodedString()
-    }
     let request = DTO.CreateRecordRequest(
       location: input.location.value,
       content: input.contents.value,

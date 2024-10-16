@@ -115,7 +115,7 @@ final class NicknameView: UIView {
       errorLabel.textColor = CommonAsset.recordyAlert.color
       
     case .unselected:
-      nicknameView.errorLabel.text = ""
+//      nicknameView.errorLabel.text = ""
       nextButton.buttonState = .inactive
     }
   }

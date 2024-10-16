@@ -118,50 +118,12 @@ class FeedCell: UICollectionViewCell {
       name: .AVPlayerItemDidPlayToEndTime,
       object: avPlayer?.currentItem
     )
-    //    avPlayer?.currentItem?.addObserver(
-    //      self,
-    //      forKeyPath: "playbackBufferEmpty",
-    //      options: .new,
-    //      context: nil
-    //    )
-    //    avPlayer?.currentItem?.addObserver(
-    //      self,
-    //      forKeyPath: "playbackLikelyToKeepUp",
-    //      options: .new,
-    //      context: nil
-    //    )
-    //    avPlayer?.currentItem?.addObserver(
-    //      self,
-    //      forKeyPath: "playbackBufferFull",
-    //      options: .new,
-    //      context: nil
-    //    )
   }
 
   @objc private func playerItemDidReachEnd(notification: Notification) {
     avPlayer?.seek(to: CMTime.zero)
     avPlayer?.play()
   }
-
-  //  override func observeValue(
-  //    forKeyPath keyPath: String?,
-  //    of object: Any?,
-  //    change: [NSKeyValueChangeKey: Any]?,
-  //    context: UnsafeMutableRawPointer?
-  //  ) {
-  //    if object is AVPlayerItem {
-  //      switch keyPath {
-  //      case "playbackBufferEmpty":
-  //        print("bufferEmpty")
-  //      case "playbackLikelyToKeepUp":
-  //        print("LikelyToKeepUp")
-  //      case "playbackBufferFull":
-  //        print("BufferFull")
-  //      default:
-  //        print("Default")
-  //      }
-  //    }
-  //  }
 
   func bind(feed: Feed, bounds: CGRect, shouldAddPlayer: Bool) {
     self.feed = feed
@@ -215,3 +177,42 @@ class FeedCell: UICollectionViewCell {
     self.deleteAction?()
   }
 }
+
+//    avPlayer?.currentItem?.addObserver(
+//      self,
+//      forKeyPath: "playbackBufferEmpty",
+//      options: .new,
+//      context: nil
+//    )
+//    avPlayer?.currentItem?.addObserver(
+//      self,
+//      forKeyPath: "playbackLikelyToKeepUp",
+//      options: .new,
+//      context: nil
+//    )
+//    avPlayer?.currentItem?.addObserver(
+//      self,
+//      forKeyPath: "playbackBufferFull",
+//      options: .new,
+//      context: nil
+//    )
+
+//  override func observeValue(
+//    forKeyPath keyPath: String?,
+//    of object: Any?,
+//    change: [NSKeyValueChangeKey: Any]?,
+//    context: UnsafeMutableRawPointer?
+//  ) {
+//    if object is AVPlayerItem {
+//      switch keyPath {
+//      case "playbackBufferEmpty":
+//        print("bufferEmpty")
+//      case "playbackLikelyToKeepUp":
+//        print("LikelyToKeepUp")
+//      case "playbackBufferFull":
+//        print("BufferFull")
+//      default:
+//        print("Default")
+//      }
+//    }
+//  }

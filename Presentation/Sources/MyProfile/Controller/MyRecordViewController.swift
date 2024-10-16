@@ -38,8 +38,8 @@ public class MyRecordViewController: UIViewController {
     setStyle()
     setUI()
     setAutoLayout()
-    bindViewModel()
-    viewModel.fetchRecords()
+//    bindViewModel()
+//    viewModel.fetchRecords()
   }
   
   public func setStyle() {
@@ -136,35 +136,36 @@ public class MyRecordViewController: UIViewController {
     
   }
   
-  private func bindViewModel() {
-    viewModel.isEmpty.bind { [weak self] isEmpty in
-      self?.emptyRecordView.isHidden = !isEmpty
-      self?.emptyRecordText.isHidden = !isEmpty
-      self?.recordButton.isHidden = !isEmpty
-      self?.countLabel.isHidden = isEmpty
-      self?.collectionView.isHidden = isEmpty
-    }
-    
-    viewModel.records.bind { [weak self] records in
-      self?.updateUI(with: records)
-    }
-  }
+//  private func bindViewModel() {
+//    viewModel.isEmpty.bind { [weak self] isEmpty in
+//      self?.emptyRecordView.isHidden = !isEmpty
+//      self?.emptyRecordText.isHidden = !isEmpty
+//      self?.recordButton.isHidden = !isEmpty
+//      self?.countLabel.isHidden = isEmpty
+//      self?.collectionView.isHidden = isEmpty
+//    }
+//    
+//    viewModel.records.bind { [weak self] records in
+//      self?.updateUI(with: records)
+//    }
+//  }
   
-  private func updateUI(with records: [FeedModel]) {
-    countLabel.text = "• \(records.count)개의 기록"
-    collectionView.reloadData()
-  }
+//  private func updateUI(with records: [FeedModel]) {
+//    countLabel.text = "• \(records.count)개의 기록"
+//    collectionView.reloadData()
+//  }
 }
 
 extension MyRecordViewController: UICollectionViewDataSource {
   public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return viewModel.records.value.count
+//    return viewModel.records.value.count
+    return 0
   }
   
   public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "RecordCell", for: indexPath) as! RecordCollectionViewCell
-    let record = viewModel.records.value[indexPath.item]
-    cell.configure(with: record)
+//    let record = viewModel.records.value[indexPath.item]
+//    cell.configure(with: record)
     return cell
   }
 }

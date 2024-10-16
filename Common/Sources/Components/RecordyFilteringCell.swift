@@ -36,8 +36,8 @@ public class RecordyFilteringCell: UICollectionViewCell {
     }
   }
 
-  public func bind(keyword: Keyword, isSelected: Bool) {
-    self.chipButton.setTitle(keyword.title, for: .normal)
-    self.chipButton.setState(state: isSelected ? .active : .inactive)
-  }
+//  public func bind(keyword: Keyword, isSelected: Bool) {
+//    self.chipButton.setTitle(keyword.title, for: .normal)
+//    self.chipButton.setState(state: isSelected ? .active : .inactive)
+//  }
 }

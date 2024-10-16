@@ -80,15 +80,15 @@ class FollowerCell: UITableViewCell {
   @objc private func followButtonTapped() {
     self.followButtonEvent?()
   }
-  
-  func configure(with follower: Follower) {
-    let url = URL(string: follower.profileImage)
-    profileImageView.kf.setImage(with: url)
-    usernameLabel.text = follower.username
-    followButton.isHidden = follower.username == "유영"
-    updateFollowButton(isFollowed: follower.isFollowing)
-  }
-  
+//  
+//  func configure(with follower: Follower) {
+//    let url = URL(string: follower.profileImage)
+//    profileImageView.kf.setImage(with: url)
+//    usernameLabel.text = follower.username
+//    followButton.isHidden = follower.username == "유영"
+//    updateFollowButton(isFollowed: follower.isFollowing)
+//  }
+//  
   func updateFollowButton(isFollowed: Bool) {
     followButton.mediumState = isFollowed ? .active : .inactive
   }
