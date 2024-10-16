@@ -174,23 +174,23 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
   func getUserInfo() {
     let apiProvider = APIProvider<APITarget.Users>()
     let request = DTO.GetProfileRequest(otherUserId: id)
-    apiProvider.requestResponsable(.getProfile(request), DTO.GetProfileResponse.self) { [weak self] result in
-      guard let self = self else { return }
-      switch result {
-      case .success(let response):
-        self.user = User(
-          isMine: response.id,
-          id: response.nickname,
-          nickname: response.followerCount,
-          follower: response.followingCount,
-          following: response.isFollowing,
-          isFollowing: response.profileImageUrl
-        )
-        self.setUserProfile()
-      case .failure(let failure):
-        print(failure)
-      }
-    }
+//    apiProvider.requestResponsable(.getProfile(request), DTO.GetProfileResponse.self) { [weak self] result in
+//      guard let self = self else { return }
+//      switch result {
+//      case .success(let response):
+//        self.user = User(
+//          isMine: response.id,
+//          id: response.nickname,
+//          nickname: response.followerCount,
+//          follower: response.followingCount,
+//          following: response.isFollowing,
+//          isFollowing: response.profileImageUrl
+//        )
+//        self.setUserProfile()
+//      case .failure(let failure):
+//        print(failure)
+//      }
+//    }
   }
 
   func getOtherRecordList() {
@@ -200,33 +200,33 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
       cursorId: cursorId,
       size: 100
     )
-    apiProvider.requestResponsable(.getUserRecordList(request), DTO.GetUserRecordListResponse.self) { [weak self]
-      result in
-      guard let self = self else {return}
-      switch result {
-      case .success(let response):
-        let feeds = response.content.map {
-          Feed(
-            id: $0.recordInfo.id,
-            userId: $0.recordInfo.uploaderId,
-            location: $0.recordInfo.location, placeInfo: <#PlaceInfo#>,
-            nickname: $0.recordInfo.uploaderNickname,
-            description: $0.recordInfo.content,
-            isBookmarked: $0.isBookmark, bookmarkCount: $0.recordInfo.bookmarkCount,
-            videoLink: $0.recordInfo.fileUrl.videoUrl,
-            thumbnailLink: $0.recordInfo.fileUrl.thumbnailUrl,
-            isMine: $0.recordInfo.isMine
-          )
-        }
-        self.feeds += feeds
-        DispatchQueue.main.async {
-          self.collectionView!.reloadData()
-          self.setCountLabelText()
-        }
-      case .failure(let failure):
-        print(failure.localizedDescription)
-      }
-    }
+//    apiProvider.requestResponsable(.getUserRecordList(request), DTO.GetUserRecordListResponse.self) { [weak self]
+//      result in
+//      guard let self = self else {return}
+//      switch result {
+//      case .success(let response):
+//        let feeds = response.content.map {
+//          Feed(
+//            id: $0.recordInfo.id,
+//            userId: $0.recordInfo.uploaderId,
+//            location: $0.recordInfo.location, placeInfo: <#PlaceInfo#>,
+//            nickname: $0.recordInfo.uploaderNickname,
+//            description: $0.recordInfo.content,
+//            isBookmarked: $0.isBookmark, bookmarkCount: $0.recordInfo.bookmarkCount,
+//            videoLink: $0.recordInfo.fileUrl.videoUrl,
+//            thumbnailLink: $0.recordInfo.fileUrl.thumbnailUrl,
+//            isMine: $0.recordInfo.isMine
+//          )
+//        }
+//        self.feeds += feeds
+//        DispatchQueue.main.async {
+//          self.collectionView!.reloadData()
+//          self.setCountLabelText()
+//        }
+//      case .failure(let failure):
+//        print(failure.localizedDescription)
+//      }
+//    }
   }
 
   @objc private func followButtonTap() {

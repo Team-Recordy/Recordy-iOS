@@ -30,7 +30,7 @@ public class UploadVideoViewController: UIViewController {
   let videoThumbnailAlertLabel = UILabel()
   private let videoThumbnailImageView = UIImageView()
   private let selectedKeywordLabel = RecordySubtitleLabel(subtitle: "키워드")
-  private let selectKeywordStackView = RecordySelectKeywordStackView()
+//  private let selectKeywordStackView = RecordySelectKeywordStackView()
   private let firstKeywordLabel = RecordyKeywordLabel()
   private let secondKeywordLabel = RecordyKeywordLabel()
   private let thirdKeywordLabel = RecordyKeywordLabel()
@@ -91,13 +91,13 @@ public class UploadVideoViewController: UIViewController {
       $0.font = RecordyFont.caption2.font
       $0.textColor = CommonAsset.recordyGrey01.color
     }
-    selectKeywordStackView.keywordButton.do {
-      $0.addTarget(
-        self,
-        action: #selector(selectedKeywordButtonTapped),
-        for: .touchUpInside
-      )
-    }
+//    selectKeywordStackView.keywordButton.do {
+//      $0.addTarget(
+//        self,
+//        action: #selector(selectedKeywordButtonTapped),
+//        for: .touchUpInside
+//      )
+//    }
     locationTextCountLabel.do {
       $0.font = RecordyFont.caption2.font
       $0.textColor = CommonAsset.recordyGrey04.color
@@ -127,7 +127,7 @@ public class UploadVideoViewController: UIViewController {
       warningLabel,
       videoThumbnailLabel,
       videoThumbnailView,
-      selectKeywordStackView,
+//      selectKeywordStackView,
       selectedKeywordLabel,
       locationLabel,
       locationTextField,
@@ -181,17 +181,17 @@ public class UploadVideoViewController: UIViewController {
       $0.height.equalTo(28.adaptiveHeight)
     }
 
-    selectKeywordStackView.snp.makeConstraints {
-      $0.top.equalTo(selectedKeywordLabel.snp.bottom).offset(10.adaptiveHeight)
-      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
-      $0.height.equalTo(36.adaptiveHeight)
-    }
-
-    locationLabel.snp.makeConstraints {
-      $0.top.equalTo(selectKeywordStackView.snp.bottom).offset(24.adaptiveHeight)
-      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
-      $0.height.equalTo(28.adaptiveHeight)
-    }
+//    selectKeywordStackView.snp.makeConstraints {
+//      $0.top.equalTo(selectedKeywordLabel.snp.bottom).offset(10.adaptiveHeight)
+//      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
+//      $0.height.equalTo(36.adaptiveHeight)
+//    }
+//
+//    locationLabel.snp.makeConstraints {
+//      $0.top.equalTo(selectKeywordStackView.snp.bottom).offset(24.adaptiveHeight)
+//      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
+//      $0.height.equalTo(28.adaptiveHeight)
+//    }
 
     locationTextField.snp.makeConstraints {
       $0.top.equalTo(locationLabel.snp.bottom).offset(12.adaptiveHeight)
@@ -318,19 +318,19 @@ public class UploadVideoViewController: UIViewController {
     }
   }
 
-  @objc func selectedKeywordButtonTapped() {
-    let filteringViewController = RecordyFilteringViewController()
-    filteringViewController.delegate = self
-    if let sheet = filteringViewController.sheetPresentationController {
-      sheet.detents = [
-        .custom { _ in
-          return 495.adaptiveHeight
-        }
-      ]
-      sheet.prefersGrabberVisible = true
-    }
-    self.present(filteringViewController, animated: true)
-  }
+//  @objc func selectedKeywordButtonTapped() {
+//    let filteringViewController = RecordyFilteringViewController()
+//    filteringViewController.delegate = self
+//    if let sheet = filteringViewController.sheetPresentationController {
+//      sheet.detents = [
+//        .custom { _ in
+//          return 495.adaptiveHeight
+//        }
+//      ]
+//      sheet.prefersGrabberVisible = true
+//    }
+//    self.present(filteringViewController, animated: true)
+//  }
 
   @objc func uploadButtonTapped() {
     viewModel.uploadButtonTapped()
@@ -353,13 +353,13 @@ extension UploadVideoViewController: SelectVideoDelegate {
   }
 }
 
-@available(iOS 16.0, *)
-extension UploadVideoViewController: FilteringDelegate {
+//@available(iOS 16.0, *)
+//extension UploadVideoViewController: FilteringDelegate {
 //  public func selectKeywords(_ keywords: [Keyword]) {
 //    viewModel.input.selectedKeywords.accept(keywords)
 //    selectKeywordStackView.updateKeywords(keywords: keywords)
 //  }
-}
+//}
 
 @available(iOS 16.0, *)
 extension Reactive where Base: UploadVideoViewController {
