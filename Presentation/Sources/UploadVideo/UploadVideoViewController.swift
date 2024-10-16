@@ -355,10 +355,10 @@ extension UploadVideoViewController: SelectVideoDelegate {
 
 @available(iOS 16.0, *)
 extension UploadVideoViewController: FilteringDelegate {
-  public func selectKeywords(_ keywords: [Keyword]) {
-    viewModel.input.selectedKeywords.accept(keywords)
-    selectKeywordStackView.updateKeywords(keywords: keywords)
-  }
+//  public func selectKeywords(_ keywords: [Keyword]) {
+//    viewModel.input.selectedKeywords.accept(keywords)
+//    selectKeywordStackView.updateKeywords(keywords: keywords)
+//  }
 }
 
 @available(iOS 16.0, *)
