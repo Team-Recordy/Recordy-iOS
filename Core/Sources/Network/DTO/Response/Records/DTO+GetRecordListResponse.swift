@@ -79,12 +79,17 @@ extension DTO.RecordList {
         id: response.recordInfo.id,
         userId: response.recordInfo.uploaderId,
         location: response.recordInfo.location,
+        placeInfo: PlaceInfo(
+          feature: .all,
+          title: "국현미",
+          duration: "2024.10.03~"
+        ),
         nickname: response.recordInfo.uploaderNickname,
         description: response.recordInfo.content,
-        bookmarkCount: response.recordInfo.bookmarkCount,
         isBookmarked: response.isBookmark,
+        bookmarkCount: response.recordInfo.bookmarkCount,
         videoLink: response.recordInfo.fileUrl.videoUrl,
-        thumbnailLink: response.recordInfo.fileUrl.thumbnailUrl, 
+        thumbnailLink: response.recordInfo.fileUrl.thumbnailUrl,
         isMine: response.recordInfo.isMine
       )
     }
