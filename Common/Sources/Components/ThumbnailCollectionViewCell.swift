@@ -13,7 +13,6 @@ import Kingfisher
 import SnapKit
 import Then
 
-
 public class ThumbnailCollectionViewCell: UICollectionViewCell {
 
   public let gradientLayer = CAGradientLayer()
@@ -149,15 +148,15 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
     }
   }
 
-  public func configure(with record: MainRecord) {
-    let image = String(record.thumbnailUrl)
-    self.backgroundImageView.kf.setImage(
-      with: URL(string: image),
-      options: [.cacheOriginalImage]
-    )
-    self.locationText.text = record.location
-    self.bookmarkImage.image = record.isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image
-  }
+//  public func configure(with record: MainRecord) {
+//    let image = String(record.thumbnailUrl)
+//    self.backgroundImageView.kf.setImage(
+//      with: URL(string: image),
+//      options: [.cacheOriginalImage]
+//    )
+//    self.locationText.text = record.location
+//    self.bookmarkImage.image = record.isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image
+//  }
 
   public func configure(feed: Feed) {
     let image = String(feed.thumbnailLink)

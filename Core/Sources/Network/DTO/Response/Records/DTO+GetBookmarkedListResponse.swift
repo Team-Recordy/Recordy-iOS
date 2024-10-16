@@ -96,14 +96,18 @@ extension DTO.GetBookmarkedListResponse {
         id: $0.recordInfo.id,
         userId: $0.recordInfo.uploaderId,
         location: $0.recordInfo.location,
+        placeInfo: PlaceInfo(
+          feature: .all,
+          title: "국현미",
+          duration: "2024.10.03~"
+        ),
         nickname: $0.recordInfo.uploaderNickname,
         description: $0.recordInfo.content,
-        bookmarkCount: $0.recordInfo.bookmarkCount,
         isBookmarked: $0.isBookmark,
+        bookmarkCount: $0.recordInfo.bookmarkCount,
         videoLink: $0.recordInfo.fileUrl.videoUrl,
         thumbnailLink: $0.recordInfo.fileUrl.thumbnailUrl,
         isMine: $0.recordInfo.isMine
-      )
-    }
+      )    }
   }
 }

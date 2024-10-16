@@ -23,14 +23,13 @@ enum VideoFeedType {
 class VideoFeedViewModel {
 
   private(set) var feedList: [Feed] = []
+  let apiProvider = APIProvider<APITarget.Records>()
   var type: VideoFeedType
   var cursorId: Int?
   var currentId: Int?
   var userId: Int?
-  var keyword: Keyword?
   var hasNext = true
   var pageNumber = 0
-  let apiProvider = APIProvider<APITarget.Records>()
   var isFetching = false
   var isToggle = false
   var onFeedListUpdate: ((Int) -> ())?
@@ -38,13 +37,11 @@ class VideoFeedViewModel {
 
   init(
     type: VideoFeedType,
-    keyword: Keyword? = nil,
     currentId: Int? = nil,
     cursorId: Int? = nil,
     userId: Int? = nil
   ) {
     self.type = type
-    self.keyword = keyword
     self.currentId = currentId
     self.cursorId = cursorId
     self.userId = userId
@@ -71,16 +68,10 @@ class VideoFeedViewModel {
         response: DTO.GetFollowingRecordListResponse.self
       )
     case .famous:
-      var selectedKeyword: String?
-      if keyword != .all {
-        selectedKeyword = keyword?.title.keywordEncode()
-      } else {
-        selectedKeyword = nil
-      }
       getRecordList(
         endPoint: .getFamousRecordList(
           DTO.GetFamousRecordListRequest(
-            keywords: selectedKeyword,
+            keywords: nil,
             pageNumber: pageNumber,
             pageSize: 15
           )
@@ -89,16 +80,10 @@ class VideoFeedViewModel {
       )
     case .recent:
       guard let cursorId, let currentId else { return }
-      var selectedKeyword: String?
-      if keyword != .all {
-        selectedKeyword = keyword?.title.keywordEncode()
-      } else {
-        selectedKeyword = nil
-      }
       getRecordList(
         endPoint: .getRecentRecordList(
           DTO.GetRecentRecordListRequest(
-            keywords: selectedKeyword,
+            keywords: nil,
             cursorId: cursorId,
             size: 15
           )
@@ -230,10 +215,15 @@ class VideoFeedViewModel {
             id: feed.id,
             userId: feed.userId,
             location: feed.location,
+            placeInfo: PlaceInfo(
+              feature: .all,
+              title: "국현미",
+              duration: "2024.10.03~"
+            ),
             nickname: feed.nickname,
             description: feed.description,
+            isBookmarked: feed.isBookmarked,
             bookmarkCount: feed.bookmarkCount,
-            isBookmarked: feed.isMine,
             videoLink: String(describing: url!),
             thumbnailLink: feed.thumbnailLink,
             isMine: feed.isMine

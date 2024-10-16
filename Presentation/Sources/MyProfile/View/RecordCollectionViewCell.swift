@@ -44,12 +44,12 @@ class RecordCollectionViewCell: UICollectionViewCell {
     locationLabel.textAlignment = .left
   }
   
-  func configure(with record: FeedModel) {
-    if let image = UIImage(named: record.thumbnail) {
-      imageView.image = image
-    } else {
-      imageView.image = UIImage(named: "placeholder_image")
-    }
-    locationLabel.text = record.location
-  }
+//  func configure(with record: FeedModel) {
+//    if let image = UIImage(named: record.thumbnail) {
+//      imageView.image = image
+//    } else {
+//      imageView.image = UIImage(named: "placeholder_image")
+//    }
+//    locationLabel.text = record.location
+//  }
 }
