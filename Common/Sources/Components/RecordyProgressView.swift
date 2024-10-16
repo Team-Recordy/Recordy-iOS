@@ -28,7 +28,7 @@ public final class RecordyProgressView: UIView {
         delay: 0,
         options: .curveEaseInOut,
         animations: {
-          layoutIfNeeded()
+          self.layoutIfNeeded()
         },
         completion: nil
       )
