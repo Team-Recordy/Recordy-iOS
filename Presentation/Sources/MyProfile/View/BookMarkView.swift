@@ -6,13 +6,10 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 import UIKit
-
 import Common
 import Core
-
 import SnapKit
 import Then
-import Kingfisher
 
 protocol BookmarkDelegate: AnyObject {
   func bookmarkFeedTapped(feed: Feed)
@@ -22,7 +19,7 @@ protocol BookmarkDelegate: AnyObject {
 class BookmarkView: UIView {
   private let bookmarkEmptyView = BookMarkEmptyView()
   private let countLabel = UILabel()
-  private lazy var collectionView: UICollectionView = {
+  lazy var collectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
     layout.itemSize = CGSize(width: 170, height: 288)
     layout.minimumLineSpacing = 10
@@ -46,20 +43,22 @@ class BookmarkView: UIView {
   
   override init(frame: CGRect) {
     super.init(frame: frame)
-    setupViews()
+    setUI()
     setStyle()
     setLayout()
-    updateViewState() // 초기 상태 설정
+    updateViewState()
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
   
-  private func setupViews() {
-    addSubview(bookmarkEmptyView)
-    addSubview(countLabel)
-    addSubview(collectionView)
+  private func setUI() {
+    [
+      bookmarkEmptyView,
+      countLabel,
+      collectionView
+    ].forEach { addSubview($0) }
     
     bookmarkEmptyView.setActionButtonHandler { [weak self] in
       print("영상 둘러보기 눌림")
@@ -115,7 +114,7 @@ class BookmarkView: UIView {
   }
 }
 
-extension BookmarkView: UICollectionViewDataSource, UICollectionViewDelegate {
+extension BookmarkView: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return feeds.count
   }
@@ -136,7 +135,9 @@ extension BookmarkView: UICollectionViewDataSource, UICollectionViewDelegate {
     }
     return cell
   }
-  
+}
+
+extension BookmarkView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     delegate?.bookmarkFeedTapped(feed: feeds[indexPath.row])
   }
