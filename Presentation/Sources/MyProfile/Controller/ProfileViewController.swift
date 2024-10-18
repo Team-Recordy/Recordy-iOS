@@ -93,9 +93,14 @@ public class ProfileViewController: UIViewController {
     }
     
     segmentControlView.snp.makeConstraints {
-      $0.top.equalTo(profileInfoView.snp.bottom).offset(35.adaptiveHeight)
-      $0.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(40.adaptiveHeight)
+//      $0.top.equalTo(profileInfoView.snp.bottom).offset(35.adaptiveHeight)
+//      $0.horizontalEdges.equalToSuperview()
+//      $0.height.equalTo(40.adaptiveHeight)
+      
+      $0.top.equalTo(profileInfoView.snp.bottom).offset(32)
+      $0.horizontalEdges.equalToSuperview().inset(20)
+//      $0.trailing.equalToSuperview().inset(20)
+      $0.height.equalTo(34)
     }
     
     myRecordView.snp.makeConstraints {

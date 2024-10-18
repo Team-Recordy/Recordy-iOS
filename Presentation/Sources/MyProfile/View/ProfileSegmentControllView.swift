@@ -21,7 +21,6 @@ public final class ProfileSegmentControllView: UIView {
   private var selectedTab: ControlType = .record {
     didSet {
       setStyle()
-      setTabUI()
     }
   }
   weak var delegate: ControlTypeDelegate?
@@ -64,8 +63,8 @@ public final class ProfileSegmentControllView: UIView {
   private func setStyle() {
     barStack.do {
       $0.axis = .horizontal
-      $0.spacing = 50.adaptiveWidth
-      $0.distribution = .equalSpacing
+      $0.spacing = 11.adaptiveWidth
+      $0.distribution = .fillEqually
     }
     
     recordButton.do {
@@ -86,17 +85,13 @@ public final class ProfileSegmentControllView: UIView {
   private func setAutoLayout() {
     barStack.snp.makeConstraints {
       $0.centerX.equalToSuperview()
-      $0.verticalEdges.equalToSuperview()
+      $0.horizontalEdges.equalToSuperview()
     }
   }
   
   private func setTabViews() {
     recordButton.addAction(tapAction, for: .touchUpInside)
     bookmarkButton.addAction(tapAction, for: .touchUpInside)
-  }
-  
-  private func setTabUI() {
-    // 선택된 탭에 따라 다른 뷰를 표시
   }
   
   private func applySelectUI(to button: UIButton, type: ControlType) {
