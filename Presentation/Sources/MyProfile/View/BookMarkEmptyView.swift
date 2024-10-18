@@ -5,7 +5,6 @@
 //  Created by 송여경 on 10/19/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
-
 import UIKit
 import SnapKit
 import Then
@@ -16,6 +15,8 @@ class BookMarkEmptyView: UIView {
   private let imageView = UIImageView()
   private let titleLabel = UILabel()
   private let goAroundButton = ViskitYellowButton()
+  
+  private var actionButtonHandler: (() -> Void)?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -37,11 +38,25 @@ class BookMarkEmptyView: UIView {
     }
     
     titleLabel.do {
-      $0.text = "북마크한 영상이 없어요.\n영상을 둘러보고 저장해 보세요!"
-      $0.numberOfLines = 2
-      $0.textAlignment = .center
+      let text = "북마크한 영상이 없어요.\n영상을 둘러보고 저장해 보세요!"
+      $0.numberOfLines = 0
       $0.textColor = CommonAsset.viskitGray02.color
       $0.font = ViskitFont.title2.font
+      
+      let paragraphStyle = NSMutableParagraphStyle()
+      paragraphStyle.lineSpacing = 30 - $0.font.lineHeight
+      paragraphStyle.alignment = .center
+      
+      let attributedString = NSAttributedString(
+        string: text,
+        attributes: [
+          .paragraphStyle: paragraphStyle,
+          .font: ViskitFont.title2.font,
+          .foregroundColor: CommonAsset.viskitGray02.color
+        ]
+      )
+      $0.attributedText = attributedString
+      $0.textAlignment = .center
     }
     
     goAroundButton.do {
@@ -54,7 +69,7 @@ class BookMarkEmptyView: UIView {
       imageView,
       titleLabel,
       goAroundButton
-    ].forEach{ addSubview($0)}
+    ].forEach { addSubview($0) }
   }
   
   private func setAutoLayout() {
@@ -83,8 +98,6 @@ class BookMarkEmptyView: UIView {
     goAroundButton.addTarget(self, action: #selector(actionButtonTapped), for: .touchUpInside)
     self.actionButtonHandler = handler
   }
-  
-  private var actionButtonHandler: (() -> Void)?
   
   @objc private func actionButtonTapped() {
     actionButtonHandler?()

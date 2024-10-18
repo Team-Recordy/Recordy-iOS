@@ -5,7 +5,6 @@
 //  Created by 송여경 on 10/19/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
-
 import UIKit
 import SnapKit
 import Then
@@ -39,11 +38,25 @@ class MyRecordEmptyView: UIView {
     }
     
     textLabel.do {
-      $0.text = "직접 방문한 공간 영상을\n공유해 보세요!"
-      $0.numberOfLines = 2
-      $0.textAlignment = .center
+      let text = "직접 방문한 공간 영상을\n공유해 보세요!"
+      $0.numberOfLines = 0
       $0.textColor = CommonAsset.viskitGray02.color
       $0.font = ViskitFont.title2.font
+      
+      let paragraphStyle = NSMutableParagraphStyle()
+      paragraphStyle.lineSpacing = 30 - $0.font.lineHeight
+      paragraphStyle.alignment = .center
+      
+      let attributedString = NSAttributedString(
+        string: text,
+        attributes: [
+          .paragraphStyle: paragraphStyle,
+          .font: ViskitFont.title2.font,
+          .foregroundColor: CommonAsset.viskitGray02.color
+        ]
+      )
+      $0.attributedText = attributedString
+      $0.textAlignment = .center
     }
     
     goRecordButton.do {
@@ -57,7 +70,7 @@ class MyRecordEmptyView: UIView {
       imageView,
       textLabel,
       goRecordButton
-    ].forEach{ addSubview($0)}
+    ].forEach { addSubview($0) }
   }
   
   private func setAutoLayout() {

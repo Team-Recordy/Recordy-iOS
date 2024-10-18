@@ -19,84 +19,70 @@ protocol BookmarkDelegate: AnyObject {
   func bookmarkButtonTapped(feed: Feed)
 }
 
-class BookmarkView: UIView, UICollectionViewDataSource, UICollectionViewDelegate {
-  private let bookmarkEmptyView = UIView()
-  private let bookmarkDataView = UIView()
-  let bookmarkEmptyImageView = UIImageView()
-  let bookmarkEmptyTextVIew = UIImageView()
+class BookmarkView: UIView {
+  private let bookmarkEmptyView = BookMarkEmptyView()
   private let countLabel = UILabel()
-  private var collectionView: UICollectionView!
-
-  private var feeds: [Feed] = []
+  private lazy var collectionView: UICollectionView = {
+    let layout = UICollectionViewFlowLayout()
+    layout.itemSize = CGSize(width: 170, height: 288)
+    layout.minimumLineSpacing = 10
+    layout.minimumInteritemSpacing = 10
+    layout.sectionInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
+    
+    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    collectionView.dataSource = self
+    collectionView.delegate = self
+    collectionView.backgroundColor = .clear
+    collectionView.register(ThumbnailCollectionViewCell.self, forCellWithReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier)
+    return collectionView
+  }()
+  
+  private var feeds: [Feed] = [] {
+    didSet {
+      updateViewState()
+    }
+  }
   weak var delegate: BookmarkDelegate?
-
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
-    setUpCollectionView()
+    setupViews()
     setStyle()
-    setUI()
-    setAutoLayout()
-    checkDataEmpty()
+    setLayout()
+    updateViewState() // 초기 상태 설정
   }
   
   required init?(coder: NSCoder) {
-    fatalError("init(coder:)가 구현되지 않았습니다.")
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  private func setupViews() {
+    addSubview(bookmarkEmptyView)
+    addSubview(countLabel)
+    addSubview(collectionView)
+    
+    bookmarkEmptyView.setActionButtonHandler { [weak self] in
+      print("영상 둘러보기 눌림")
+    }
   }
   
   private func setStyle() {
-    self.backgroundColor = .black
-    bookmarkEmptyImageView.do {
-      $0.image = CommonAsset.mypagebookmark.image
-      $0.contentMode = .scaleAspectFit
-    }
-    bookmarkEmptyTextVIew.do {
-      $0.image = CommonAsset.bookmarkText.image
-    }
+    backgroundColor = .black
     
     countLabel.do {
-      $0.text = "0 개의 기록"
       $0.textColor = .white
       $0.font = RecordyFont.caption1.font
       $0.numberOfLines = 1
       $0.textAlignment = .right
     }
-    
-    collectionView.do {
-      $0.backgroundColor = .clear
-    }
   }
   
-  private func setUI() {
-    self.addSubview(bookmarkEmptyView)
-    self.addSubview(bookmarkDataView)
-    self.addSubview(countLabel)
-    self.addSubview(collectionView)
-    
-    bookmarkEmptyView.addSubview(bookmarkEmptyImageView)
-    bookmarkEmptyView.addSubview(bookmarkEmptyTextVIew)
-  }
-  
-  private func setAutoLayout() {
-    bookmarkEmptyImageView.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(115)
-      $0.leading.equalTo(143)
-      $0.width.equalTo(100.adaptiveWidth)
-      $0.height.equalTo(100.adaptiveHeight)
-    }
-    
-    bookmarkEmptyTextVIew.snp.makeConstraints {
-      $0.top.equalTo(bookmarkEmptyImageView.snp.bottom).offset(18)
-      $0.leading.equalTo(70)
-    }
-    
-    bookmarkEmptyView.snp.makeConstraints {
-      $0.edges.equalToSuperview()
-    }
+  private func setLayout() {
+    bookmarkEmptyView.snp.makeConstraints { $0.edges.equalToSuperview() }
     
     countLabel.snp.makeConstraints {
       $0.top.equalToSuperview().offset(-18)
-      $0.leading.equalToSuperview().offset(194)
-      $0.width.equalTo(161.adaptiveWidth)
+      $0.trailing.equalToSuperview().inset(20)
       $0.height.equalTo(18.adaptiveHeight)
     }
     
@@ -106,46 +92,30 @@ class BookmarkView: UIView, UICollectionViewDataSource, UICollectionViewDelegate
     }
   }
   
-  private func setUpCollectionView() {
-    let layout = UICollectionViewFlowLayout()
-    layout.itemSize = CGSize(width: 170, height: 288)
-    layout.minimumLineSpacing = 10
-    layout.minimumInteritemSpacing = 10
-    layout.sectionInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
-    
-    collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-    collectionView.dataSource = self
-    collectionView.delegate = self
-    collectionView.register(ThumbnailCollectionViewCell.self, forCellWithReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier)
-  }
-  
-  private func checkDataEmpty() {
-    if feeds.isEmpty {
-      bookmarkEmptyView.isHidden = false
-      countLabel.isHidden = true
-      collectionView.isHidden = true
-    } else {
-      bookmarkEmptyView.isHidden = true
-      countLabel.isHidden = false
-      collectionView.isHidden = false
-      setCountLabelText()
+  private func updateViewState() {
+    let isEmpty = feeds.isEmpty
+    bookmarkEmptyView.isHidden = !isEmpty
+    collectionView.isHidden = isEmpty
+    setCountLabelText()
+    if !isEmpty {
+      collectionView.reloadData()
     }
   }
   
   private func setCountLabelText() {
     let whiteText = "• \(feeds.count)"
     let greyText = " 개의 기록"
-    let attributedText = NSMutableAttributedString(string: whiteText, attributes:       [NSAttributedString.Key.foregroundColor: UIColor.white])
-    attributedText.append(NSAttributedString(string: greyText, attributes: [NSAttributedString.Key.foregroundColor: CommonAsset.recordyGrey03.color]))
+    let attributedText = NSMutableAttributedString(string: whiteText, attributes: [.foregroundColor: UIColor.white])
+    attributedText.append(NSAttributedString(string: greyText, attributes: [.foregroundColor: CommonAsset.recordyGrey03.color]))
     countLabel.attributedText = attributedText
   }
-
+  
   func getBookmarkList(feeds: [Feed]) {
     self.feeds = feeds
-    self.collectionView.reloadData()
-    checkDataEmpty()
   }
+}
 
+extension BookmarkView: UICollectionViewDataSource, UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return feeds.count
   }
@@ -166,11 +136,8 @@ class BookmarkView: UIView, UICollectionViewDataSource, UICollectionViewDelegate
     }
     return cell
   }
-
-  func collectionView(
-    _ collectionView: UICollectionView,
-    didSelectItemAt indexPath: IndexPath
-  ) {
+  
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     delegate?.bookmarkFeedTapped(feed: feeds[indexPath.row])
   }
 }
