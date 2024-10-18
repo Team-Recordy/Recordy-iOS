@@ -21,9 +21,14 @@ public class ViskitYellowButton: UIButton {
   
   private func setUI() {
     backgroundColor = CommonAsset.viskitYellow400.color
-    layer.cornerRadius = 30
+    layer.cornerRadius = 40
     titleLabel?.font = ViskitFont.body2Bold.font
     setTitleColor(.black, for: .normal)
+    clipsToBounds = true
   }
   
+  public override func layoutSubviews() {
+    super.layoutSubviews()
+    layer.cornerRadius = bounds.height / 2
+  }
 }

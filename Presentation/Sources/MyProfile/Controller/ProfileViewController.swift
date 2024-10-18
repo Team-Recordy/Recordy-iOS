@@ -93,13 +93,8 @@ public class ProfileViewController: UIViewController {
     }
     
     segmentControlView.snp.makeConstraints {
-//      $0.top.equalTo(profileInfoView.snp.bottom).offset(35.adaptiveHeight)
-//      $0.horizontalEdges.equalToSuperview()
-//      $0.height.equalTo(40.adaptiveHeight)
-      
       $0.top.equalTo(profileInfoView.snp.bottom).offset(32)
       $0.horizontalEdges.equalToSuperview().inset(20)
-//      $0.trailing.equalToSuperview().inset(20)
       $0.height.equalTo(34)
     }
     
@@ -127,10 +122,10 @@ public class ProfileViewController: UIViewController {
   
   private func setUserProfile() {
     guard let user = user else { return }
-    let followerAttributedText = NSMutableAttributedString(string: "\(user.follower.count)", attributes: [.font: RecordyFont.body2.font])
+    let followerAttributedText = NSMutableAttributedString(string: "\(user.followerCount)", attributes: [.font: RecordyFont.body2.font])
     followerAttributedText.append(NSAttributedString(string: " 명의 팔로워", attributes: [.font: RecordyFont.body2.font, .foregroundColor: CommonAsset.recordyGrey03.color]))
     self.profileInfoView.followerButton.setAttributedTitle(followerAttributedText, for: .normal)
-    let followingAttributedText = NSMutableAttributedString(string: "\(user.following?.count ?? 0)", attributes: [.font: RecordyFont.body2.font])
+    let followingAttributedText = NSMutableAttributedString(string: "\(user.followingCount)", attributes: [.font: RecordyFont.body2.font])
     followingAttributedText.append(NSAttributedString(string: " 명의 팔로잉", attributes: [.font: RecordyFont.body2.font, .foregroundColor: CommonAsset.recordyGrey03.color]))
     self.profileInfoView.followingButton.setAttributedTitle(followingAttributedText, for: .normal)
     self.profileInfoView.userName.text = user.nickname
@@ -197,10 +192,9 @@ public class ProfileViewController: UIViewController {
                thumbnailLink: content.recordInfo.fileUrl.thumbnailUrl,
                isMine: content.recordInfo.isMine)
         }
-        DispatchQueue.main.async { [weak self] in
-          guard let self = self else { return }
-          self.myRecordView.getMyRecordList(feeds: feeds)
+        DispatchQueue.main.async {
           self.user?.feeds = feeds
+          self.myRecordView.getMyRecordList(feeds: feeds)
           self.setUserProfile()
         }
       case .failure(let failure):
@@ -209,16 +203,6 @@ public class ProfileViewController: UIViewController {
           self.showErrorAlert(message: "기록을 불러오는데 실패했습니다. 다시 시도해주세요.")
         }
       }
-    }
-  }
-  
-  private func getPlaceFeature(from location: String) -> PlaceFeature {
-    if location.lowercased().contains("free") {
-      return .free
-    } else if location.lowercased().contains("closing soon") {
-      return .closingSoon
-    } else {
-      return .all
     }
   }
   
@@ -247,12 +231,22 @@ public class ProfileViewController: UIViewController {
                isMine: false)
         }
         DispatchQueue.main.async {
-          self.bookmarkView.getBookmarkList(feeds: feeds)
           self.user?.bookmarkedFeeds = feeds
+          self.bookmarkView.getBookmarkList(feeds: feeds)
         }
       case .failure(let failure):
         print(failure)
       }
+    }
+  }
+  
+  private func getPlaceFeature(from location: String) -> PlaceFeature {
+    if location.lowercased().contains("free") {
+      return .free
+    } else if location.lowercased().contains("closing soon") {
+      return .closingSoon
+    } else {
+      return .all
     }
   }
   
