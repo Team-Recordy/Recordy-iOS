@@ -96,6 +96,8 @@ public class SetViewController: UIViewController {
     setUI()
     setAutoLayout()
     setDelegate()
+    configureNavigationBar()
+    self.navigationController?.navigationBar.topItem?.title = ""
   }
   
   private lazy var firstDivider = createDivider()
@@ -145,6 +147,18 @@ public class SetViewController: UIViewController {
   private func setDelegate() {
     extraTableView.signOutDelegate = self
     extraTableView.withDrawDelegate = self
+    accountTableView.accountActionDelegate = self
+  }
+  
+  private func configureNavigationBar() {
+    navigationItem.title = "설정"
+    if let navigationBar = navigationController?.navigationBar {
+      navigationBar.tintColor = .white
+      navigationBar.titleTextAttributes = [
+        .foregroundColor: CommonAsset.viskitGray01.color,
+        .font: ViskitFont.title3.font
+      ]
+    }
   }
 }
 
