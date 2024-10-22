@@ -5,12 +5,25 @@ import SnapKit
 
 import Common
 
+protocol AccountActionDelegate: AnyObject {
+    func didTapProfileEdit()
+    func didTapLoginConnection()
+}
+
+protocol SignOutDelegate: AnyObject {
+  func signOut()
+}
+
+protocol WithDrawDelegate: AnyObject {
+  func withDraw()
+}
+
 enum SettingType: String {
   case community = "커뮤니티 가이드라인"
   case service = "서비스 이용약관"
   case privacy = "개인정보 취급방침"
   case inquiry = "문의"
-
+  
   var url: URL {
     switch self {
     case .community:
@@ -28,6 +41,7 @@ enum SettingType: String {
 enum SettingSection {
   case help
   case etc
+  case account
 }
 
 public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource {
@@ -40,7 +54,8 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
   let type: SettingSection
   weak var signOutDelegate: SignOutDelegate?
   weak var withDrawDelegate: WithDrawDelegate?
-
+  weak var accountActionDelegate: AccountActionDelegate?
+  
   init(
     type: SettingSection,
     list: [String],
@@ -88,7 +103,7 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
   }
   
   public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-    return 64
+    return 60
   }
   
   public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -96,8 +111,8 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
     let headerLabel = UILabel()
     
     headerLabel.do {
-      $0.textColor = CommonAsset.recordyGrey01.color
-      $0.font = RecordyFont.title3.font
+      $0.textColor = CommonAsset.viskitWhite.color
+      $0.font = ViskitFont.title4.font
       $0.text = headerTitle
     }
     headerView.addSubview(headerLabel)
@@ -118,11 +133,11 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
       for: indexPath
     )
     cell.textLabel?.text = list[indexPath.row]
-    cell.textLabel?.font = RecordyFont.body1.font
-    cell.textLabel?.textColor = CommonAsset.recordyGrey01.color
+    cell.textLabel?.font = ViskitFont.body1.font
+    cell.textLabel?.textColor = CommonAsset.viskitGray01.color
     cell.backgroundColor = .black
     cell.selectionStyle = .none
-
+    
     if cellArrowImages.indices.contains(
       indexPath.row
     ) {
@@ -139,7 +154,7 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
   }
   
   public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-    if let footerView = footerView, 
+    if let footerView = footerView,
         let heightConstraint = footerView.constraints.first(where: { $0.firstAttribute == .height })
     {
       return heightConstraint.constant
@@ -151,16 +166,21 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
     
     return footerView
   }
-
-  public func tableView(
-    _ tableView: UITableView,
-    didSelectRowAt indexPath: IndexPath
-  ) {
-    if type == .help {
+  
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    switch type {
+    case .help:
       if let url = SettingType(rawValue: list[indexPath.row])?.url {
         UIApplication.shared.open(url)
       }
-    } else {
+    case .account:
+      switch list[indexPath.row] {
+      case "프로필 수정":
+        accountActionDelegate?.didTapProfileEdit()
+      default:
+        break
+      }
+    case .etc:
       if list[indexPath.row] == "로그아웃" {
         signOutDelegate?.signOut()
       } else if list[indexPath.row] == "탈퇴하기" {
@@ -168,12 +188,4 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
       }
     }
   }
-}
-
-protocol SignOutDelegate: AnyObject {
-  func signOut()
-}
-
-protocol WithDrawDelegate: AnyObject {
-  func withDraw()
 }

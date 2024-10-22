@@ -17,6 +17,19 @@ import Common
 @available(iOS 16.0, *)
 public class SetViewController: UIViewController {
   
+  let accountTableView: CustomTableView = {
+    return CustomTableView(
+      type: .account,
+      list: [
+        "프로필 수정",
+        "로그인 연동"
+      ],
+      headerTitle: "계정",
+      footerView: nil,
+      cellArrowImages: [CommonAsset.indicator.image]
+    )
+  }()
+  
   let helpTableView: CustomTableView = {
     
     return CustomTableView(
@@ -38,8 +51,6 @@ public class SetViewController: UIViewController {
     )
   }()
   
-  let divider = UIView()
-  
   let extraTableView: CustomTableView = {
     let footerLabel = UILabel()
     footerLabel.do {
@@ -59,7 +70,6 @@ public class SetViewController: UIViewController {
     return CustomTableView(
       type: .etc,
       list: [
-        "로그인 연동",
         "로그아웃",
         "탈퇴하기"
       ],
@@ -73,6 +83,12 @@ public class SetViewController: UIViewController {
     )
   }()
   
+  private func createDivider() -> UIView {
+    let divider = UIView()
+    divider.backgroundColor = CommonAsset.recordyGrey09.color
+    return divider
+  }
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -82,32 +98,50 @@ public class SetViewController: UIViewController {
     setDelegate()
   }
   
+  private lazy var firstDivider = createDivider()
+  private lazy var secondDivider = createDivider()
+  
   private func setUI() {
-    divider.backgroundColor = CommonAsset.recordyGrey09.color
-    view.addSubview(helpTableView)
-    view.addSubview(divider)
-    view.addSubview(extraTableView)
+    [ accountTableView,
+      helpTableView,
+      firstDivider,
+      secondDivider,
+      extraTableView
+    ].forEach { view.addSubview($0) }
   }
-
+  
   private func setAutoLayout() {
-    helpTableView.snp.makeConstraints {
+    
+    accountTableView.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide)
       $0.leading.trailing.equalToSuperview()
-      $0.height.equalTo(256.adaptiveHeight)
+      $0.height.equalTo(160.adaptiveHeight)
     }
     
-    divider.snp.makeConstraints {
-      $0.top.equalTo(helpTableView.snp.bottom).offset(12.adaptiveHeight)
+    firstDivider.snp.makeConstraints {
+      $0.top.equalTo(accountTableView.snp.bottom)
       $0.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(8.adaptiveHeight)
+      $0.height.equalTo(4.adaptiveHeight)
+    }
+    
+    helpTableView.snp.makeConstraints {
+      $0.top.equalTo(firstDivider.snp.bottom)
+      $0.leading.trailing.equalToSuperview()
+      $0.height.equalTo(265.adaptiveHeight)
+    }
+    
+    secondDivider.snp.makeConstraints {
+      $0.top.equalTo(helpTableView.snp.bottom).inset(10)
+      $0.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(4.adaptiveHeight)
     }
     
     extraTableView.snp.makeConstraints {
-      $0.top.equalTo(divider.snp.bottom)
+      $0.top.equalTo(secondDivider.snp.bottom)
       $0.leading.trailing.bottom.equalToSuperview()
     }
-  } 
-
+  }
+  
   private func setDelegate() {
     extraTableView.signOutDelegate = self
     extraTableView.withDrawDelegate = self
@@ -155,5 +189,16 @@ extension SetViewController: WithDrawDelegate {
       loginViewController.modalPresentationStyle = .fullScreen
       self.present(loginViewController, animated: false)
     }
+  }
+}
+
+@available(iOS 16.0, *)
+extension SetViewController: AccountActionDelegate {
+  func didTapProfileEdit() {
+    let profileEditVC = ProfileEditViewController()
+    navigationController?.pushViewController(profileEditVC, animated: true)
+  }
+  func didTapLoginConnection() {
+    
   }
 }
