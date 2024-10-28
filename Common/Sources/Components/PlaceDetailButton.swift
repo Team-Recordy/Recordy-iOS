@@ -1,5 +1,5 @@
 //
-//  ViskitPlaceDetailButton.swift
+//  PlaceDetailButton.swift
 //  Common
 //
 //  Created by Chandrala on 10/12/24.
@@ -11,7 +11,7 @@ import UIKit
 import SnapKit
 import Then
 
-public class ViskitPlaceDetailButton: UIButton {
+public class PlaceDetailButton: UIButton {
   
   public let locationLabel = UILabel()
   public let placeNameLabel = UILabel()
@@ -28,25 +28,24 @@ public class ViskitPlaceDetailButton: UIButton {
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  // -TODO: 에셋 파일 수정되면 폰트, 색깔 변경
+  
   private func setStyle() {
     locationLabel.do {
       $0.text = "서울 종로구"
-      $0.font = RecordyFont.keyword1.font
-      $0.textColor = CommonAsset.recordyGrey03.color
+      $0.font = ViskitFont.caption1Medium.font
+      $0.textColor = CommonAsset.viskitGray05.color
     }
     
     placeNameLabel.do {
       $0.text = "국립현대미술관"
-      $0.font = RecordyFont.keyword1.font
-      $0.textColor = CommonAsset.recordyGrey03.color
+      $0.font = ViskitFont.title3.font
+      $0.textColor = CommonAsset.viskitGray01.color
     }
     
-    // -TODO: 숫자 폰트, 색깔 변경
     eventCountLabel.do {
       $0.text = "7개의 전시가 진행중이에요"
-      $0.font = RecordyFont.keyword1.font
-      $0.textColor = CommonAsset.recordyGrey03.color
+      $0.font = ViskitFont.body2Semibold.font
+      $0.textColor = CommonAsset.viskitGray02.color
     }
     
     rightChevronIcon.do {

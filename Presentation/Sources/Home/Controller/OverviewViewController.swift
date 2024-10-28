@@ -15,14 +15,18 @@ final class OverviewViewController: UIViewController {
   
   var placeInfo: [PlaceInfo] = []
   
-  let overviewView = OverviewView()
+  let rootView = OverviewView()
+  
+  public override func loadView() {
+    self.view = rootView
+  }
   
   public override func viewDidLoad() {
     super.viewDidLoad()
-    overviewView.placeInfoCollectionView.delegate = self
+    rootView.placeInfoCollectionView.delegate = self
   }
   
-  func setplaceInfoCollectionView() {
+  func setPlaceInfoCollectionView() {
     let layout = UICollectionViewFlowLayout()
     
     layout.scrollDirection = .horizontal
@@ -38,17 +42,17 @@ final class OverviewViewController: UIViewController {
       right: 0
     )
 
-    overviewView.placeInfoCollectionView = UICollectionView(
+    rootView.placeInfoCollectionView = UICollectionView(
       frame: .zero,
       collectionViewLayout: layout
     )
-    overviewView.placeInfoCollectionView.showsHorizontalScrollIndicator = false
-    overviewView.placeInfoCollectionView.register(
+    rootView.placeInfoCollectionView.showsHorizontalScrollIndicator = false
+    rootView.placeInfoCollectionView.register(
       ThumbnailCollectionViewCell.self,
       forCellWithReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier
     )
-    overviewView.placeInfoCollectionView.delegate = self
-    overviewView.placeInfoCollectionView.dataSource = self
+    rootView.placeInfoCollectionView.delegate = self
+    rootView.placeInfoCollectionView.dataSource = self
   }
 }
 
@@ -87,7 +91,7 @@ extension OverviewViewController: UICollectionViewDataSource {
   ) {
 //    var nextType: VideoFeedType = .famous
 //    var currentId: Int?
-//    if collectionView == overviewView.placeInfoCollectionView {
+//    if collectionView == rootView.placeInfoCollectionView {
 //      nextType = .famous
 //      currentId = famousRecords[indexPath.row].id
 //    }

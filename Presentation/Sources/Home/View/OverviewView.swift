@@ -22,7 +22,7 @@ final class OverviewView: UIView {
   let locationButton = UIButton()
   let overviewScrollView = UIScrollView()
   let overviewStackView = UIStackView()
-  let placeDetailButton = ViskitPlaceDetailButton()
+  let placeDetailButton = PlaceDetailButton()
   lazy var placeInfoCollectionView = UICollectionView()
   
   public override init(frame: CGRect) {
