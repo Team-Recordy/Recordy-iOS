@@ -16,9 +16,9 @@ import Common
 final class ExhibitionListView: UIView {
   
   let exhibitionCount = UILabel()
-  let allFilterButton = ChipKeyWordButton()
-  let freeFilterButton = ChipKeyWordButton()
-  let endSoonFilterButton = ChipKeyWordButton()
+  public let allFilterButton = ChipKeyWordButton()
+  public let freeFilterButton = ChipKeyWordButton()
+  public let endSoonFilterButton = ChipKeyWordButton()
   var exhibitionCollectionView: UICollectionView?
   
   public override init(frame: CGRect) {

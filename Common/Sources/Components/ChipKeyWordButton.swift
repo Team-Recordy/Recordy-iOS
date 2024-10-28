@@ -10,13 +10,13 @@ import UIKit
 import SnapKit
 import Then
 
-enum ChipState {
+public enum ChipState {
   case active
   case inactive
 }
 
 public class ChipKeyWordButton: UIButton {
-  var chipstate: ChipState = .inactive {
+  public var chipstate: ChipState = .inactive {
     didSet {
       updateChipAppearance()
     }
@@ -37,23 +37,23 @@ public class ChipKeyWordButton: UIButton {
     updateChipAppearance()
   }
 
-  func setState(state: ChipState) {
+  public func setState(state: ChipState) {
     self.chipstate = state
   }
 
   private func updateChipAppearance() {
     switch chipstate {
     case .active:
-      backgroundColor = CommonAsset.recordyGrey01.color
+      backgroundColor = CommonAsset.viskitGray01.color
       setTitleColor(
-        CommonAsset.recordyGrey09.color,
+        CommonAsset.viskitBlack.color,
         for: .normal
       )
 
     case .inactive:
-      backgroundColor = CommonAsset.recordyGrey09.color
+      backgroundColor = CommonAsset.viskitGray09.color
       setTitleColor(
-        CommonAsset.recordyGrey04.color,
+        CommonAsset.viskitGray03.color,
         for: .normal
       )
     }
