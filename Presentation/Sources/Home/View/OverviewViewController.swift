@@ -13,46 +13,165 @@ import Core
 
 final class OverviewViewController: UIViewController {
   
-  var placeInfo: [PlaceInfo] = []
+  var overview: [Overview] = mockData
   
-  let rootView = OverviewView()
+  let viskitLogo = UIImageView()
+  let locationButton = UIButton()
+  let overviewScrollView = UIScrollView()
+  let contentView = UIView()
+  let overviewStackView = UIStackView()
   
-  public override func loadView() {
-    self.view = rootView
+  private var viewModel = OverviewViewModel()
+  
+  public init(viewModel: OverviewViewModel) {
+    self.viewModel = viewModel
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
   
   public override func viewDidLoad() {
     super.viewDidLoad()
-    rootView.placeInfoCollectionView.delegate = self
+    
+    setStyle()
+    setUI()
+    setAutolayout()
+    configureStackView()
+    bind()
   }
   
-  func setPlaceInfoCollectionView() {
-    let layout = UICollectionViewFlowLayout()
+  func setStyle() {
+    navigationController?.isNavigationBarHidden = true
     
+    overviewScrollView.do {
+      $0.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    contentView.do {
+      $0.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    overviewStackView.do {
+      $0.axis = .vertical
+      $0.spacing = 16
+      $0.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    viskitLogo.do {
+      $0.image = CommonAsset.viskitLogo.image
+      $0.contentMode = .scaleAspectFit
+    }
+    
+    locationButton.do {
+      $0.setImage(CommonAsset.locationInactive.image, for: .normal)
+      $0.contentMode = .scaleAspectFit
+      $0.addTarget(self, action: #selector(locationButtonTapped), for: .touchUpInside)
+    }
+  }
+  
+  func setUI() {
+    view.addSubviews(
+      viskitLogo,
+      locationButton,
+      overviewScrollView
+    )
+    overviewScrollView.addSubview(contentView)
+    contentView.addSubview(overviewStackView)
+  }
+  
+  func setAutolayout() {
+    viskitLogo.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide).offset(17)
+      $0.leading.equalToSuperview().offset(20)
+      $0.width.equalTo(75.adaptiveWidth)
+      $0.height.equalTo(23.adaptiveHeight)
+    }
+    
+    overviewScrollView.snp.makeConstraints {
+      $0.top.equalTo(viskitLogo.snp.bottom).offset(31)
+      $0.horizontalEdges.equalToSuperview()
+      $0.bottom.equalTo(view.safeAreaLayoutGuide)
+    }
+    
+    contentView.snp.makeConstraints {
+      $0.edges.equalToSuperview()
+      $0.width.equalToSuperview()
+      $0.height.greaterThanOrEqualToSuperview().priority(.low)
+    }
+    
+    overviewStackView.snp.makeConstraints {
+      $0.leading.equalToSuperview().offset(16)
+      $0.trailing.equalToSuperview().offset(-16)
+      $0.verticalEdges.equalToSuperview()
+    }
+
+    locationButton.snp.makeConstraints {
+      $0.width.equalTo(24.adaptiveWidth)
+      $0.height.equalTo(24.adaptiveHeight)
+      $0.top.equalTo(view.safeAreaLayoutGuide).offset(16)
+      $0.trailing.equalToSuperview().offset(-20)
+    }
+  }
+  /// places 내의 객체 개수 만큼 button, collectionView 생성
+  func configureStackView() {
+    overviewStackView.spacing = 16
+    
+    for place in overview.first?.places ?? [] {
+      let placeDetailButton = PlaceDetailButton()
+      placeDetailButton.bind(place: place)
+      
+      let placeInfoCollectionView = createCollectionView()
+      
+      overviewStackView.addArrangedSubview(placeDetailButton)
+      overviewStackView.addArrangedSubview(placeInfoCollectionView)
+      
+      placeDetailButton.snp.makeConstraints {
+        $0.height.equalTo(102.adaptiveHeight)
+      }
+      
+      placeInfoCollectionView.snp.makeConstraints {
+        $0.height.equalTo(240.adaptiveHeight)
+      }
+    }
+  }
+  
+  private func createCollectionView() -> UICollectionView {
+    let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .horizontal
     layout.minimumLineSpacing = 12
-    layout.itemSize = CGSize(
-      width: 135,
-      height: 240
-    )
+    layout.itemSize = CGSize(width: 135, height: 240)
     layout.sectionInset = UIEdgeInsets(
       top: 0,
-      left: 16.adaptiveWidth,
+      left: 0,
       bottom: 0,
       right: 0
     )
-
-    rootView.placeInfoCollectionView = UICollectionView(
+    
+    let collectionView = UICollectionView(
       frame: .zero,
       collectionViewLayout: layout
     )
-    rootView.placeInfoCollectionView.showsHorizontalScrollIndicator = false
-    rootView.placeInfoCollectionView.register(
-      ThumbnailCollectionViewCell.self,
-      forCellWithReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier
+    collectionView.showsHorizontalScrollIndicator = false
+    collectionView.register(
+      UICollectionViewCell.self,
+      forCellWithReuseIdentifier: "DefaultCell"
     )
-    rootView.placeInfoCollectionView.delegate = self
-    rootView.placeInfoCollectionView.dataSource = self
+    collectionView.delegate = self
+    collectionView.dataSource = self
+    
+    return collectionView
+  }
+  
+  private func bind() {
+    viewModel.onLocationStateChanged = { [weak self] state in
+      self?.locationButton.setImage(state.buttonImage, for: .normal)
+    }
+  }
+  
+  @objc private func locationButtonTapped() {
+    viewModel.updateLocationState()
   }
 }
 
@@ -65,46 +184,14 @@ extension OverviewViewController: UICollectionViewDataSource {
   }
 
   public func collectionView(
-    _ collectionView: UICollectionView,
-    cellForItemAt indexPath: IndexPath
-  ) -> UICollectionViewCell {
+    _ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let cell = collectionView.dequeueReusableCell(
-      withReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier,
+      withReuseIdentifier: "DefaultCell",
       for: indexPath
-    ) as! ThumbnailCollectionViewCell
-    let placeInfoRecord = placeInfo[indexPath.row]
-//    cell.configure(feed: PlaceInfo)
-//    cell.bookmarkButtonEvent = { [weak self] in
-//      guard let self = self else { return }
-//      self.postBookmarkRequest(
-//        index: indexPath.row,
-//        type: .famous
-//      )
-//      cell.updateBookmarkButton(isBookmarked: famousRecords[indexPath.row].isBookmarked)
-//    }
+    )
+    cell.backgroundColor = .lightGray
+    
     return cell
-  }
-
-  public func collectionView(
-    _ collectionView: UICollectionView,
-    didSelectItemAt indexPath: IndexPath
-  ) {
-//    var nextType: VideoFeedType = .famous
-//    var currentId: Int?
-//    if collectionView == rootView.placeInfoCollectionView {
-//      nextType = .famous
-//      currentId = famousRecords[indexPath.row].id
-//    }
-//    let videoFeedViewController = VideoFeedViewController(
-//      type: nextType,
-//      currentId: currentId,
-//      cursorId: 0,
-//      userId: 0
-//    )
-//    self.navigationController?.pushViewController(
-//      videoFeedViewController,
-//      animated: true
-//    )
   }
 }
 
