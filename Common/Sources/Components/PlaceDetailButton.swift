@@ -11,6 +11,8 @@ import UIKit
 import SnapKit
 import Then
 
+import Core
+
 public class PlaceDetailButton: UIButton {
   
   public let locationLabel = UILabel()
@@ -30,20 +32,20 @@ public class PlaceDetailButton: UIButton {
   }
   
   private func setStyle() {
+    backgroundColor = CommonAsset.viskitGray10.color
+    cornerRadius(8)
+    
     locationLabel.do {
-      $0.text = "서울 종로구"
       $0.font = ViskitFont.caption1Medium.font
       $0.textColor = CommonAsset.viskitGray05.color
     }
     
     placeNameLabel.do {
-      $0.text = "국립현대미술관"
       $0.font = ViskitFont.title3.font
       $0.textColor = CommonAsset.viskitGray01.color
     }
     
     eventCountLabel.do {
-      $0.text = "7개의 전시가 진행중이에요"
       $0.font = ViskitFont.body2Semibold.font
       $0.textColor = CommonAsset.viskitGray02.color
     }
@@ -82,6 +84,12 @@ public class PlaceDetailButton: UIButton {
       $0.trailing.equalToSuperview().offset(-16)
       $0.width.height.equalTo(24.adaptiveWidth)
     }
+  }
+  
+  public func bind(place: Place) {
+    locationLabel.text = place.shortenLocation
+    placeNameLabel.text = place.title
+    eventCountLabel.text = "\(place.placeInfoList.count)개의 전시가 진행중이에요"
   }
 }
 

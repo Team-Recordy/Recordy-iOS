@@ -9,5 +9,9 @@
 import Foundation
 
 public struct Overview {
-  let places: [Place]
+  public let places: [Place]
+  
+  public init(places: [Place]) {
+    self.places = places
+  }
 }
