@@ -11,6 +11,7 @@ import UIKit
 import Common
 import Core
 
+@available(iOS 16.0, *)
 final class OverviewViewController: UIViewController {
   
   var overview: [Overview] = mockData
@@ -122,6 +123,8 @@ final class OverviewViewController: UIViewController {
       let placeDetailButton = PlaceDetailButton()
       placeDetailButton.bind(place: place)
       
+      placeDetailButton.addTarget(self, action: #selector(placeDetailButtonTapped), for: .touchUpInside)
+      
       let placeInfoCollectionView = createCollectionView()
       
       overviewStackView.addArrangedSubview(placeDetailButton)
@@ -173,8 +176,16 @@ final class OverviewViewController: UIViewController {
   @objc private func locationButtonTapped() {
     viewModel.updateLocationState()
   }
+  
+  @objc private func placeDetailButtonTapped(_ sender: PlaceDetailButton) {
+    guard let place = sender.place else { return }
+    
+    let placeDetailVC = PlaceDetailViewController(place: place)
+    navigationController?.pushViewController(placeDetailVC, animated: true)
+  }
 }
 
+@available(iOS 16.0, *)
 extension OverviewViewController: UICollectionViewDataSource {
   public func collectionView(
     _ collectionView: UICollectionView,
@@ -195,6 +206,7 @@ extension OverviewViewController: UICollectionViewDataSource {
   }
 }
 
+@available(iOS 16.0, *)
 extension OverviewViewController: UICollectionViewDelegateFlowLayout {
   public func collectionView(
     _ collectionView: UICollectionView,

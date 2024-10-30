@@ -15,6 +15,8 @@ import Core
 @available(iOS 16.0, *)
 final public class PlaceDetailViewController: UIViewController{
   
+  var viewModel: PlaceDetailViewModel
+  
   let placeNameLabel = UILabel()
   let detailLocationLabel = UILabel()
   let findRouteButton = UIButton()
@@ -25,15 +27,18 @@ final public class PlaceDetailViewController: UIViewController{
   let exhibitionListView = ExhibitionListView()
   let reviewFeedView = ReviewFeedView()
   
-  var viewModel = PlaceDetailViewModel()
-  
-  public init(viewModel: PlaceDetailViewModel) {
-    self.viewModel = viewModel
+  init(place: Place) {
+    self.viewModel = PlaceDetailViewModel(place: place)
     super.init(nibName: nil, bundle: nil)
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  public override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    navigationController?.isNavigationBarHidden = false
   }
   
   public override func viewDidLoad() {
@@ -42,22 +47,24 @@ final public class PlaceDetailViewController: UIViewController{
     setUI()
     setAutolayout()
     setDelegate()
+    configureView()
     bind()
     setTarget()
   }
   
   func setStyle() {
     view.backgroundColor = CommonAsset.viskitBlack.color
+    title = "전시관"
     
     placeNameLabel.do {
-      $0.text = "국립현대미술관"
+      $0.text = viewModel.place.title
       $0.textColor = CommonAsset.viskitWhite.color
       $0.font = ViskitFont.title1.font
       $0.numberOfLines = 1
     }
     
     detailLocationLabel.do {
-      $0.text = "서울시 종로구 삼청로 30"
+      $0.text = viewModel.place.detailLocation
       $0.textColor = CommonAsset.viskitGray03.color
       $0.font = ViskitFont.body2.font
       $0.numberOfLines = 1
@@ -170,6 +177,10 @@ final public class PlaceDetailViewController: UIViewController{
     }
   }
   
+  private func configureView() {
+    exhibitionListView.updateExhibitionList(data: viewModel.place)
+  }
+  
   private func bind() {
     viewModel.onControlTypeChanged = { [weak self] type in
       self?.updateView(for: type)
@@ -221,7 +232,7 @@ extension PlaceDetailViewController: UICollectionViewDataSource {
   ) -> Int {
     switch collectionView {
     case exhibitionListView.exhibitionCollectionView:
-      return 10
+      return viewModel.place.placeInfoList.count
     case reviewFeedView.reviewFeedCollectionView:
       return 10
     default:
@@ -234,21 +245,28 @@ extension PlaceDetailViewController: UICollectionViewDataSource {
       let cell: UICollectionViewCell
       switch collectionView {
       case exhibitionListView.exhibitionCollectionView:
-        cell = collectionView.dequeueReusableCell(
+        guard let cell = collectionView.dequeueReusableCell(
           withReuseIdentifier: ExhibitionCollectionViewCell.cellIdentifier,
           for: indexPath
-        )
+        ) as? ExhibitionCollectionViewCell else {
+          fatalError("Could not dequeue ExhibitionCollectionViewCell")
+        }
+        let placeInfo = viewModel.place.placeInfoList[indexPath.row]
+        cell.bind(with: placeInfo)
         cell.backgroundColor = CommonAsset.viskitGray10.color
+        return cell
+        
       case reviewFeedView.reviewFeedCollectionView:
         cell = collectionView.dequeueReusableCell(
           withReuseIdentifier: "DefaultCell",
           for: indexPath
         )
         cell.backgroundColor = .lightGray
+        return cell
+        
       default:
         fatalError("Unexpected collection view")
       }
-      return cell
     }
 }
 

@@ -12,10 +12,12 @@ import SnapKit
 import Then
 
 import Common
+import Core
 
 final class ExhibitionListView: UIView {
+  private var exhibitionData: Place?
   
-  let exhibitionCount = UILabel()
+  var exhibitionCount = UILabel()
   public let allFilterButton = ChipKeyWordButton()
   public let freeFilterButton = ChipKeyWordButton()
   public let endSoonFilterButton = ChipKeyWordButton()
@@ -38,7 +40,7 @@ final class ExhibitionListView: UIView {
     self.exhibitionCollectionView?.backgroundColor = .clear
     
     exhibitionCount.do {
-      $0.text = "• 1 개의 전시"
+      $0.text = ""
       $0.font = ViskitFont.caption1Regular.font
       $0.textColor = CommonAsset.viskitWhite.color
     }
@@ -105,6 +107,12 @@ final class ExhibitionListView: UIView {
       $0.trailing.equalToSuperview().offset(-20)
       $0.bottom.equalToSuperview()
     }
+  }
+  
+  public func updateExhibitionList(data: Place) {
+    exhibitionData = data
+    guard let count = exhibitionData?.placeInfoList.count else { return }
+    exhibitionCount.text = "• \(count) 개의 전시"
   }
   
   func setExhibitionCollectionView() {

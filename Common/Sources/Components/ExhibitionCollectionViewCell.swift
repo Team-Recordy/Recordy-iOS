@@ -11,6 +11,8 @@ import UIKit
 import SnapKit
 import Then
 
+import Core
+
 public class ExhibitionCollectionViewCell: UICollectionViewCell {
   
   public let exhibitionNameLabel = UILabel()
@@ -61,6 +63,11 @@ public class ExhibitionCollectionViewCell: UICollectionViewCell {
       $0.bottom.equalToSuperview().offset(-12)
       $0.leading.equalToSuperview().offset(16)
     }
+  }
+  
+  public func bind(with placeInfo: PlaceInfo) {
+    exhibitionNameLabel.text = placeInfo.title
+    exhibitionDateLabel.text = placeInfo.duration
   }
 }
 

@@ -7,6 +7,7 @@
 //
 
 import Common
+import Core
 
 public enum FilterType {
   case all
@@ -20,6 +21,8 @@ public enum PlaceDetailControlType: String {
 }
 
 public class PlaceDetailViewModel {
+  public let place: Place
+  
   var onControlTypeChanged: ((PlaceDetailControlType) -> Void)?
   var onFilterChanged: ((ChipState, ChipState, ChipState) -> Void)?
   
@@ -33,7 +36,9 @@ public class PlaceDetailViewModel {
   private(set) var freeFilterState: ChipState = .inactive
   private(set) var endSoonFilterState: ChipState = .inactive
   
-  public init() {}
+  public init(place: Place) {
+    self.place = place
+  }
   
   func updateControlType(to type: PlaceDetailControlType) {
     currentControlType = type
