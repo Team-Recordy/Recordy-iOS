@@ -19,8 +19,8 @@ public let mockData: [Overview] = [
       title: "국립현대미술관 서울관",
       reviewFeeds: ["Great exhibition!", "Loved the architecture!", "Amazing modern art."],
       placeInfoList: [
-        PlaceInfo(feature: .all, title: "Title", duration: "Duration"),
-        PlaceInfo(feature: .all, title: "Title", duration: "Duration")
+        PlaceInfo(feature: .all, title: "전시 1", duration: "2024년 10월 31일~2024년 10월 31일"),
+        PlaceInfo(feature: .all, title: "전시 2", duration: "2024년 10월 31일~2024년 10월 31일")
       ],
       placeReview: PlaceReview(rating: 4.5, comments: "추천할 만한 멋진 공간이에요.")
     ),
@@ -30,8 +30,8 @@ public let mockData: [Overview] = [
       title: "용산 전쟁기념관",
       reviewFeeds: ["Historical and moving experience.", "Very educational!", "A must-visit for history buffs."],
       placeInfoList: [
-        PlaceInfo(feature: .all, title: "Title", duration: "Duration"),
-        PlaceInfo(feature: .all, title: "Title", duration: "Duration"),
+        PlaceInfo(feature: .all, title: "전시 1", duration: "2024년 10월 31일~2024년 10월 31일"),
+        PlaceInfo(feature: .all, title: "전시 2", duration: "2024년 10월 31일~2024년 10월 31일")
       ],
       placeReview: PlaceReview(rating: 4.8, comments: "역사에 관심이 많다면 꼭 방문해 보세요.")
     ),
@@ -41,8 +41,8 @@ public let mockData: [Overview] = [
       title: "코엑스 몰",
       reviewFeeds: ["Great place for shopping and dining!", "Good cinema and aquarium.", "Lots of brand stores."],
       placeInfoList: [
-        PlaceInfo(feature: .all, title: "Title", duration: "Duration"),
-        PlaceInfo(feature: .all, title: "Title", duration: "Duration"),
+        PlaceInfo(feature: .all, title: "전시 1", duration: "2024년 10월 31일~2024년 10월 31일"),
+        PlaceInfo(feature: .all, title: "전시 2", duration: "2024년 10월 31일~2024년 10월 31일")
       ],
       placeReview: PlaceReview(rating: 4.3, comments: "다양한 상점과 즐길 거리가 많아요.")
     )
