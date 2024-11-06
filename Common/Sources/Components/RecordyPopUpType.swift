@@ -10,6 +10,7 @@ import UIKit
 
 public enum RecordyPopUpType {
   case permission
+  case uploadPermission
   case exit
   case signOut
   case withdraw
@@ -20,12 +21,14 @@ public enum RecordyPopUpType {
   }
   
   public var backgroundColor: UIColor {
-    return CommonAsset.recordyGrey08.color
+    return CommonAsset.viskitGray10.color
   }
   
   public var title: String {
     switch self {
     case .permission:
+      "필수 권한을 허용해주세요"
+    case .uploadPermission:
       "필수 권한을 허용해주세요"
     case .exit:
       "화면을 나가시겠어요?"
@@ -34,18 +37,20 @@ public enum RecordyPopUpType {
     case .withdraw:
       "정말 탈퇴하시겠어요?"
     case .delete:
-      "삭제하시겠어요?"
+      "영상을 삭제할까요?"
     }
   }
   
   public var titleFont: UIFont {
-    return RecordyFont.title3.font
+    return ViskitFont.title3.font
   }
   
   public var subtitle: String {
     switch self {
     case .permission:
-      "프로필 사진 업로드를 위해\n사진 라이브러리에 접근하도록 허용해 주세요."
+      "내 위치 기반 공간 추천을 위해\n사용자의 위치에 접근하도록 허용해주세요."
+    case .uploadPermission:
+      "프로필 사진 업로드를 위해\n사진 라이브러리에 접근하도록 허용해주세요."
     case .exit:
       "지금까지 작성하신 내용이 모두 사라져요."
     case .signOut:
@@ -58,13 +63,15 @@ public enum RecordyPopUpType {
   }
   
   public var subtitleFont: UIFont {
-    return RecordyFont.caption1.font
+    return ViskitFont.caption1Regular.font
   }
   
   public var buttonTitle: String {
     switch self {
     case .permission:
-      "지금 설정"
+      "설정으로 가기"
+    case .uploadPermission:
+      "설정으로 가기"
     case .exit:
       "나가기"
     case .signOut:
@@ -72,24 +79,24 @@ public enum RecordyPopUpType {
     case .withdraw:
       "탈퇴"
     case .delete:
-      "삭제"
+      "삭제하기"
     }
   }
   
   public var buttonBackgroundColor: UIColor {
-    return CommonAsset.recordyMain.color
+    return CommonAsset.viskitYellow400.color
   }
   
   public var buttonTitleColor: UIColor {
-    return CommonAsset.recordyGrey09.color
+    return CommonAsset.viskitBlack.color
   }
   
   public var closeButtonBackgroundColor: UIColor {
-    return CommonAsset.recordyGrey06.color
+    return CommonAsset.viskitGray07.color
   }
   
   public var closeButtonTitleColor: UIColor {
-    return CommonAsset.recordyGrey01.color
+    return CommonAsset.viskitGray03.color
   }
   
   public var buttonFont: UIFont {
