@@ -46,6 +46,7 @@ public class RecordyPopUpView: UIView {
       $0.font = popUpType.subtitleFont
       $0.textAlignment = .center
       $0.textColor = CommonAsset.recordyGrey01.color
+      $0.numberOfLines = 0
     }
     
     leftButton.do {

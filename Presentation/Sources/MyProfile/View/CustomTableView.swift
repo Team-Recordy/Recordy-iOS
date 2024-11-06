@@ -4,10 +4,10 @@ import Then
 import SnapKit
 
 import Common
+import Core
 
 protocol AccountActionDelegate: AnyObject {
-    func didTapProfileEdit()
-    func didTapLoginConnection()
+  func didTapProfileEdit()
 }
 
 protocol SignOutDelegate: AnyObject {
@@ -74,6 +74,15 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
     setStyle()
     setUI()
     setAutoLayout()
+  }
+  
+  private func getPlatformLogo(for loginState: LoginState) -> UIImage? {
+    switch loginState {
+    case .kakao:
+      return CommonAsset.kakao.image
+    case .apple:
+      return CommonAsset.appleLogo.image
+    }
   }
   
   required init?(coder: NSCoder) {
@@ -155,7 +164,7 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
   
   public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
     if let footerView = footerView,
-        let heightConstraint = footerView.constraints.first(where: { $0.firstAttribute == .height })
+       let heightConstraint = footerView.constraints.first(where: { $0.firstAttribute == .height })
     {
       return heightConstraint.constant
     }
@@ -183,7 +192,7 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
     case .etc:
       if list[indexPath.row] == "로그아웃" {
         signOutDelegate?.signOut()
-      } else if list[indexPath.row] == "탈퇴하기" {
+      } else if list[indexPath.row] == "탈퇴" {
         withDrawDelegate?.withDraw()
       }
     }

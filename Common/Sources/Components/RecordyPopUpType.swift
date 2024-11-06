@@ -16,18 +16,7 @@ public enum RecordyPopUpType {
   case delete
   
   public var image: UIImage {
-    switch self {
-    case .permission:
-      return CommonAsset.permission.image
-    case .exit:
-      return CommonAsset.exit.image
-    case .signOut:
-      return CommonAsset.alert.image
-    case .withdraw:
-      return CommonAsset.alert.image
-    case .delete:
-      return CommonAsset.alert.image
-    }
+    return CommonAsset.alertImage.image
   }
   
   public var backgroundColor: UIColor {
@@ -56,7 +45,7 @@ public enum RecordyPopUpType {
   public var subtitle: String {
     switch self {
     case .permission:
-      "사진 접근을 허용하여 영상을 업로드 하세요."
+      "프로필 사진 업로드를 위해\n사진 라이브러리에 접근하도록 허용해 주세요."
     case .exit:
       "지금까지 작성하신 내용이 모두 사라져요."
     case .signOut:

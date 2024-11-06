@@ -71,7 +71,7 @@ public class SetViewController: UIViewController {
       type: .etc,
       list: [
         "로그아웃",
-        "탈퇴하기"
+        "탈퇴"
       ],
       headerTitle: "기타",
       footerView: footerView,
@@ -211,8 +211,5 @@ extension SetViewController: AccountActionDelegate {
   func didTapProfileEdit() {
     let profileEditVC = ProfileEditViewController()
     navigationController?.pushViewController(profileEditVC, animated: true)
-  }
-  func didTapLoginConnection() {
-    
   }
 }
