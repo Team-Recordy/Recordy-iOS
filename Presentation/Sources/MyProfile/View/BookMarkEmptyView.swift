@@ -65,11 +65,11 @@ class BookMarkEmptyView: UIView {
   }
   
   private func setUI() {
-    [
+    addSubviews(
       imageView,
       titleLabel,
       goAroundButton
-    ].forEach { addSubview($0) }
+    )
   }
   
   private func setAutoLayout() {

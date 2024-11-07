@@ -19,18 +19,9 @@ protocol BookmarkDelegate: AnyObject {
 class BookmarkView: UIView {
   private let bookmarkEmptyView = BookMarkEmptyView()
   private let countLabel = UILabel()
-  lazy var collectionView: UICollectionView = {
+  private lazy var collectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
-    layout.itemSize = CGSize(width: 170, height: 288)
-    layout.minimumLineSpacing = 10
-    layout.minimumInteritemSpacing = 10
-    layout.sectionInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
-    
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-    collectionView.dataSource = self
-    collectionView.delegate = self
-    collectionView.backgroundColor = .clear
-    collectionView.register(ThumbnailCollectionViewCell.self, forCellWithReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier)
     return collectionView
   }()
   
@@ -47,6 +38,7 @@ class BookmarkView: UIView {
     setStyle()
     setLayout()
     updateViewState()
+    setCollectionView()
   }
   
   required init?(coder: NSCoder) {
@@ -54,11 +46,11 @@ class BookmarkView: UIView {
   }
   
   private func setUI() {
-    [
+    addSubviews(
       bookmarkEmptyView,
       countLabel,
       collectionView
-    ].forEach { addSubview($0) }
+    )
     
     bookmarkEmptyView.setActionButtonHandler { [weak self] in
       print("영상 둘러보기 눌림")
@@ -99,6 +91,22 @@ class BookmarkView: UIView {
     if !isEmpty {
       collectionView.reloadData()
     }
+  }
+  
+  private func setCollectionView() {
+    let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout
+    layout?.itemSize = CGSize(width: 170, height: 288)
+    layout?.minimumLineSpacing = 10
+    layout?.minimumInteritemSpacing = 10
+    layout?.sectionInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
+    
+    collectionView.dataSource = self
+    collectionView.delegate = self
+    collectionView.backgroundColor = .clear
+    collectionView.register(
+      ThumbnailCollectionViewCell.self,
+      forCellWithReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier
+    )
   }
   
   private func setCountLabelText() {

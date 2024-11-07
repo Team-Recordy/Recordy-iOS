@@ -29,6 +29,6 @@ public class ViskitYellowButton: UIButton {
   
   public override func layoutSubviews() {
     super.layoutSubviews()
-    layer.cornerRadius = bounds.height / 2
+    layer.cornerRadius = bounds.height.adaptiveHeight / 2
   }
 }
