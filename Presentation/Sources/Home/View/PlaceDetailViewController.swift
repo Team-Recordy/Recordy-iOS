@@ -11,21 +11,20 @@ import UIKit
 import Common
 import Core
 
-
 @available(iOS 16.0, *)
 final public class PlaceDetailViewController: UIViewController{
   
   var viewModel: PlaceDetailViewModel
   
-  let placeNameLabel = UILabel()
-  let detailLocationLabel = UILabel()
-  let findRouteButton = UIButton()
-  let reviewButton = UIButton()
-  public let segmentedControl = PlaceDetailSegmentedControl()
-  var segmentedControlContainer = UIView()
+  private let placeNameLabel = UILabel()
+  private let detailLocationLabel = UILabel()
+  private let findRouteButton = UIButton()
+  private let reviewButton = UIButton()
+  private let segmentedControl = PlaceDetailSegmentedControl()
+  private var segmentedControlContainer = UIView()
   
-  let exhibitionListView = ExhibitionListView()
-  let reviewFeedView = ReviewFeedView()
+  private let exhibitionListView = ExhibitionListView()
+  private let reviewFeedView = ReviewFeedView()
   
   init(place: Place) {
     self.viewModel = PlaceDetailViewModel(place: place)
@@ -52,7 +51,7 @@ final public class PlaceDetailViewController: UIViewController{
     setTarget()
   }
   
-  func setStyle() {
+  private func setStyle() {
     view.backgroundColor = CommonAsset.viskitBlack.color
     title = "전시관"
     
@@ -91,7 +90,7 @@ final public class PlaceDetailViewController: UIViewController{
     }
   }
   
-  func setUI() {
+  private func setUI() {
     view.addSubviews(
       placeNameLabel,
       detailLocationLabel,
@@ -107,7 +106,7 @@ final public class PlaceDetailViewController: UIViewController{
     )
   }
   
-  func setAutolayout() {
+  private func setAutolayout() {
     placeNameLabel.snp.makeConstraints {
       $0.top.equalToSuperview().offset(130)
       $0.centerX.equalToSuperview()
@@ -162,23 +161,22 @@ final public class PlaceDetailViewController: UIViewController{
   }
   
   private func setTarget() {
+    exhibitionListView.allFilterButton.tag = FilterType.all.rawValue
+    exhibitionListView.freeFilterButton.tag = FilterType.free.rawValue
+    exhibitionListView.endSoonFilterButton.tag = FilterType.endSoon.rawValue
+    
     exhibitionListView.allFilterButton.addTarget(self, action: #selector(filterButtonTapped(_:)), for: .touchUpInside)
     exhibitionListView.freeFilterButton.addTarget(self, action: #selector(filterButtonTapped(_:)), for: .touchUpInside)
     exhibitionListView.endSoonFilterButton.addTarget(self, action: #selector(filterButtonTapped(_:)), for: .touchUpInside)
   }
   
   @objc private func filterButtonTapped(_ sender: UIButton) {
-    if sender == exhibitionListView.allFilterButton {
-      viewModel.updateFilterState(selected: .all)
-    } else if sender == exhibitionListView.freeFilterButton {
-      viewModel.updateFilterState(selected: .free)
-    } else if sender == exhibitionListView.endSoonFilterButton {
-      viewModel.updateFilterState(selected: .endSoon)
-    }
+      guard let filterType = FilterType(rawValue: sender.tag) else { return }
+      viewModel.updateFilterState(selected: filterType)
   }
   
   private func configureView() {
-    exhibitionListView.updateExhibitionList(data: viewModel.place)
+    exhibitionListView.updateExhibitionList(place: viewModel.place)
   }
   
   private func bind() {
@@ -194,11 +192,6 @@ final public class PlaceDetailViewController: UIViewController{
         endSoonState: endSoonState
       )
     }
-    viewModel.onFilterChanged?(
-      viewModel.allFilterState,
-      viewModel.freeFilterState,
-      viewModel.endSoonFilterState
-    )
   }
   
   private func updateView(for type: PlaceDetailControlType) {

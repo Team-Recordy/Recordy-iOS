@@ -9,10 +9,10 @@
 import Common
 import Core
 
-public enum FilterType {
-  case all
-  case free
-  case endSoon
+public enum FilterType: Int {
+  case all = 0
+  case free = 1
+  case endSoon = 2
 }
 
 public enum PlaceDetailControlType: String {
@@ -38,6 +38,7 @@ public class PlaceDetailViewModel {
   
   public init(place: Place) {
     self.place = place
+    initFilterState()
   }
   
   func updateControlType(to type: PlaceDetailControlType) {
@@ -49,6 +50,10 @@ public class PlaceDetailViewModel {
     freeFilterState = (selected == .free) ? .active : .inactive
     endSoonFilterState = (selected == .endSoon) ? .active : .inactive
     
+    onFilterChanged?(allFilterState, freeFilterState, endSoonFilterState)
+  }
+  
+  private func initFilterState() {
     onFilterChanged?(allFilterState, freeFilterState, endSoonFilterState)
   }
 }

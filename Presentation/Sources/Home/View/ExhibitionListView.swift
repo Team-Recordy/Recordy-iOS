@@ -15,19 +15,18 @@ import Common
 import Core
 
 final class ExhibitionListView: UIView {
-  private var exhibitionData: Place?
   
-  var exhibitionCount = UILabel()
-  public let allFilterButton = ChipKeyWordButton()
-  public let freeFilterButton = ChipKeyWordButton()
-  public let endSoonFilterButton = ChipKeyWordButton()
+  private var exhibitionCountLabel = UILabel()
+  let allFilterButton = ChipKeyWordButton()
+  let freeFilterButton = ChipKeyWordButton()
+  let endSoonFilterButton = ChipKeyWordButton()
   var exhibitionCollectionView: UICollectionView?
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
     
     setStyle()
-    setExhibitionCollectionView()
+    setCollectionView()
     setUI()
     setAutolayout()
   }
@@ -39,7 +38,7 @@ final class ExhibitionListView: UIView {
   func setStyle() {
     self.exhibitionCollectionView?.backgroundColor = .clear
     
-    exhibitionCount.do {
+    exhibitionCountLabel.do {
       $0.text = ""
       $0.font = ViskitFont.caption1Regular.font
       $0.textColor = CommonAsset.viskitWhite.color
@@ -66,7 +65,7 @@ final class ExhibitionListView: UIView {
   
   func setUI() {
     addSubviews(
-      exhibitionCount,
+      exhibitionCountLabel,
       allFilterButton,
       freeFilterButton,
       endSoonFilterButton,
@@ -96,7 +95,7 @@ final class ExhibitionListView: UIView {
       $0.height.equalTo(34)
     }
     
-    exhibitionCount.snp.makeConstraints {
+    exhibitionCountLabel.snp.makeConstraints {
       $0.top.equalToSuperview().offset(36)
       $0.trailing.equalToSuperview().offset(-20)
     }
@@ -109,13 +108,11 @@ final class ExhibitionListView: UIView {
     }
   }
   
-  public func updateExhibitionList(data: Place) {
-    exhibitionData = data
-    guard let count = exhibitionData?.placeInfoList.count else { return }
-    exhibitionCount.text = "• \(count) 개의 전시"
+  public func updateExhibitionList(place: Place) {
+    exhibitionCountLabel.text = "• \(place.placeInfoList.count) 개의 전시"
   }
   
-  func setExhibitionCollectionView() {
+  func setCollectionView() {
     let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .vertical
     layout.minimumLineSpacing = 0
@@ -130,4 +127,3 @@ final class ExhibitionListView: UIView {
     )
   }
 }
-
