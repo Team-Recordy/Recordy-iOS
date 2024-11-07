@@ -72,7 +72,7 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
     }
 
     locationImageView.do {
-      $0.image = CommonAsset.location.image
+      $0.image = CommonAsset.locationActive.image
     }
 
     bookmarkButton.do {
