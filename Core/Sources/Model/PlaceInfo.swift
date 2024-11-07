@@ -9,9 +9,9 @@
 import Foundation
 
 public struct PlaceInfo: Equatable {
-  let feature: PlaceFeature
-  let title: String
-  let duration: String
+  public let feature: PlaceFeature
+  public let title: String
+  public let duration: String
 
   public init(
     feature: PlaceFeature,

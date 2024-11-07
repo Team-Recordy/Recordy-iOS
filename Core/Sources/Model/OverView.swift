@@ -8,6 +8,10 @@
 
 import Foundation
 
-struct Overview {
-  let places: [Place]
+public struct Overview {
+  public let places: [Place]
+  
+  public init(places: [Place]) {
+    self.places = places
+  }
 }
