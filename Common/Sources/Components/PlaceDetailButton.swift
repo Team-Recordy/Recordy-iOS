@@ -15,8 +15,6 @@ import Core
 
 public class PlaceDetailButton: UIButton {
   
-  public var place: Place?
-  
   public let locationLabel = UILabel()
   public let placeNameLabel = UILabel()
   public let eventCountLabel = UILabel()
@@ -89,7 +87,6 @@ public class PlaceDetailButton: UIButton {
   }
   
   public func bind(place: Place) {
-    self.place = place
     locationLabel.text = place.shortenLocation
     placeNameLabel.text = place.title
     eventCountLabel.text = "\(place.placeInfoList.count)개의 전시가 진행중이에요"

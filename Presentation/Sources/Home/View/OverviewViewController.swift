@@ -14,13 +14,11 @@ import Core
 @available(iOS 16.0, *)
 final class OverviewViewController: UIViewController {
   
-  var overview: [Overview] = mockData
-  
-  let viskitLogo = UIImageView()
-  let locationButton = UIButton()
-  let overviewScrollView = UIScrollView()
-  let contentView = UIView()
-  let overviewStackView = UIStackView()
+  private let viskitLogo = UIImageView()
+  private let locationButton = UIButton()
+  private let overviewScrollView = UIScrollView()
+  private let contentView = UIView()
+  private let overviewStackView = UIStackView()
   
   private var viewModel = OverviewViewModel()
   
@@ -43,7 +41,7 @@ final class OverviewViewController: UIViewController {
     bind()
   }
   
-  func setStyle() {
+  private func setStyle() {
     navigationController?.isNavigationBarHidden = true
     
     overviewScrollView.do {
@@ -72,7 +70,7 @@ final class OverviewViewController: UIViewController {
     }
   }
   
-  func setUI() {
+  private func setUI() {
     view.addSubviews(
       viskitLogo,
       locationButton,
@@ -82,7 +80,7 @@ final class OverviewViewController: UIViewController {
     contentView.addSubview(overviewStackView)
   }
   
-  func setAutolayout() {
+  private func setAutolayout() {
     viskitLogo.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide).offset(17)
       $0.leading.equalToSuperview().offset(20)
@@ -116,13 +114,13 @@ final class OverviewViewController: UIViewController {
     }
   }
   /// places 내의 객체 개수 만큼 button, collectionView 생성
-  func configureStackView() {
+  private func configureStackView() {
     overviewStackView.spacing = 16
     
-    for place in overview.first?.places ?? [] {
+    for (index, place) in (viewModel.overview.first?.places ?? []).enumerated() {
       let placeDetailButton = PlaceDetailButton()
       placeDetailButton.bind(place: place)
-      
+      placeDetailButton.tag = index
       placeDetailButton.addTarget(self, action: #selector(placeDetailButtonTapped), for: .touchUpInside)
       
       let placeInfoCollectionView = createCollectionView()
@@ -178,10 +176,11 @@ final class OverviewViewController: UIViewController {
   }
   
   @objc private func placeDetailButtonTapped(_ sender: PlaceDetailButton) {
-    guard let place = sender.place else { return }
-    
-    let placeDetailVC = PlaceDetailViewController(place: place)
-    navigationController?.pushViewController(placeDetailVC, animated: true)
+    guard let places = viewModel.overview.first?.places, places.indices.contains(sender.tag) else { return }
+      
+      let place = places[sender.tag]
+      let placeDetailVC = PlaceDetailViewController(place: place)
+      navigationController?.pushViewController(placeDetailVC, animated: true)
   }
 }
 

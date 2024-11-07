@@ -16,7 +16,7 @@ public enum ChipState {
 }
 
 public class ChipKeyWordButton: UIButton {
-  public var chipstate: ChipState = .inactive {
+  private var chipstate: ChipState = .inactive {
     didSet {
       updateChipAppearance()
     }
@@ -34,7 +34,6 @@ public class ChipKeyWordButton: UIButton {
   private func setUI() {
     self.cornerRadius(16.adaptiveHeight)
     titleLabel?.font = RecordyFont.caption1.font
-    updateChipAppearance()
   }
 
   public func setState(state: ChipState) {
