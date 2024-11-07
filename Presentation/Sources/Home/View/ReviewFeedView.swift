@@ -15,7 +15,7 @@ import Common
 
 final class ReviewFeedView: UIView {
   
-  let reviewFeedCount = UILabel()
+  private let reviewFeedCount = UILabel()
   var reviewFeedCollectionView: UICollectionView?
   
   public override init(frame: CGRect) {
@@ -31,7 +31,7 @@ final class ReviewFeedView: UIView {
     fatalError("init(coder:) has not been implemented")
   }
   
-  func setStyle() {
+  private func setStyle() {
     self.reviewFeedCollectionView?.backgroundColor = .clear
     
     reviewFeedCount.do {
@@ -41,14 +41,14 @@ final class ReviewFeedView: UIView {
     }
   }
   
-  func setUI() {
+  private func setUI() {
     addSubviews(
       reviewFeedCount,
       reviewFeedCollectionView!
     )
   }
   
-  func setAutolayout() {
+  private func setAutolayout() {
     reviewFeedCount.snp.makeConstraints {
       $0.top.equalToSuperview().offset(36)
       $0.trailing.equalToSuperview().offset(-20)
@@ -62,7 +62,7 @@ final class ReviewFeedView: UIView {
     }
   }
   
-  func setReviewFeedCollectionView() {
+  private func setReviewFeedCollectionView() {
     let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .vertical
     layout.minimumLineSpacing = 0
@@ -77,5 +77,3 @@ final class ReviewFeedView: UIView {
     )
   }
 }
-
-

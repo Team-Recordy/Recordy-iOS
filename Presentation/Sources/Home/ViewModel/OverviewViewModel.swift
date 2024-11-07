@@ -9,6 +9,7 @@
 import UIKit
 
 import Common
+import Core
 
 public enum LocationState {
   case active
@@ -24,7 +25,10 @@ public enum LocationState {
   }
 }
 
-public class OverviewViewModel {
+class OverviewViewModel {
+  
+  var overview: [Overview] = mockData
+  
   private(set) var locationState: LocationState = .inactive {
     didSet {
       onLocationStateChanged?(locationState)
