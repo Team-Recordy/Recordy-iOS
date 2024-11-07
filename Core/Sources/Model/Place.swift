@@ -8,11 +8,27 @@
 
 import Foundation
 
-struct Place {
-  let shortenLocation: String
-  let detailLocation: String
-  let title: String
-  let reviewFeeds: [String]
-  let placeInfoList: [PlaceInfo]
-  let placeReview: PlaceReview
+public struct Place {
+  public let shortenLocation: String
+  public let detailLocation: String
+  public let title: String
+  public let reviewFeeds: [String]
+  public let placeInfoList: [PlaceInfo]
+  public let placeReview: PlaceReview
+  
+  public init(
+    shortenLocation: String,
+    detailLocation: String,
+    title: String,
+    reviewFeeds: [String],
+    placeInfoList: [PlaceInfo],
+    placeReview: PlaceReview
+  ) {
+    self.shortenLocation = shortenLocation
+    self.detailLocation = detailLocation
+    self.title = title
+    self.reviewFeeds = reviewFeeds
+    self.placeInfoList = placeInfoList
+    self.placeReview = placeReview
+  }
 }

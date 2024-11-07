@@ -25,8 +25,11 @@ public final class RecordyTabBarController: UITabBarController, UITabBarControll
 
   private func setStyle() {
     let appearance = UITabBarAppearance()
-    appearance.backgroundColor = CommonAsset.recordyBG.color
-    appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.clear]
+    appearance.backgroundColor = CommonAsset.viskitBlack.color
+    let font = ViskitFont.title3.font
+    appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
+      .font: font
+    ]
     appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.clear]
     tabBar.backgroundColor = .clear
     tabBar.tintColor = .clear
