@@ -38,7 +38,7 @@ class FeedView: UIView {
     $0.alignment = .leading
   }
   private let locationImage = UIImageView().then {
-    $0.image = CommonAsset.locationActive.image
+    $0.image = CommonAsset.location.image
     $0.contentMode = .scaleAspectFit
   }
   let locationLabel = UILabel().then {
