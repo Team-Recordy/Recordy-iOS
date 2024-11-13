@@ -261,7 +261,7 @@ public class ProfileViewController: UIViewController {
   }
   
   @objc private func settingButtonTapped() {
-    let settingViewController = SetViewController()
+    let settingViewController = SettingViewController()
     self.navigationController?.pushViewController(settingViewController, animated: true)
   }
   

@@ -15,10 +15,22 @@ import Core
 import Common
 
 @available(iOS 16.0, *)
-public class SetViewController: UIViewController {
+public class SettingViewController: UIViewController {
+  
+  let accountTableView: CustomTableView = {
+    return CustomTableView(
+      type: .account,
+      list: [
+        "프로필 수정",
+        "로그인 연동"
+      ],
+      headerTitle: "계정",
+      footerView: nil,
+      cellArrowImages: [CommonAsset.indicator.image]
+    )
+  }()
   
   let helpTableView: CustomTableView = {
-    
     return CustomTableView(
       type: .help,
       list: [
@@ -38,13 +50,11 @@ public class SetViewController: UIViewController {
     )
   }()
   
-  let divider = UIView()
-  
   let extraTableView: CustomTableView = {
     let footerLabel = UILabel()
     footerLabel.do {
-      $0.textColor = CommonAsset.recordyGrey04.color
-      $0.font = RecordyFont.caption2.font
+      $0.textColor = CommonAsset.viskitGray01.color
+      $0.font = ViskitFont.caption2Medium.font
       $0.text = "앱 버전 1.1.1"
     }
     let footerView = UIView()
@@ -59,9 +69,8 @@ public class SetViewController: UIViewController {
     return CustomTableView(
       type: .etc,
       list: [
-        "로그인 연동",
         "로그아웃",
-        "탈퇴하기"
+        "탈퇴"
       ],
       headerTitle: "기타",
       footerView: footerView,
@@ -73,49 +82,91 @@ public class SetViewController: UIViewController {
     )
   }()
   
+  private lazy var firstDivider = createDivider()
+  private lazy var secondDivider = createDivider()
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
     
-    view.backgroundColor = .black
+    setStyle()
     setUI()
     setAutoLayout()
     setDelegate()
   }
   
-  private func setUI() {
-    divider.backgroundColor = CommonAsset.recordyGrey09.color
-    view.addSubview(helpTableView)
-    view.addSubview(divider)
-    view.addSubview(extraTableView)
+  private func setStyle() {
+    view.backgroundColor = .black
+    configureNavigationBar()
+    self.navigationController?.navigationBar.topItem?.title = ""
   }
-
+  
+  private func setUI() {
+    view.addSubviews(
+      accountTableView,
+      helpTableView,
+      firstDivider,
+      secondDivider,
+      extraTableView
+    )
+  }
+  
   private func setAutoLayout() {
-    helpTableView.snp.makeConstraints {
+    accountTableView.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide)
       $0.leading.trailing.equalToSuperview()
-      $0.height.equalTo(256.adaptiveHeight)
+      $0.height.equalTo(160.adaptiveHeight)
     }
     
-    divider.snp.makeConstraints {
-      $0.top.equalTo(helpTableView.snp.bottom).offset(12.adaptiveHeight)
+    firstDivider.snp.makeConstraints {
+      $0.top.equalTo(accountTableView.snp.bottom)
       $0.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(8.adaptiveHeight)
+      $0.height.equalTo(4.adaptiveHeight)
+    }
+    
+    helpTableView.snp.makeConstraints {
+      $0.top.equalTo(firstDivider.snp.bottom)
+      $0.leading.trailing.equalToSuperview()
+      $0.height.equalTo(265.adaptiveHeight)
+    }
+    
+    secondDivider.snp.makeConstraints {
+      $0.top.equalTo(helpTableView.snp.bottom).inset(10)
+      $0.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(4.adaptiveHeight)
     }
     
     extraTableView.snp.makeConstraints {
-      $0.top.equalTo(divider.snp.bottom)
+      $0.top.equalTo(secondDivider.snp.bottom)
       $0.leading.trailing.bottom.equalToSuperview()
     }
-  } 
-
+  }
+  
   private func setDelegate() {
     extraTableView.signOutDelegate = self
     extraTableView.withDrawDelegate = self
+    accountTableView.accountActionDelegate = self
+  }
+  
+  private func createDivider() -> UIView {
+    let divider = UIView()
+    divider.backgroundColor = CommonAsset.viskitGray11.color
+    return divider
+  }
+  
+  private func configureNavigationBar() {
+    navigationItem.title = "설정"
+    if let navigationBar = navigationController?.navigationBar {
+      navigationBar.tintColor = .white
+      navigationBar.titleTextAttributes = [
+        .foregroundColor: CommonAsset.viskitGray01.color,
+        .font: ViskitFont.title3.font
+      ]
+    }
   }
 }
 
 @available(iOS 16.0, *)
-extension SetViewController: SignOutDelegate {
+extension SettingViewController: SignOutDelegate {
   func signOut() {
     self.showPopUp(type: .signOut) {
       let apiProvider = APIProvider<APITarget.Users>()
@@ -137,7 +188,7 @@ extension SetViewController: SignOutDelegate {
 }
 
 @available(iOS 16.0, *)
-extension SetViewController: WithDrawDelegate {
+extension SettingViewController: WithDrawDelegate {
   func withDraw() {
     self.showPopUp(type: .withdraw) {
       let apiProvider = APIProvider<APITarget.Users>()
@@ -155,5 +206,13 @@ extension SetViewController: WithDrawDelegate {
       loginViewController.modalPresentationStyle = .fullScreen
       self.present(loginViewController, animated: false)
     }
+  }
+}
+
+@available(iOS 16.0, *)
+extension SettingViewController: AccountActionDelegate {
+  func didTapProfileEdit() {
+    let profileEditVC = ProfileEditViewController()
+    navigationController?.pushViewController(profileEditVC, animated: true)
   }
 }
