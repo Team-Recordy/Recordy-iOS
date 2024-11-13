@@ -101,12 +101,13 @@ public class SettingViewController: UIViewController {
   }
   
   private func setUI() {
-    [ accountTableView,
+    view.addSubviews(
+      accountTableView,
       helpTableView,
       firstDivider,
       secondDivider,
       extraTableView
-    ].forEach { view.addSubview($0) }
+    )
   }
   
   private func setAutoLayout() {
@@ -148,7 +149,7 @@ public class SettingViewController: UIViewController {
   
   private func createDivider() -> UIView {
     let divider = UIView()
-    divider.backgroundColor = CommonAsset.viskitGray09.color
+    divider.backgroundColor = CommonAsset.viskitGray11.color
     return divider
   }
   

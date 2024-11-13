@@ -127,7 +127,7 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
     headerView.addSubview(headerLabel)
     headerLabel.snp.makeConstraints {
       $0.top.equalTo(headerView.snp.top).inset(28)
-      $0.leading.equalToSuperview().inset(16)
+      $0.leading.equalToSuperview().inset(20)
     }
     return headerView
   }
