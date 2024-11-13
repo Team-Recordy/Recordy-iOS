@@ -15,7 +15,7 @@ import Core
 import Common
 
 @available(iOS 16.0, *)
-public class SetViewController: UIViewController {
+public class SettingViewController: UIViewController {
   
   let accountTableView: CustomTableView = {
     return CustomTableView(
@@ -31,7 +31,6 @@ public class SetViewController: UIViewController {
   }()
   
   let helpTableView: CustomTableView = {
-    
     return CustomTableView(
       type: .help,
       list: [
@@ -54,8 +53,8 @@ public class SetViewController: UIViewController {
   let extraTableView: CustomTableView = {
     let footerLabel = UILabel()
     footerLabel.do {
-      $0.textColor = CommonAsset.recordyGrey04.color
-      $0.font = RecordyFont.caption2.font
+      $0.textColor = CommonAsset.viskitGray01.color
+      $0.font = ViskitFont.caption2Medium.font
       $0.text = "앱 버전 1.1.1"
     }
     let footerView = UIView()
@@ -83,25 +82,23 @@ public class SetViewController: UIViewController {
     )
   }()
   
-  private func createDivider() -> UIView {
-    let divider = UIView()
-    divider.backgroundColor = CommonAsset.recordyGrey09.color
-    return divider
-  }
+  private lazy var firstDivider = createDivider()
+  private lazy var secondDivider = createDivider()
   
   public override func viewDidLoad() {
     super.viewDidLoad()
     
-    view.backgroundColor = .black
+    setStyle()
     setUI()
     setAutoLayout()
     setDelegate()
+  }
+  
+  private func setStyle() {
+    view.backgroundColor = .black
     configureNavigationBar()
     self.navigationController?.navigationBar.topItem?.title = ""
   }
-  
-  private lazy var firstDivider = createDivider()
-  private lazy var secondDivider = createDivider()
   
   private func setUI() {
     [ accountTableView,
@@ -113,7 +110,6 @@ public class SetViewController: UIViewController {
   }
   
   private func setAutoLayout() {
-    
     accountTableView.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide)
       $0.leading.trailing.equalToSuperview()
@@ -150,6 +146,12 @@ public class SetViewController: UIViewController {
     accountTableView.accountActionDelegate = self
   }
   
+  private func createDivider() -> UIView {
+    let divider = UIView()
+    divider.backgroundColor = CommonAsset.viskitGray09.color
+    return divider
+  }
+  
   private func configureNavigationBar() {
     navigationItem.title = "설정"
     if let navigationBar = navigationController?.navigationBar {
@@ -163,7 +165,7 @@ public class SetViewController: UIViewController {
 }
 
 @available(iOS 16.0, *)
-extension SetViewController: SignOutDelegate {
+extension SettingViewController: SignOutDelegate {
   func signOut() {
     self.showPopUp(type: .signOut) {
       let apiProvider = APIProvider<APITarget.Users>()
@@ -185,7 +187,7 @@ extension SetViewController: SignOutDelegate {
 }
 
 @available(iOS 16.0, *)
-extension SetViewController: WithDrawDelegate {
+extension SettingViewController: WithDrawDelegate {
   func withDraw() {
     self.showPopUp(type: .withdraw) {
       let apiProvider = APIProvider<APITarget.Users>()
@@ -207,7 +209,7 @@ extension SetViewController: WithDrawDelegate {
 }
 
 @available(iOS 16.0, *)
-extension SetViewController: AccountActionDelegate {
+extension SettingViewController: AccountActionDelegate {
   func didTapProfileEdit() {
     let profileEditVC = ProfileEditViewController()
     navigationController?.pushViewController(profileEditVC, animated: true)
