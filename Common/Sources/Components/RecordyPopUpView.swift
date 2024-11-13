@@ -38,14 +38,14 @@ public class RecordyPopUpView: UIView {
       $0.text = popUpType.title
       $0.font = popUpType.titleFont
       $0.textAlignment = .center
-      $0.textColor = CommonAsset.recordyGrey01.color
+      $0.textColor = CommonAsset.viskitGray01.color
     }
     
     subtitleLabel.do {
       $0.text = popUpType.subtitle
       $0.font = popUpType.subtitleFont
       $0.textAlignment = .center
-      $0.textColor = CommonAsset.recordyGrey01.color
+      $0.textColor = CommonAsset.viskitGray01.color
       $0.numberOfLines = 0
     }
     
