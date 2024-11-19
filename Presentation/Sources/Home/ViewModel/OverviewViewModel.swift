@@ -25,7 +25,7 @@ public enum LocationState {
   }
 }
 
-class OverviewViewModel {
+public class OverviewViewModel {
   
   var overview: [Overview] = mockData
   

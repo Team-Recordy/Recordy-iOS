@@ -33,7 +33,7 @@ class BookMarkEmptyView: UIView {
     backgroundColor = .black
     
     imageView.do {
-      $0.image = CommonAsset.ledyEmpty.image
+      $0.image = CommonAsset.ledyEmpty1.image
       $0.contentMode = .scaleAspectFit
     }
     

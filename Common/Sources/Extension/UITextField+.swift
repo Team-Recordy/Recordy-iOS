@@ -9,10 +9,10 @@
 import UIKit
 
 extension UITextField {
-  func setPlaceholder(
+  public func setPlaceholder(
     placeholder: String,
     placeholderColor: CommonColors,
-    font: RecordyFont
+    font: ViskitFont
   ) {
     attributedPlaceholder = NSAttributedString(
       string: placeholder,
@@ -24,7 +24,7 @@ extension UITextField {
     self.font = font.font
   }
   
-  func setLayer(
+  public func setLayer(
     borderColor: CommonColors? = nil,
     borderWidth: CGFloat? = nil,
     cornerRadius: CGFloat
@@ -38,7 +38,7 @@ extension UITextField {
     layer.cornerRadius = cornerRadius
   }
   
-  func addPadding(left: CGFloat? = nil, right: CGFloat? = nil) {
+  public func addPadding(left: CGFloat? = nil, right: CGFloat? = nil) {
     if let leftPadding = left {
       let leftView = UIView(
         frame: CGRect(
