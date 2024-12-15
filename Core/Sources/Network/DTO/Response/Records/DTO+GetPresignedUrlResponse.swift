@@ -12,7 +12,7 @@ extension DTO {
   public struct GetPresignedUrlResponse: BaseResponse {
     public let videoUrl: String
     public let thumbnailUrl: String
-
+    
     public init(
       videoUrl: String,
       thumbnailUrl: String

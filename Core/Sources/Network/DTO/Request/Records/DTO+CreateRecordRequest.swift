@@ -11,23 +11,33 @@ import Foundation
 extension DTO {
   public struct CreateRecordRequest: BaseRequest {
     /// 위치 정보
-    public let location: String
+    //    public let location: String
     /// 내용
-    public let content: String
+    //    public let content: String
     /// 선택 키워드 - encoding etf8
-    public let keywords: String
+    //    public let keywords: String
     public let fileUrl: FileUrl
-
+    public let content: String
+    public let exhibitionName: String
+    public let placeId: Int
+    
     public init(
-      location: String,
+      //      location: String,
+      //      content: String,
+      //      keywords: String,
+      fileUrl: FileUrl,
       content: String,
-      keywords: String,
-      fileUrl: FileUrl
+      exhibitionName: String,
+      placeId: Int
+      
     ) {
-      self.location = location
-      self.content = content
-      self.keywords = keywords
+      //      self.location = location
+      //      self.content = content
+      //      self.keywords = keywords
       self.fileUrl = fileUrl
+      self.content = content
+      self.exhibitionName = exhibitionName
+      self.placeId = placeId
     }
   }
 }
@@ -37,7 +47,7 @@ extension DTO.CreateRecordRequest {
   public struct FileUrl: BaseRequest {
     let videoUrl: String
     let thumbnailUrl: String
-
+    
     public init(
       videoUrl: String,
       thumbnailUrl: String

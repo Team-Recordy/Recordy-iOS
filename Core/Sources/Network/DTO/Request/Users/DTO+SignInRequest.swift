@@ -12,7 +12,7 @@ extension DTO {
   public struct SignInRequest: BaseRequest {
     public let authorization: String
     public let platformType: PlatformType
-
+    
     public init(
       authorization: String,
       platformType: PlatformType

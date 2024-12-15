@@ -14,7 +14,7 @@ extension DTO {
     let cursorId: Int?
     /// 가져올 데이터 갯수
     let size: Int
-
+    
     public init(
       cursorId: Int?,
       size: Int

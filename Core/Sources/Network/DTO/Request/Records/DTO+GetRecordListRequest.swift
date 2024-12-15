@@ -10,10 +10,18 @@ import Foundation
 
 extension DTO {
   public struct GetRecordListRequest: BaseRequest {
+    public let placeId: Int
+    public let cursorId: Int
     /// 요청 리스트 사이즈, 디폴트 10
     public let size: Int
-
-    public init(size: Int) {
+    
+    public init(
+      cursorId: Int,
+      placeId: Int,
+      size: Int
+    ) {
+      self.cursorId = cursorId
+      self.placeId = placeId
       self.size = size
     }
   }

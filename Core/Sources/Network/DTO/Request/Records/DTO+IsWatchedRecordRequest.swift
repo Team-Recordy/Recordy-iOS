@@ -8,10 +8,12 @@
 
 import Foundation
 
+//TODO: 필요없음
+
 extension DTO {
   public struct IsRecordWatchedRequest: BaseRequest {
     let recordId: Int
-
+    
     public init(recordId: Int) {
       self.recordId = recordId
     }

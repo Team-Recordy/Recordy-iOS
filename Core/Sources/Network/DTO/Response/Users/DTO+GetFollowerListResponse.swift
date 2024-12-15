@@ -50,19 +50,18 @@ extension DTO.GetFollowerListResponse.Content {
     public let id: Int
     public let nickname: String
     public let profileImageUrl: String
+    public let isFollowing: Bool
     
     public init(
       id: Int,
       nickname: String,
-      profileImageUrl: String
+      profileImageUrl: String,
+      isFollowing: Bool
     ) {
       self.id = id
       self.nickname = nickname
       self.profileImageUrl = profileImageUrl
+      self.isFollowing = isFollowing
     }
   }
 }
-
-
-
-// MARK: - UserInfo

@@ -11,7 +11,7 @@ import Foundation
 extension DTO {
   public struct CheckNicknameRequest: BaseRequest {
     public let nickname: String
-
+    
     public init(nickname: String) {
       self.nickname = nickname
     }

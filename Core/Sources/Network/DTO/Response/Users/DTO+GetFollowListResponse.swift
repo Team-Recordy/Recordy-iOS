@@ -16,7 +16,7 @@ extension DTO {
     public let hasNext: Bool
     /// 다음 커서
     public let content: [Content]
-
+    
     public init(
       nextCursor: Int?,
       hasNext: Bool,
@@ -37,15 +37,19 @@ extension DTO.GetFollowListResponse {
     public let nickname: String
     /// 프로필 사진
     public let profileImageUrl: String
-
+    /// 팔로우 여부
+    public let isFollowing: Bool
+    
     public init(
       id: Int,
       nickname: String,
-      profileImageUrl: String
+      profileImageUrl: String,
+      isFollowing: Bool
     ) {
       self.id = id
       self.nickname = nickname
       self.profileImageUrl = profileImageUrl
+      self.isFollowing = isFollowing
     }
   }
 }

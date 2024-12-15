@@ -11,7 +11,7 @@ import Foundation
 extension DTO {
   public struct RefreshTokenResponse: BaseResponse {
     public let accessToken: String
-
+    
     public init(accessToken: String) {
       self.accessToken = accessToken
     }
