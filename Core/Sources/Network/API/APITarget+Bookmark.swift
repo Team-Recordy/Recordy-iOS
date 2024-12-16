@@ -13,6 +13,7 @@ import Moya
 extension APITarget {
   public enum Bookmark {
     case postBookmark(DTO.PostBookmarkRequest)
+    case getBookmarkedCount
   }
 }
 
@@ -26,6 +27,8 @@ extension APITarget.Bookmark: TargetType {
     switch self {
     case .postBookmark(let postBookmarkRequest):
       return "\(postBookmarkRequest.recordId)"
+    case .getBookmarkedCount:
+      return ""
     }
   }
   
@@ -33,6 +36,8 @@ extension APITarget.Bookmark: TargetType {
     switch self {
     case .postBookmark:
       return .post
+    case .getBookmarkedCount:
+      return .get
     }
   }
   

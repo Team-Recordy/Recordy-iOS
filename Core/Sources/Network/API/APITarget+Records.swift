@@ -12,16 +12,14 @@ import Moya
 
 extension APITarget {
   public enum Records {
-    case getPresignedUrl
     case createRecord(DTO.CreateRecordRequest)
-    case deleteRecord(DTO.DeleteRecordRequest)
-    case isRecordWatched(DTO.IsRecordWatchedRequest)
-    case getRecordList(DTO.GetRecordListRequest)
     case getUserRecordList(DTO.GetUserRecordListRequest)
-    case getRecentRecordList(DTO.GetRecentRecordListRequest)
-    case getFamousRecordList(DTO.GetFamousRecordListRequest)
+    case getRandomRecordList(DTO.GetRandomRecordListRequest)
+    case getPresignedUrl
+    case getPlaceRecordList(DTO.GetPlaceRecordListRequest)
     case getFollowingRecordList(DTO.GetFollowingRecordListRequest)
     case getBookmarkedRecordList(DTO.GetBookmarkedListRequest)
+    case deleteRecord(DTO.DeleteRecordRequest)
   }
 }
 
@@ -33,52 +31,43 @@ extension APITarget.Records: TargetType {
 
   public var path: String {
     switch self {
-    case .getPresignedUrl:
-      return "presigned-url"
     case .createRecord:
-      return ""
-    case .deleteRecord(let deleteRecordRequest):
-      return "\(deleteRecordRequest.record_id)"
-    case .isRecordWatched(let isRecordWatchedRequest):
-      return "\(isRecordWatchedRequest.recordId)"
-    case .getRecordList:
       return ""
     case .getUserRecordList(let getUserRecordListRequest):
       return "user/\(getUserRecordListRequest.otherUserId)"
-    case .getRecentRecordList:
-      return "recent"
-    case .getFamousRecordList:
-      return "famous"
+    case .getRandomRecordList(let getRandomRecordListRequest):
+      return "random"
+    case .getPresignedUrl:
+      return "presigned-url"
+    case .getPlaceRecordList:
+      return "place"
     case .getFollowingRecordList:
       return "follow"
     case .getBookmarkedRecordList:
       return "bookmarks"
+    case .deleteRecord(let deleteRecordRequest):
+      return "\(deleteRecordRequest.record_id)"
     }
   }
 
-  /// 다 붙이고 수정하기
   public var method: Moya.Method {
     switch self {
-    case .getPresignedUrl:
-      return .get
     case .createRecord:
       return .post
-    case .deleteRecord:
-      return .delete
-    case .isRecordWatched:
-      return .post
-    case .getRecordList:
-      return .get
     case .getUserRecordList:
       return .get
-    case .getRecentRecordList:
+    case .getRandomRecordList:
       return .get
-    case .getFamousRecordList:
+    case .getPresignedUrl:
+      return .get
+    case .getPlaceRecordList:
       return .get
     case .getFollowingRecordList:
       return .get
     case .getBookmarkedRecordList:
       return .get
+    case .deleteRecord:
+      return .delete
     }
   }
 
@@ -86,15 +75,6 @@ extension APITarget.Records: TargetType {
     switch self {
     case .createRecord(let createRecordRequest):
       return .requestJSONEncodable(createRecordRequest)
-    case .deleteRecord:
-      return .requestPlain
-    case .isRecordWatched:
-      return .requestPlain
-    case .getRecordList(let getRecordListRequest):
-      return .requestParameters(
-        parameters: ["size": getRecordListRequest.size],
-        encoding: URLEncoding.queryString
-      )
     case .getUserRecordList(let getUserRecordListRequest):
       return .requestParameters(
         parameters: [
@@ -103,48 +83,27 @@ extension APITarget.Records: TargetType {
         ],
         encoding: URLEncoding.queryString
       )
-    case .getRecentRecordList(let getRecentRecordListRequest):
-      var parameters: [String: Any]
-      if getRecentRecordListRequest.keywords == nil {
-        parameters = [
-          "cursorId": getRecentRecordListRequest.cursorId,
-          "size": getRecentRecordListRequest.size
-        ]
-      } else {
-        parameters = [
-          "keywords": getRecentRecordListRequest.keywords!,
-          "cursorId": getRecentRecordListRequest.cursorId,
-          "size": getRecentRecordListRequest.size
-        ]
-      }
+    case .getRandomRecordList(let getRandomRecordListRequest):
       return .requestParameters(
-        parameters: parameters,
+        parameters: [
+          "size": getRandomRecordListRequest.size
+        ],
         encoding: URLEncoding.queryString
       )
-    case .getFamousRecordList(let getFamousRecordListRequest):
-      var parameters: [String: Any]
-      if getFamousRecordListRequest.keywords == nil {
-        parameters = [
-          "pageNumber": getFamousRecordListRequest.pageNumber,
-          "pageSize": getFamousRecordListRequest.pageSize
-        ]
-      } else {
-        parameters = [
-          "keywords": getFamousRecordListRequest.keywords!,
-          "pageNumber": getFamousRecordListRequest.pageNumber,
-          "pageSize": getFamousRecordListRequest.pageSize
-        ]
-      }
+    case .deleteRecord:
+      return .requestPlain
+    case .getPlaceRecordList(let getPlaceRecordListRequest):
       return .requestParameters(
-        parameters: parameters,
+        parameters: [
+          "placeId": getPlaceRecordListRequest.placeId,
+          "cursorId": getPlaceRecordListRequest.cursorId,
+          "size": getPlaceRecordListRequest.size
+        ],
         encoding: URLEncoding.queryString
       )
     case .getFollowingRecordList(let getFollowingRecordListRequest):
       return .requestParameters(
-        parameters: [
-          "cursorId": getFollowingRecordListRequest.cursorId,
-          "size": getFollowingRecordListRequest.size
-        ],
+        parameters: ["size": getFollowingRecordListRequest.size],
         encoding: URLEncoding.queryString
       )
     case .getBookmarkedRecordList(let getBookmarkedRecordListRequest):
@@ -156,6 +115,44 @@ extension APITarget.Records: TargetType {
         encoding: URLEncoding.queryString
       )
     default: return .requestPlain
+      
+//    case .getRecentRecordList(let getRecentRecordListRequest):
+//      var parameters: [String: Any]
+//      if getRecentRecordListRequest.keywords == nil {
+//        parameters = [
+//          "cursorId": getRecentRecordListRequest.cursorId,
+//          "size": getRecentRecordListRequest.size
+//        ]
+//      } else {
+//        parameters = [
+//          "keywords": getRecentRecordListRequest.keywords!,
+//          "cursorId": getRecentRecordListRequest.cursorId,
+//          "size": getRecentRecordListRequest.size
+//        ]
+//      }
+//      return .requestParameters(
+//        parameters: parameters,
+//        encoding: URLEncoding.queryString
+//      )
+      
+//    case .getFamousRecordList(let getFamousRecordListRequest):
+//      var parameters: [String: Any]
+//      if getFamousRecordListRequest.keywords == nil {
+//        parameters = [
+//          "pageNumber": getFamousRecordListRequest.pageNumber,
+//          "pageSize": getFamousRecordListRequest.pageSize
+//        ]
+//      } else {
+//        parameters = [
+//          "keywords": getFamousRecordListRequest.keywords!,
+//          "pageNumber": getFamousRecordListRequest.pageNumber,
+//          "pageSize": getFamousRecordListRequest.pageSize
+//        ]
+//      }
+//      return .requestParameters(
+//        parameters: parameters,
+//        encoding: URLEncoding.queryString
+//      )
     }
   }
 

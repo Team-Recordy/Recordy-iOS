@@ -11,17 +11,20 @@ import Foundation
 import Moya
 
 extension APITarget {
+  
   public enum Users {
-    case signIn(DTO.SignInRequest)
-    case signUp(DTO.SignUpRequest)
-    case signOut // 로그아웃
-    case checkNickname(DTO.CheckNicknameRequest)
     case refreshToken(DTO.RefreshTokenRequest)
-    case withdraw // 회원 탈퇴
-    case getfollowList(DTO.GetFollowListRequest)
-    case getfollowerList(DTO.GetFollowerListRequest)
+    case signUp(DTO.SignUpRequest)
+    case signIn(DTO.SignInRequest)
+    case checkNickname(DTO.CheckNicknameRequest)
+    case signOut
+    case withdraw
     case follow(DTO.FollowRequest)
+    case editProfile(DTO.EditUserInfoRequest)
     case getProfile(DTO.GetProfileRequest)
+    case getProfileImage(DTO.GetPresignedUrlResponse)
+    case getFollowingList(DTO.GetFollowingListRequest)
+    case getFollowerList(DTO.GetFollowerListRequest)
   }
 }
 
@@ -33,80 +36,97 @@ extension APITarget.Users: TargetType {
 
   public var path: String {
     switch self {
-    case .signIn:
-      "signIn"
-    case .signUp:
-      "signUp"
-    case .signOut:
-      "logout"
-    case .checkNickname:
-      "check-nickname"
     case .refreshToken:
       "token"
+    case .signUp:
+      "signUp"
+    case .signIn:
+      "signIn"
+    case .checkNickname:
+      "check-nickname"
+    case .signOut:
+      "logout"
     case .withdraw:
       "delete"
-    case .getfollowList:
-      "following"
-    case .getfollowerList:
-      "follower"
     case .follow(let followRequest):
       "follow/\(followRequest.followingId)"
+    case .editProfile:
+      "users"
     case .getProfile(let getProfileRequest):
       "profile/\(getProfileRequest.otherUserId)"
+    case .getProfileImage:
+      "presigned-url"
+    case .getFollowingList:
+      "following"
+    case .getFollowerList:
+      "follower"
+
     }
   }
 
   public var method: Moya.Method {
     switch self {
-    case .signIn:
+    case .refreshToken:
       return .post
     case .signUp:
       return .post
-    case .signOut:
-      return .delete
+    case .signIn:
+      return .post
     case .checkNickname:
       return .get
-    case .refreshToken:
-      return .post
+    case .signOut:
+      return .delete
     case .withdraw:
       return .delete
-    case .getfollowList:
-      return .get
-    case .getfollowerList:
-      return .get
     case .follow:
       return .post
+    case .editProfile:
+      return .post
     case .getProfile:
+      return .get
+    case .getProfileImage:
+      return .get
+    case .getFollowingList:
+      return .get
+    case .getFollowerList:
       return .get
     }
   }
 
   public var task: Moya.Task {
     switch self {
+    case .signUp(let signUpRequest):
+      return .requestJSONEncodable(signUpRequest)
     case .signIn(let signInRequest):
       return .requestParameters(
         parameters: ["platformType": signInRequest.platformType.rawValue],
         encoding: JSONEncoding.default
       )
-    case .signUp(let signUpRequest):
-      return .requestJSONEncodable(signUpRequest)
     case .checkNickname(let checkNicknameRequest):
       return .requestParameters(
         parameters: ["nickname": checkNicknameRequest.nickname],
         encoding: URLEncoding.queryString
       )
-    case .getfollowList(let getFollowListRequest):
+    case .editProfile(let editProfileRequest):
       return .requestParameters(
         parameters: [
-//          "cursorId": getFollowListRequest.cursorId,
-          "size": getFollowListRequest.size
+          "nickname" : editProfileRequest.nickname,
+          "profileImageUrl" : editProfileRequest.profileImageUrl
+        ],
+        encoding: JSONEncoding.default
+      )
+    case .getFollowingList(let getFollowingListRequest):
+      return .requestParameters(
+        parameters: [
+          "cursorId": getFollowingListRequest.cursorId,
+          "size": getFollowingListRequest.size
         ],
         encoding: URLEncoding.queryString
       )
-    case .getfollowerList(let getFollowerListRequest):
+    case .getFollowerList(let getFollowerListRequest):
       return .requestParameters(
         parameters: [
-//          "cursorId": getFollowerListRequest.cursorId,
+          "cursorId": getFollowerListRequest.cursorId,
           "size": getFollowerListRequest.size
         ],
         encoding: URLEncoding.queryString
