@@ -7,3 +7,18 @@
 //
 
 import Foundation
+
+extension DTO {
+  public struct GetOngoingExhibitionPlacesRequest: BaseResponse {
+    public let number: Int
+    public let size: Int
+    
+    public init(
+      number: Int,
+      size: Int
+    ) {
+      self.number = number
+      self.size = size
+    }
+  }
+}

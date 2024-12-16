@@ -7,3 +7,14 @@
 //
 
 import Foundation
+
+extension DTO {
+  public struct CreatePlaceResponse: BaseRequest {
+    
+    public let placeId: Int
+    
+    public init(placeID: Int) {
+      self.placeId = placeID
+    }
+  }
+}

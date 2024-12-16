@@ -6,4 +6,17 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 
-import Foundation
+extension DTO {
+  public struct SearchLocationRequest: BaseRequest {
+    public let query: String
+    public let page: Int
+    
+    public init(
+      query: String,
+      page: Int
+    ) {
+      self.query = query
+      self.page = page
+    }
+  }
+}

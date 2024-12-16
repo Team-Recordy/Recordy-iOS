@@ -1,5 +1,5 @@
 //
-//  DTO+GetOngoingExhibitionListRequest.swift
+//  DTO+DeleteExhibitionRequest.swift
 //  Core
 //
 //  Created by Chandrala on 12/16/24.
@@ -9,14 +9,14 @@
 import Foundation
 
 extension DTO {
-  public struct GetOngoingExhibitionListRequest: BaseRequest {
+  public struct DeleteExhibitionRequest: BaseRequest {
     
-    public let placeId: Int
+    public let exhibitionId: Int
     
     public init(
-      placeId: Int
+      exhibitionId: Int
     ) {
-      self.placeId = placeId
+      self.exhibitionId = exhibitionId
     }
   }
 }

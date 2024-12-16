@@ -7,3 +7,16 @@
 //
 
 import Foundation
+
+extension DTO {
+  public struct GetExhibitionListRequest: BaseRequest {
+    
+    public let placeId: Int
+    
+    public init(
+      placeId: Int
+    ) {
+      self.placeId = placeId
+    }
+  }
+}

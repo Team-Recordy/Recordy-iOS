@@ -7,3 +7,13 @@
 //
 
 import Foundation
+
+extension DTO {
+  public struct SearchRequest: BaseRequest {
+    public let query: String
+    
+    public init(query: String) {
+      self.query = query
+    }
+  }
+}
