@@ -52,13 +52,13 @@ class VideoFeedViewModel {
     guard !isFetching else { return }
     switch type {
     case .all:
-      getRecordList(
-        endPoint: .getRecordList(DTO.GetRecordListRequest(size: 15)),
+      getPlaceRecordList(
+        endPoint: .getPlaceRecordList(DTO.GetPlaceRecordListRequest(size: 15)),
         response: DTO.RecordList.self
       )
     case .following:
       guard let cursorId else { return }
-      getRecordList(
+      getPlaceRecordList(
         endPoint: .getFollowingRecordList(
           DTO.GetFollowingRecordListRequest(
             cursorId: cursorId,
@@ -68,7 +68,7 @@ class VideoFeedViewModel {
         response: DTO.GetFollowingRecordListResponse.self
       )
     case .famous:
-      getRecordList(
+      getPlaceRecordList(
         endPoint: .getFamousRecordList(
           DTO.GetFamousRecordListRequest(
             keywords: nil,
@@ -80,7 +80,7 @@ class VideoFeedViewModel {
       )
     case .recent:
       guard let cursorId, let currentId else { return }
-      getRecordList(
+      getPlaceRecordList(
         endPoint: .getRecentRecordList(
           DTO.GetRecentRecordListRequest(
             keywords: nil,
@@ -92,7 +92,7 @@ class VideoFeedViewModel {
       )
     case .userProfile:
       guard let userId else { return }
-      getRecordList(
+      getPlaceRecordList(
         endPoint: .getUserRecordList(
           DTO.GetUserRecordListRequest(
             otherUserId: userId,
@@ -103,7 +103,7 @@ class VideoFeedViewModel {
         response: DTO.GetUserRecordListResponse.self
       )
     case .bookmarked:
-      getRecordList(
+      getPlaceRecordList(
         endPoint: .getBookmarkedRecordList(
           DTO.GetBookmarkedListRequest(
             cursorId: 0,
@@ -116,7 +116,7 @@ class VideoFeedViewModel {
     }
   }
 
-  private func getRecordList<T: Codable>(
+  private func getPlaceRecordList<T: Codable>(
     endPoint: APITarget.Records,
     response: T.Type
   ) {

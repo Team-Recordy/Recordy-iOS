@@ -1,5 +1,5 @@
 //
-//  DTO+GetRecordListRequest.swift
+//  DTO+GetPlaceRecordListRequest.swift
 //  Core
 //
 //  Created by 한지석 on 7/17/24.
@@ -9,7 +9,7 @@
 import Foundation
 
 extension DTO {
-  public struct GetRecordListRequest: BaseRequest {
+  public struct GetPlaceRecordListRequest: BaseRequest {
     public let placeId: Int
     public let cursorId: Int
     /// 요청 리스트 사이즈, 디폴트 10
