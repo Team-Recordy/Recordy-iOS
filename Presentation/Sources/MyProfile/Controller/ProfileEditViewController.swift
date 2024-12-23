@@ -8,10 +8,20 @@
 
 import UIKit
 
+import Then
+
 class ProfileEditViewController: UIViewController {
+  
+  private let profileEditView = ProfileEditView()
+  
   override func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = .black
-    
+    self.view = profileEditView
   }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    tabBarController?.tabBar.isHidden = true
+  }
+  
 }
