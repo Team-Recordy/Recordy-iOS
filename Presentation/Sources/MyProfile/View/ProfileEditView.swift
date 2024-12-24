@@ -110,9 +110,8 @@ public final class ProfileEditView: UIView {
   }
   
   private func setAutoLayout() {
-    
     profileImageView.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(36)
+      $0.top.equalTo(safeAreaLayoutGuide).offset(36)
       $0.centerX.equalToSuperview()
     }
     
@@ -122,7 +121,7 @@ public final class ProfileEditView: UIView {
     }
     
     editTitle.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(180)
+      $0.top.equalTo(profileImageView.snp.bottom).offset(24)
       $0.leading.equalToSuperview().offset(20)
     }
     
@@ -154,6 +153,7 @@ public final class ProfileEditView: UIView {
       $0.width.equalTo(335.adaptiveWidth)
       $0.height.equalTo(54.adaptiveHeight)
     }
+    
   }
   
   public func setNickname(_ nickname: String) {

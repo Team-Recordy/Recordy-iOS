@@ -44,7 +44,6 @@ public class ProfileViewController: UIViewController {
   public override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     updateProfile()
-//    self.title = "프로필"
     self.tabBarController?.tabBar.isHidden = false
   }
   
@@ -55,6 +54,7 @@ public class ProfileViewController: UIViewController {
   }
   
   func setStyle() {
+    configureNavigationBar()
     let rightButton = UIButton(type: .system)
     rightButton.setImage(CommonAsset.settingIcon.image, for: .normal)
     rightButton.addTarget(
@@ -107,6 +107,17 @@ public class ProfileViewController: UIViewController {
     bookmarkView.snp.makeConstraints {
       $0.top.equalTo(segmentControlView.snp.bottom).offset(30)
       $0.horizontalEdges.bottom.equalToSuperview()
+    }
+  }
+  
+  private func configureNavigationBar() {
+    navigationItem.title = "프로필"
+    if let navigationBar = navigationController?.navigationBar {
+      navigationBar.tintColor = .white
+      navigationBar.titleTextAttributes = [
+        .foregroundColor: CommonAsset.viskitGray01.color,
+        .font: ViskitFont.title3.font
+      ]
     }
   }
   

@@ -11,6 +11,7 @@ import Common
 
 import Then
 
+@available(iOS 16.0, *)
 public final class ProfileEditViewController: UIViewController {
   
   private let profileEditView = ProfileEditView()
@@ -21,7 +22,24 @@ public final class ProfileEditViewController: UIViewController {
     super.viewDidLoad()
     self.view = profileEditView
     profileEditView.setNickname(currentNickname)
+    setUI()
+  }
+  
+  private func setUI() {
     buttonAction()
+    configureNavigationBar()
+  }
+  
+  private func configureNavigationBar() {
+    navigationItem.title = "프로필 수정"
+    if let navigationBar = navigationController?.navigationBar {
+      navigationBar.tintColor = .white
+      navigationBar.titleTextAttributes = [
+        .foregroundColor: CommonAsset.viskitGray01.color,
+        .font: ViskitFont.title3.font
+      ]
+    }
+    self.navigationController?.navigationBar.topItem?.title = ""
   }
   
   private func buttonAction() {
@@ -34,6 +52,12 @@ public final class ProfileEditViewController: UIViewController {
     let tapGesture = UITapGestureRecognizer(
       target: self,
       action: #selector(profileImageViewDidTap)
+    )
+    
+    profileEditView.nextButton.addTarget(
+      self,
+      action: #selector(nextButtonDidTap),
+      for: .touchUpInside
     )
   }
   
@@ -71,8 +95,14 @@ public final class ProfileEditViewController: UIViewController {
     
   }
   
+  @available(iOS 16.0, *)
+  @objc private func nextButtonDidTap() {
+    let profileViewController = ProfileViewController()
+    navigationController?.pushViewController(profileViewController, animated: true)
+  }
+  
   @objc private func profileImageViewDidTap() {
     //TODO: 프로필 이미지 선택 (추 후 구현)
   }
-  
+
 }
