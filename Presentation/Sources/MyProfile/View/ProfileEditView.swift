@@ -15,6 +15,7 @@ import Common
 
 final class ProfileEditView: UIView {
   private let profileImageView = UIImageView()
+  private let cameraImageView = UIImageView()
   private let editTitle = UILabel()
   private let nicknameEditTextField = UITextField()
   private let nicknameCountLabel = UILabel()
@@ -42,6 +43,13 @@ final class ProfileEditView: UIView {
       $0.layer.cornerRadius = 120/2
       $0.clipsToBounds = true
       $0.isUserInteractionEnabled = true
+    }
+    
+    cameraImageView.do {
+      $0.image = CommonAsset.camera.image
+      $0.contentMode = .scaleAspectFill
+      $0.layer.cornerRadius = 24/2
+      $0.clipsToBounds = true
     }
     
     editTitle.do {
@@ -84,6 +92,7 @@ final class ProfileEditView: UIView {
   
   private func setUI() {
     addSubviews(profileImageView,
+                cameraImageView,
                 editTitle,
                 nicknameEditTextField,
                 nicknameCountLabel,
@@ -96,6 +105,11 @@ final class ProfileEditView: UIView {
     profileImageView.snp.makeConstraints {
       $0.top.equalToSuperview().offset(36)
       $0.centerX.equalToSuperview()
+    }
+    
+    cameraImageView.snp.makeConstraints {
+      $0.bottom.equalTo(profileImageView.snp.bottom).inset(6)
+      $0.trailing.equalTo(profileImageView.snp.trailing).inset(6)
     }
     
     editTitle.snp.makeConstraints {
