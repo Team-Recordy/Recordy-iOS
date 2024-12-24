@@ -112,6 +112,7 @@ public class ProfileViewController: UIViewController {
   
   private func configureNavigationBar() {
     navigationItem.title = "프로필"
+    navigationItem.backButtonTitle = ""
     if let navigationBar = navigationController?.navigationBar {
       navigationBar.tintColor = .white
       navigationBar.titleTextAttributes = [

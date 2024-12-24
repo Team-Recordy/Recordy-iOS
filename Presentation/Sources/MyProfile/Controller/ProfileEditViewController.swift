@@ -37,7 +37,7 @@ public final class ProfileEditViewController: UIViewController {
         .font: ViskitFont.title3.font
       ]
     }
-    self.navigationController?.navigationBar.topItem?.title = ""
+    navigationItem.backButtonTitle = ""
   }
   
   private func buttonAction() {
@@ -99,5 +99,4 @@ public final class ProfileEditViewController: UIViewController {
   @objc private func profileImageViewDidTap() {
     //TODO: 프로필 이미지 선택 (추 후 구현)
   }
-
 }
