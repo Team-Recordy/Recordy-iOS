@@ -9,8 +9,6 @@
 import UIKit
 import Common
 
-import Then
-
 @available(iOS 16.0, *)
 public final class ProfileEditViewController: UIViewController {
   
@@ -62,7 +60,6 @@ public final class ProfileEditViewController: UIViewController {
   }
   
   @objc private func textFieldDidChange(_ textField: UITextField) {
-    
     guard let text = textField.text else { return }
     profileEditView.nicknameCountLabel.text = "\(text.count) / \(maxNicknameLength)"
     
@@ -86,13 +83,11 @@ public final class ProfileEditViewController: UIViewController {
     if text == currentNickname {
       profileEditView.showErrorLabel(withMessage: "ⓘ 이미 사용 중인 닉네임이에요.")
       profileEditView.updateButtonState(isEnabled: false)
-      
       return
     } //TODO: Server에서 존재하는 닉네임인지 확인 요청 필요, 우선은 currentNickname으로 확인
     
     profileEditView.showSuccessLabel()
     profileEditView.updateButtonState(isEnabled: true)
-    
   }
   
   @available(iOS 16.0, *)

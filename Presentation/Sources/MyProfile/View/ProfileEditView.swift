@@ -153,18 +153,18 @@ public final class ProfileEditView: UIView {
       $0.width.equalTo(335.adaptiveWidth)
       $0.height.equalTo(54.adaptiveHeight)
     }
-    
   }
-  
-  public func setNickname(_ nickname: String) {
-    nicknameEditTextField.placeholder = nickname
-  }
-  
+}
+
+extension ProfileEditView {
   public func updateButtonState(isEnabled: Bool) {
     nextButton.isEnabled = isEnabled
     nextButton.backgroundColor = isEnabled ? CommonAsset.viskitYellow400.color : CommonAsset.viskitGray11.color
     nextButton.titleLabel?.textColor = isEnabled ? CommonAsset.recordyBG.color : CommonAsset.viskitGray08.color
-    //TODO: ViskitBG로 변경 필요(AssetX)
+  }
+  
+  public func setNickname(_ nickname: String) {
+      nicknameEditTextField.placeholder = nickname
   }
   
   public func updateTextFieldBorderColor(to color: UIColor?) {
@@ -195,5 +195,6 @@ public final class ProfileEditView: UIView {
     successLabel.isHidden = true
     updateTextFieldBorderColor(to: nil)
   }
-  
 }
+
+
