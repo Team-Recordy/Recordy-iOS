@@ -141,4 +141,9 @@ final class ProfileEditView: UIView {
       $0.height.equalTo(54.adaptiveHeight)
     }
   }
+  
+  public func setNickname(_ nickname: String) {
+    nicknameEditTextField.placeholder = nickname
+  }
+  
 }

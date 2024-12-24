@@ -13,15 +13,13 @@ import Then
 class ProfileEditViewController: UIViewController {
   
   private let profileEditView = ProfileEditView()
+  private let currentNickname: String = "레코디"
   
   override func viewDidLoad() {
     super.viewDidLoad()
     self.view = profileEditView
+    profileEditView.setNickname(currentNickname)
+    
   }
-  
-//  override func viewWillAppear(_ animated: Bool) {
-////    super.viewWillAppear(animated)
-////    tabBarController?.tabBar.isHidden = true
-//  }
   
 }

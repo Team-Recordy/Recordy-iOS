@@ -44,7 +44,8 @@ public class ProfileViewController: UIViewController {
   public override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     updateProfile()
-    self.title = "프로필"
+//    self.title = "프로필"
+    self.tabBarController?.tabBar.isHidden = false
   }
   
   private func updateProfile() {
