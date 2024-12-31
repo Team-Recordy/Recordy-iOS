@@ -34,8 +34,7 @@ public final class ProfileEditView: UIView {
   }
   
   private func setStyle() {
-    backgroundColor = CommonAsset.recordyBG.color
-    //TODO: viskitBG 없어서 추 후 대치 필요
+    backgroundColor = CommonAsset.viskitBG.color
     
     profileImageView.do {
       $0.image = CommonAsset.profileEdit.image
