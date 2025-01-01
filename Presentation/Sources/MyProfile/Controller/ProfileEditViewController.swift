@@ -16,9 +16,12 @@ public final class ProfileEditViewController: UIViewController {
   private let currentNickname: String = "레코디"
   private let maxNicknameLength: Int = 10
   
+  public override func loadView() {
+    self.view = profileEditView
+  }
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
-    self.view = profileEditView
     profileEditView.setNickname(currentNickname)
     setUI()
   }
