@@ -48,5 +48,3 @@ public let mockData: [Overview] = [
     )
   ])
 ]
-
-

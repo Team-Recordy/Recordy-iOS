@@ -85,9 +85,13 @@ public class SettingViewController: UIViewController {
   private lazy var firstDivider = createDivider()
   private lazy var secondDivider = createDivider()
   
+  public override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    tabBarController?.tabBar.isHidden = true
+  }
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
-    
     setStyle()
     setUI()
     setAutoLayout()
@@ -97,7 +101,6 @@ public class SettingViewController: UIViewController {
   private func setStyle() {
     view.backgroundColor = .black
     configureNavigationBar()
-    self.navigationController?.navigationBar.topItem?.title = ""
   }
   
   private func setUI() {
@@ -155,6 +158,7 @@ public class SettingViewController: UIViewController {
   
   private func configureNavigationBar() {
     navigationItem.title = "설정"
+    navigationItem.backButtonTitle = ""
     if let navigationBar = navigationController?.navigationBar {
       navigationBar.tintColor = .white
       navigationBar.titleTextAttributes = [

@@ -33,8 +33,8 @@ public class ViskitGradientView: UIView {
 
   private func setStyle() {
     let colors: [UIColor] = [
-      CommonAsset.viskitGradient.color.withAlphaComponent(0.0),
-      CommonAsset.viskitGradient.color.withAlphaComponent(1.0)
+      CommonAsset.viskitBG.color.withAlphaComponent(0.0),
+      CommonAsset.viskitBG.color.withAlphaComponent(1.0)
     ]
     gradientLayer.do {
       $0.startPoint = CGPoint(x: 0.5, y: 0.0)

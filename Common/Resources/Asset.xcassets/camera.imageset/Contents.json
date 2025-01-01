@@ -1,15 +1,17 @@
 {
   "images" : [
     {
+      "filename" : "ic_camera_circle_gray01_24.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "chevronLeft.png",
+      "filename" : "ic_camera_circle_gray01_24@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "ic_camera_circle_gray01_24@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
