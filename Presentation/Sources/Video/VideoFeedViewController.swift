@@ -258,6 +258,6 @@ extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDat
 
 extension VideoFeedViewController: FeedWatchDelegate {
   func play(feed: Feed) {
-    viewModel.postIsFeedWatched(feed: feed)
+//    viewModel.postIsFeedWatched(feed: feed)
   }
 }

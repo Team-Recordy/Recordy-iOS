@@ -21,7 +21,7 @@ enum VideoFeedType {
 }
 
 class VideoFeedViewModel {
-
+  
   private(set) var feedList: [Feed] = []
   let apiProvider = APIProvider<APITarget.Records>()
   var type: VideoFeedType
@@ -34,7 +34,7 @@ class VideoFeedViewModel {
   var isToggle = false
   var onFeedListUpdate: ((Int) -> ())?
   var isBookmarked: (() -> ())?
-
+  
   init(
     type: VideoFeedType,
     currentId: Int? = nil,
@@ -47,48 +47,23 @@ class VideoFeedViewModel {
     self.userId = userId
     recordListCase()
   }
-
+  
+  // 필요없는 famous, recent case 삭제함
   func recordListCase(toggle: Bool? = nil) {
     guard !isFetching else { return }
     switch type {
     case .all:
       getPlaceRecordList(
-        endPoint: .getPlaceRecordList(DTO.GetPlaceRecordListRequest(size: 15)),
-        response: DTO.RecordList.self
+        endPoint: .getRandomRecordList(DTO.GetRandomRecordListRequest(size: 15)),
+        response: DTO.GetRandomRecordListResponse.self
       )
     case .following:
       guard let cursorId else { return }
       getPlaceRecordList(
         endPoint: .getFollowingRecordList(
-          DTO.GetFollowingRecordListRequest(
-            cursorId: cursorId,
-            size: 15
-          )
+          DTO.GetFollowingRecordListRequest(size: 15)
         ),
         response: DTO.GetFollowingRecordListResponse.self
-      )
-    case .famous:
-      getPlaceRecordList(
-        endPoint: .getFamousRecordList(
-          DTO.GetFamousRecordListRequest(
-            keywords: nil,
-            pageNumber: pageNumber,
-            pageSize: 15
-          )
-        ),
-        response: DTO.GetFamousRecordListResponse.self
-      )
-    case .recent:
-      guard let cursorId, let currentId else { return }
-      getPlaceRecordList(
-        endPoint: .getRecentRecordList(
-          DTO.GetRecentRecordListRequest(
-            keywords: nil,
-            cursorId: cursorId,
-            size: 15
-          )
-        ),
-        response: DTO.GetRecentRecordListResponse.self
       )
     case .userProfile:
       guard let userId else { return }
@@ -115,7 +90,7 @@ class VideoFeedViewModel {
     default: return
     }
   }
-
+  
   private func getPlaceRecordList<T: Codable>(
     endPoint: APITarget.Records,
     response: T.Type
@@ -137,77 +112,107 @@ class VideoFeedViewModel {
       }
     }
   }
-
-  private func processResponse<T: Codable> (response: T) {
-    if let allRecordListResponse = response as? DTO.RecordList {
-      /// 전체 레코드 랜덤 조회
-      updateFeedList(allRecordListResponse.feeds)
-    } else if let followRecordListResponse = response as? DTO.GetFollowingRecordListResponse {
+  
+  // Content -> Feed 타입 변환 해줬음
+  private func processResponse<T: Codable>(response: T) {
+    if let randomRecordListResponse = response as? DTO.GetRandomRecordListResponse {
+      let feeds: [Feed] = randomRecordListResponse.content.map { content in
+        Feed(
+          id: content.id,
+          userId: content.uploaderId,
+          location: content.placeName,
+          nickname: content.uploaderNickname,
+          description: content.content,
+          isBookmarked: content.isBookmarked,
+          bookmarkCount: content.bookmarkCount,
+          videoLink: content.fileUrl.videoUrl,
+          thumbnailLink: content.fileUrl.thumbnailUrl,
+          isMine: content.isMine
+        )
+      }
+      updateFeedList(feeds)
+    } else if let followingRecordListResponse = response as? DTO.GetFollowingRecordListResponse {
       /// 팔로잉 레코드 조회
-      updateFeedList(followRecordListResponse.feeds)
-      hasNext = followRecordListResponse.hasNext
-      cursorId = followRecordListResponse.nextCursor
-    } else if let famousRecordListResponse = response as? DTO.GetFamousRecordListResponse {
-      /// 인기 레코드 조회 - n번째 게시물 클릭 가능
-      var newFeeds: [Feed] = []
-      if pageNumber == 0 {
-        if let index = famousRecordListResponse.feeds.firstIndex(where: { $0.id == currentId }) {
-          newFeeds = Array(famousRecordListResponse.feeds[index...])
-        }
-      } else {
-        newFeeds = famousRecordListResponse.feeds
+      let feeds: [Feed] = followingRecordListResponse.content.map { content in
+        Feed(
+          id: content.id,
+          userId: content.uploaderId,
+          location: content.placeName,
+          nickname: content.uploaderNickname,
+          description: content.content,
+          isBookmarked: content.isBookmarked,
+          bookmarkCount: content.bookmarkCount,
+          videoLink: content.fileUrl.videoUrl,
+          thumbnailLink: content.fileUrl.thumbnailUrl,
+          isMine: content.isMine
+        )
       }
-      updateFeedList(newFeeds)
-      hasNext = famousRecordListResponse.hasNext
-      pageNumber += 1
-    } else if let recentRecordListResponse = response as? DTO.GetRecentRecordListResponse {
-      /// 최신 레코드 조회
-      var newFeeds: [Feed] = []
-      if cursorId == 0 {
-        if let index = recentRecordListResponse.feeds.firstIndex(where: { $0.id == currentId }) {
-          newFeeds = Array(recentRecordListResponse.feeds[index...])
-        }
-      } else {
-        newFeeds = recentRecordListResponse.feeds
-      }
-      updateFeedList(newFeeds)
-      hasNext = recentRecordListResponse.hasNext
-      cursorId = recentRecordListResponse.nextCursor
+      updateFeedList(feeds)
+      hasNext = followingRecordListResponse.hasNext
+      cursorId = followingRecordListResponse.nextCursor
     } else if let userProfileRecordListResponse = response as? DTO.GetUserRecordListResponse {
       /// 유저 프로필 레코드 조회
       guard let currentId else { return }
-      if let index = userProfileRecordListResponse.feeds.firstIndex(where: { $0.id == currentId }) {
-        let newFeeds = Array(userProfileRecordListResponse.feeds[index...])
-        updateFeedList(newFeeds)
-      }
-    } else if let bookmarkedRecordListResponse = response as? DTO.GetBookmarkedListResponse {
-      /// 유저 북마크 레코드 조회
-      guard let currentId, hasNext else { return }
-      if let index = bookmarkedRecordListResponse.feeds.firstIndex(where: { $0.id == currentId }) {
-        let newFeeds = Array(bookmarkedRecordListResponse.feeds[index...])
-        self.hasNext = bookmarkedRecordListResponse.hasNext
-        updateFeedList(newFeeds)
+      if let index = userProfileRecordListResponse.content.firstIndex(where: { $0.id == currentId }) {
+        let feeds: [Feed] = userProfileRecordListResponse.content.map { content in
+          Feed(
+            id: content.id,
+            userId: content.uploaderId,
+            location: content.placeName,
+            nickname: content.uploaderNickname,
+            description: content.content,
+            isBookmarked: content.isBookmarked,
+            bookmarkCount: content.bookmarkCount,
+            videoLink: content.fileUrl.videoUrl,
+            thumbnailLink: content.fileUrl.thumbnailUrl,
+            isMine: content.isMine
+          )
+        }
+        updateFeedList(feeds)
+      } else if let bookmarkedRecordListResponse = response as? DTO.GetBookmarkedListResponse {
+        /// 유저 북마크 레코드 조회
+        guard hasNext else { return }
+        if let index = bookmarkedRecordListResponse.content.firstIndex(where: { $0.id == currentId }) {
+          let newFeeds: [Feed] = Array(bookmarkedRecordListResponse.content[index...]).map { content in
+            Feed(
+              id: content.id,
+              userId: content.uploaderId,
+              location: content.placeName,
+              nickname: content.uploaderNickname,
+              description: content.content,
+              isBookmarked: content.isBookmarked,
+              bookmarkCount: content.bookmarkCount,
+              videoLink: content.fileUrl.videoUrl,
+              thumbnailLink: content.fileUrl.thumbnailUrl,
+              isMine: content.isMine
+            )
+          }
+          self.hasNext = bookmarkedRecordListResponse.hasNext
+          updateFeedList(newFeeds)
+        }
       }
     }
   }
-
-  private func updateFeedList(_ newFeeds: [Feed]) {
-    cacheVideos(feeds: newFeeds) { [weak self] feed in
-      guard let self else { return }
-      self.feedList += feed
-      self.onFeedListUpdate?(feed.count)
+    
+    func updateFeedList(_ newFeeds: [Feed]) {
+      cacheVideos(feeds: newFeeds) { [weak self] cachedFeeds in
+        guard let self else { return }
+        self.feedList += cachedFeeds
+        self.onFeedListUpdate?(cachedFeeds.count)
+      }
     }
-  }
-
-  func cacheVideos(
-    feeds: [Feed],
-    completion: @escaping ([Feed]) -> Void) {
+    
+    func cacheVideos(
+      feeds: [Feed],
+      completion: @escaping ([Feed]) -> Void
+    ) {
       let dispatchGroup = DispatchGroup()
       var cachedFeeds: [Feed] = []
+      
       for feed in feeds {
         dispatchGroup.enter()
         VideoCacheManager.shared.downloadAndCacheURL(url: URL(string: feed.videoLink)!) { url in
-          guard url != nil else {
+          guard let cachedUrl = url else {
             dispatchGroup.leave()
             return
           }
@@ -215,16 +220,11 @@ class VideoFeedViewModel {
             id: feed.id,
             userId: feed.userId,
             location: feed.location,
-            placeInfo: PlaceInfo(
-              feature: .all,
-              title: "국현미",
-              duration: "2024.10.03~"
-            ),
             nickname: feed.nickname,
             description: feed.description,
             isBookmarked: feed.isBookmarked,
             bookmarkCount: feed.bookmarkCount,
-            videoLink: String(describing: url!),
+            videoLink: String(describing: cachedUrl),
             thumbnailLink: feed.thumbnailLink,
             isMine: feed.isMine
           )
@@ -232,49 +232,50 @@ class VideoFeedViewModel {
           dispatchGroup.leave()
         }
       }
+      
       dispatchGroup.notify(queue: .main) {
         completion(cachedFeeds)
       }
     }
-
-  func postIsFeedWatched(feed: Feed) {
-    let request = DTO.IsRecordWatchedRequest(recordId: feed.id)
-    apiProvider.justRequest(.isRecordWatched(request)) { result in
-      switch result {
-      case .success:
-        print("@Log - success")
-      case .failure(let failure):
-        print(failure)
+    
+    //  func postIsFeedWatched(feed: Feed) {
+    //    let request = DTO.IsRecordWatchedRequest(recordId: feed.id)
+    //    apiProvider.justRequest(.isRecordWatched(request)) { result in
+    //      switch result {
+    //      case .success:
+    //        print("@Log - success")
+    //      case .failure(let failure):
+    //        print(failure)
+    //      }
+    //    }
+    //  }
+    
+    func deleteFeed(_ index: Int) {
+      let feed = self.feedList[index]
+      let request = DTO.DeleteRecordRequest(record_id: feed.id)
+      apiProvider.justRequest(.deleteRecord(request)) { result in
+        switch result {
+        case .success(let success):
+          print(success)
+        case .failure(let failure):
+          print(failure)
+        }
+      }
+    }
+    
+    func bookmarkButtonTapped(_ index: Int) {
+      self.feedList[index].isBookmarked.toggle()
+      let count = self.feedList[index].isBookmarked ? 1 : -1
+      self.feedList[index].bookmarkCount += count
+      let bookmarkProvider = APIProvider<APITarget.Bookmarks>()
+      let request = DTO.PostBookmarkRequest(recordId: feedList[index].id)
+      bookmarkProvider.justRequest(.postBookmark(request)) { result in
+        switch result {
+        case .success:
+          print("@Log - success")
+        case .failure(let failure):
+          print(failure)
+        }
       }
     }
   }
-
-  func deleteFeed(_ index: Int) {
-    let feed = self.feedList[index]
-    let request = DTO.DeleteRecordRequest(record_id: feed.id)
-    apiProvider.justRequest(.deleteRecord(request)) { result in
-      switch result {
-      case .success(let success):
-        print(success)
-      case .failure(let failure):
-        print(failure)
-      }
-    }
-  }
-
-  func bookmarkButtonTapped(_ index: Int) {
-    self.feedList[index].isBookmarked.toggle()
-    let count = self.feedList[index].isBookmarked ? 1 : -1
-    self.feedList[index].bookmarkCount += count
-    let bookmarkProvider = APIProvider<APITarget.Bookmark>()
-    let request = DTO.PostBookmarkRequest(recordId: feedList[index].id)
-    bookmarkProvider.justRequest(.postBookmark(request)) { result in
-      switch result {
-      case .success:
-        print("@Log - success")
-      case .failure(let failure):
-        print(failure)
-      }
-    }
-  }
-}
