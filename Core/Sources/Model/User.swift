@@ -22,7 +22,6 @@ public struct User {
   public let recordCount: Int
   public let followerCount: Int
   public let followingCount: Int
-  public let bookmarkCount: Int
 
   public init(
     isMine: Bool,
@@ -37,8 +36,7 @@ public struct User {
     loginState: LoginState,
     recordCount: Int,
     followerCount: Int,
-    followingCount: Int,
-    bookmarkCount: Int
+    followingCount: Int
   ) {
     self.isMine = isMine
     self.id = id
@@ -53,7 +51,6 @@ public struct User {
     self.recordCount = recordCount
     self.followerCount = followerCount
     self.followingCount = followingCount
-    self.bookmarkCount = bookmarkCount
   }
 }
 
