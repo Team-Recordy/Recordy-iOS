@@ -1,5 +1,5 @@
 //
-//  DTO+SearchLocationResponse.swift
+//  DTO+GetSearchLocationResponse.swift
 //  Core
 //
 //  Created by Chandrala on 12/16/24.
@@ -9,7 +9,7 @@
 import Foundation
 
 extension DTO {
-  public struct SearchLocationResponse: BaseResponse {
+  public struct GetSearchLocationResponse: BaseResponse {
     public let platformPlaceId: String
     public let address: String
     public let longitude: Double

@@ -1,5 +1,5 @@
 //
-//  DTO+GetOngoingExhibitionPlacesRequest.swift
+//  DTO+GetOngoingExhibitionPlaceListRequest.swift
 //  Core
 //
 //  Created by Chandrala on 12/15/24.
@@ -9,7 +9,7 @@
 import Foundation
 
 extension DTO {
-  public struct GetOngoingExhibitionPlacesRequest: BaseResponse {
+  public struct GetOngoingExhibitionPlaceListRequest: BaseResponse {
     public let number: Int
     public let size: Int
     

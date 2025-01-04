@@ -1,5 +1,5 @@
 //
-//  DTO+GetFreeExhibitionRequest.swift
+//  DTO+GetFreeExhibitionListRequest.swift
 //  Core
 //
 //  Created by Chandrala on 12/16/24.
@@ -9,7 +9,7 @@
 import Foundation
 
 extension DTO {
-  public struct GetFreeExhibitionRequest: BaseRequest {
+  public struct GetFreeExhibitionListRequest: BaseRequest {
     
     public let placeId: Int
     

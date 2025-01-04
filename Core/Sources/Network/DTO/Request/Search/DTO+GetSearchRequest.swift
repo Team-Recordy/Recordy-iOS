@@ -1,5 +1,5 @@
 //
-//  DTO+SearchRequest.swift
+//  DTO+GetSearchRequest.swift
 //  Core
 //
 //  Created by Chandrala on 12/16/24.
@@ -9,7 +9,7 @@
 import Foundation
 
 extension DTO {
-  public struct SearchRequest: BaseRequest {
+  public struct GetSearchRequest: BaseRequest {
     public let query: String
     
     public init(query: String) {
