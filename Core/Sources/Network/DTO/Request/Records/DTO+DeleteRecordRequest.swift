@@ -11,7 +11,7 @@ import Foundation
 extension DTO {
   public struct DeleteRecordRequest: BaseRequest {
     public let record_id: Int
-
+    
     public init(record_id: Int) {
       self.record_id = record_id
     }

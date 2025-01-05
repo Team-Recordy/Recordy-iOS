@@ -42,7 +42,7 @@ class FollowViewModel {
   private func getFollowerList() {
     let request = DTO.GetFollowerListRequest(cursorId: cursorId, size: 100)
     apiProvider.requestResponsable(
-      .getfollowerList(request),
+      .getFollowerList(request),
       DTO.GetFollowerListResponse.self
     ) { [weak self] result in
       guard let self = self else { return }
@@ -56,9 +56,9 @@ class FollowViewModel {
   }
   
   func getFollowingList() {
-    let request = DTO.GetFollowListRequest(size: 10)
+    let request = DTO.GetFollowingListRequest(cursorId: cursorId, size: 10)
     
-    apiProvider.requestResponsable(.getfollowList(request), DTO.GetFollowListResponse.self) { [weak self] result in
+    apiProvider.requestResponsable(.getFollowingList(request), DTO.GetFollowingListResponse.self) { [weak self] result in
       guard let self = self else { return }
       switch result {
       case .success(let response):
@@ -82,7 +82,7 @@ class FollowViewModel {
     self.followers = followerList
   }
   
-  private func handleFollowingResponse(response: DTO.GetFollowListResponse) {
+  private func handleFollowingResponse(response: DTO.GetFollowingListResponse) {
     let followList = response.content.map {
       Follow(
         followState: .following,

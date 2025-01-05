@@ -12,7 +12,7 @@ extension DTO {
   public struct GetProfileRequest: BaseRequest {
     /// 유저의 프로필 ID, 본인 포함
     public let otherUserId: Int
-
+    
     public init(otherUserId: Int) {
       self.otherUserId = otherUserId
     }

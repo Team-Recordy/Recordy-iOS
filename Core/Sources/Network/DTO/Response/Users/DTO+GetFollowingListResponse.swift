@@ -1,5 +1,5 @@
 //
-//  DTO+GetFollowListResponse.swift
+//  DTO+GetFollowingListResponse.swift
 //  Core
 //
 //  Created by 한지석 on 7/17/24.
@@ -9,14 +9,14 @@
 import Foundation
 
 extension DTO {
-  public struct GetFollowListResponse: BaseResponse {
+  public struct GetFollowingListResponse: BaseResponse {
     /// 다음 커서
     public let nextCursor: Int?
     /// 다음 페이지 여부
     public let hasNext: Bool
     /// 다음 커서
     public let content: [Content]
-
+    
     public init(
       nextCursor: Int?,
       hasNext: Bool,
@@ -29,7 +29,7 @@ extension DTO {
   }
 }
 
-extension DTO.GetFollowListResponse {
+extension DTO.GetFollowingListResponse {
   public struct Content: BaseResponse {
     /// 사용자
     public let id: Int
@@ -37,15 +37,19 @@ extension DTO.GetFollowListResponse {
     public let nickname: String
     /// 프로필 사진
     public let profileImageUrl: String
-
+    /// 팔로우 여부
+    public let isFollowing: Bool
+    
     public init(
       id: Int,
       nickname: String,
-      profileImageUrl: String
+      profileImageUrl: String,
+      isFollowing: Bool
     ) {
       self.id = id
       self.nickname = nickname
       self.profileImageUrl = profileImageUrl
+      self.isFollowing = isFollowing
     }
   }
 }

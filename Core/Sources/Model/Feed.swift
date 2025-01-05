@@ -12,7 +12,7 @@ public struct Feed: Equatable {
   public let id: Int
   public let userId: Int
   public let location: String
-  public let placeInfo: PlaceInfo
+//  public let placeInfo: PlaceInfo
   public let nickname: String
   public let description: String
   public var isBookmarked: Bool
@@ -25,7 +25,7 @@ public struct Feed: Equatable {
     id: Int,
     userId: Int,
     location: String,
-    placeInfo: PlaceInfo,
+//    placeInfo: PlaceInfo,
     nickname: String,
     description: String,
     isBookmarked: Bool,
@@ -37,7 +37,7 @@ public struct Feed: Equatable {
     self.id = id
     self.userId = userId
     self.location = location
-    self.placeInfo = placeInfo
+//    self.placeInfo = placeInfo
     self.nickname = nickname
     self.description = description
     self.isBookmarked = isBookmarked

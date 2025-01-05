@@ -8,12 +8,14 @@
 
 import Foundation
 
+//TODO: 필요없음
+
 extension DTO {
   public struct GetRecentRecordListResponse: BaseResponse {
     public let nextCursor: Int
     public let hasNext: Bool
     public let content: [Content]
-
+    
     public init(
       nextCursor: Int,
       hasNext: Bool,
@@ -30,7 +32,7 @@ extension DTO.GetRecentRecordListResponse {
   public struct Content: BaseResponse {
     public let recordInfo: RecordInfo
     public let isBookmark: Bool
-
+    
     public init(
       recordInfo: RecordInfo,
       isBookmark: Bool
@@ -58,7 +60,7 @@ extension DTO.GetRecentRecordListResponse.Content.RecordInfo {
   public struct FileUrl: BaseResponse {
     public let videoUrl: String
     public let thumbnailUrl: String
-
+    
     init(
       videoUrl: String,
       thumbnailUrl: String
@@ -76,11 +78,6 @@ extension DTO.GetRecentRecordListResponse {
         id: $0.recordInfo.id,
         userId: $0.recordInfo.uploaderId,
         location: $0.recordInfo.location,
-        placeInfo: PlaceInfo(
-          feature: .all,
-          title: "국현미",
-          duration: "2024.10.03~"
-        ),
         nickname: $0.recordInfo.uploaderNickname,
         description: $0.recordInfo.content,
         isBookmarked: $0.isBookmark,
@@ -92,4 +89,3 @@ extension DTO.GetRecentRecordListResponse {
     }
   }
 }
-

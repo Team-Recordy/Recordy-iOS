@@ -13,7 +13,7 @@ extension DTO {
     public let otherUserId: Int
     public let cursorId: Int
     public let size: Int
-
+    
     public init(
       otherUserId: Int,
       cursorId: Int,

@@ -10,6 +10,7 @@ import Foundation
 
 import Moya
 
+//TODO: 필요없음
 extension APITarget {
   public enum Preference {
     case getPreference

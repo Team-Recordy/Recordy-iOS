@@ -8,12 +8,14 @@
 
 import Foundation
 
+//TODO: 필요없음
+
 extension DTO {
   public struct GetRecentRecordListRequest: BaseRequest {
     public let keywords: String?
     public let cursorId: Int
     public let size: Int
-
+    
     public init(
       keywords: String?,
       cursorId: Int,

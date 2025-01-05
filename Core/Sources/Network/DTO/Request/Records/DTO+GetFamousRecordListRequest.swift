@@ -8,12 +8,14 @@
 
 import Foundation
 
+//TODO: 필요없음
+
 extension DTO {
   public struct GetFamousRecordListRequest: BaseRequest {
     public let keywords: String?
     public let pageNumber: Int
     public let pageSize: Int
-
+    
     public init(
       keywords: String?,
       pageNumber: Int,

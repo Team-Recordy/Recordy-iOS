@@ -20,9 +20,9 @@ final class UploadVideoViewModel {
 
   struct Input {
     let selectedAsset = BehaviorRelay<PHAsset?>(value: nil)
-//    let selectedKeywords = BehaviorRelay<[Keyword]>(value: [])
     let location = BehaviorRelay<String>(value: "")
     let contents = BehaviorRelay<String>(value: "")
+    let exhibitionName = BehaviorRelay<String>(value: "")
   }
 
   struct Output {
@@ -71,11 +71,23 @@ final class UploadVideoViewModel {
       .bind(to: output.contentsTextCount)
       .disposed(by: disposeBag)
 
+    input.exhibitionName
+      .map {
+        if $0 == "전시명을 입력해주세요" {
+          "0 / 300"
+        } else {
+          "\($0.count) / 300"
+        }
+      }
+      .bind(to: output.locationTextCount)
+      .disposed(by: disposeBag)
+    
     Observable.combineLatest(
       input.selectedAsset,
       input.location,
-      input.contents
-    ).map { asset, location, contents in
+      input.contents,
+      input.exhibitionName
+    ).map { asset, location, contents, exhibitionName in
       return asset != nil && location.count > 0 && contents.count > 0 && contents != "공간에 대한 나의 생각을 자유롭게 적어주세요!"
     }
     .bind(to: output.uploadEnabled)
@@ -114,14 +126,23 @@ final class UploadVideoViewModel {
   ) {
     var encodedString = ""
     let request = DTO.CreateRecordRequest(
-      location: input.location.value,
-      content: input.contents.value,
-      keywords: encodedString,
       fileUrl: DTO.CreateRecordRequest.FileUrl(
         videoUrl: videoUrl,
         thumbnailUrl: thumbnailUrl
+      ),
+      content: input.contents.value,
+      exhibitionName: input.exhibitionName.value,
+      
+      //TODO: 선택한 장소로 Id 넣어야 함
+      placeId: 0
+//      location: input.location.value,
+//      content: input.contents.value,
+//      keywords: encodedString,
+//      fileUrl: DTO.CreateRecordRequest.FileUrl(
+//        videoUrl: videoUrl,
+//        thumbnailUrl: thumbnailUrl
       )
-    )
+    
     apiProvider.justRequest(.createRecord(request)) { result in
       switch result {
       case .success:

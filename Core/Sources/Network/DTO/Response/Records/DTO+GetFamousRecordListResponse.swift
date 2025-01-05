@@ -8,12 +8,14 @@
 
 import Foundation
 
+//TODO: 필요없음
+
 extension DTO {
   public struct GetFamousRecordListResponse: BaseResponse {
     public let pageNumber: Int
     public let hasNext: Bool
     public let content: [Content]
-
+    
     public init(pageNumber: Int, hasNext: Bool, content: [Content]) {
       self.pageNumber = pageNumber
       self.hasNext = hasNext
@@ -26,7 +28,7 @@ extension DTO.GetFamousRecordListResponse {
   public struct Content: BaseResponse {
     public let recordInfo: RecordInfo
     public let isBookmark: Bool
-
+    
     public init(recordInfo: RecordInfo, isBookmark: Bool) {
       self.recordInfo = recordInfo
       self.isBookmark = isBookmark
@@ -44,7 +46,7 @@ extension DTO.GetFamousRecordListResponse.Content {
     public let uploaderNickname: String
     public let bookmarkCount: Int
     public let isMine: Bool
-
+    
     public init(id: Int, fileUrl: FileUrl, location: String, content: String, uploaderId: Int, uploaderNickname: String, bookmarkCount: Int, isMine: Bool) {
       self.id = id
       self.fileUrl = fileUrl
@@ -62,7 +64,7 @@ extension DTO.GetFamousRecordListResponse.Content.RecordInfo {
   public struct FileUrl: BaseResponse {
     public let videoUrl: String
     public let thumbnailUrl: String
-
+    
     public init(
       videoUrl: String,
       thumbnailUrl: String
@@ -80,11 +82,6 @@ extension DTO.GetFamousRecordListResponse {
         id: $0.recordInfo.id,
         userId: $0.recordInfo.uploaderId,
         location: $0.recordInfo.location,
-        placeInfo: PlaceInfo(
-          feature: .all,
-          title: "국현미",
-          duration: "2024.10.03~"
-        ),
         nickname: $0.recordInfo.uploaderNickname,
         description: $0.recordInfo.content,
         isBookmarked: $0.isBookmark,

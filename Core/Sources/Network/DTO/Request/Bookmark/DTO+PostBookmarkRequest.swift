@@ -11,7 +11,7 @@ import Foundation
 extension DTO {
   public struct PostBookmarkRequest: BaseRequest {
     public let recordId: Int
-
+    
     public init(recordId: Int) {
       self.recordId = recordId
     }

@@ -8,6 +8,8 @@
 
 import Foundation
 
+//TODO: 필요없음
+
 extension DTO {
   public struct GetPreferenceResponse: BaseResponse {
     public let preference: [[String]]

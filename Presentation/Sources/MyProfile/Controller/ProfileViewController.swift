@@ -167,8 +167,7 @@ public class ProfileViewController: UIViewController {
           loginState: .apple,
           recordCount: response.recordCount,
           followerCount: response.followerCount,
-          followingCount: response.followingCount,
-          bookmarkCount: response.bookmarkCount
+          followingCount: response.followingCount
         )
         DispatchQueue.main.async {
           self.setUserProfile()
@@ -189,21 +188,18 @@ public class ProfileViewController: UIViewController {
       switch result {
       case .success(let response):
         let feeds = response.content.map { content in
-          Feed(id: content.recordInfo.id,
-               userId: content.recordInfo.uploaderId,
-               location: content.recordInfo.location,
-               placeInfo: PlaceInfo(
-                feature: self.getPlaceFeature(from: content.recordInfo.location),
-                title: content.recordInfo.location,
-                duration: ""
-               ),
-               nickname: content.recordInfo.uploaderNickname,
-               description: content.recordInfo.content,
-               isBookmarked: content.isBookmark,
-               bookmarkCount: content.recordInfo.bookmarkCount,
-               videoLink: content.recordInfo.fileUrl.videoUrl,
-               thumbnailLink: content.recordInfo.fileUrl.thumbnailUrl,
-               isMine: content.recordInfo.isMine)
+          Feed(
+            id: content.id,
+            userId: content.uploaderId,
+            location: content.placeName,
+            nickname: content.uploaderNickname,
+            description: content.content,
+            isBookmarked: content.isBookmarked,
+            bookmarkCount: content.bookmarkCount,
+            videoLink: content.fileUrl.videoUrl,
+            thumbnailLink: content.fileUrl.thumbnailUrl,
+            isMine: content.isMine
+          )
         }
         DispatchQueue.main.async {
           self.user?.feeds = feeds
@@ -227,21 +223,18 @@ public class ProfileViewController: UIViewController {
       switch result {
       case .success(let response):
         let feeds = response.content.map { content in
-          Feed(id: content.recordInfo.id,
-               userId: content.recordInfo.uploaderId,
-               location: content.recordInfo.location,
-               placeInfo: PlaceInfo(
-                feature: self.getPlaceFeature(from: content.recordInfo.location),
-                title: content.recordInfo.location,
-                duration: ""
-               ),
-               nickname: content.recordInfo.uploaderNickname,
-               description: content.recordInfo.content,
-               isBookmarked: true,
-               bookmarkCount: content.recordInfo.bookmarkCount,
-               videoLink: content.recordInfo.fileUrl.videoUrl,
-               thumbnailLink: content.recordInfo.fileUrl.thumbnailUrl,
-               isMine: false)
+          Feed(
+            id: content.id,
+            userId: content.uploaderId,
+            location: content.placeName,
+            nickname: content.uploaderNickname,
+            description: content.content,
+            isBookmarked: content.isBookmarked,
+            bookmarkCount: content.bookmarkCount,
+            videoLink: content.fileUrl.videoUrl,
+            thumbnailLink: content.fileUrl.thumbnailUrl,
+            isMine: content.isMine
+          )
         }
         DispatchQueue.main.async {
           self.user?.bookmarkedFeeds = feeds
@@ -295,7 +288,7 @@ extension ProfileViewController: ControlTypeDelegate {
 @available(iOS 16.0, *)
 extension ProfileViewController: BookmarkDelegate {
   func bookmarkButtonTapped(feed: Feed) {
-    let apiProvider = APIProvider<APITarget.Bookmark>()
+    let apiProvider = APIProvider<APITarget.Bookmarks>()
     let request = DTO.PostBookmarkRequest(recordId: feed.id)
     apiProvider.justRequest(.postBookmark(request)) { [weak self] result in
       guard let self = self else { return }

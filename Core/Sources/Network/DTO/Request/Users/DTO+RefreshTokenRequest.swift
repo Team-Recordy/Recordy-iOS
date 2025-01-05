@@ -11,7 +11,7 @@ import Foundation
 extension DTO {
   public struct RefreshTokenRequest: BaseRequest {
     let authorization: String
-
+    
     public init(authorization: String) {
       self.authorization = authorization
     }

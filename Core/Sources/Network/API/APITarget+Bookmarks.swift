@@ -1,5 +1,5 @@
 //
-//  APITarget+Bookmark.swift
+//  APITarget+Bookmarks.swift
 //  Core
 //
 //  Created by 한지석 on 7/17/24.
@@ -11,12 +11,13 @@ import Foundation
 import Moya
 
 extension APITarget {
-  public enum Bookmark {
+  public enum Bookmarks {
     case postBookmark(DTO.PostBookmarkRequest)
+    case getBookmarkedCount
   }
 }
 
-extension APITarget.Bookmark: TargetType {
+extension APITarget.Bookmarks: TargetType {
   
   public var baseURL: URL {
     return URL(string: BaseURL.string + "/bookmarks")!
@@ -26,6 +27,8 @@ extension APITarget.Bookmark: TargetType {
     switch self {
     case .postBookmark(let postBookmarkRequest):
       return "\(postBookmarkRequest.recordId)"
+    case .getBookmarkedCount:
+      return ""
     }
   }
   
@@ -33,6 +36,8 @@ extension APITarget.Bookmark: TargetType {
     switch self {
     case .postBookmark:
       return .post
+    case .getBookmarkedCount:
+      return .get
     }
   }
   
