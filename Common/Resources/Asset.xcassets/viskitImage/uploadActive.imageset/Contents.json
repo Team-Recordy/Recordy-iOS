@@ -5,11 +5,11 @@
       "scale" : "1x"
     },
     {
+      "filename" : "uploadActive.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "videoActive.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
