@@ -179,6 +179,13 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
     locationLabel.text = formattedAddress
     placeNameLabel.text = place.name
     eventCountLabelYellow.text = "\(place.exhibitionSize)개"
+    
+    /// recordSize가 0이면 placeExhibitionCollectionView 숨기기
+    if place.recordSize == 0 {
+        placeExhibitionCollectionView?.isHidden = true
+    } else {
+        placeExhibitionCollectionView?.isHidden = false
+    }
   }
   
   public func updateRecords(records: [Feed]) {
