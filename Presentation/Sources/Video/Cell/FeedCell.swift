@@ -134,9 +134,9 @@ class FeedCell: UICollectionViewCell {
       5,
       text: feed.description
     )
-    self.feedView.locationLabel.text = feed.location
+    self.feedView.locationLabel.text = feed.exhibitionName
     self.feedView.nicknameButton.setTitle(
-      feed.nickname,
+      feed.uploaderNickname,
       for: .normal
     )
     self.feedView.descriptionTextView.text = feed.description

@@ -9,18 +9,18 @@
 import Foundation
 
 extension DTO {
-  public struct GetPlaceRecordListRequest: Codable {
+  public struct GetPlaceRecordListRequest: Encodable {
     public let placeId: Int
-    public let cursorId: Int
+//    public let cursorId: Int?
     public let size: Int
     
     public init(
       placeId: Int,
-      cursorId: Int,
+//      cursorId: Int?,
       size: Int
     ) {
       self.placeId = placeId
-      self.cursorId = cursorId
+//      self.cursorId = cursorId
       self.size = size
     }
   }

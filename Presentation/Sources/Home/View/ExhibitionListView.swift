@@ -109,7 +109,7 @@ final class ExhibitionListView: UIView {
   }
   
   public func updateExhibitionList(place: Place) {
-    exhibitionCountLabel.text = "• \(place.placeInfoList.count) 개의 전시"
+//    exhibitionCountLabel.text = "• \(place.placeInfoList.count) 개의 전시"
   }
   
   func setCollectionView() {

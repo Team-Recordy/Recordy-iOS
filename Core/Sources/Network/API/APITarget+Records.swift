@@ -96,7 +96,7 @@ extension APITarget.Records: TargetType {
       return .requestParameters(
         parameters: [
           "placeId": getPlaceRecordListRequest.placeId,
-          "cursorId": getPlaceRecordListRequest.cursorId,
+//          "cursorId": getPlaceRecordListRequest.cursorId,
           "size": getPlaceRecordListRequest.size
         ],
         encoding: URLEncoding.queryString

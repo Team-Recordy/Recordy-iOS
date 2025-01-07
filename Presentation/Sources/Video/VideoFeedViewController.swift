@@ -137,7 +137,7 @@ public class VideoFeedViewController: UIViewController {
     guard type != .userProfile && type != .myProfile else { return }
     let index = sender.tag
     let feed = viewModel.feedList[index]
-    let userVC = OtherUserProfileViewController(id: feed.userId)
+    let userVC = OtherUserProfileViewController(id: feed.uploaderId)
     self.navigationController?.pushViewController(userVC, animated: true)
   }
 

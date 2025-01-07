@@ -164,7 +164,7 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
       with: URL(string: image),
       options: [.cacheOriginalImage]
     )
-    self.locationText.text = feed.location
+    self.locationText.text = feed.exhibitionName
     self.bookmarkImage.image = feed.isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image
   }
 
