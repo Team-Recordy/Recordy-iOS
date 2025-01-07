@@ -9,7 +9,7 @@
 import Foundation
 
 extension DTO {
-  public struct GetNearPlaceListResponse: BaseResponse {
+  public struct GetNearPlaceListResponse: Codable {
     public let pageNumber: Int
     public let hasNext: Bool
     public let content: [Place]
@@ -27,7 +27,7 @@ extension DTO {
 }
 
 extension DTO.GetNearPlaceListResponse {
-  public struct Place: BaseResponse {
+  public struct Place: Codable {
     public let id: Int
     public let name: String
     public let address: String
@@ -57,22 +57,7 @@ extension DTO.GetNearPlaceListResponse {
 }
 
 extension DTO.GetNearPlaceListResponse.Place {
-  public struct Location: BaseResponse {
-    public let id: Int
-    public let point: Point
-    
-    public init(
-      id: Int,
-      point: Point
-    ) {
-      self.id = id
-      self.point = point
-    }
-  }
-}
-
-extension DTO.GetNearPlaceListResponse.Place.Location {
-  public struct Point: BaseResponse {
+  public struct Location: Codable {
     public let id: Int
     public let longitude: Double
     public let latitude: Double

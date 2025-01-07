@@ -9,19 +9,18 @@
 import Foundation
 
 extension DTO {
-  public struct GetPlaceRecordListRequest: BaseRequest {
+  public struct GetPlaceRecordListRequest: Codable {
     public let placeId: Int
     public let cursorId: Int
-    /// 요청 리스트 사이즈, 디폴트 10
     public let size: Int
     
     public init(
-      cursorId: Int,
       placeId: Int,
+      cursorId: Int,
       size: Int
     ) {
-      self.cursorId = cursorId
       self.placeId = placeId
+      self.cursorId = cursorId
       self.size = size
     }
   }
