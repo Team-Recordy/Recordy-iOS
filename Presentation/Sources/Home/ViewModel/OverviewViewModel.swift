@@ -13,7 +13,7 @@ import Core
 
 enum RecordType {
   case near
-  case place(Int)
+  case exhibition(Int)
 }
 
 public enum LocationState {
@@ -34,16 +34,13 @@ public class OverviewViewModel {
   
   var nearRecords: [Place] = []
   var placeRecords: [Feed] = []
-//  var cursorId: Int?
+  
   var hasNext = true
   var isFetching = false
+  
   var onNearRecordsUpdated: (() -> Void)?
   var onPlaceRecordsUpdated: (() -> Void)?
   var onLocationStateChanged: ((LocationState) -> Void)?
-  
-//  init(cursorId: Int? = nil) {
-//    self.cursorId = cursorId
-//  }
   
   func recordListCase(type: RecordType) {
     guard !isFetching else { return }
@@ -52,7 +49,7 @@ public class OverviewViewModel {
     switch type {
     case .near:
       getNearPlaceList()
-    case .place(let placeId):
+    case .exhibition(let placeId):
       getPlaceRecordList(placeId: placeId)
     }
   }
@@ -88,6 +85,7 @@ public class OverviewViewModel {
           )
         })
         self.onNearRecordsUpdated?()
+        
       case .failure(let error):
         print("Error fetching near places: \(error)")
       }
@@ -95,10 +93,8 @@ public class OverviewViewModel {
   }
   
   func getPlaceRecordList(placeId: Int) {
-    
     isFetching = true
     let apiProvider = APIProvider<APITarget.Records>()
-    
     let request = DTO.GetPlaceRecordListRequest(
       placeId: placeId,
       size: 10
@@ -109,7 +105,6 @@ public class OverviewViewModel {
       self.isFetching = false
       switch result {
       case .success(let response):
-//        self.cursorId = response.nextCursor
         self.hasNext = response.hasNext
         self.placeRecords.append(contentsOf: response.content.map { content in
           Feed(
@@ -127,8 +122,8 @@ public class OverviewViewModel {
             isBookmarked: content.isBookmarked
           )
         })
-        
         self.onPlaceRecordsUpdated?()
+        
       case .failure(let error):
         print("Error fetching records for placeId \(placeId): \(error)")
       }
@@ -141,7 +136,7 @@ public class OverviewViewModel {
     }
   }
   
-  func updateLocationState() {
+  func toggleLocationState() {
     locationState = (locationState == .active) ? .inactive : .active
   }
 }

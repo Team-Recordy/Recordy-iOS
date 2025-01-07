@@ -126,7 +126,7 @@ final class OverviewViewController: UIViewController {
   }
   
   @objc private func locationButtonTapped() {
-    viewModel.updateLocationState()
+    viewModel.toggleLocationState()
   }
   
   //  @objc private func placeDetailButtonTapped(_ sender: PlaceDetailButton) {
@@ -155,7 +155,6 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
       ) as? OverviewCollectionViewCell else {
         fatalError("Failed to dequeue OverviewCollectionViewCell")
       }
-      
       let place = viewModel.nearRecords[indexPath.row]
       cell.backgroundColor = .clear
       cell.bind(place: place, records: [])
@@ -166,7 +165,6 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
           cell?.updateRecords(records: self.viewModel.placeRecords)
         }
       }
-      
       return cell
     }
 }
