@@ -103,7 +103,7 @@ final class OverviewViewController: UIViewController {
     )
     
     overviewCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-    overviewCollectionView?.showsHorizontalScrollIndicator = false
+    overviewCollectionView?.showsVerticalScrollIndicator = false
     overviewCollectionView?.dataSource = self
     overviewCollectionView?.delegate = self
     overviewCollectionView?.backgroundColor = .clear
@@ -158,6 +158,11 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
       let place = viewModel.nearRecords[indexPath.row]
       cell.backgroundColor = .clear
       cell.bind(place: place, records: [])
+      cell.onUpdateHeight = { [weak self] in
+        DispatchQueue.main.async {
+          collectionView.collectionViewLayout.invalidateLayout()
+        }
+      }
       
       viewModel.getPlaceRecordList(placeId: place.id)
       viewModel.onPlaceRecordsUpdated = { [weak cell] in
@@ -176,9 +181,12 @@ extension OverviewViewController: UICollectionViewDelegateFlowLayout {
     layout collectionViewLayout: UICollectionViewLayout,
     sizeForItemAt indexPath: IndexPath
   ) -> CGSize {
-    let cell = OverviewCollectionViewCell()
+    let place = viewModel.nearRecords[indexPath.row]
+    let tempCell = OverviewCollectionViewCell()
+    tempCell.bind(place: place, records: [])
+    
     let screenWidth = UIScreen.main.bounds.width
-    let cellHeight = cell.contentHeight
+    let cellHeight = tempCell.contentHeight
     
     return CGSize(
       width: screenWidth,

@@ -26,13 +26,15 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
   private var placeExhibitionCollectionView: UICollectionView?
   
   public var contentHeight: CGFloat {
-    var totalHeight: CGFloat = 0
-    totalHeight += 102.adaptiveHeight
-    if let collectionView = placeExhibitionCollectionView {
-      totalHeight += 261.adaptiveHeight
-    }
-    return totalHeight
+      var totalHeight: CGFloat = 0
+      totalHeight += 102.adaptiveHeight
+      if let collectionView = placeExhibitionCollectionView, !collectionView.isHidden {
+          totalHeight += 261.adaptiveHeight
+      }
+      return totalHeight
   }
+  
+  public var onUpdateHeight: (() -> Void)?
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -161,6 +163,7 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
       collectionViewLayout: layout
     )
     placeExhibitionCollectionView?.backgroundColor = .clear
+    placeExhibitionCollectionView?.showsHorizontalScrollIndicator = false
     placeExhibitionCollectionView?.register(
       ThumbnailCollectionViewCell.self,
       forCellWithReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier
@@ -186,11 +189,14 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
     } else {
         placeExhibitionCollectionView?.isHidden = false
     }
+    placeExhibitionCollectionView?.reloadData()
+    onUpdateHeight?()
   }
   
   public func updateRecords(records: [Feed]) {
     self.records = records
     placeExhibitionCollectionView?.reloadData()
+
   }
 }
 
@@ -199,7 +205,10 @@ extension OverviewCollectionViewCell: UICollectionViewDataSource, UICollectionVi
     _ collectionView: UICollectionView,
     numberOfItemsInSection section: Int
   ) -> Int {
-    return records.count
+    guard !(placeExhibitionCollectionView?.isHidden ?? true) else {
+      return 0
+    }
+    return min(records.count, 10)
   }
   
   public func collectionView(
@@ -211,7 +220,11 @@ extension OverviewCollectionViewCell: UICollectionViewDataSource, UICollectionVi
       for: indexPath
     ) as? ThumbnailCollectionViewCell else {
       fatalError("Failed to dequeue ThumbnailCollectionViewCell")
-  }
+    }
+    
+    guard indexPath.row < records.count else {
+      return cell
+    }
     let record = records[indexPath.row]
     cell.configure(feed: record)
     
