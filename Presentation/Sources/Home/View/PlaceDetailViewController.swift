@@ -55,27 +55,27 @@ final public class PlaceDetailViewController: UIViewController{
     view.backgroundColor = CommonAsset.viskitBlack.color
     title = "전시관"
     
-    placeNameLabel.do {
-      $0.text = viewModel.place.title
-      $0.textColor = CommonAsset.viskitWhite.color
-      $0.font = ViskitFont.title1.font
-      $0.numberOfLines = 1
-    }
-    
-    detailLocationLabel.do {
-      $0.text = viewModel.place.detailLocation
-      $0.textColor = CommonAsset.viskitGray03.color
-      $0.font = ViskitFont.body2.font
-      $0.numberOfLines = 1
-    }
-    
-    findRouteButton.do {
-      $0.backgroundColor = CommonAsset.viskitGray01.color
-      $0.setTitle("길찾기", for: .normal)
-      $0.setTitleColor(CommonAsset.viskitBlack.color, for: .normal)
-      $0.titleLabel?.font = ViskitFont.body2.font
-      $0.cornerRadius(8)
-    }
+//    placeNameLabel.do {
+//      $0.text = viewModel.place.title
+//      $0.textColor = CommonAsset.viskitWhite.color
+//      $0.font = ViskitFont.title1.font
+//      $0.numberOfLines = 1
+//    }
+//    
+//    detailLocationLabel.do {
+//      $0.text = viewModel.place.detailLocation
+//      $0.textColor = CommonAsset.viskitGray03.color
+//      $0.font = ViskitFont.body2.font
+//      $0.numberOfLines = 1
+//    }
+//    
+//    findRouteButton.do {
+//      $0.backgroundColor = CommonAsset.viskitGray01.color
+//      $0.setTitle("길찾기", for: .normal)
+//      $0.setTitleColor(CommonAsset.viskitBlack.color, for: .normal)
+//      $0.titleLabel?.font = ViskitFont.body2.font
+//      $0.cornerRadius(8)
+//    }
     
     reviewButton.do {
       $0.backgroundColor = CommonAsset.viskitGray01.color
@@ -225,7 +225,7 @@ extension PlaceDetailViewController: UICollectionViewDataSource {
   ) -> Int {
     switch collectionView {
     case exhibitionListView.exhibitionCollectionView:
-      return viewModel.place.placeInfoList.count
+      return 5
     case reviewFeedView.reviewFeedCollectionView:
       return 10
     default:
@@ -244,8 +244,8 @@ extension PlaceDetailViewController: UICollectionViewDataSource {
         ) as? ExhibitionCollectionViewCell else {
           fatalError("Could not dequeue ExhibitionCollectionViewCell")
         }
-        let placeInfo = viewModel.place.placeInfoList[indexPath.row]
-        cell.bind(with: placeInfo)
+//        let placeInfo = viewModel.place.placeInfoList[indexPath.row]
+//        cell.bind(with: placeInfo)
         cell.backgroundColor = CommonAsset.viskitGray10.color
         return cell
         
