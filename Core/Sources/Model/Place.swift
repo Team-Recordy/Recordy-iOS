@@ -8,27 +8,36 @@
 
 import Foundation
 
-public struct Place {
-  public let shortenLocation: String
-  public let detailLocation: String
-  public let title: String
-  public let reviewFeeds: [String]
-  public let placeInfoList: [PlaceInfo]
-  public let placeReview: PlaceReview
-  
-  public init(
-    shortenLocation: String,
-    detailLocation: String,
-    title: String,
-    reviewFeeds: [String],
-    placeInfoList: [PlaceInfo],
-    placeReview: PlaceReview
-  ) {
-    self.shortenLocation = shortenLocation
-    self.detailLocation = detailLocation
-    self.title = title
-    self.reviewFeeds = reviewFeeds
-    self.placeInfoList = placeInfoList
-    self.placeReview = placeReview
-  }
+public struct Place: Decodable {
+    public let id: Int
+    public let name: String
+    public let address: String
+    public let platformId: String
+    public let locationId: Int
+    public let longitude: Double
+    public let latitude: Double
+    public let exhibitionSize: Int
+    public let recordSize: Int
+
+    public init(
+        id: Int,
+        name: String,
+        address: String,
+        platformId: String,
+        locationId: Int,
+        longitude: Double,
+        latitude: Double,
+        exhibitionSize: Int,
+        recordSize: Int
+    ) {
+        self.id = id
+        self.name = name
+        self.address = address
+        self.platformId = platformId
+        self.locationId = locationId
+        self.longitude = longitude
+        self.latitude = latitude
+        self.exhibitionSize = exhibitionSize
+        self.recordSize = recordSize
+    }
 }

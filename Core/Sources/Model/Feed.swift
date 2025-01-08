@@ -10,41 +10,44 @@ import Foundation
 
 public struct Feed: Equatable {
   public let id: Int
-  public let userId: Int
-  public let location: String
-//  public let placeInfo: PlaceInfo
-  public let nickname: String
-  public let description: String
-  public var isBookmarked: Bool
-  public var bookmarkCount: Int
   public let videoLink: String
   public let thumbnailLink: String
+  public let description: String
+  public let exhibitionName: String
+  public let placeId: Int
+  public let placeName: String
+  public let uploaderId: Int
+  public let uploaderNickname: String
+  public var bookmarkCount: Int
   public let isMine: Bool
-
+  public var isBookmarked: Bool
+  
   public init(
     id: Int,
-    userId: Int,
-    location: String,
-//    placeInfo: PlaceInfo,
-    nickname: String,
-    description: String,
-    isBookmarked: Bool,
-    bookmarkCount: Int,
     videoLink: String,
     thumbnailLink: String,
-    isMine: Bool
+    description: String,
+    exhibitionName: String,
+    placeId: Int,
+    placeName: String,
+    uploaderId: Int,
+    uploaderNickname: String,
+    bookmarkCount: Int,
+    isMine: Bool,
+    isBookmarked: Bool
   ) {
     self.id = id
-    self.userId = userId
-    self.location = location
-//    self.placeInfo = placeInfo
-    self.nickname = nickname
-    self.description = description
-    self.isBookmarked = isBookmarked
-    self.bookmarkCount = bookmarkCount
     self.videoLink = videoLink
     self.thumbnailLink = thumbnailLink
+    self.description = description
+    self.exhibitionName = exhibitionName
+    self.placeId = placeId
+    self.placeName = placeName
+    self.uploaderId = uploaderId
+    self.uploaderNickname = uploaderNickname
+    self.bookmarkCount = bookmarkCount
     self.isMine = isMine
+    self.isBookmarked = isBookmarked
   }
 }
 

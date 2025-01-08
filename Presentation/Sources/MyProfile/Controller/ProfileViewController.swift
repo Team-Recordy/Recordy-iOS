@@ -190,15 +190,17 @@ public class ProfileViewController: UIViewController {
         let feeds = response.content.map { content in
           Feed(
             id: content.id,
-            userId: content.uploaderId,
-            location: content.placeName,
-            nickname: content.uploaderNickname,
-            description: content.content,
-            isBookmarked: content.isBookmarked,
-            bookmarkCount: content.bookmarkCount,
             videoLink: content.fileUrl.videoUrl,
             thumbnailLink: content.fileUrl.thumbnailUrl,
-            isMine: content.isMine
+            description: content.content,
+            exhibitionName: content.exhibitionName,
+            placeId: content.placeId,
+            placeName: content.placeName,
+            uploaderId: content.uploaderId,
+            uploaderNickname: content.uploaderNickname,
+            bookmarkCount: content.bookmarkCount,
+            isMine: content.isMine,
+            isBookmarked: content.isBookmarked
           )
         }
         DispatchQueue.main.async {
@@ -225,15 +227,17 @@ public class ProfileViewController: UIViewController {
         let feeds = response.content.map { content in
           Feed(
             id: content.id,
-            userId: content.uploaderId,
-            location: content.placeName,
-            nickname: content.uploaderNickname,
-            description: content.content,
-            isBookmarked: content.isBookmarked,
-            bookmarkCount: content.bookmarkCount,
             videoLink: content.fileUrl.videoUrl,
             thumbnailLink: content.fileUrl.thumbnailUrl,
-            isMine: content.isMine
+            description: content.content,
+            exhibitionName: content.exhibitionName,
+            placeId: content.placeId,
+            placeName: content.placeName,
+            uploaderId: content.uploaderId,
+            uploaderNickname: content.uploaderNickname,
+            bookmarkCount: content.bookmarkCount,
+            isMine: content.isMine,
+            isBookmarked: content.isBookmarked
           )
         }
         DispatchQueue.main.async {
@@ -246,15 +250,15 @@ public class ProfileViewController: UIViewController {
     }
   }
   
-  private func getPlaceFeature(from location: String) -> PlaceFeature {
-    if location.lowercased().contains("free") {
-      return .free
-    } else if location.lowercased().contains("closing soon") {
-      return .closingSoon
-    } else {
-      return .all
-    }
-  }
+//  private func getPlaceFeature(from location: String) -> PlaceFeature {
+//    if location.lowercased().contains("free") {
+//      return .free
+//    } else if location.lowercased().contains("closing soon") {
+//      return .closingSoon
+//    } else {
+//      return .all
+//    }
+//  }
   
   @objc private func showFollowers() {
     let followerViewController = FollowViewController(followType: .follower)
@@ -318,7 +322,7 @@ extension ProfileViewController: UserRecordDelegate {
     let videoFeedViewController = VideoFeedViewController(
       type: .userProfile,
       currentId: feed.id,
-      userId: feed.userId
+      userId: feed.uploaderId
     )
     self.navigationController?.pushViewController(videoFeedViewController, animated: true)
   }

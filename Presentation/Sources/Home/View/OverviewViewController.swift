@@ -16,9 +16,7 @@ final class OverviewViewController: UIViewController {
   
   private let viskitLogo = UIImageView()
   private let locationButton = UIButton()
-  private let overviewScrollView = UIScrollView()
-  private let contentView = UIView()
-  private let overviewStackView = UIStackView()
+  private var overviewCollectionView: UICollectionView?
   
   private var viewModel = OverviewViewModel()
   
@@ -34,28 +32,20 @@ final class OverviewViewController: UIViewController {
   public override func viewDidLoad() {
     super.viewDidLoad()
     
+    setOverviewCollectionView()
     setStyle()
     setUI()
     setAutolayout()
-    configureStackView()
     bind()
+    
+    viewModel.getNearPlaceList()
   }
   
   private func setStyle() {
     navigationController?.isNavigationBarHidden = true
     
-    overviewScrollView.do {
-      $0.translatesAutoresizingMaskIntoConstraints = false
-    }
-    
-    contentView.do {
-      $0.translatesAutoresizingMaskIntoConstraints = false
-    }
-    
-    overviewStackView.do {
-      $0.axis = .vertical
-      $0.spacing = 16
-      $0.translatesAutoresizingMaskIntoConstraints = false
+    overviewCollectionView!.do {
+      $0.backgroundColor = .clear
     }
     
     viskitLogo.do {
@@ -74,10 +64,8 @@ final class OverviewViewController: UIViewController {
     view.addSubviews(
       viskitLogo,
       locationButton,
-      overviewScrollView
+      overviewCollectionView!
     )
-    overviewScrollView.addSubview(contentView)
-    contentView.addSubview(overviewStackView)
   }
   
   private func setAutolayout() {
@@ -88,24 +76,12 @@ final class OverviewViewController: UIViewController {
       $0.height.equalTo(23.adaptiveHeight)
     }
     
-    overviewScrollView.snp.makeConstraints {
+    overviewCollectionView!.snp.makeConstraints {
       $0.top.equalTo(viskitLogo.snp.bottom).offset(31)
       $0.horizontalEdges.equalToSuperview()
       $0.bottom.equalTo(view.safeAreaLayoutGuide)
     }
     
-    contentView.snp.makeConstraints {
-      $0.edges.equalToSuperview()
-      $0.width.equalToSuperview()
-      $0.height.greaterThanOrEqualToSuperview().priority(.low)
-    }
-    
-    overviewStackView.snp.makeConstraints {
-      $0.leading.equalToSuperview().offset(16)
-      $0.trailing.equalToSuperview().offset(-16)
-      $0.verticalEdges.equalToSuperview()
-    }
-
     locationButton.snp.makeConstraints {
       $0.width.equalTo(24.adaptiveWidth)
       $0.height.equalTo(24.adaptiveHeight)
@@ -113,95 +89,92 @@ final class OverviewViewController: UIViewController {
       $0.trailing.equalToSuperview().offset(-20)
     }
   }
-  /// places 내의 객체 개수 만큼 button, collectionView 생성
-  private func configureStackView() {
-    overviewStackView.spacing = 16
-    
-    for (index, place) in (viewModel.overview.first?.places ?? []).enumerated() {
-      let placeDetailButton = PlaceDetailButton()
-      placeDetailButton.bind(place: place)
-      placeDetailButton.tag = index
-      placeDetailButton.addTarget(self, action: #selector(placeDetailButtonTapped), for: .touchUpInside)
-      
-      let placeInfoCollectionView = createCollectionView()
-      
-      overviewStackView.addArrangedSubview(placeDetailButton)
-      overviewStackView.addArrangedSubview(placeInfoCollectionView)
-      
-      placeDetailButton.snp.makeConstraints {
-        $0.height.equalTo(102.adaptiveHeight)
-      }
-      
-      placeInfoCollectionView.snp.makeConstraints {
-        $0.height.equalTo(240.adaptiveHeight)
-      }
-    }
-  }
   
-  private func createCollectionView() -> UICollectionView {
+  private func setOverviewCollectionView() {
     let layout = UICollectionViewFlowLayout()
-    layout.scrollDirection = .horizontal
-    layout.minimumLineSpacing = 12
-    layout.itemSize = CGSize(width: 135, height: 240)
+    
+    layout.minimumInteritemSpacing = 16
+    layout.scrollDirection = .vertical
     layout.sectionInset = UIEdgeInsets(
       top: 0,
       left: 0,
-      bottom: 0,
+      bottom: 16,
       right: 0
     )
     
-    let collectionView = UICollectionView(
-      frame: .zero,
-      collectionViewLayout: layout
+    overviewCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    overviewCollectionView?.showsVerticalScrollIndicator = false
+    overviewCollectionView?.dataSource = self
+    overviewCollectionView?.delegate = self
+    overviewCollectionView?.backgroundColor = .clear
+    overviewCollectionView?.register(
+      OverviewCollectionViewCell.self,
+      forCellWithReuseIdentifier: OverviewCollectionViewCell.cellIdentifier
     )
-    collectionView.showsHorizontalScrollIndicator = false
-    collectionView.register(
-      UICollectionViewCell.self,
-      forCellWithReuseIdentifier: "DefaultCell"
-    )
-    collectionView.delegate = self
-    collectionView.dataSource = self
-    
-    return collectionView
   }
   
   private func bind() {
+    viewModel.onNearPlacesUpdated = { [weak self] in
+      DispatchQueue.main.async {
+        self?.overviewCollectionView?.reloadData()
+      }
+    }
+    
     viewModel.onLocationStateChanged = { [weak self] state in
       self?.locationButton.setImage(state.buttonImage, for: .normal)
     }
   }
   
   @objc private func locationButtonTapped() {
-    viewModel.updateLocationState()
-  }
-  
-  @objc private func placeDetailButtonTapped(_ sender: PlaceDetailButton) {
-    guard let places = viewModel.overview.first?.places, places.indices.contains(sender.tag) else { return }
-      
-      let place = places[sender.tag]
-      let placeDetailVC = PlaceDetailViewController(place: place)
-      navigationController?.pushViewController(placeDetailVC, animated: true)
+    viewModel.toggleLocationState()
   }
 }
 
 @available(iOS 16.0, *)
-extension OverviewViewController: UICollectionViewDataSource {
+extension OverviewViewController: UICollectionViewDelegate, UICollectionViewDataSource {
   public func collectionView(
     _ collectionView: UICollectionView,
     numberOfItemsInSection section: Int
   ) -> Int {
-    return 10
+    return viewModel.nearPlaces.count
   }
-
+  
   public func collectionView(
     _ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    let cell = collectionView.dequeueReusableCell(
-      withReuseIdentifier: "DefaultCell",
-      for: indexPath
-    )
-    cell.backgroundColor = .lightGray
+      guard let cell = collectionView.dequeueReusableCell(
+        withReuseIdentifier: OverviewCollectionViewCell.cellIdentifier,
+        for: indexPath
+      ) as? OverviewCollectionViewCell else {
+        fatalError("Failed to dequeue OverviewCollectionViewCell")
+      }
+      let place = viewModel.nearPlaces[indexPath.row]
+      cell.backgroundColor = .clear
+      cell.bind(place: place, records: [], index: indexPath.row)
+      cell.onPlaceDetailButtonTapped = { [weak self] tag in
+        guard let self = self else { return }
+        self.handlePlaceDetailButtonTapped(index: tag)
+      }
+      cell.onUpdateHeight = {
+        DispatchQueue.main.async {
+          collectionView.collectionViewLayout.invalidateLayout()
+        }
+      }
+      
+      viewModel.getPlaceRecordList(placeId: place.id)
+      viewModel.onPlaceRecordsUpdated = { [weak self, weak cell] in
+        guard let self = self else { return }
+        DispatchQueue.main.async {
+          cell?.updateRecords(records: self.viewModel.placeRecords)
+        }
+      }
+      return cell
+    }
+  private func handlePlaceDetailButtonTapped(index: Int) {
+    guard index >= 0, index < viewModel.nearPlaces.count else { return }
     
-    return cell
+    let selectedPlace = viewModel.nearPlaces[index]
+    let placeDetailVC = PlaceDetailViewController(place: selectedPlace)
+    navigationController?.pushViewController(placeDetailVC, animated: true)
   }
 }
 
@@ -212,11 +185,16 @@ extension OverviewViewController: UICollectionViewDelegateFlowLayout {
     layout collectionViewLayout: UICollectionViewLayout,
     sizeForItemAt indexPath: IndexPath
   ) -> CGSize {
+    let place = viewModel.nearPlaces[indexPath.row]
+    let overViewCollectionViewCell = OverviewCollectionViewCell()
+    overViewCollectionViewCell.bind(place: place, records: [])
+    
+    let screenWidth = UIScreen.main.bounds.width
+    let cellHeight = overViewCollectionViewCell.contentHeight
+    
     return CGSize(
-      width: 135.adaptiveWidth,
-      height: 240.adaptiveHeight
+      width: screenWidth,
+      height: cellHeight
     )
   }
 }
-
-

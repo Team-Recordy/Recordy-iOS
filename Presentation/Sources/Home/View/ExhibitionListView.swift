@@ -16,11 +16,15 @@ import Core
 
 final class ExhibitionListView: UIView {
   
+  public var onAllFilterButtonTapped: (() -> Void)?
+  
   private var exhibitionCountLabel = UILabel()
   let allFilterButton = ChipKeyWordButton()
   let freeFilterButton = ChipKeyWordButton()
   let endSoonFilterButton = ChipKeyWordButton()
   var exhibitionCollectionView: UICollectionView?
+  
+  private var exhibitions: [Exhibition] = []
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -108,8 +112,9 @@ final class ExhibitionListView: UIView {
     }
   }
   
-  public func updateExhibitionList(place: Place) {
-    exhibitionCountLabel.text = "• \(place.placeInfoList.count) 개의 전시"
+  public func updateExhibitionList(with exhibitions: [Exhibition]) {
+    self.exhibitionCountLabel.text = "• \(exhibitions.count)개의 전시"
+    self.exhibitionCollectionView?.reloadData()
   }
   
   func setCollectionView() {
@@ -125,5 +130,9 @@ final class ExhibitionListView: UIView {
       ExhibitionCollectionViewCell.self,
       forCellWithReuseIdentifier: ExhibitionCollectionViewCell.cellIdentifier
     )
+  }
+  
+  @objc private func allFilterButtonTapped() {
+    onAllFilterButtonTapped?()
   }
 }

@@ -13,6 +13,8 @@ import Common
 @available(iOS 16.0, *)
 enum RecordyTabBarType: CaseIterable {
   case home
+  case search
+  case upload
   case video
   case profile
 
@@ -20,6 +22,10 @@ enum RecordyTabBarType: CaseIterable {
     switch self {
     case .home:
       CommonAsset.homeActive.image
+    case .search:
+      CommonAsset.searchActive.image
+    case .upload:
+      CommonAsset.uploadActive.image
     case .video:
       CommonAsset.videoActive.image
     case .profile:
@@ -30,6 +36,10 @@ enum RecordyTabBarType: CaseIterable {
     switch self {
     case .home:
       CommonAsset.homeInactive.image
+    case .search:
+      CommonAsset.searchInactive.image
+    case .upload:
+      CommonAsset.uploadInactive.image
     case .video:
       CommonAsset.videoInactive.image
     case .profile:
@@ -41,6 +51,10 @@ enum RecordyTabBarType: CaseIterable {
     switch self {
     case .home:
       BaseNavigationController(rootViewController: OverviewViewController(viewModel: OverviewViewModel()))
+    case .search:
+      BaseNavigationController(rootViewController: SearchViewController())
+    case .upload:
+      BaseNavigationController(rootViewController: UploadVideoViewController())
     case .video:
       BaseNavigationController(
         rootViewController: VideoFeedViewController(

@@ -48,8 +48,7 @@ class VideoFeedViewModel {
     self.userId = userId
     recordListCase()
   }
-
-  // 필요없는 famous, recent case 삭제함
+  
   func recordListCase(toggle: Bool? = nil) {
     guard !isFetching else { return }
     switch type {
@@ -116,22 +115,23 @@ class VideoFeedViewModel {
       }
     }
   }
-
-  // Content -> Feed 타입 변환 해줬음
+  
   private func processResponse<T: Codable>(response: T) {
     if let randomRecordListResponse = response as? DTO.GetRandomRecordListResponse {
       let feeds: [Feed] = randomRecordListResponse.content.map { content in
         Feed(
           id: content.id,
-          userId: content.uploaderId,
-          location: content.placeName,
-          nickname: content.uploaderNickname,
-          description: content.content,
-          isBookmarked: content.isBookmarked,
-          bookmarkCount: content.bookmarkCount,
           videoLink: content.fileUrl.videoUrl,
           thumbnailLink: content.fileUrl.thumbnailUrl,
-          isMine: content.isMine
+          description: content.content,
+          exhibitionName: content.exhibitionName,
+          placeId: content.placeId,
+          placeName: content.placeName,
+          uploaderId: content.uploaderId,
+          uploaderNickname: content.uploaderNickname,
+          bookmarkCount: content.bookmarkCount,
+          isMine: content.isMine,
+          isBookmarked: content.isBookmarked
         )
       }
       updateFeedList(feeds)
@@ -140,15 +140,17 @@ class VideoFeedViewModel {
       let feeds: [Feed] = followingRecordListResponse.content.map { content in
         Feed(
           id: content.id,
-          userId: content.uploaderId,
-          location: content.placeName,
-          nickname: content.uploaderNickname,
-          description: content.content,
-          isBookmarked: content.isBookmarked,
-          bookmarkCount: content.bookmarkCount,
           videoLink: content.fileUrl.videoUrl,
           thumbnailLink: content.fileUrl.thumbnailUrl,
-          isMine: content.isMine
+          description: content.content,
+          exhibitionName: content.exhibitionName,
+          placeId: content.placeId,
+          placeName: content.placeName,
+          uploaderId: content.uploaderId,
+          uploaderNickname: content.uploaderNickname,
+          bookmarkCount: content.bookmarkCount,
+          isMine: content.isMine,
+          isBookmarked: content.isBookmarked
         )
       }
       updateFeedList(feeds)
@@ -161,15 +163,17 @@ class VideoFeedViewModel {
         let feeds: [Feed] = userProfileRecordListResponse.content.map { content in
           Feed(
             id: content.id,
-            userId: content.uploaderId,
-            location: content.placeName,
-            nickname: content.uploaderNickname,
-            description: content.content,
-            isBookmarked: content.isBookmarked,
-            bookmarkCount: content.bookmarkCount,
             videoLink: content.fileUrl.videoUrl,
             thumbnailLink: content.fileUrl.thumbnailUrl,
-            isMine: content.isMine
+            description: content.content,
+            exhibitionName: content.exhibitionName,
+            placeId: content.placeId,
+            placeName: content.placeName,
+            uploaderId: content.uploaderId,
+            uploaderNickname: content.uploaderNickname,
+            bookmarkCount: content.bookmarkCount,
+            isMine: content.isMine,
+            isBookmarked: content.isBookmarked
           )
         }
         updateFeedList(feeds)
@@ -180,15 +184,17 @@ class VideoFeedViewModel {
           let newFeeds: [Feed] = Array(bookmarkedRecordListResponse.content[index...]).map { content in
             Feed(
               id: content.id,
-              userId: content.uploaderId,
-              location: content.placeName,
-              nickname: content.uploaderNickname,
-              description: content.content,
-              isBookmarked: content.isBookmarked,
-              bookmarkCount: content.bookmarkCount,
               videoLink: content.fileUrl.videoUrl,
               thumbnailLink: content.fileUrl.thumbnailUrl,
-              isMine: content.isMine
+              description: content.content,
+              exhibitionName: content.exhibitionName,
+              placeId: content.placeId,
+              placeName: content.placeName,
+              uploaderId: content.uploaderId,
+              uploaderNickname: content.uploaderNickname,
+              bookmarkCount: content.bookmarkCount,
+              isMine: content.isMine,
+              isBookmarked: content.isBookmarked
             )
           }
           self.hasNext = bookmarkedRecordListResponse.hasNext
@@ -204,19 +210,36 @@ class VideoFeedViewModel {
       self.feedList += cachedFeeds
       self.onFeedListUpdate?(cachedFeeds.count)
     }
-  }
-
-  func cacheVideos(
-    feeds: [Feed],
-    completion: @escaping ([Feed]) -> Void
-  ) {
-    let dispatchGroup = DispatchGroup()
-    var cachedFeeds: [Feed] = []
-
-    for feed in feeds {
-      dispatchGroup.enter()
-      VideoCacheManager.shared.downloadAndCacheURL(url: URL(string: feed.videoLink)!) { url in
-        guard let cachedUrl = url else {
+    
+    func cacheVideos(
+      feeds: [Feed],
+      completion: @escaping ([Feed]) -> Void
+    ) {
+      let dispatchGroup = DispatchGroup()
+      var cachedFeeds: [Feed] = []
+      
+      for feed in feeds {
+        dispatchGroup.enter()
+        VideoCacheManager.shared.downloadAndCacheURL(url: URL(string: feed.videoLink)!) { url in
+          guard let cachedUrl = url else {
+            dispatchGroup.leave()
+            return
+          }
+          let cachedFeed = Feed(
+            id: feed.id,
+            videoLink: feed.videoLink,
+            thumbnailLink: feed.thumbnailLink,
+            description: feed.description,
+            exhibitionName: feed.exhibitionName,
+            placeId: feed.placeId,
+            placeName: feed.placeName,
+            uploaderId: feed.uploaderId,
+            uploaderNickname: feed.uploaderNickname,
+            bookmarkCount: feed.bookmarkCount,
+            isMine: feed.isMine,
+            isBookmarked: feed.isBookmarked
+          )
+          cachedFeeds.append(cachedFeed)
           dispatchGroup.leave()
           return
         }
