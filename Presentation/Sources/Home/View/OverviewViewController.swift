@@ -114,7 +114,7 @@ final class OverviewViewController: UIViewController {
   }
   
   private func bind() {
-    viewModel.onNearRecordsUpdated = { [weak self] in
+    viewModel.onNearPlacesUpdated = { [weak self] in
       DispatchQueue.main.async {
         self?.overviewCollectionView?.reloadData()
       }
@@ -128,14 +128,6 @@ final class OverviewViewController: UIViewController {
   @objc private func locationButtonTapped() {
     viewModel.toggleLocationState()
   }
-  
-  //  @objc private func placeDetailButtonTapped(_ sender: PlaceDetailButton) {
-  //    guard let places = viewModel.nearRecords, places.indices.contains(sender.tag) else { return }
-  //
-  //      let place = places[sender.tag]
-  //      let placeDetailVC = PlaceDetailViewController(place: place)
-  //      navigationController?.pushViewController(placeDetailVC, animated: true)
-  //  }
 }
 
 @available(iOS 16.0, *)
@@ -144,7 +136,7 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
     _ collectionView: UICollectionView,
     numberOfItemsInSection section: Int
   ) -> Int {
-    return viewModel.nearRecords.count
+    return viewModel.nearPlaces.count
   }
   
   public func collectionView(
@@ -155,23 +147,35 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
       ) as? OverviewCollectionViewCell else {
         fatalError("Failed to dequeue OverviewCollectionViewCell")
       }
-      let place = viewModel.nearRecords[indexPath.row]
+      let place = viewModel.nearPlaces[indexPath.row]
       cell.backgroundColor = .clear
-      cell.bind(place: place, records: [])
-      cell.onUpdateHeight = { [weak self] in
+      cell.bind(place: place, records: [], index: indexPath.row)
+      cell.onPlaceDetailButtonTapped = { [weak self] tag in
+        guard let self = self else { return }
+        self.handlePlaceDetailButtonTapped(index: tag)
+      }
+      cell.onUpdateHeight = {
         DispatchQueue.main.async {
           collectionView.collectionViewLayout.invalidateLayout()
         }
       }
       
       viewModel.getPlaceRecordList(placeId: place.id)
-      viewModel.onPlaceRecordsUpdated = { [weak cell] in
+      viewModel.onPlaceRecordsUpdated = { [weak self, weak cell] in
+        guard let self = self else { return }
         DispatchQueue.main.async {
           cell?.updateRecords(records: self.viewModel.placeRecords)
         }
       }
       return cell
     }
+  private func handlePlaceDetailButtonTapped(index: Int) {
+    guard index >= 0, index < viewModel.nearPlaces.count else { return }
+    
+    let selectedPlace = viewModel.nearPlaces[index]
+    let placeDetailVC = PlaceDetailViewController(place: selectedPlace)
+    navigationController?.pushViewController(placeDetailVC, animated: true)
+  }
 }
 
 @available(iOS 16.0, *)
@@ -181,12 +185,12 @@ extension OverviewViewController: UICollectionViewDelegateFlowLayout {
     layout collectionViewLayout: UICollectionViewLayout,
     sizeForItemAt indexPath: IndexPath
   ) -> CGSize {
-    let place = viewModel.nearRecords[indexPath.row]
-    let tempCell = OverviewCollectionViewCell()
-    tempCell.bind(place: place, records: [])
+    let place = viewModel.nearPlaces[indexPath.row]
+    let overViewCollectionViewCell = OverviewCollectionViewCell()
+    overViewCollectionViewCell.bind(place: place, records: [])
     
     let screenWidth = UIScreen.main.bounds.width
-    let cellHeight = tempCell.contentHeight
+    let cellHeight = overViewCollectionViewCell.contentHeight
     
     return CGSize(
       width: screenWidth,

@@ -31,28 +31,27 @@ public enum LocationState {
 }
 
 public class OverviewViewModel {
-  
-  var nearRecords: [Place] = []
+  var nearPlaces: [Place] = []
   var placeRecords: [Feed] = []
   
   var hasNext = true
   var isFetching = false
   
-  var onNearRecordsUpdated: (() -> Void)?
+  var onNearPlacesUpdated: (() -> Void)?
   var onPlaceRecordsUpdated: (() -> Void)?
   var onLocationStateChanged: ((LocationState) -> Void)?
   
-  func recordListCase(type: RecordType) {
-    guard !isFetching else { return }
-    guard hasNext else { return }
-    
-    switch type {
-    case .near:
-      getNearPlaceList()
-    case .exhibition(let placeId):
-      getPlaceRecordList(placeId: placeId)
-    }
-  }
+//  func recordListCase(type: RecordType) {
+//    guard !isFetching else { return }
+//    guard hasNext else { return }
+//    
+//    switch type {
+//    case .near:
+//      getNearPlaceList()
+//    case .exhibition(let placeId):
+//      getPlaceRecordList(placeId: placeId)
+//    }
+//  }
   
   func getNearPlaceList() {
     isFetching = true
@@ -71,7 +70,7 @@ public class OverviewViewModel {
       switch result {
       case .success(let response):
         self.hasNext = response.hasNext
-        self.nearRecords.append(contentsOf: response.content.map { place in
+        self.nearPlaces.append(contentsOf: response.content.map { place in
           Place(
             id: place.id,
             name: place.name,
@@ -84,7 +83,7 @@ public class OverviewViewModel {
             recordSize: place.recordSize
           )
         })
-        self.onNearRecordsUpdated?()
+        self.onNearPlacesUpdated?()
         
       case .failure(let error):
         print("Error fetching near places: \(error)")

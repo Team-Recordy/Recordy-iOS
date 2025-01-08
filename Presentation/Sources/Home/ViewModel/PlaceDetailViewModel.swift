@@ -21,10 +21,21 @@ public enum PlaceDetailControlType: String {
 }
 
 public class PlaceDetailViewModel {
-  public let place: Place
-  
   var onControlTypeChanged: ((PlaceDetailControlType) -> Void)?
   var onFilterChanged: ((ChipState, ChipState, ChipState) -> Void)?
+  var onExhibitionsUpdated: (() -> Void)?
+  
+  var selectedPlace: [Place] = []
+  var exhibitions: [Exhibition] = [] {
+    didSet {
+      onExhibitionsUpdated?()
+    }
+  }
+  var freeExhibitions: [Exhibition] = []
+  var ongoingExhibitions: [Exhibition] = []
+  
+  var hasNext = true
+  var isFetching = false
   
   private(set) var currentControlType: PlaceDetailControlType = .exhibitionList {
     didSet {
@@ -37,8 +48,33 @@ public class PlaceDetailViewModel {
   private(set) var endSoonFilterState: ChipState = .inactive
   
   public init(place: Place) {
-    self.place = place
+    selectedPlace.append(place)
     initFilterState()
+  }
+  
+  func getExhibitionList(placeId: Int) {
+    isFetching = true
+    let apiProvider = APIProvider<APITarget.Exhibitions>()
+    let request = DTO.GetExhibitionListRequest(
+      placeId: placeId
+    )
+    
+    apiProvider.requestResponsable(.getExhibitionList(request), [DTO.GetExhibitionListResponse].self) { [weak self] result in
+      guard let self = self else { return }
+      switch result {
+      case .success(let response):
+        self.exhibitions = response.map { exhibition in
+          Exhibition(
+            id: exhibition.id,
+            name: exhibition.name,
+            startDate: exhibition.startDate,
+            isFree: exhibition.isFree
+          )
+        }
+      case .failure(let error):
+        print("Error fetching exhibitions: \(error)")
+      }
+    }
   }
   
   func updateControlType(to type: PlaceDetailControlType) {

@@ -46,36 +46,36 @@ final public class PlaceDetailViewController: UIViewController{
     setUI()
     setAutolayout()
     setDelegate()
-    configureView()
     bind()
     setTarget()
+
   }
   
   private func setStyle() {
     view.backgroundColor = CommonAsset.viskitBlack.color
     title = "전시관"
     
-//    placeNameLabel.do {
-//      $0.text = viewModel.place.title
-//      $0.textColor = CommonAsset.viskitWhite.color
-//      $0.font = ViskitFont.title1.font
-//      $0.numberOfLines = 1
-//    }
-//    
-//    detailLocationLabel.do {
-//      $0.text = viewModel.place.detailLocation
-//      $0.textColor = CommonAsset.viskitGray03.color
-//      $0.font = ViskitFont.body2.font
-//      $0.numberOfLines = 1
-//    }
-//    
-//    findRouteButton.do {
-//      $0.backgroundColor = CommonAsset.viskitGray01.color
-//      $0.setTitle("길찾기", for: .normal)
-//      $0.setTitleColor(CommonAsset.viskitBlack.color, for: .normal)
-//      $0.titleLabel?.font = ViskitFont.body2.font
-//      $0.cornerRadius(8)
-//    }
+    placeNameLabel.do {
+      $0.text = viewModel.selectedPlace.first?.name ?? "전시회"
+      $0.textColor = CommonAsset.viskitWhite.color
+      $0.font = ViskitFont.title1.font
+      $0.numberOfLines = 1
+    }
+    
+    detailLocationLabel.do {
+      $0.text = viewModel.selectedPlace.first?.address ?? "주소"
+      $0.textColor = CommonAsset.viskitGray03.color
+      $0.font = ViskitFont.body2.font
+      $0.numberOfLines = 1
+    }
+    
+    findRouteButton.do {
+      $0.backgroundColor = CommonAsset.viskitGray01.color
+      $0.setTitle("길찾기", for: .normal)
+      $0.setTitleColor(CommonAsset.viskitBlack.color, for: .normal)
+      $0.titleLabel?.font = ViskitFont.body2.font
+      $0.cornerRadius(8)
+    }
     
     reviewButton.do {
       $0.backgroundColor = CommonAsset.viskitGray01.color
@@ -165,7 +165,7 @@ final public class PlaceDetailViewController: UIViewController{
     exhibitionListView.freeFilterButton.tag = FilterType.free.rawValue
     exhibitionListView.endSoonFilterButton.tag = FilterType.endSoon.rawValue
     
-    exhibitionListView.allFilterButton.addTarget(self, action: #selector(filterButtonTapped(_:)), for: .touchUpInside)
+    exhibitionListView.allFilterButton.addTarget(self, action: #selector(onAllFilterButtonTapped), for: .touchUpInside)
     exhibitionListView.freeFilterButton.addTarget(self, action: #selector(filterButtonTapped(_:)), for: .touchUpInside)
     exhibitionListView.endSoonFilterButton.addTarget(self, action: #selector(filterButtonTapped(_:)), for: .touchUpInside)
   }
@@ -175,8 +175,8 @@ final public class PlaceDetailViewController: UIViewController{
       viewModel.updateFilterState(selected: filterType)
   }
   
-  private func configureView() {
-    exhibitionListView.updateExhibitionList(place: viewModel.place)
+  @objc private func onAllFilterButtonTapped() {
+    viewModel.getExhibitionList(placeId: viewModel.selectedPlace.first?.id ?? 0)
   }
   
   private func bind() {
@@ -191,6 +191,12 @@ final public class PlaceDetailViewController: UIViewController{
         freeState: freeState,
         endSoonState: endSoonState
       )
+    }
+    
+    viewModel.onExhibitionsUpdated = { [weak self] in
+      DispatchQueue.main.async {
+        self?.exhibitionListView.updateExhibitionList(with: self?.viewModel.exhibitions ?? [])
+      }
     }
   }
   
@@ -244,8 +250,6 @@ extension PlaceDetailViewController: UICollectionViewDataSource {
         ) as? ExhibitionCollectionViewCell else {
           fatalError("Could not dequeue ExhibitionCollectionViewCell")
         }
-//        let placeInfo = viewModel.place.placeInfoList[indexPath.row]
-//        cell.bind(with: placeInfo)
         cell.backgroundColor = CommonAsset.viskitGray10.color
         return cell
         

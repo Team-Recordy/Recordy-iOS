@@ -64,11 +64,11 @@ public class ExhibitionCollectionViewCell: UICollectionViewCell {
       $0.leading.equalToSuperview().offset(16)
     }
   }
-//  
-//  public func bind(with placeInfo: PlaceInfo) {
-//    exhibitionNameLabel.text = placeInfo.title
-//    exhibitionDateLabel.text = placeInfo.duration
-//  }
+  
+  public func configure(exhibition: Exhibition) {
+    exhibitionNameLabel.text = exhibition.name
+    exhibitionDateLabel.text = exhibition.startDate
+  }
 }
 
 

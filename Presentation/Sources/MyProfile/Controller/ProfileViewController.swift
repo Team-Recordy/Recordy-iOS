@@ -250,15 +250,15 @@ public class ProfileViewController: UIViewController {
     }
   }
   
-  private func getPlaceFeature(from location: String) -> PlaceFeature {
-    if location.lowercased().contains("free") {
-      return .free
-    } else if location.lowercased().contains("closing soon") {
-      return .closingSoon
-    } else {
-      return .all
-    }
-  }
+//  private func getPlaceFeature(from location: String) -> PlaceFeature {
+//    if location.lowercased().contains("free") {
+//      return .free
+//    } else if location.lowercased().contains("closing soon") {
+//      return .closingSoon
+//    } else {
+//      return .all
+//    }
+//  }
   
   @objc private func showFollowers() {
     let followerViewController = FollowViewController(followType: .follower)

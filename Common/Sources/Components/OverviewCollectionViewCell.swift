@@ -17,6 +17,8 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
   public var place: Place?
   private var records: [Feed] = []
   
+  public var onPlaceDetailButtonTapped: ((Int) -> Void)?
+  
   public let locationLabel = UILabel()
   public let placeNameLabel = UILabel()
   public let eventCountLabelYellow = UILabel()
@@ -55,6 +57,7 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
     placeDetailButton.do {
       $0.backgroundColor = CommonAsset.viskitGray10.color
       $0.cornerRadius(8)
+      $0.addTarget(self, action: #selector(placeDetailButtonTapped), for: .touchUpInside)
     }
     
     placeExhibitionCollectionView!.do {
@@ -172,7 +175,7 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
     placeExhibitionCollectionView?.dataSource = self
   }
   
-  public func bind(place: Place, records: [Feed]) {
+  public func bind(place: Place, records: [Feed], index: Int? = nil) {
     self.place = place
     self.records = records
     
@@ -182,6 +185,7 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
     locationLabel.text = formattedAddress
     placeNameLabel.text = place.name
     eventCountLabelYellow.text = "\(place.exhibitionSize)개"
+    placeDetailButton.tag = index ?? -1
     
     /// recordSize가 0이면 placeExhibitionCollectionView 숨기기
     if place.recordSize == 0 {
@@ -196,7 +200,10 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
   public func updateRecords(records: [Feed]) {
     self.records = records
     placeExhibitionCollectionView?.reloadData()
-
+  }
+  
+  @objc private func placeDetailButtonTapped(_ sender: UIButton) {
+    onPlaceDetailButtonTapped?(sender.tag)
   }
 }
 
