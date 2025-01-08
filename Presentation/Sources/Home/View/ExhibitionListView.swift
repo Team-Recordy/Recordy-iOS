@@ -14,6 +14,7 @@ import Then
 import Common
 import Core
 
+@available(iOS 16.0, *)
 final class ExhibitionListView: UIView {
   
   public var onAllFilterButtonTapped: (() -> Void)?
@@ -29,8 +30,8 @@ final class ExhibitionListView: UIView {
   public override init(frame: CGRect) {
     super.init(frame: frame)
     
-    setStyle()
     setCollectionView()
+    setStyle()
     setUI()
     setAutolayout()
   }
@@ -113,6 +114,8 @@ final class ExhibitionListView: UIView {
   }
   
   public func updateExhibitionList(with exhibitions: [Exhibition]) {
+    
+    self.exhibitions = exhibitions
     self.exhibitionCountLabel.text = "• \(exhibitions.count)개의 전시"
     self.exhibitionCollectionView?.reloadData()
   }
@@ -120,7 +123,7 @@ final class ExhibitionListView: UIView {
   func setCollectionView() {
     let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .vertical
-    layout.minimumLineSpacing = 0
+    layout.minimumLineSpacing = 12
     layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     
     exhibitionCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -130,9 +133,55 @@ final class ExhibitionListView: UIView {
       ExhibitionCollectionViewCell.self,
       forCellWithReuseIdentifier: ExhibitionCollectionViewCell.cellIdentifier
     )
+    
+    exhibitionCollectionView?.dataSource = self
+    exhibitionCollectionView?.delegate = self
   }
   
   @objc private func allFilterButtonTapped() {
     onAllFilterButtonTapped?()
+  }
+}
+
+@available(iOS 16.0, *)
+extension ExhibitionListView: UICollectionViewDelegate, UICollectionViewDataSource {
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    numberOfItemsInSection section: Int
+  ) -> Int {
+    let exhibitions = exhibitions
+    return exhibitions.count
+  }
+  
+  public func collectionView(
+    _ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+      guard let cell = collectionView.dequeueReusableCell(
+        withReuseIdentifier: ExhibitionCollectionViewCell.cellIdentifier,
+        for: indexPath
+      ) as? ExhibitionCollectionViewCell else {
+        fatalError("Failed to dequeue OverviewCollectionViewCell")
+      }
+      let exhibition = exhibitions[indexPath.row]
+      
+      cell.backgroundColor = CommonAsset.viskitGray10.color
+      cell.bind(exhibition: exhibition)
+      
+      return cell
+    }
+}
+
+@available(iOS 16.0, *)
+extension ExhibitionListView: UICollectionViewDelegateFlowLayout {
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    sizeForItemAt indexPath: IndexPath
+  ) -> CGSize {
+    let width = collectionView.frame.width
+    guard let cell = collectionView.cellForItem(at: indexPath) as? ExhibitionCollectionViewCell else {
+        return CGSize(width: width, height: 100)
+    }
+    let calculatedHeight = cell.calculateHeight(width: width)
+    return CGSize(width: width, height: calculatedHeight)
   }
 }

@@ -48,7 +48,14 @@ final public class PlaceDetailViewController: UIViewController{
     setDelegate()
     bind()
     setTarget()
-
+  
+    viewModel.getExhibitionList(placeId: viewModel.selectedPlace.first?.id ?? 0)
+    
+    updateFilterButtonState(
+      allState: viewModel.allFilterState,
+      freeState: viewModel.freeFilterState,
+      endSoonState: viewModel.endSoonFilterState
+    )
   }
   
   private func setStyle() {
@@ -154,10 +161,6 @@ final public class PlaceDetailViewController: UIViewController{
   
   private func setDelegate() {
     segmentedControl.delegate = self
-    exhibitionListView.exhibitionCollectionView?.delegate = self
-    reviewFeedView.reviewFeedCollectionView?.delegate = self
-    exhibitionListView.exhibitionCollectionView?.dataSource = self
-    reviewFeedView.reviewFeedCollectionView?.dataSource = self
   }
   
   private func setTarget() {
@@ -166,18 +169,25 @@ final public class PlaceDetailViewController: UIViewController{
     exhibitionListView.endSoonFilterButton.tag = FilterType.endSoon.rawValue
     
     exhibitionListView.allFilterButton.addTarget(self, action: #selector(onAllFilterButtonTapped), for: .touchUpInside)
-    exhibitionListView.freeFilterButton.addTarget(self, action: #selector(filterButtonTapped(_:)), for: .touchUpInside)
-    exhibitionListView.endSoonFilterButton.addTarget(self, action: #selector(filterButtonTapped(_:)), for: .touchUpInside)
+    exhibitionListView.freeFilterButton.addTarget(self, action: #selector(onFreeFilterButtonTapped(_:)), for: .touchUpInside)
+    exhibitionListView.endSoonFilterButton.addTarget(self, action: #selector(onEndSoonFilterButtonTapped(_:)), for: .touchUpInside)
   }
   
-  @objc private func filterButtonTapped(_ sender: UIButton) {
-      guard let filterType = FilterType(rawValue: sender.tag) else { return }
-      viewModel.updateFilterState(selected: filterType)
+  @objc private func onAllFilterButtonTapped(_ sender: UIButton) {
+    guard let filterType = FilterType(rawValue: sender.tag) else { return }
+    viewModel.updateFilterState(selected: filterType)
   }
   
-  @objc private func onAllFilterButtonTapped() {
-    viewModel.getExhibitionList(placeId: viewModel.selectedPlace.first?.id ?? 0)
+  @objc private func onFreeFilterButtonTapped(_ sender: UIButton) {
+    guard let filterType = FilterType(rawValue: sender.tag) else { return }
+    viewModel.updateFilterState(selected: filterType)
   }
+
+  @objc private func onEndSoonFilterButtonTapped(_ sender: UIButton) {
+    guard let filterType = FilterType(rawValue: sender.tag) else { return }
+    viewModel.updateFilterState(selected: filterType)
+  }
+
   
   private func bind() {
     viewModel.onControlTypeChanged = { [weak self] type in
@@ -186,7 +196,7 @@ final public class PlaceDetailViewController: UIViewController{
     viewModel.onControlTypeChanged?(viewModel.currentControlType)
     
     viewModel.onFilterChanged = { [weak self] allState, freeState, endSoonState in
-      self?.updateFilterButtonStates(
+      self?.updateFilterButtonState(
         allState: allState,
         freeState: freeState,
         endSoonState: endSoonState
@@ -195,7 +205,7 @@ final public class PlaceDetailViewController: UIViewController{
     
     viewModel.onExhibitionsUpdated = { [weak self] in
       DispatchQueue.main.async {
-        self?.exhibitionListView.updateExhibitionList(with: self?.viewModel.exhibitions ?? [])
+        self?.exhibitionListView.updateExhibitionList(with: self?.viewModel.filteredExhibitions ?? [])
       }
     }
   }
@@ -205,7 +215,7 @@ final public class PlaceDetailViewController: UIViewController{
     reviewFeedView.isHidden = type != .reviewFeed
   }
   
-  private func updateFilterButtonStates(
+  private func updateFilterButtonState(
     allState: ChipState,
     freeState: ChipState,
     endSoonState: ChipState
@@ -220,88 +230,5 @@ final public class PlaceDetailViewController: UIViewController{
 extension PlaceDetailViewController: PlaceDetailControlTypeDelegate {
   public func sendControlType(_ type: PlaceDetailControlType) {
     viewModel.updateControlType(to: type)
-  }
-}
-
-@available(iOS 16.0, *)
-extension PlaceDetailViewController: UICollectionViewDataSource {
-  public func collectionView(
-    _ collectionView: UICollectionView,
-    numberOfItemsInSection section: Int
-  ) -> Int {
-    switch collectionView {
-    case exhibitionListView.exhibitionCollectionView:
-      return 5
-    case reviewFeedView.reviewFeedCollectionView:
-      return 10
-    default:
-      return 0
-    }
-  }
-  
-  public func collectionView(
-    _ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-      let cell: UICollectionViewCell
-      switch collectionView {
-      case exhibitionListView.exhibitionCollectionView:
-        guard let cell = collectionView.dequeueReusableCell(
-          withReuseIdentifier: ExhibitionCollectionViewCell.cellIdentifier,
-          for: indexPath
-        ) as? ExhibitionCollectionViewCell else {
-          fatalError("Could not dequeue ExhibitionCollectionViewCell")
-        }
-        cell.backgroundColor = CommonAsset.viskitGray10.color
-        return cell
-        
-      case reviewFeedView.reviewFeedCollectionView:
-        cell = collectionView.dequeueReusableCell(
-          withReuseIdentifier: "DefaultCell",
-          for: indexPath
-        )
-        cell.backgroundColor = .lightGray
-        return cell
-        
-      default:
-        fatalError("Unexpected collection view")
-      }
-    }
-}
-
-@available(iOS 16.0, *)
-extension PlaceDetailViewController: UICollectionViewDelegateFlowLayout {
-  public func collectionView(
-    _ collectionView: UICollectionView,
-    layout collectionViewLayout: UICollectionViewLayout,
-    sizeForItemAt indexPath: IndexPath
-  ) -> CGSize {
-    switch collectionView {
-      // TODO: 두줄일 때 height 늘어나게 설정
-    case exhibitionListView.exhibitionCollectionView:
-      return CGSize(width: 335.adaptiveWidth, height: 74.adaptiveHeight)
-      
-    case reviewFeedView.reviewFeedCollectionView:
-      return CGSize(width: 162.adaptiveWidth, height: 288.adaptiveHeight)
-      
-    default:
-      return CGSize.zero
-    }
-  }
-  
-  public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-    switch collectionView {
-    case exhibitionListView.exhibitionCollectionView:
-      return 12.adaptiveHeight
-    case reviewFeedView.reviewFeedCollectionView:
-      return 16.adaptiveHeight
-    default:
-      return 0
-    }
-  }
-  
-  public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-    if collectionView == reviewFeedView.reviewFeedCollectionView {
-      return 11.adaptiveWidth
-    }
-    return 0
   }
 }

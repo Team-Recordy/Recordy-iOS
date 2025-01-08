@@ -9,7 +9,7 @@
 import Foundation
 
 extension DTO {
-  public struct GetExhibitionListRequest: BaseRequest {
+  public struct GetExhibitionListRequest: Codable {
     
     public let placeId: Int
     
