@@ -17,12 +17,17 @@ class ReportWithCopyLinkViewController: UIViewController {
 
   private lazy var copyLinkButton = UIButton()
   private lazy var reportButton = UIButton()
+  weak var delegate: ReportWithCopyLinkDelegate?
 
   override func viewDidLoad() {
     super.viewDidLoad()
     setStyle()
     setUI()
     setAutolayout()
+  }
+
+  override func viewWillAppear(_ animated: Bool) {
+    delegate?.cancel()
   }
 
   private func setStyle() {
@@ -77,7 +82,7 @@ class ReportWithCopyLinkViewController: UIViewController {
       $0.contentHorizontalAlignment = .left
       $0.addTarget(
           self,
-          action: #selector(copyLinkButtonTapped),
+          action: #selector(reportButtonTapped),
           for: .touchUpInside
         )
     }
@@ -105,12 +110,17 @@ class ReportWithCopyLinkViewController: UIViewController {
 
   @objc
   private func copyLinkButtonTapped() {
-
+    delegate?.copy()
   }
 
   @objc
   private func reportButtonTapped() {
-
+    delegate?.didTapReport()
+    let nextViewController = ReportViewController()
+    navigationController?.pushViewController(
+        nextViewController,
+        animated: true
+    )
   }
 }
 

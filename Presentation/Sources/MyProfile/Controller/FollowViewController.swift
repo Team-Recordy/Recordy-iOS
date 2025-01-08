@@ -94,6 +94,7 @@ public class FollowViewController: UIViewController {
   }
 }
 
+@available(iOS 16.0, *)
 extension FollowViewController: UITableViewDataSource, UITableViewDelegate {
   
   public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

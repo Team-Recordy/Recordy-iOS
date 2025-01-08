@@ -20,11 +20,11 @@ public class BaseNavigationController: UINavigationController {
     appearance.backgroundColor = .clear
     appearance.shadowColor = .clear
     appearance.titleTextAttributes = [
-        NSAttributedString.Key.foregroundColor: CommonAsset.recordyWhite.color,
-        NSAttributedString.Key.font: RecordyFont.title3.font
+      NSAttributedString.Key.foregroundColor: CommonAsset.viskitGray01.color,
+      NSAttributedString.Key.font: ViskitFont.title3.font
     ]
     appearance.buttonAppearance.normal.titleTextAttributes = [
-        NSAttributedString.Key.foregroundColor: CommonAsset.recordyWhite.color
+      NSAttributedString.Key.foregroundColor: CommonAsset.viskitGray01.color
     ]
 
     navigationBar.standardAppearance = appearance
@@ -32,5 +32,11 @@ public class BaseNavigationController: UINavigationController {
 
     navigationBar.tintColor = .white
     navigationItem.backButtonDisplayMode = .minimal
+    navigationBar.topItem?.backBarButtonItem = UIBarButtonItem(
+      title: "",
+      style: .plain,
+      target: nil,
+      action: nil
+    )
   }
 }

@@ -106,14 +106,14 @@ class FeedView: UIView {
         trailing: 10
       )
       config.imagePlacement = .trailing
-      var container = AttributeContainer()
-      container.font = RecordyFont.caption1.font
-      container.foregroundColor = CommonAsset.viskitWhite.color
-      config.attributedTitle = AttributedString(
-        title,
-        attributes: container
-      )
-      $0.configuration = config
+//      var container = AttributeContainer()
+//      container.font = RecordyFont.caption1.font
+//      container.foregroundColor = CommonAsset.viskitWhite.color
+//      config.attributedTitle = AttributedString(
+//        title,
+//        attributes: container
+//      )
+//      $0.configuration = config
 
       $0.layer.backgroundColor = (UIColor.black.cgColor).copy(alpha: 0.5)
       $0.layoutMargins = UIEdgeInsets(

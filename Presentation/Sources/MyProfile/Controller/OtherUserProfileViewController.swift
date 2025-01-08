@@ -15,6 +15,7 @@ import SnapKit
 import Then
 import Kingfisher
 
+@available(iOS 16.0, *)
 public class OtherUserProfileViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
 
   private let profileImage = UIImageView()
