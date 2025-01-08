@@ -10,7 +10,7 @@ import Foundation
 
 import Core
 
-enum VideoFeedType {
+public enum VideoFeedType {
   case all
   case following
   case famous
@@ -18,6 +18,7 @@ enum VideoFeedType {
   case userProfile
   case myProfile
   case bookmarked
+  case test
 }
 
 class VideoFeedViewModel {
@@ -87,6 +88,9 @@ class VideoFeedViewModel {
         ),
         response: DTO.GetBookmarkedListResponse.self
       )
+    case .test:
+      self.feedList = Feed.mockData
+      self.onFeedListUpdate?(self.feedList.count)
     default: return
     }
   }
@@ -237,45 +241,28 @@ class VideoFeedViewModel {
         completion(cachedFeeds)
       }
     }
-    
-    //  func postIsFeedWatched(feed: Feed) {
-    //    let request = DTO.IsRecordWatchedRequest(recordId: feed.id)
-    //    apiProvider.justRequest(.isRecordWatched(request)) { result in
-    //      switch result {
-    //      case .success:
-    //        print("@Log - success")
-    //      case .failure(let failure):
-    //        print(failure)
-    //      }
-    //    }
-    //  }
-    
-    func deleteFeed(_ index: Int) {
-      let feed = self.feedList[index]
-      let request = DTO.DeleteRecordRequest(record_id: feed.id)
-      apiProvider.justRequest(.deleteRecord(request)) { result in
-        switch result {
-        case .success(let success):
-          print(success)
-        case .failure(let failure):
-          print(failure)
-        }
-      }
-    }
-    
-    func bookmarkButtonTapped(_ index: Int) {
-      self.feedList[index].isBookmarked.toggle()
-      let count = self.feedList[index].isBookmarked ? 1 : -1
-      self.feedList[index].bookmarkCount += count
-      let bookmarkProvider = APIProvider<APITarget.Bookmarks>()
-      let request = DTO.PostBookmarkRequest(recordId: feedList[index].id)
-      bookmarkProvider.justRequest(.postBookmark(request)) { result in
-        switch result {
-        case .success:
-          print("@Log - success")
-        case .failure(let failure):
-          print(failure)
-        }
+
+  func postIsFeedWatched(feed: Feed) {
+//    let request = DTO.IsRecordWatchedRequest(recordId: feed.id)
+//    apiProvider.justRequest(.isRecordWatched(request)) { result in
+//      switch result {
+//      case .success:
+//        print("@Log - success")
+//      case .failure(let failure):
+//        print(failure)
+//      }
+//    }
+  }
+
+  func deleteFeed(_ index: Int) {
+    let feed = self.feedList[index]
+    let request = DTO.DeleteRecordRequest(record_id: feed.id)
+    apiProvider.justRequest(.deleteRecord(request)) { result in
+      switch result {
+      case .success(let success):
+        print(success)
+      case .failure(let failure):
+        print(failure)
       }
     }
   }

@@ -21,19 +21,22 @@ protocol FeedWatchDelegate: AnyObject {
 
 class FeedCell: UICollectionViewCell {
 
+  weak var delegate: FeedWatchDelegate?
+
+  private let playerView = UIView()
+  let feedView = FeedView()
+
+  var feed: Feed?
   var avPlayer: AVPlayer?
   var avPlayerLayer: AVPlayerLayer?
   var avPlayerLooper: AVPlayerLooper?
   var isPlaying: Bool = false
   var isPlayRequested: Bool = false
-  weak var delegate: FeedWatchDelegate?
-  private let playerView = UIView()
-  let feedView = FeedView()
-  var feed: Feed?
 
   var bookmarkAction: (() -> Void)?
-  var pushToOtherProfile: (() -> Void)?
+  var profileAction: (() -> Void)?
   var deleteAction: (() -> Void)?
+  var moreAction: (() -> Void)?
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -61,8 +64,8 @@ class FeedCell: UICollectionViewCell {
   }
 
   private func setUI() {
-    self.addSubview(playerView)
-    self.addSubview(feedView)
+    addSubview(playerView)
+    addSubview(feedView)
   }
 
   private func setAutolayout() {
@@ -80,15 +83,15 @@ class FeedCell: UICollectionViewCell {
   func play() {
     isPlayRequested = true
     isPlaying = true
-    self.avPlayer?.play()
-    if let feed = self.feed {
+    avPlayer?.play()
+    if let feed = feed {
       delegate?.play(feed: feed)
     }
   }
 
   func pause() {
     isPlayRequested = false
-    self.avPlayer?.pause()
+    avPlayer?.pause()
   }
 
   func deinitPlayers() {
@@ -127,92 +130,68 @@ class FeedCell: UICollectionViewCell {
 
   func bind(feed: Feed, bounds: CGRect, shouldAddPlayer: Bool) {
     self.feed = feed
+
+    feedView.updateTitle(feed.placeInfo.title)
     if shouldAddPlayer {
       addPlayer(for: URL(string: feed.videoLink)!, bounds: bounds)
     }
-    self.feedView.descriptionTextView.attributedText = UITextView.setLineSpacing(
+    feedView.descriptionTextView.attributedText = UITextView.setLineSpacing(
       5,
       text: feed.description
     )
-    self.feedView.locationLabel.text = feed.location
-    self.feedView.nicknameButton.setTitle(
+    feedView.locationLabel.text = feed.location
+    feedView.nicknameButton.setTitle(
       feed.nickname,
       for: .normal
     )
-    self.feedView.descriptionTextView.text = feed.description
-    self.feedView.bookmarkButton.setImage(
+    feedView.descriptionTextView.text = feed.description
+    feedView.bookmarkButton.setImage(
       feed.isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image,
       for: .normal
     )
-    self.feedView.bookmarkLabel.text = "\(feed.bookmarkCount)"
-    self.feedView.bookmarkButton.addTarget(
+    feedView.bookmarkLabel.text = "\(feed.bookmarkCount)"
+    feedView.bookmarkButton.addTarget(
       self,
       action: #selector(bookmarkButtonTapped),
       for: .touchUpInside
     )
-    self.feedView.deleteButton.isHidden = !feed.isMine
-    self.feedView.deleteButton.addTarget(
+    feedView.deleteButton.isHidden = !feed.isMine
+    feedView.deleteButton.addTarget(
       self,
       action: #selector(deleteButtonTapped),
       for: .touchUpInside
     )
+    feedView.moreButton
+      .addTarget(
+        self,
+        action: #selector(moreButtonTapped),
+        for: .touchUpInside
+      )
   }
 
   func updateBookmarkStatus(
     count: Int,
     isBookmarked: Bool
   ) {
-    self.feedView.bookmarkButton.setImage(
+    feedView.bookmarkButton.setImage(
       isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image,
       for: .normal
     )
-    self.feedView.bookmarkLabel.text = "\(count)"
+    feedView.bookmarkLabel.text = "\(count)"
   }
 
-  @objc private func bookmarkButtonTapped() {
-    self.bookmarkAction?()
+  @objc
+  private func bookmarkButtonTapped() {
+    bookmarkAction?()
   }
 
-  @objc private func deleteButtonTapped() {
-    self.deleteAction?()
+  @objc
+  private func deleteButtonTapped() {
+    deleteAction?()
+  }
+
+  @objc 
+  private func moreButtonTapped() {
+    moreAction?()
   }
 }
-
-//    avPlayer?.currentItem?.addObserver(
-//      self,
-//      forKeyPath: "playbackBufferEmpty",
-//      options: .new,
-//      context: nil
-//    )
-//    avPlayer?.currentItem?.addObserver(
-//      self,
-//      forKeyPath: "playbackLikelyToKeepUp",
-//      options: .new,
-//      context: nil
-//    )
-//    avPlayer?.currentItem?.addObserver(
-//      self,
-//      forKeyPath: "playbackBufferFull",
-//      options: .new,
-//      context: nil
-//    )
-
-//  override func observeValue(
-//    forKeyPath keyPath: String?,
-//    of object: Any?,
-//    change: [NSKeyValueChangeKey: Any]?,
-//    context: UnsafeMutableRawPointer?
-//  ) {
-//    if object is AVPlayerItem {
-//      switch keyPath {
-//      case "playbackBufferEmpty":
-//        print("bufferEmpty")
-//      case "playbackLikelyToKeepUp":
-//        print("LikelyToKeepUp")
-//      case "playbackBufferFull":
-//        print("BufferFull")
-//      default:
-//        print("Default")
-//      }
-//    }
-//  }
