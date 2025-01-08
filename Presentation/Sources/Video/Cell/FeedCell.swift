@@ -131,7 +131,7 @@ class FeedCell: UICollectionViewCell {
   func bind(feed: Feed, bounds: CGRect, shouldAddPlayer: Bool) {
     self.feed = feed
 
-    feedView.updateTitle(feed.placeInfo.title)
+//    feedView.updateTitle(feed.placeInfo.title)
     if shouldAddPlayer {
       addPlayer(for: URL(string: feed.videoLink)!, bounds: bounds)
     }

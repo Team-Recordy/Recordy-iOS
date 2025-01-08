@@ -170,9 +170,3 @@ public class VideoFeedViewController: UIViewController {
     }
   }
 }
-
-extension VideoFeedViewController: FeedWatchDelegate {
-  func play(feed: Feed) {
-//    viewModel.postIsFeedWatched(feed: feed)
-  }
-}

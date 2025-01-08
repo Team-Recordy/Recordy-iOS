@@ -22,7 +22,7 @@ public enum VideoFeedType {
 }
 
 class VideoFeedViewModel {
-  
+
   private(set) var feedList: [Feed] = []
   let apiProvider = APIProvider<APITarget.Records>()
   var type: VideoFeedType
@@ -35,7 +35,7 @@ class VideoFeedViewModel {
   var isToggle = false
   var onFeedListUpdate: ((Int) -> ())?
   var isBookmarked: (() -> ())?
-  
+
   init(
     type: VideoFeedType,
     currentId: Int? = nil,
@@ -48,7 +48,7 @@ class VideoFeedViewModel {
     self.userId = userId
     recordListCase()
   }
-  
+
   // 필요없는 famous, recent case 삭제함
   func recordListCase(toggle: Bool? = nil) {
     guard !isFetching else { return }
@@ -94,7 +94,7 @@ class VideoFeedViewModel {
     default: return
     }
   }
-  
+
   private func getPlaceRecordList<T: Codable>(
     endPoint: APITarget.Records,
     response: T.Type
@@ -116,7 +116,7 @@ class VideoFeedViewModel {
       }
     }
   }
-  
+
   // Content -> Feed 타입 변환 해줬음
   private func processResponse<T: Codable>(response: T) {
     if let randomRecordListResponse = response as? DTO.GetRandomRecordListResponse {
@@ -197,61 +197,61 @@ class VideoFeedViewModel {
       }
     }
   }
-    
-    func updateFeedList(_ newFeeds: [Feed]) {
-      cacheVideos(feeds: newFeeds) { [weak self] cachedFeeds in
-        guard let self else { return }
-        self.feedList += cachedFeeds
-        self.onFeedListUpdate?(cachedFeeds.count)
-      }
+
+  func updateFeedList(_ newFeeds: [Feed]) {
+    cacheVideos(feeds: newFeeds) { [weak self] cachedFeeds in
+      guard let self else { return }
+      self.feedList += cachedFeeds
+      self.onFeedListUpdate?(cachedFeeds.count)
     }
-    
-    func cacheVideos(
-      feeds: [Feed],
-      completion: @escaping ([Feed]) -> Void
-    ) {
-      let dispatchGroup = DispatchGroup()
-      var cachedFeeds: [Feed] = []
-      
-      for feed in feeds {
-        dispatchGroup.enter()
-        VideoCacheManager.shared.downloadAndCacheURL(url: URL(string: feed.videoLink)!) { url in
-          guard let cachedUrl = url else {
-            dispatchGroup.leave()
-            return
-          }
-          let cachedFeed = Feed(
-            id: feed.id,
-            userId: feed.userId,
-            location: feed.location,
-            nickname: feed.nickname,
-            description: feed.description,
-            isBookmarked: feed.isBookmarked,
-            bookmarkCount: feed.bookmarkCount,
-            videoLink: String(describing: cachedUrl),
-            thumbnailLink: feed.thumbnailLink,
-            isMine: feed.isMine
-          )
-          cachedFeeds.append(cachedFeed)
+  }
+
+  func cacheVideos(
+    feeds: [Feed],
+    completion: @escaping ([Feed]) -> Void
+  ) {
+    let dispatchGroup = DispatchGroup()
+    var cachedFeeds: [Feed] = []
+
+    for feed in feeds {
+      dispatchGroup.enter()
+      VideoCacheManager.shared.downloadAndCacheURL(url: URL(string: feed.videoLink)!) { url in
+        guard let cachedUrl = url else {
           dispatchGroup.leave()
+          return
         }
-      }
-      
-      dispatchGroup.notify(queue: .main) {
-        completion(cachedFeeds)
+        let cachedFeed = Feed(
+          id: feed.id,
+          userId: feed.userId,
+          location: feed.location,
+          nickname: feed.nickname,
+          description: feed.description,
+          isBookmarked: feed.isBookmarked,
+          bookmarkCount: feed.bookmarkCount,
+          videoLink: String(describing: cachedUrl),
+          thumbnailLink: feed.thumbnailLink,
+          isMine: feed.isMine
+        )
+        cachedFeeds.append(cachedFeed)
+        dispatchGroup.leave()
       }
     }
 
+    dispatchGroup.notify(queue: .main) {
+      completion(cachedFeeds)
+    }
+  }
+
   func postIsFeedWatched(feed: Feed) {
-//    let request = DTO.IsRecordWatchedRequest(recordId: feed.id)
-//    apiProvider.justRequest(.isRecordWatched(request)) { result in
-//      switch result {
-//      case .success:
-//        print("@Log - success")
-//      case .failure(let failure):
-//        print(failure)
-//      }
-//    }
+    //    let request = DTO.IsRecordWatchedRequest(recordId: feed.id)
+    //    apiProvider.justRequest(.isRecordWatched(request)) { result in
+    //      switch result {
+    //      case .success:
+    //        print("@Log - success")
+    //      case .failure(let failure):
+    //        print(failure)
+    //      }
+    //    }
   }
 
   func deleteFeed(_ index: Int) {
@@ -266,3 +266,4 @@ class VideoFeedViewModel {
       }
     }
   }
+}

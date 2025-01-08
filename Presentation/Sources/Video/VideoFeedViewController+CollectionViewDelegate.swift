@@ -56,7 +56,7 @@ extension VideoFeedViewController: UICollectionViewDataSource {
     )
     cell.bookmarkAction = { [weak self] in
       guard let self else { return }
-      self.viewModel.bookmarkButtonTapped(indexPath.row)
+//      self.viewModel.bookmarkButtonTapped(indexPath.row)
       cell.updateBookmarkStatus(
         count: self.viewModel.feedList[indexPath.row].bookmarkCount,
         isBookmarked: self.viewModel.feedList[indexPath.row].isBookmarked
