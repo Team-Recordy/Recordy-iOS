@@ -10,7 +10,7 @@ import Foundation
 
 import Core
 
-enum VideoFeedType {
+public enum VideoFeedType {
   case all
   case following
   case famous
@@ -18,10 +18,11 @@ enum VideoFeedType {
   case userProfile
   case myProfile
   case bookmarked
+  case test
 }
 
 class VideoFeedViewModel {
-  
+
   private(set) var feedList: [Feed] = []
   let apiProvider = APIProvider<APITarget.Records>()
   var type: VideoFeedType
@@ -34,7 +35,7 @@ class VideoFeedViewModel {
   var isToggle = false
   var onFeedListUpdate: ((Int) -> ())?
   var isBookmarked: (() -> ())?
-  
+
   init(
     type: VideoFeedType,
     currentId: Int? = nil,
@@ -86,10 +87,13 @@ class VideoFeedViewModel {
         ),
         response: DTO.GetBookmarkedListResponse.self
       )
+    case .test:
+      self.feedList = Feed.mockData
+      self.onFeedListUpdate?(self.feedList.count)
     default: return
     }
   }
-  
+
   private func getPlaceRecordList<T: Codable>(
     endPoint: APITarget.Records,
     response: T.Type
@@ -199,13 +203,12 @@ class VideoFeedViewModel {
       }
     }
   }
-    
-    func updateFeedList(_ newFeeds: [Feed]) {
-      cacheVideos(feeds: newFeeds) { [weak self] cachedFeeds in
-        guard let self else { return }
-        self.feedList += cachedFeeds
-        self.onFeedListUpdate?(cachedFeeds.count)
-      }
+
+  func updateFeedList(_ newFeeds: [Feed]) {
+    cacheVideos(feeds: newFeeds) { [weak self] cachedFeeds in
+      guard let self else { return }
+      self.feedList += cachedFeeds
+      self.onFeedListUpdate?(cachedFeeds.count)
     }
     
     func cacheVideos(
@@ -238,15 +241,31 @@ class VideoFeedViewModel {
           )
           cachedFeeds.append(cachedFeed)
           dispatchGroup.leave()
+          return
         }
-      }
-      
-      dispatchGroup.notify(queue: .main) {
-        completion(cachedFeeds)
+        let cachedFeed = Feed(
+          id: feed.id,
+          userId: feed.userId,
+          location: feed.location,
+          nickname: feed.nickname,
+          description: feed.description,
+          isBookmarked: feed.isBookmarked,
+          bookmarkCount: feed.bookmarkCount,
+          videoLink: String(describing: cachedUrl),
+          thumbnailLink: feed.thumbnailLink,
+          isMine: feed.isMine
+        )
+        cachedFeeds.append(cachedFeed)
+        dispatchGroup.leave()
       }
     }
-    
-    //  func postIsFeedWatched(feed: Feed) {
+
+    dispatchGroup.notify(queue: .main) {
+      completion(cachedFeeds)
+    }
+  }
+
+  func postIsFeedWatched(feed: Feed) {
     //    let request = DTO.IsRecordWatchedRequest(recordId: feed.id)
     //    apiProvider.justRequest(.isRecordWatched(request)) { result in
     //      switch result {
@@ -256,34 +275,18 @@ class VideoFeedViewModel {
     //        print(failure)
     //      }
     //    }
-    //  }
-    
-    func deleteFeed(_ index: Int) {
-      let feed = self.feedList[index]
-      let request = DTO.DeleteRecordRequest(record_id: feed.id)
-      apiProvider.justRequest(.deleteRecord(request)) { result in
-        switch result {
-        case .success(let success):
-          print(success)
-        case .failure(let failure):
-          print(failure)
-        }
-      }
-    }
-    
-    func bookmarkButtonTapped(_ index: Int) {
-      self.feedList[index].isBookmarked.toggle()
-      let count = self.feedList[index].isBookmarked ? 1 : -1
-      self.feedList[index].bookmarkCount += count
-      let bookmarkProvider = APIProvider<APITarget.Bookmarks>()
-      let request = DTO.PostBookmarkRequest(recordId: feedList[index].id)
-      bookmarkProvider.justRequest(.postBookmark(request)) { result in
-        switch result {
-        case .success:
-          print("@Log - success")
-        case .failure(let failure):
-          print(failure)
-        }
+  }
+
+  func deleteFeed(_ index: Int) {
+    let feed = self.feedList[index]
+    let request = DTO.DeleteRecordRequest(record_id: feed.id)
+    apiProvider.justRequest(.deleteRecord(request)) { result in
+      switch result {
+      case .success(let success):
+        print(success)
+      case .failure(let failure):
+        print(failure)
       }
     }
   }
+}

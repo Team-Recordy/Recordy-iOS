@@ -14,16 +14,22 @@ import Common
 import SnapKit
 import Then
 
+@available(iOS 16.0, *)
 public class VideoFeedViewController: UIViewController {
-
-  private var collectionView: UICollectionView? = nil
-  private let recordyToggle = RecordyToggle()
-  private var isPlayed = false
-
+  
+  enum Sheet {
+    static let defaultHeight: CGFloat = 152
+    static let expandedHeight: CGFloat = 566
+  }
+  
+  var collectionView: UICollectionView? = nil
+  
+  private let recordyToggle = ViskitToggle()
+  var isPlayed = false
   var type: VideoFeedType
-  private var viewModel: VideoFeedViewModel
-
-  init(
+  var viewModel: VideoFeedViewModel
+  
+  public init(
     type: VideoFeedType,
     currentId: Int? = nil,
     cursorId: Int? = nil,
@@ -38,11 +44,11 @@ public class VideoFeedViewController: UIViewController {
     )
     super.init(nibName: nil, bundle: nil)
   }
-
+  
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
     setUpCollectionView()
@@ -50,85 +56,86 @@ public class VideoFeedViewController: UIViewController {
     setUI()
     setAutolayout()
   }
-
+  
   public override func viewWillAppear(_ animated: Bool) {
     bind()
     viewModel.recordListCase()
   }
-
+  
   public override func viewDidDisappear(_ animated: Bool) {
     removeAVPlayers()
   }
-
+  
   private func setStyle() {
-    self.navigationController?.navigationBar.isHidden = self.type == .all || self.type == .following
-    self.view.backgroundColor = CommonAsset.recordyBG.color
-    self.recordyToggle.do {
-      $0.isHidden = type != .all && type != .following
+    navigationController?.navigationBar.isHidden = type == .all || type == .following
+    view.backgroundColor = CommonAsset.recordyBG.color
+    recordyToggle.do {
+      $0.isHidden = type != .all && type != .following && type != .test
     }
-    self.recordyToggle.toggleAction = { [weak self] toggleState in
+    recordyToggle.toggleAction = { [weak self] toggleState in
       guard let self = self else { return }
       toggleButtonTapped(type: toggleState == .all ? .following : .all)
     }
-    if self.type != .all {
-      self.navigationController?.navigationBar.topItem?.title = ""
+    if type != .all {
+      navigationController?.navigationBar.topItem?.title = ""
     }
   }
-
+  
   private func setUI() {
-    self.view.addSubview(collectionView!)
-    self.view.addSubview(recordyToggle)
-    self.view.bringSubviewToFront(recordyToggle)
+    view.addSubview(collectionView!)
+    view.addSubview(recordyToggle)
+    view.bringSubviewToFront(recordyToggle)
   }
-
+  
   private func setAutolayout() {
-    self.collectionView!.snp.makeConstraints {
+    collectionView!.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
-    self.recordyToggle.snp.makeConstraints {
+    recordyToggle.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide).inset(12.adaptiveHeight)
       $0.centerX.equalToSuperview()
       $0.width.equalTo(124)
       $0.height.equalTo(32)
     }
   }
-
+  
   private func setUpCollectionView() {
     let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .vertical
     layout.minimumLineSpacing = 0
     layout.minimumInteritemSpacing = 0
-    self.collectionView = UICollectionView(
+    collectionView = UICollectionView(
       frame: .zero,
       collectionViewLayout: layout
     )
-    self.collectionView!.showsVerticalScrollIndicator = false
-    self.collectionView!.contentInsetAdjustmentBehavior = .never
-    self.collectionView!.isPagingEnabled = true
-    self.collectionView!.backgroundColor = CommonAsset.recordyBG.color
-    self.collectionView!.register(
+    collectionView!.showsVerticalScrollIndicator = false
+    collectionView!.contentInsetAdjustmentBehavior = .never
+    collectionView!.isPagingEnabled = true
+    collectionView!.backgroundColor = CommonAsset.recordyBG.color
+    collectionView!.register(
       FeedCell.self,
       forCellWithReuseIdentifier: FeedCell.cellIdentifier
     )
-    self.collectionView!.delegate = self
-    self.collectionView!.dataSource = self
+    collectionView!.delegate = self
+    collectionView!.dataSource = self
   }
-
+  
   private func bind() {
     viewModel.onFeedListUpdate = { [weak self] count in
       guard let self = self else { return }
       DispatchQueue.main.async {
-        if self.viewModel.isToggle {
-          //TODO: 토글 되었을 때 가능한 상황 추가적 고려 필요
-          self.isPlayed = false
-          self.collectionView!.reloadData()
-          self.viewModel.isToggle = false
-        } else {
-          let indexPaths = (self.viewModel.feedList.count - count..<self.viewModel.feedList.count).map {
-              IndexPath(item: $0, section: 0)
-          }
-          self.collectionView!.insertItems(at: indexPaths)
-        }
+        self.collectionView?.reloadData()
+        //        if self.viewModel.isToggle {
+        //          //TODO: 토글 되었을 때 가능한 상황 추가적 고려 필요
+        //          self.isPlayed = false
+        //          self.collectionView!.reloadData()
+        //          self.viewModel.isToggle = false
+        //        } else {
+        //          let indexPaths = (self.viewModel.feedList.count - count..<self.viewModel.feedList.count).map {
+        //              IndexPath(item: $0, section: 0)
+        //          }
+        //          self.collectionView!.insertItems(at: indexPaths)
+        //        }
       }
     }
   }
@@ -142,122 +149,32 @@ public class VideoFeedViewController: UIViewController {
   }
 
   func toggleButtonTapped(type: VideoFeedType) {
-    self.viewModel.type = type == .all ? .following : .all
-    self.viewModel.recordListCase(toggle: true)
-    self.viewModel.isToggle = true
+    viewModel.type = type == .all ? .following : .all
+    viewModel.recordListCase(toggle: true)
+    viewModel.isToggle = true
   }
-}
+  
+  func sheetAction() {
+    let nextViewController = ReportWithCopyLinkViewController()
+    nextViewController.delegate = self
+    let navigationController = BaseNavigationController(rootViewController: nextViewController)
 
-extension VideoFeedViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-
-  public func collectionView(
-    _ collectionView: UICollectionView,
-    numberOfItemsInSection section: Int
-  ) -> Int {
-    return viewModel.feedList.count
-  }
-
-  public func collectionView(
-    _ collectionView: UICollectionView,
-    cellForItemAt indexPath: IndexPath
-  ) -> UICollectionViewCell {
-    let cell = collectionView.dequeueReusableCell(
-      withReuseIdentifier: FeedCell.cellIdentifier,
-      for: indexPath
-    ) as! FeedCell
-    let feed = viewModel.feedList[indexPath.row]
-    cell.delegate = self
-    cell.bind(
-      feed: feed,
-      bounds: collectionView.frame,
-      shouldAddPlayer: cell.avPlayer == nil
-    )
-    if !isPlayed && indexPath.row == 0 {
-      cell.play()
-      isPlayed = true
+    if let sheet = navigationController.sheetPresentationController {
+      configureSheet(sheet, height: Sheet.defaultHeight)
     }
-    cell.feedView.nicknameButton.tag = indexPath.row
-    cell.feedView.nicknameButton.addTarget(
-      self,
-      action: #selector(nicknameButtonTapped),
-      for: .touchUpInside
-    )
-    cell.bookmarkAction = {
-      self.viewModel.bookmarkButtonTapped(indexPath.row)
-      cell.updateBookmarkStatus(
-        count: self.viewModel.feedList[indexPath.row].bookmarkCount,
-        isBookmarked: self.viewModel.feedList[indexPath.row].isBookmarked
-      )
+    
+    present(navigationController, animated: true)
+  }
+  
+  private func configureSheet(_ sheet: UISheetPresentationController, height: CGFloat) {
+    sheet.detents = [.custom { _ in return height.adaptiveHeight }]
+    sheet.prefersGrabberVisible = true
+  }
+  
+  func updateSheetHeight(_ height: CGFloat) {
+    guard let sheet = presentedViewController?.sheetPresentationController else { return }
+    sheet.animateChanges {
+      sheet.detents = [.custom { _ in return height.adaptiveHeight }]
     }
-    return cell
-  }
-
-  public func collectionView(
-    _ collectionView: UICollectionView,
-    willDisplay cell: UICollectionViewCell,
-    forItemAt indexPath: IndexPath
-  ) {
-    if indexPath.row == viewModel.feedList.count - 3 {
-      viewModel.recordListCase()
-    }
-  }
-
-  public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-    checkAndPlay()
-  }
-
-  public func collectionView(
-    _ collectionView: UICollectionView,
-    didEndDisplaying cell: UICollectionViewCell,
-    forItemAt indexPath: IndexPath
-  ) {
-    let cell = cell as! FeedCell
-    cell.pause()
-  }
-
-  public func collectionView(
-    _ collectionView: UICollectionView,
-    layout collectionViewLayout: UICollectionViewLayout,
-    sizeForItemAt indexPath: IndexPath
-  ) -> CGSize {
-    return collectionView.frame.size
-  }
-
-  private func removeAVPlayers() {
-    let visibleCells = collectionView?.visibleCells.compactMap { $0 as? FeedCell } ?? []
-    for cell in visibleCells {
-      cell.deinitPlayers()
-    }
-  }
-
-  private func checkAndPlay() {
-    let visibleCells = collectionView!.visibleCells.compactMap { $0 as? FeedCell }
-    visibleCells.forEach {
-      let frame = $0.frame
-      let window = self.view.window!
-      let rect = window.convert(frame, from: $0.superview!)
-      let intersection = rect.intersection(window.bounds)
-      let ratio = (intersection.width * intersection.height) / (frame.width * frame.height)
-      if ratio > 0.5 {
-        if !$0.isPlayRequested {
-          $0.play()
-        }
-      } else {
-        $0.pause()
-      }
-    }
-  }
-
-  private func playFirstVisibleCell() {
-    let visibleCells = collectionView?.visibleCells.compactMap { $0 as? FeedCell } ?? []
-    guard let firstCell = visibleCells.first else { return }
-    firstCell.play()
-    isPlayed = true
-  }
-}
-
-extension VideoFeedViewController: FeedWatchDelegate {
-  func play(feed: Feed) {
-//    viewModel.postIsFeedWatched(feed: feed)
   }
 }
