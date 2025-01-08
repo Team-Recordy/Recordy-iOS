@@ -12,6 +12,7 @@ import SnapKit
 import Then
 
 import Core
+import Common
 
 public class OverviewCollectionViewCell: UICollectionViewCell {
   public var place: Place?

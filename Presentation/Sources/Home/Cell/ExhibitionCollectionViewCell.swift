@@ -12,6 +12,7 @@ import SnapKit
 import Then
 
 import Core
+import Common
 
 public class ExhibitionCollectionViewCell: UICollectionViewCell {
   
@@ -65,7 +66,7 @@ public class ExhibitionCollectionViewCell: UICollectionViewCell {
     }
   }
   
-  public func configure(exhibition: Exhibition) {
+  public func bind(exhibition: Exhibition) {
     exhibitionNameLabel.text = exhibition.name
     exhibitionDateLabel.text = exhibition.startDate
   }
