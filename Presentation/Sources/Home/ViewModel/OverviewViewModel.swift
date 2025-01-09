@@ -57,7 +57,7 @@ public class OverviewViewModel {
       switch result {
       case .success(let response):
         self.hasNext = response.hasNext
-        self.nearPlaces.append(contentsOf: response.content.map { place in
+        self.nearPlaces = response.content.map { place in
           Place(
             id: place.id,
             name: place.name,
@@ -69,7 +69,7 @@ public class OverviewViewModel {
             exhibitionSize: place.exhibitionSize,
             recordSize: place.recordSize
           )
-        })
+        }
         self.onNearPlacesUpdated?()
         
       case .failure(let error):
@@ -92,7 +92,7 @@ public class OverviewViewModel {
       switch result {
       case .success(let response):
         if let index = self.nearPlaces.firstIndex(where: { $0.id == placeId }) {
-          self.nearPlaces[index].recordList.append(contentsOf: response.content.map { content in
+          self.nearPlaces[index].recordList = response.content.map { content in
             Feed(
               id: content.id,
               videoLink: content.fileUrl.videoUrl,
@@ -107,7 +107,7 @@ public class OverviewViewModel {
               isMine: content.isMine,
               isBookmarked: content.isBookmarked
             )
-          })
+          }
           self.onPlaceRecordsUpdated?()
         }
         

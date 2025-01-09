@@ -39,6 +39,12 @@ final class OverviewViewController: UIViewController {
     bind()
     
     viewModel.getNearPlaceList()
+    viewModel.onNearPlacesUpdated = { [weak self] in
+      guard let self = self else { return }
+      self.viewModel.nearPlaces.forEach { place in
+        self.viewModel.getPlaceRecordList(placeId: place.id)
+      }
+    }
   }
   
   private func setStyle() {
@@ -123,6 +129,12 @@ final class OverviewViewController: UIViewController {
     viewModel.onLocationStateChanged = { [weak self] state in
       self?.locationButton.setImage(state.buttonImage, for: .normal)
     }
+    
+    viewModel.onPlaceRecordsUpdated = { [weak self] in
+      DispatchQueue.main.async {
+        self?.overviewCollectionView?.reloadData()
+      }
+    }
   }
   
   @objc private func locationButtonTapped() {
@@ -157,14 +169,6 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
       cell.onUpdateHeight = {
         DispatchQueue.main.async {
           collectionView.collectionViewLayout.invalidateLayout()
-        }
-      }
-      
-      viewModel.getPlaceRecordList(placeId: place.id)
-      viewModel.onPlaceRecordsUpdated = { [weak self, weak cell] in
-        guard let self = self else { return }
-        DispatchQueue.main.async {
-          cell?.updateRecords(records: place.recordList)
         }
       }
       return cell

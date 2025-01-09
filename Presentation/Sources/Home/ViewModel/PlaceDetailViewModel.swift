@@ -55,7 +55,7 @@ public class PlaceDetailViewModel {
     place: Place,
     reviewFeeds: [Feed]
   ) {
-    selectedPlace.append(place)
+    selectedPlace = [place]
     reviewFeedList = reviewFeeds
     onFeedsUpdated?()
     initFilterState()
