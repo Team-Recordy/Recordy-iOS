@@ -18,6 +18,7 @@ public struct Place: Decodable {
     public let latitude: Double
     public let exhibitionSize: Int
     public let recordSize: Int
+    public var recordList: [Feed] = [] // record는 이후에 불러오기 떄문에 처음엔 빈 배열
 
     public init(
         id: Int,
@@ -28,16 +29,19 @@ public struct Place: Decodable {
         longitude: Double,
         latitude: Double,
         exhibitionSize: Int,
-        recordSize: Int
+        recordSize: Int,
+        recordList: [Feed] = []
+        
     ) {
-        self.id = id
-        self.name = name
-        self.address = address
-        self.platformId = platformId
-        self.locationId = locationId
-        self.longitude = longitude
-        self.latitude = latitude
-        self.exhibitionSize = exhibitionSize
-        self.recordSize = recordSize
+      self.id = id
+      self.name = name
+      self.address = address
+      self.platformId = platformId
+      self.locationId = locationId
+      self.longitude = longitude
+      self.latitude = latitude
+      self.exhibitionSize = exhibitionSize
+      self.recordSize = recordSize
+      self.recordList = recordList
     }
 }

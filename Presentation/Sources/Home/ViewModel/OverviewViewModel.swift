@@ -32,7 +32,6 @@ public enum LocationState {
 
 public class OverviewViewModel {
   var nearPlaces: [Place] = []
-  var placeRecords: [Feed] = []
   
   var hasNext = true
   var isFetching = false
@@ -40,18 +39,6 @@ public class OverviewViewModel {
   var onNearPlacesUpdated: (() -> Void)?
   var onPlaceRecordsUpdated: (() -> Void)?
   var onLocationStateChanged: ((LocationState) -> Void)?
-  
-//  func recordListCase(type: RecordType) {
-//    guard !isFetching else { return }
-//    guard hasNext else { return }
-//    
-//    switch type {
-//    case .near:
-//      getNearPlaceList()
-//    case .exhibition(let placeId):
-//      getPlaceRecordList(placeId: placeId)
-//    }
-//  }
   
   func getNearPlaceList() {
     isFetching = true
@@ -104,24 +91,25 @@ public class OverviewViewModel {
       self.isFetching = false
       switch result {
       case .success(let response):
-        self.hasNext = response.hasNext
-        self.placeRecords.append(contentsOf: response.content.map { content in
-          Feed(
-            id: content.id,
-            videoLink: content.fileUrl.videoUrl,
-            thumbnailLink: content.fileUrl.thumbnailUrl,
-            description: content.content,
-            exhibitionName: content.exhibitionName,
-            placeId: content.placeId,
-            placeName: content.placeName,
-            uploaderId: content.uploaderId,
-            uploaderNickname: content.uploaderNickname,
-            bookmarkCount: content.bookmarkCount,
-            isMine: content.isMine,
-            isBookmarked: content.isBookmarked
-          )
-        })
-        self.onPlaceRecordsUpdated?()
+        if let index = self.nearPlaces.firstIndex(where: { $0.id == placeId }) {
+          self.nearPlaces[index].recordList.append(contentsOf: response.content.map { content in
+            Feed(
+              id: content.id,
+              videoLink: content.fileUrl.videoUrl,
+              thumbnailLink: content.fileUrl.thumbnailUrl,
+              description: content.content,
+              exhibitionName: content.exhibitionName,
+              placeId: content.placeId,
+              placeName: content.placeName,
+              uploaderId: content.uploaderId,
+              uploaderNickname: content.uploaderNickname,
+              bookmarkCount: content.bookmarkCount,
+              isMine: content.isMine,
+              isBookmarked: content.isBookmarked
+            )
+          })
+          self.onPlaceRecordsUpdated?()
+        }
         
       case .failure(let error):
         print("Error fetching records for placeId \(placeId): \(error)")
