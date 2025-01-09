@@ -18,7 +18,6 @@ public protocol PlaceDetailControlTypeDelegate: AnyObject {
 }
 
 public final class PlaceDetailSegmentedControl: UIView {
-  
   private var selectedTab: PlaceDetailControlType = .exhibitionList {
     didSet {
       setStyle()

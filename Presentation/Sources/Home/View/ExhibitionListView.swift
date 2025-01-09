@@ -16,17 +16,16 @@ import Core
 
 @available(iOS 16.0, *)
 final class ExhibitionListView: UIView {
+  private var exhibitions: [Exhibition] = []
   
   public var onAllFilterButtonTapped: (() -> Void)?
   
+  public let allFilterButton = ChipKeyWordButton()
+  public let freeFilterButton = ChipKeyWordButton()
+  public let endSoonFilterButton = ChipKeyWordButton()
   private var exhibitionCountLabel = UILabel()
-  let allFilterButton = ChipKeyWordButton()
-  let freeFilterButton = ChipKeyWordButton()
-  let endSoonFilterButton = ChipKeyWordButton()
   private let emptyLabel = UILabel()
-  var exhibitionCollectionView: UICollectionView?
-  
-  private var exhibitions: [Exhibition] = []
+  private var exhibitionCollectionView: UICollectionView?
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -41,7 +40,7 @@ final class ExhibitionListView: UIView {
     fatalError("init(coder:) has not been implemented")
   }
   
-  func setStyle() {
+  private func setStyle() {
     self.exhibitionCollectionView?.backgroundColor = .clear
     
     exhibitionCountLabel.do {
@@ -75,7 +74,7 @@ final class ExhibitionListView: UIView {
     }
   }
   
-  func setUI() {
+  private func setUI() {
     addSubviews(
       exhibitionCountLabel,
       allFilterButton,
@@ -86,7 +85,7 @@ final class ExhibitionListView: UIView {
     )
   }
   
-  func setAutolayout() {
+  private func setAutolayout() {
     allFilterButton.snp.makeConstraints {
       $0.top.equalToSuperview().offset(24)
       $0.leading.equalToSuperview().offset(20)
@@ -131,17 +130,17 @@ final class ExhibitionListView: UIView {
     self.exhibitionCountLabel.text = "• \(exhibitions.count)개의 전시"
     
     if exhibitions.isEmpty {
-        emptyLabel.isHidden = false
-        exhibitionCollectionView?.isHidden = true
+      emptyLabel.isHidden = false
+      exhibitionCollectionView?.isHidden = true
     } else {
-        emptyLabel.isHidden = true
-        exhibitionCollectionView?.isHidden = false
+      emptyLabel.isHidden = true
+      exhibitionCollectionView?.isHidden = false
     }
     
     self.exhibitionCollectionView?.reloadData()
   }
   
-  func setCollectionView() {
+  private func setCollectionView() {
     let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .vertical
     layout.minimumLineSpacing = 12
@@ -200,7 +199,7 @@ extension ExhibitionListView: UICollectionViewDelegateFlowLayout {
   ) -> CGSize {
     let width = collectionView.frame.width
     guard let cell = collectionView.cellForItem(at: indexPath) as? ExhibitionCollectionViewCell else {
-        return CGSize(width: width, height: 74)
+      return CGSize(width: width, height: 74)
     }
     let calculatedHeight = cell.calculateHeight(width: width)
     return CGSize(width: width, height: calculatedHeight)

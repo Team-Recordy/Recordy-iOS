@@ -15,29 +15,28 @@ import Core
 import Common
 
 public class OverviewCollectionViewCell: UICollectionViewCell {
-  public var place: Place?
+  private var place: Place?
   private var records: [Feed] = []
   
   public var onPlaceDetailButtonTapped: ((Int) -> Void)?
+  public var onUpdateHeight: (() -> Void)?
   
-  public let locationLabel = UILabel()
-  public let placeNameLabel = UILabel()
-  public let eventCountLabelYellow = UILabel()
-  public let eventCountLabel = UILabel()
-  public let rightChevronIcon = UIImageView()
+  private let locationLabel = UILabel()
+  private let placeNameLabel = UILabel()
+  private let eventCountLabelYellow = UILabel()
+  private let eventCountLabel = UILabel()
+  private let rightChevronIcon = UIImageView()
   private let placeDetailButton = UIButton()
   private var placeExhibitionCollectionView: UICollectionView?
   
   public var contentHeight: CGFloat {
-      var totalHeight: CGFloat = 0
-      totalHeight += 102.adaptiveHeight
-      if let collectionView = placeExhibitionCollectionView, !collectionView.isHidden {
-          totalHeight += 261.adaptiveHeight
-      }
-      return totalHeight
+    var totalHeight: CGFloat = 0
+    totalHeight += 102.adaptiveHeight
+    if let collectionView = placeExhibitionCollectionView, !collectionView.isHidden {
+      totalHeight += 261.adaptiveHeight
+    }
+    return totalHeight
   }
-  
-  public var onUpdateHeight: (() -> Void)?
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -46,8 +45,6 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
     setStyle()
     setUI()
     setAutolayout()
-    
-    print()
   }
   
   required init?(coder aDecoder: NSCoder) {
@@ -96,6 +93,7 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
       placeDetailButton,
       placeExhibitionCollectionView!
     )
+    
     placeDetailButton.addSubviews(
       locationLabel,
       placeNameLabel,
@@ -133,7 +131,7 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
       $0.leading.equalToSuperview().offset(16)
       $0.height.equalTo(20.adaptiveHeight)
     }
-
+    
     eventCountLabel.snp.makeConstraints {
       $0.centerY.equalTo(eventCountLabelYellow.snp.centerY)
       $0.leading.equalTo(eventCountLabelYellow.snp.trailing)
@@ -188,17 +186,17 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
     eventCountLabelYellow.text = "\(place.exhibitionSize)개"
     placeDetailButton.tag = index ?? -1
     
-    /// recordSize가 0이면 placeExhibitionCollectionView 숨기기
+    // recordSize가 0이면 placeExhibitionCollectionView 숨기기
     if place.recordSize == 0 {
-        placeExhibitionCollectionView?.isHidden = true
+      placeExhibitionCollectionView?.isHidden = true
     } else {
-        placeExhibitionCollectionView?.isHidden = false
+      placeExhibitionCollectionView?.isHidden = false
     }
     placeExhibitionCollectionView?.reloadData()
     onUpdateHeight?()
   }
   
-  public func updateRecords(records: [Feed]) {
+  private func updateRecords(records: [Feed]) {
     self.records = records
     placeExhibitionCollectionView?.reloadData()
   }

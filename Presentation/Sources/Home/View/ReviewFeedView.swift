@@ -15,14 +15,13 @@ import Common
 import Core
 
 final class ReviewFeedView: UIView {
-  
   var feeds: [Feed] = []
   
   private let reviewFeedCount = UILabel()
   private let emptyFirstLineLabel = UILabel()
   private let emptySecondLineLabel = UILabel()
   private let recordUploadButton = UIButton()
-  var reviewFeedCollectionView: UICollectionView?
+  private var reviewFeedCollectionView: UICollectionView?
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -123,7 +122,7 @@ final class ReviewFeedView: UIView {
       recordUploadButton.isHidden = true
       reviewFeedCollectionView?.isHidden = false
     }
-
+    
     self.reviewFeedCollectionView?.reloadData()
   }
   
@@ -136,10 +135,10 @@ final class ReviewFeedView: UIView {
     
     layout.itemSize = CGSize(width: cellWidth, height: 288.adaptiveHeight)
     layout.sectionInset = UIEdgeInsets(
-        top: 0,
-        left: 20.adaptiveWidth,
-        bottom: 0,
-        right: 20.adaptiveWidth
+      top: 0,
+      left: 20.adaptiveWidth,
+      bottom: 0,
+      right: 20.adaptiveWidth
     )
     layout.scrollDirection = .vertical
     layout.minimumLineSpacing = 16

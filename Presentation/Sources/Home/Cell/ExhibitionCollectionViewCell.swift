@@ -16,8 +16,8 @@ import Common
 
 public class ExhibitionCollectionViewCell: UICollectionViewCell {
   
-  public let exhibitionNameLabel = UILabel()
-  public let exhibitionDateLabel = UILabel()
+  private let exhibitionNameLabel = UILabel()
+  private let exhibitionDateLabel = UILabel()
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -68,31 +68,31 @@ public class ExhibitionCollectionViewCell: UICollectionViewCell {
   }
   
   public func bind(exhibition: Exhibition) {
-      let formatter = DateFormatter()
-      formatter.dateFormat = "yyyy-MM-dd"
-      formatter.timeZone = TimeZone.current
-
-      let outputFormatter = DateFormatter()
-      outputFormatter.dateFormat = "yyyy년 MM월 dd일"
-
-      let startDate = formatter.date(from: exhibition.startDate)
-      let endDate = formatter.date(from: exhibition.endDate)
-
-      let formattedStartDate = startDate != nil ? outputFormatter.string(from: startDate!) : exhibition.startDate
-      let formattedEndDate = endDate != nil ? outputFormatter.string(from: endDate!) : exhibition.endDate
-
-      exhibitionNameLabel.text = exhibition.name
-      exhibitionDateLabel.text = "\(formattedStartDate)~\(formattedEndDate)"
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd"
+    formatter.timeZone = TimeZone.current
+    
+    let outputFormatter = DateFormatter()
+    outputFormatter.dateFormat = "yyyy년 MM월 dd일"
+    
+    let startDate = formatter.date(from: exhibition.startDate)
+    let endDate = formatter.date(from: exhibition.endDate)
+    
+    let formattedStartDate = startDate != nil ? outputFormatter.string(from: startDate!) : exhibition.startDate
+    let formattedEndDate = endDate != nil ? outputFormatter.string(from: endDate!) : exhibition.endDate
+    
+    exhibitionNameLabel.text = exhibition.name
+    exhibitionDateLabel.text = "\(formattedStartDate)~\(formattedEndDate)"
   }
   
   public func calculateHeight(width: CGFloat) -> CGFloat {
-      let targetSize = CGSize(width: width - 32, height: CGFloat.greatestFiniteMagnitude)
-      
-      let nameLabelHeight = exhibitionNameLabel.sizeThatFits(targetSize).height
-      let dateLabelHeight = exhibitionDateLabel.sizeThatFits(targetSize).height
-      let padding: CGFloat = 12 + 4 + 12
+    let targetSize = CGSize(width: width - 32, height: CGFloat.greatestFiniteMagnitude)
     
-      return nameLabelHeight + dateLabelHeight + padding
+    let nameLabelHeight = exhibitionNameLabel.sizeThatFits(targetSize).height
+    let dateLabelHeight = exhibitionDateLabel.sizeThatFits(targetSize).height
+    let padding: CGFloat = 12 + 4 + 12
+    
+    return nameLabelHeight + dateLabelHeight + padding
   }
 }
 

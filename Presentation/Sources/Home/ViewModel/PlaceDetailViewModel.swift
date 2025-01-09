@@ -22,19 +22,17 @@ public enum PlaceDetailControlType: String {
 }
 
 public class PlaceDetailViewModel {
-  var onControlTypeChanged: ((PlaceDetailControlType) -> Void)?
-  var onFilterChanged: ((ChipState, ChipState, ChipState) -> Void)?
-  var onExhibitionsUpdated: (() -> Void)?
-  var onFeedsUpdated:(() -> Void)?
-  
   var selectedPlace: [Place] = []
   var exhibitions: [Exhibition] = []
   var reviewFeedList: [Feed] = []
   var allExhibitions: [Exhibition] = []
   var freeExhibitions: [Exhibition] = []
   var endSoonExhibitions: [Exhibition] = []
-  // isFree가 false인 데이터가 대부분이라 필터링 잘 되는지 확인 위해 MockData 활용
-  var test: [Exhibition] = [Core.Exhibition(id: 326, name: "장인, 세상을 이롭게 하다", startDate: "2021-07-16", endDate: "2022-12-31", isFree: true), Core.Exhibition(id: 327, name: "자수, 꽃이 피다", startDate: "2021-07-16", endDate: "2025-12-31", isFree: false)]
+  
+  var onControlTypeChanged: ((PlaceDetailControlType) -> Void)?
+  var onFilterChanged: ((ChipState, ChipState, ChipState) -> Void)?
+  var onExhibitionsUpdated: (() -> Void)?
+  var onFeedsUpdated:(() -> Void)?
   
   var hasNext = true
   var isFetching = false
@@ -44,7 +42,7 @@ public class PlaceDetailViewModel {
       onControlTypeChanged?(currentControlType)
     }
   }
-
+  
   private(set) var currentFilterType: FilterType = .all
   
   private(set) var allFilterState: ChipState = .active
@@ -62,22 +60,22 @@ public class PlaceDetailViewModel {
   }
   
   private func categorizeExhibitions() {
-      let formatter = DateFormatter()
-      formatter.dateFormat = "yyyy-MM-dd"
-      formatter.timeZone = TimeZone.current
-      
-      allExhibitions = exhibitions
-      freeExhibitions = exhibitions.filter { $0.isFree }
-      endSoonExhibitions = exhibitions
-          .filter { exhibition in
-              let endDate = formatter.date(from: exhibition.endDate) ?? Date.distantPast
-              return endDate > Date() // 종료일이 현재 날짜 이후인 항목만 포함
-          }
-          .sorted { first, second in
-              let firstEndDate = formatter.date(from: first.endDate) ?? Date.distantFuture
-              let secondEndDate = formatter.date(from: second.endDate) ?? Date.distantFuture
-              return firstEndDate < secondEndDate // 종료일이 빠른 순으로 정렬
-          }
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd"
+    formatter.timeZone = TimeZone.current
+    
+    allExhibitions = exhibitions
+    freeExhibitions = exhibitions.filter { $0.isFree }
+    endSoonExhibitions = exhibitions
+      .filter { exhibition in
+        let endDate = formatter.date(from: exhibition.endDate) ?? Date.distantPast
+        return endDate > Date() // 종료일이 현재 날짜 이후인 항목만 포함
+      }
+      .sorted { first, second in
+        let firstEndDate = formatter.date(from: first.endDate) ?? Date.distantFuture
+        let secondEndDate = formatter.date(from: second.endDate) ?? Date.distantFuture
+        return firstEndDate < secondEndDate // 종료일이 빠른 순으로 정렬
+      }
   }
   
   var filteredExhibitions: [Exhibition] {

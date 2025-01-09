@@ -171,31 +171,21 @@ final public class PlaceDetailViewController: UIViewController{
     exhibitionListView.freeFilterButton.tag = FilterType.free.rawValue
     exhibitionListView.endSoonFilterButton.tag = FilterType.endSoon.rawValue
     
-    exhibitionListView.allFilterButton.addTarget(self, action: #selector(onAllFilterButtonTapped), for: .touchUpInside)
-    exhibitionListView.freeFilterButton.addTarget(self, action: #selector(onFreeFilterButtonTapped(_:)), for: .touchUpInside)
-    exhibitionListView.endSoonFilterButton.addTarget(self, action: #selector(onEndSoonFilterButtonTapped(_:)), for: .touchUpInside)
+    exhibitionListView.allFilterButton.addTarget(self, action: #selector(onFilterButtonTapped), for: .touchUpInside)
+    exhibitionListView.freeFilterButton.addTarget(self, action: #selector(onFilterButtonTapped(_:)), for: .touchUpInside)
+    exhibitionListView.endSoonFilterButton.addTarget(self, action: #selector(onFilterButtonTapped(_:)), for: .touchUpInside)
   }
   
-  @objc private func onAllFilterButtonTapped(_ sender: UIButton) {
-    guard let filterType = FilterType(rawValue: sender.tag) else { return }
-    viewModel.updateFilterState(selected: filterType)
-  }
-  
-  @objc private func onFreeFilterButtonTapped(_ sender: UIButton) {
+  @objc private func onFilterButtonTapped(_ sender: UIButton) {
     guard let filterType = FilterType(rawValue: sender.tag) else { return }
     viewModel.updateFilterState(selected: filterType)
   }
 
-  @objc private func onEndSoonFilterButtonTapped(_ sender: UIButton) {
-    guard let filterType = FilterType(rawValue: sender.tag) else { return }
-    viewModel.updateFilterState(selected: filterType)
-  }
-
-  
   private func bind() {
     viewModel.onControlTypeChanged = { [weak self] type in
       self?.updateView(for: type)
     }
+    
     viewModel.onControlTypeChanged?(viewModel.currentControlType)
     
     viewModel.onFilterChanged = { [weak self] allState, freeState, endSoonState in
@@ -211,6 +201,7 @@ final public class PlaceDetailViewController: UIViewController{
         self?.exhibitionListView.updateExhibitionList(with: self?.viewModel.filteredExhibitions ?? [])
       }
     }
+    
     viewModel.onFeedsUpdated = { [weak self] in
       guard let self = self else { return }
       DispatchQueue.main.async {

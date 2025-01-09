@@ -115,13 +115,13 @@ final class OverviewViewController: UIViewController {
     
     overviewCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     overviewCollectionView?.showsVerticalScrollIndicator = false
-    overviewCollectionView?.dataSource = self
-    overviewCollectionView?.delegate = self
     overviewCollectionView?.backgroundColor = .clear
     overviewCollectionView?.register(
       OverviewCollectionViewCell.self,
       forCellWithReuseIdentifier: OverviewCollectionViewCell.cellIdentifier
     )
+    overviewCollectionView?.dataSource = self
+    overviewCollectionView?.delegate = self
   }
   
   private func bind() {
