@@ -26,8 +26,11 @@ final public class PlaceDetailViewController: UIViewController{
   private let exhibitionListView = ExhibitionListView()
   private let reviewFeedView = ReviewFeedView()
   
-  init(place: Place) {
-    self.viewModel = PlaceDetailViewModel(place: place)
+  init(place: Place, reviewFeeds: [Feed]) {
+    self.viewModel = PlaceDetailViewModel(
+      place: place,
+      reviewFeeds: reviewFeeds
+    )
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -56,6 +59,8 @@ final public class PlaceDetailViewController: UIViewController{
       freeState: viewModel.freeFilterState,
       endSoonState: viewModel.endSoonFilterState
     )
+    
+    print("🚨\(reviewFeedView.feeds)🚨")
   }
   
   private func setStyle() {
@@ -207,6 +212,16 @@ final public class PlaceDetailViewController: UIViewController{
       DispatchQueue.main.async {
         self?.exhibitionListView.updateExhibitionList(with: self?.viewModel.filteredExhibitions ?? [])
       }
+    }
+    viewModel.onFeedsUpdated = { [weak self] in
+      guard let self = self else { return }
+      DispatchQueue.main.async {
+        self.reviewFeedView.updateFeedList(with: self.viewModel.reviewFeedList)
+      }
+    }
+    
+    DispatchQueue.main.async {
+        self.reviewFeedView.updateFeedList(with: self.viewModel.reviewFeedList)
     }
   }
   
