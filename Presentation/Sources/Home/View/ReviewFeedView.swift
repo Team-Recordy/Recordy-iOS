@@ -19,6 +19,9 @@ final class ReviewFeedView: UIView {
   var feeds: [Feed] = []
   
   private let reviewFeedCount = UILabel()
+  private let emptyFirstLineLabel = UILabel()
+  private let emptySecondLineLabel = UILabel()
+  private let recordUploadButton = UIButton()
   var reviewFeedCollectionView: UICollectionView?
   
   public override init(frame: CGRect) {
@@ -42,19 +45,59 @@ final class ReviewFeedView: UIView {
       $0.font = ViskitFont.caption1Regular.font
       $0.textColor = CommonAsset.viskitWhite.color
     }
+    
+    emptyFirstLineLabel.do {
+      $0.text = "아직 후기가 없어요."
+      $0.font = RecordyFont.title3.font
+      $0.textColor = CommonAsset.viskitGray02.color
+    }
+    
+    emptySecondLineLabel.do {
+      $0.text = "첫 번째로 후기를 공유해 보세요!"
+      $0.font = RecordyFont.title3.font
+      $0.textColor = CommonAsset.viskitGray02.color
+    }
+    
+    recordUploadButton.do {
+      $0.backgroundColor = CommonAsset.viskitYellow400.color
+      $0.setTitle("영상 업로드하기", for: .normal)
+      $0.setTitleColor(CommonAsset.viskitBlack.color, for: .normal)
+      $0.titleLabel?.font = ViskitFont.body2Bold.font
+      $0.cornerRadius(22)
+    }
   }
   
   private func setUI() {
     addSubviews(
       reviewFeedCount,
+      emptyFirstLineLabel,
+      emptySecondLineLabel,
+      recordUploadButton,
       reviewFeedCollectionView!
     )
   }
   
   private func setAutolayout() {
     reviewFeedCount.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(36)
+      $0.top.equalToSuperview().offset(20)
       $0.trailing.equalToSuperview().offset(-20)
+    }
+    
+    emptyFirstLineLabel.snp.makeConstraints {
+      $0.top.equalTo(reviewFeedCount.snp.bottom).offset(101)
+      $0.centerX.equalToSuperview()
+    }
+    
+    emptySecondLineLabel.snp.makeConstraints {
+      $0.top.equalTo(emptyFirstLineLabel.snp.bottom).offset(5)
+      $0.centerX.equalToSuperview()
+    }
+    
+    recordUploadButton.snp.makeConstraints {
+      $0.top.equalTo(emptySecondLineLabel.snp.bottom).offset(23)
+      $0.width.equalTo(125.adaptiveWidth)
+      $0.height.equalTo(44.adaptiveHeight)
+      $0.centerX.equalToSuperview()
     }
     
     reviewFeedCollectionView?.snp.makeConstraints {
@@ -66,9 +109,21 @@ final class ReviewFeedView: UIView {
   }
   
   public func updateFeedList(with feeds: [Feed]) {
-    
     self.feeds = feeds
     self.reviewFeedCount.text = "• \(feeds.count)개의 기록"
+    
+    if feeds.isEmpty {
+      emptyFirstLineLabel.isHidden = false
+      emptySecondLineLabel.isHidden = false
+      recordUploadButton.isHidden = false
+      reviewFeedCollectionView?.isHidden = true
+    } else {
+      emptyFirstLineLabel.isHidden = true
+      emptySecondLineLabel.isHidden = true
+      recordUploadButton.isHidden = true
+      reviewFeedCollectionView?.isHidden = false
+    }
+
     self.reviewFeedCollectionView?.reloadData()
   }
   

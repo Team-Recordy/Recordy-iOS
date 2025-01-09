@@ -59,8 +59,6 @@ final public class PlaceDetailViewController: UIViewController{
       freeState: viewModel.freeFilterState,
       endSoonState: viewModel.endSoonFilterState
     )
-    
-    print("🚨\(reviewFeedView.feeds)🚨")
   }
   
   private func setStyle() {
@@ -146,7 +144,7 @@ final public class PlaceDetailViewController: UIViewController{
     segmentedControl.snp.makeConstraints {
       $0.top.equalTo(findRouteButton.snp.bottom).offset(40)
       $0.horizontalEdges.equalToSuperview().inset(20)
-      $0.height.equalTo(34)
+      $0.height.equalTo(40.adaptiveHeight)
     }
     
     segmentedControlContainer.snp.makeConstraints {

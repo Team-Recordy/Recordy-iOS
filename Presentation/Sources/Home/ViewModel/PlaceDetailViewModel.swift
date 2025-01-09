@@ -66,10 +66,9 @@ public class PlaceDetailViewModel {
       formatter.dateFormat = "yyyy-MM-dd"
       formatter.timeZone = TimeZone.current
       
-      allExhibitions = test
-      freeExhibitions = test.filter { $0.isFree }
-      
-      endSoonExhibitions = test
+      allExhibitions = exhibitions
+      freeExhibitions = exhibitions.filter { $0.isFree }
+      endSoonExhibitions = exhibitions
           .filter { exhibition in
               let endDate = formatter.date(from: exhibition.endDate) ?? Date.distantPast
               return endDate > Date() // 종료일이 현재 날짜 이후인 항목만 포함

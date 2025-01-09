@@ -23,6 +23,7 @@ final class ExhibitionListView: UIView {
   let allFilterButton = ChipKeyWordButton()
   let freeFilterButton = ChipKeyWordButton()
   let endSoonFilterButton = ChipKeyWordButton()
+  private let emptyLabel = UILabel()
   var exhibitionCollectionView: UICollectionView?
   
   private var exhibitions: [Exhibition] = []
@@ -66,6 +67,12 @@ final class ExhibitionListView: UIView {
       $0.titleLabel?.font = ViskitFont.caption1Regular.font
       $0.setTitleColor(CommonAsset.viskitBlack.color, for: .normal)
     }
+    
+    emptyLabel.do {
+      $0.text = "진행 중인 전시가 없어요."
+      $0.font = RecordyFont.title3.font
+      $0.textColor = CommonAsset.viskitGray02.color
+    }
   }
   
   func setUI() {
@@ -74,6 +81,7 @@ final class ExhibitionListView: UIView {
       allFilterButton,
       freeFilterButton,
       endSoonFilterButton,
+      emptyLabel,
       exhibitionCollectionView!
     )
   }
@@ -105,6 +113,11 @@ final class ExhibitionListView: UIView {
       $0.trailing.equalToSuperview().offset(-20)
     }
     
+    emptyLabel.snp.makeConstraints {
+      $0.top.equalTo(endSoonFilterButton.snp.bottom).offset(144)
+      $0.centerX.equalToSuperview()
+    }
+    
     exhibitionCollectionView?.snp.makeConstraints {
       $0.top.equalTo(allFilterButton.snp.bottom).offset(24)
       $0.leading.equalToSuperview().offset(20)
@@ -114,9 +127,17 @@ final class ExhibitionListView: UIView {
   }
   
   public func updateExhibitionList(with exhibitions: [Exhibition]) {
-    
     self.exhibitions = exhibitions
     self.exhibitionCountLabel.text = "• \(exhibitions.count)개의 전시"
+    
+    if exhibitions.isEmpty {
+        emptyLabel.isHidden = false
+        exhibitionCollectionView?.isHidden = true
+    } else {
+        emptyLabel.isHidden = true
+        exhibitionCollectionView?.isHidden = false
+    }
+    
     self.exhibitionCollectionView?.reloadData()
   }
   
@@ -179,7 +200,7 @@ extension ExhibitionListView: UICollectionViewDelegateFlowLayout {
   ) -> CGSize {
     let width = collectionView.frame.width
     guard let cell = collectionView.cellForItem(at: indexPath) as? ExhibitionCollectionViewCell else {
-        return CGSize(width: width, height: 100)
+        return CGSize(width: width, height: 74)
     }
     let calculatedHeight = cell.calculateHeight(width: width)
     return CGSize(width: width, height: calculatedHeight)

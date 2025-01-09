@@ -55,16 +55,15 @@ public class ExhibitionCollectionViewCell: UICollectionViewCell {
   
   private func setAutolayout() {
     exhibitionNameLabel.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(12)
+      $0.top.equalToSuperview().offset(16)
       $0.leading.equalToSuperview().offset(16)
       $0.trailing.equalToSuperview().offset(-16)
     }
     
     exhibitionDateLabel.snp.makeConstraints {
-      $0.top.equalTo(exhibitionNameLabel.snp.bottom).offset(4)
+      $0.top.equalTo(exhibitionNameLabel.snp.bottom).offset(8)
       $0.leading.equalToSuperview().offset(16)
       $0.trailing.equalToSuperview().offset(-16)
-      $0.bottom.equalToSuperview().offset(-12)
     }
   }
   
