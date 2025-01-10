@@ -154,11 +154,6 @@ extension SearchCompleteCollectionViewCell: UICollectionViewDataSource {
     cell.bind(result: result)
     return cell
   }
-  
-  public func collectionView(
-    _ collectionView: UICollectionView,
-    didSelectItemAt indexPath: IndexPath
-  ) {}
 }
 
 extension SearchCompleteCollectionViewCell: UICollectionViewDelegateFlowLayout {

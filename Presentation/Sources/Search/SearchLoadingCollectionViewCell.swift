@@ -30,7 +30,7 @@ public class SearchLoadingCollectionViewCell: UICollectionViewCell {
   
   private func setStyle() {
     loadingLocationResult.do {
-      $0.text = "전시관 • 서울 동대문구"
+      $0.text = ""
       $0.font = ViskitFont.caption1Medium.font
       $0.textColor = CommonAsset.viskitGray05.color
       $0.textAlignment = .left
@@ -38,7 +38,7 @@ public class SearchLoadingCollectionViewCell: UICollectionViewCell {
     }
     
     loadingExhibitionResult.do {
-      $0.text = "국립현대미술관"
+      $0.text = ""
       $0.font = ViskitFont.subtitle.font
       $0.textColor = CommonAsset.viskitGray01.color
       $0.textAlignment = .left
@@ -84,11 +84,11 @@ public class SearchLoadingCollectionViewCell: UICollectionViewCell {
     let typeDisplayName: String
     switch result.type {
     case "EXHIBITION":
-        typeDisplayName = "전시회"
+      typeDisplayName = "전시회"
     case "PLACE":
-        typeDisplayName = "전시관"
+      typeDisplayName = "전시관"
     default:
-        typeDisplayName = ""
+      typeDisplayName = ""
     }
     
     loadingLocationResult.text = "\(typeDisplayName) • \(formattedAddress)"

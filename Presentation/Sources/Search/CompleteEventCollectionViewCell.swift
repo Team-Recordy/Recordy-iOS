@@ -34,7 +34,7 @@ public class CompleteEventCollectionViewCell: UICollectionViewCell {
     }
     
     completeEventLabel.do {
-      $0.text = "박수빈: 코딩 파이팅 전시회"
+      $0.text = ""
       $0.font = ViskitFont.caption1Regular.font
       $0.textColor = CommonAsset.viskitGray03.color
       $0.textAlignment = .left

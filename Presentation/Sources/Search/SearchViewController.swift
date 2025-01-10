@@ -304,7 +304,7 @@ public class SearchViewController: UIViewController {
   private func bindSearchSubject() {
     searchSubject
       .debounce(for: .milliseconds(200), scheduler: DispatchQueue.main)
-    // 사용자 입력 시간 고려, 500Ms 이후 데이터 요청
+    // 사용자 입력 시간 고려, 200Ms 이후 데이터 요청
       .removeDuplicates()
       .sink { [weak self] query in
         guard let self = self else { return }
@@ -423,7 +423,6 @@ extension SearchViewController: UICollectionViewDelegateFlowLayout {
 }
 
 extension SearchViewController: UITextFieldDelegate {
-  
   public func textFieldDidBeginEditing(_ textField: UITextField) {
     updateSearchState(for: textField.text)
   }
@@ -436,38 +435,4 @@ extension SearchViewController: UITextFieldDelegate {
 }
 
 
-//----------------------------------------------------
-//1️⃣[GET] http://13.209.194.222/api/v1/search?query=%EB%8B%AC%ED%86%A0
-//----------------------------------------------------
-//2️⃣API: getSearch(Core.DTO.GetSearchRequest(query: "달토"))
-//------------------- END GET -------------------
-//------------------- Reponse가 도착했습니다. -------------------
-//3️⃣[200] http://13.209.194.222/api/v1/search?query=%EB%8B%AC%ED%86%A0
-//API: getSearch(Core.DTO.GetSearchRequest(query: "달토"))
-//Status Code: [200]
-//URL: http://13.209.194.222/api/v1/search?query=%EB%8B%AC%ED%86%A0
-//response:
-//4️⃣[{"id":434,"type":"EXHIBITION","address":"서울 용산구 용산동6가 168-6","name":"달항아리를 만든 곳, 금사리"},{"id":426,"type":"EXHIBITION","address":"서울 종로구 세종로 1-1","name":"달토끼와 산토끼"},{"id":432,"type":"EXHIBITION","address":"서울 서대문구 현저동 101","name":"2024년 이달의 독립운동가 \"세계 속의 한국독립운동\""},{"id":485,"type":"EXHIBITION","address":"서울 성북구 돈암동 538-59","name":"2024 성북 신문인사 프로젝트 &lt;이태준: 달밤은 그에게도 유감한 듯하였다&gt; 展"}]
-//----------------------------------------------------
 
-
-
-
-
-//------------------- Reponse가 도착했습니다. -------------------
-//3️⃣[200] http://13.209.194.222/api/v1/places/430
-//API: getPlaceList(id: 430)
-//Status Code: [200]
-//URL: http://13.209.194.222/api/v1/places/430
-//response:
-//4️⃣{"id":430,"name":"동대문디자인플라자","address":"서울 중구 을지로7가 2-1","platformId":"25022134","location":{"id":430,"longitude":127.009911013917,"latitude":37.5671843130818},"exhibitionSize":1,"recordSize":0}
-//------------------- END HTTP -------------------
-
-//------------------- Reponse가 도착했습니다. -------------------
-//3️⃣[200] http://13.209.194.222/api/v1/exhibitions?placeId=430
-//API: getExhibitionList(Core.DTO.GetExhibitionListRequest(placeId: 430))
-//Status Code: [200]
-//URL: http://13.209.194.222/api/v1/exhibitions?placeId=430
-//response:
-//4️⃣[]
-//------------------- END HTTP -------------------

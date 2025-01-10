@@ -44,7 +44,6 @@ public class SearchViewModel {
         let group = DispatchGroup()
         
         for placeId in self.filteredPlaceIDs {
-//          print("🚨루프에 돌아가는 아이디: \(placeId)🚨")
           group.enter()
           self.getPlace(placeId: placeId) { place in
             DispatchQueue.main.async {
@@ -68,9 +67,6 @@ public class SearchViewModel {
   func getPlace(placeId: Int, completion: @escaping (Place?) -> Void) {
     isFetching = true
     let apiProvider = APIProvider<APITarget.Places>()
-    let request = DTO.GetExhibitionListRequest(
-      placeId: placeId
-    )
     
     apiProvider.requestResponsable(.getPlaceList(id: placeId), DTO.GetPlaceResponse.self) { [weak self] result in
       guard let self = self else { return }
