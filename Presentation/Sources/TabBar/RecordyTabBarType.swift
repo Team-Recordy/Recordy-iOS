@@ -52,7 +52,7 @@ enum RecordyTabBarType: CaseIterable {
     case .home:
       BaseNavigationController(rootViewController: OverviewViewController(viewModel: OverviewViewModel()))
     case .search:
-      BaseNavigationController(rootViewController: SearchViewController())
+      BaseNavigationController(rootViewController: SearchViewController(viewModel: SearchViewModel()))
     case .upload:
       BaseNavigationController(rootViewController: UploadVideoViewController())
     case .video:
