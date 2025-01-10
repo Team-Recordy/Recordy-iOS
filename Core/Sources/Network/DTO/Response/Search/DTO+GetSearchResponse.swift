@@ -9,7 +9,9 @@
 import Foundation
 
 extension DTO {
-  public struct GetSearchResponse: BaseResponse {
+  public typealias GetSearchResponse = [Result]
+  
+  public struct Result: Codable {
     public let id: Int
     public let type: String
     public let address: String

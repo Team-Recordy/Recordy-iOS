@@ -9,7 +9,7 @@
 import Foundation
 
 extension DTO {
-  public struct GetPlaceResponse: BaseRequest {
+  public struct GetPlaceResponse: Codable {
     
     public let id: Int
     public let name: String
