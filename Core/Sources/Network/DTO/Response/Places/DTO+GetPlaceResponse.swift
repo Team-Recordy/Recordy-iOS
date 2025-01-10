@@ -15,7 +15,7 @@ extension DTO {
     public let name: String
     public let address: String
     public let platformId: String
-    public let location: [Location]
+    public let location: Location
     public let exhibitionSize: Int
     public let recordSize: Int
     
@@ -24,7 +24,7 @@ extension DTO {
       name: String,
       address: String,
       platformId: String,
-      location: [Location],
+      location: Location,
       exhibitionSize: Int,
       recordSize: Int
     ) {
@@ -42,13 +42,13 @@ extension DTO {
 extension DTO.GetPlaceResponse {
   public struct Location: BaseResponse {
     public let id: Int
-    public let longitude: Int
-    public let latitude: Int
+    public let longitude: Double
+    public let latitude: Double
     
     public init(
       id: Int,
-      longitude: Int,
-      latitude: Int
+      longitude: Double,
+      latitude: Double
     ) {
       self.id = id
       self.longitude = longitude
