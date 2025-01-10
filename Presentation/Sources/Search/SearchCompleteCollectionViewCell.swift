@@ -7,12 +7,16 @@
 //
 
 import UIKit
+
 import Common
+import Core
 
 public class SearchCompleteCollectionViewCell: UICollectionViewCell {
+  private var searchPlaceResult: Place?
+  private var searchExhibitionResult: [Exhibition] = []
   
   private var completeLocationResult = UILabel()
-  private var completeExhibitionResult = UILabel()
+  private var completePlaceResult = UILabel()
   private let completeRightChevronImageView = UIImageView()
   private var completeEventCollectionView: UICollectionView!
   private let cellDivider = UILabel()
@@ -38,7 +42,7 @@ public class SearchCompleteCollectionViewCell: UICollectionViewCell {
       $0.textAlignment = .left
     }
     
-    completeExhibitionResult.do {
+    completePlaceResult.do {
       $0.text = "국립현대미술관"
       $0.font = ViskitFont.subtitle.font
       $0.textColor = CommonAsset.viskitGray01.color
@@ -58,7 +62,7 @@ public class SearchCompleteCollectionViewCell: UICollectionViewCell {
   private func setUI() {
     addSubviews(
       completeLocationResult,
-      completeExhibitionResult,
+      completePlaceResult,
       completeRightChevronImageView,
       completeEventCollectionView,
       cellDivider
@@ -71,7 +75,7 @@ public class SearchCompleteCollectionViewCell: UICollectionViewCell {
       $0.leading.equalToSuperview().offset(20)
     }
     
-    completeExhibitionResult.snp.makeConstraints {
+    completePlaceResult.snp.makeConstraints {
       $0.top.equalTo(completeLocationResult.snp.bottom).offset(8)
       $0.leading.equalToSuperview().offset(20)
     }
@@ -84,7 +88,7 @@ public class SearchCompleteCollectionViewCell: UICollectionViewCell {
     }
     
     completeEventCollectionView.snp.makeConstraints {
-      $0.top.equalTo(completeExhibitionResult.snp.bottom).offset(14)
+      $0.top.equalTo(completePlaceResult.snp.bottom).offset(14)
       $0.leading.equalToSuperview().offset(28)
       $0.trailing.equalToSuperview().offset(-28)
       $0.bottom.equalToSuperview().offset(-1)
@@ -93,7 +97,7 @@ public class SearchCompleteCollectionViewCell: UICollectionViewCell {
     cellDivider.snp.makeConstraints {
       $0.leading.equalToSuperview().offset(20)
       $0.trailing.equalToSuperview().offset(20)
-      $0.bottom.equalToSuperview()
+      $0.bottom.equalToSuperview().offset(-2)
       $0.height.equalTo(1.adaptiveHeight)
     }
   }
@@ -115,6 +119,19 @@ public class SearchCompleteCollectionViewCell: UICollectionViewCell {
     self.completeEventCollectionView.delegate = self
     self.completeEventCollectionView.dataSource = self
   }
+  
+  public func bind(place: Place) {
+    self.searchPlaceResult = place
+    self.searchExhibitionResult = place.exhibitionList
+    
+    let addressComponents = place.address.split(separator: " ")
+    let formattedAddress = addressComponents.prefix(2).joined(separator: " ")
+    
+    completeLocationResult.text = "전시관 • \(formattedAddress)"
+    completePlaceResult.text = place.name
+    
+    completeEventCollectionView.reloadData()
+  }
 }
 
 extension SearchCompleteCollectionViewCell: UICollectionViewDataSource {
@@ -122,29 +139,20 @@ extension SearchCompleteCollectionViewCell: UICollectionViewDataSource {
     _ collectionView: UICollectionView,
     numberOfItemsInSection section: Int
   ) -> Int {
-    switch collectionView {
-    case completeEventCollectionView:
-      return 3
-    default:
-      return 0
-    }
+    return searchExhibitionResult.count
   }
   
   public func collectionView(
     _ collectionView: UICollectionView,
     cellForItemAt indexPath: IndexPath
   ) -> UICollectionViewCell {
-    switch collectionView {
-    case completeEventCollectionView:
-      let cell = collectionView.dequeueReusableCell(
-        withReuseIdentifier: CompleteEventCollectionViewCell.cellIdentifier,
-        for: indexPath
-      ) as! CompleteEventCollectionViewCell
-      return cell
-      
-    default:
-      fatalError("Unexpected collection view")
-    }
+    let cell = collectionView.dequeueReusableCell(
+      withReuseIdentifier: CompleteEventCollectionViewCell.cellIdentifier,
+      for: indexPath
+    ) as! CompleteEventCollectionViewCell
+    let result = searchExhibitionResult[indexPath.row]
+    cell.bind(result: result)
+    return cell
   }
   
   public func collectionView(

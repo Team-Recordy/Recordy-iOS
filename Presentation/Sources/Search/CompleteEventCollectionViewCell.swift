@@ -7,7 +7,9 @@
 //
 
 import UIKit
+
 import Common
+import Core
 
 public class CompleteEventCollectionViewCell: UICollectionViewCell {
   
@@ -56,5 +58,9 @@ public class CompleteEventCollectionViewCell: UICollectionViewCell {
       $0.leading.equalToSuperview().offset(16)
       $0.centerY.equalToSuperview()
     }
+  }
+  
+  public func bind(result: Exhibition) {
+    completeEventLabel.text = result.name
   }
 }

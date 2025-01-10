@@ -7,16 +7,18 @@
 //
 
 import UIKit
+
 import Common
+import Core
 
 public class SearchLoadingCollectionViewCell: UICollectionViewCell {
-  
   private var loadingLocationResult = UILabel()
   private var loadingExhibitionResult = UILabel()
   private let loadingRightChevronImageView = UIImageView()
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
+    
     setStyle()
     setUI()
     setAutolayout()
@@ -74,5 +76,22 @@ public class SearchLoadingCollectionViewCell: UICollectionViewCell {
       $0.width.equalTo(18.adaptiveWidth)
       $0.height.equalTo(18.adaptiveHeight)
     }
+  }
+  
+  public func bind(result: SearchResult) {
+    let addressComponents = result.address.split(separator: " ")
+    let formattedAddress = addressComponents.prefix(2).joined(separator: " ")
+    let typeDisplayName: String
+    switch result.type {
+    case "EXHIBITION":
+        typeDisplayName = "전시회"
+    case "PLACE":
+        typeDisplayName = "전시관"
+    default:
+        typeDisplayName = ""
+    }
+    
+    loadingLocationResult.text = "\(typeDisplayName) • \(formattedAddress)"
+    loadingExhibitionResult.text = result.name
   }
 }
