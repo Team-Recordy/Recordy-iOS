@@ -7,16 +7,18 @@
 //
 
 import UIKit
+
 import Common
+import Core
 
 public class SearchLoadingCollectionViewCell: UICollectionViewCell {
-  
   private var loadingLocationResult = UILabel()
   private var loadingExhibitionResult = UILabel()
   private let loadingRightChevronImageView = UIImageView()
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
+    
     setStyle()
     setUI()
     setAutolayout()
@@ -28,7 +30,7 @@ public class SearchLoadingCollectionViewCell: UICollectionViewCell {
   
   private func setStyle() {
     loadingLocationResult.do {
-      $0.text = "전시관 • 서울 동대문구"
+      $0.text = ""
       $0.font = ViskitFont.caption1Medium.font
       $0.textColor = CommonAsset.viskitGray05.color
       $0.textAlignment = .left
@@ -36,7 +38,7 @@ public class SearchLoadingCollectionViewCell: UICollectionViewCell {
     }
     
     loadingExhibitionResult.do {
-      $0.text = "국립현대미술관"
+      $0.text = ""
       $0.font = ViskitFont.subtitle.font
       $0.textColor = CommonAsset.viskitGray01.color
       $0.textAlignment = .left
@@ -74,5 +76,22 @@ public class SearchLoadingCollectionViewCell: UICollectionViewCell {
       $0.width.equalTo(18.adaptiveWidth)
       $0.height.equalTo(18.adaptiveHeight)
     }
+  }
+  
+  public func bind(result: SearchResult) {
+    let addressComponents = result.address.split(separator: " ")
+    let formattedAddress = addressComponents.prefix(2).joined(separator: " ")
+    let typeDisplayName: String
+    switch result.type {
+    case "EXHIBITION":
+      typeDisplayName = "전시회"
+    case "PLACE":
+      typeDisplayName = "전시관"
+    default:
+      typeDisplayName = ""
+    }
+    
+    loadingLocationResult.text = "\(typeDisplayName) • \(formattedAddress)"
+    loadingExhibitionResult.text = result.name
   }
 }

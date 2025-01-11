@@ -29,6 +29,11 @@ final class OverviewViewController: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    navigationController?.isNavigationBarHidden = true
+  }
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -39,6 +44,12 @@ final class OverviewViewController: UIViewController {
     bind()
     
     viewModel.getNearPlaceList()
+    viewModel.onNearPlacesUpdated = { [weak self] in
+      guard let self = self else { return }
+      self.viewModel.nearPlaces.forEach { place in
+        self.viewModel.getPlaceRecordList(placeId: place.id)
+      }
+    }
   }
   
   private func setStyle() {
@@ -104,13 +115,13 @@ final class OverviewViewController: UIViewController {
     
     overviewCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     overviewCollectionView?.showsVerticalScrollIndicator = false
-    overviewCollectionView?.dataSource = self
-    overviewCollectionView?.delegate = self
     overviewCollectionView?.backgroundColor = .clear
     overviewCollectionView?.register(
       OverviewCollectionViewCell.self,
       forCellWithReuseIdentifier: OverviewCollectionViewCell.cellIdentifier
     )
+    overviewCollectionView?.dataSource = self
+    overviewCollectionView?.delegate = self
   }
   
   private func bind() {
@@ -122,6 +133,12 @@ final class OverviewViewController: UIViewController {
     
     viewModel.onLocationStateChanged = { [weak self] state in
       self?.locationButton.setImage(state.buttonImage, for: .normal)
+    }
+    
+    viewModel.onPlaceRecordsUpdated = { [weak self] in
+      DispatchQueue.main.async {
+        self?.overviewCollectionView?.reloadData()
+      }
     }
   }
   
@@ -149,7 +166,7 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
       }
       let place = viewModel.nearPlaces[indexPath.row]
       cell.backgroundColor = .clear
-      cell.bind(place: place, records: [], index: indexPath.row)
+      cell.bind(place: place, records: place.recordList, index: indexPath.row)
       cell.onPlaceDetailButtonTapped = { [weak self] tag in
         guard let self = self else { return }
         self.handlePlaceDetailButtonTapped(index: tag)
@@ -159,21 +176,15 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
           collectionView.collectionViewLayout.invalidateLayout()
         }
       }
-      
-      viewModel.getPlaceRecordList(placeId: place.id)
-      viewModel.onPlaceRecordsUpdated = { [weak self, weak cell] in
-        guard let self = self else { return }
-        DispatchQueue.main.async {
-          cell?.updateRecords(records: self.viewModel.placeRecords)
-        }
-      }
       return cell
     }
+  
   private func handlePlaceDetailButtonTapped(index: Int) {
     guard index >= 0, index < viewModel.nearPlaces.count else { return }
     
     let selectedPlace = viewModel.nearPlaces[index]
-    let placeDetailVC = PlaceDetailViewController(place: selectedPlace)
+    let reviewFeeds = selectedPlace.recordList
+    let placeDetailVC = PlaceDetailViewController(place: selectedPlace, reviewFeeds: reviewFeeds)
     navigationController?.pushViewController(placeDetailVC, animated: true)
   }
 }

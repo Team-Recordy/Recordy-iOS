@@ -14,23 +14,24 @@ import Then
 import Common
 import Core
 
+@available(iOS 16.0, *)
 final class ExhibitionListView: UIView {
+  private var exhibitions: [Exhibition] = []
   
   public var onAllFilterButtonTapped: (() -> Void)?
   
+  public let allFilterButton = ChipKeyWordButton()
+  public let freeFilterButton = ChipKeyWordButton()
+  public let endSoonFilterButton = ChipKeyWordButton()
   private var exhibitionCountLabel = UILabel()
-  let allFilterButton = ChipKeyWordButton()
-  let freeFilterButton = ChipKeyWordButton()
-  let endSoonFilterButton = ChipKeyWordButton()
-  var exhibitionCollectionView: UICollectionView?
-  
-  private var exhibitions: [Exhibition] = []
+  private let emptyLabel = UILabel()
+  private var exhibitionCollectionView: UICollectionView?
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
     
-    setStyle()
     setCollectionView()
+    setStyle()
     setUI()
     setAutolayout()
   }
@@ -39,7 +40,7 @@ final class ExhibitionListView: UIView {
     fatalError("init(coder:) has not been implemented")
   }
   
-  func setStyle() {
+  private func setStyle() {
     self.exhibitionCollectionView?.backgroundColor = .clear
     
     exhibitionCountLabel.do {
@@ -65,19 +66,26 @@ final class ExhibitionListView: UIView {
       $0.titleLabel?.font = ViskitFont.caption1Regular.font
       $0.setTitleColor(CommonAsset.viskitBlack.color, for: .normal)
     }
+    
+    emptyLabel.do {
+      $0.text = "진행 중인 전시가 없어요."
+      $0.font = RecordyFont.title3.font
+      $0.textColor = CommonAsset.viskitGray02.color
+    }
   }
   
-  func setUI() {
+  private func setUI() {
     addSubviews(
       exhibitionCountLabel,
       allFilterButton,
       freeFilterButton,
       endSoonFilterButton,
+      emptyLabel,
       exhibitionCollectionView!
     )
   }
   
-  func setAutolayout() {
+  private func setAutolayout() {
     allFilterButton.snp.makeConstraints {
       $0.top.equalToSuperview().offset(24)
       $0.leading.equalToSuperview().offset(20)
@@ -104,6 +112,11 @@ final class ExhibitionListView: UIView {
       $0.trailing.equalToSuperview().offset(-20)
     }
     
+    emptyLabel.snp.makeConstraints {
+      $0.top.equalTo(endSoonFilterButton.snp.bottom).offset(144)
+      $0.centerX.equalToSuperview()
+    }
+    
     exhibitionCollectionView?.snp.makeConstraints {
       $0.top.equalTo(allFilterButton.snp.bottom).offset(24)
       $0.leading.equalToSuperview().offset(20)
@@ -113,14 +126,24 @@ final class ExhibitionListView: UIView {
   }
   
   public func updateExhibitionList(with exhibitions: [Exhibition]) {
+    self.exhibitions = exhibitions
     self.exhibitionCountLabel.text = "• \(exhibitions.count)개의 전시"
+    
+    if exhibitions.isEmpty {
+      emptyLabel.isHidden = false
+      exhibitionCollectionView?.isHidden = true
+    } else {
+      emptyLabel.isHidden = true
+      exhibitionCollectionView?.isHidden = false
+    }
+    
     self.exhibitionCollectionView?.reloadData()
   }
   
-  func setCollectionView() {
+  private func setCollectionView() {
     let layout = UICollectionViewFlowLayout()
     layout.scrollDirection = .vertical
-    layout.minimumLineSpacing = 0
+    layout.minimumLineSpacing = 12
     layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     
     exhibitionCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -130,9 +153,55 @@ final class ExhibitionListView: UIView {
       ExhibitionCollectionViewCell.self,
       forCellWithReuseIdentifier: ExhibitionCollectionViewCell.cellIdentifier
     )
+    
+    exhibitionCollectionView?.dataSource = self
+    exhibitionCollectionView?.delegate = self
   }
   
   @objc private func allFilterButtonTapped() {
     onAllFilterButtonTapped?()
+  }
+}
+
+@available(iOS 16.0, *)
+extension ExhibitionListView: UICollectionViewDelegate, UICollectionViewDataSource {
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    numberOfItemsInSection section: Int
+  ) -> Int {
+    let exhibitions = exhibitions
+    return exhibitions.count
+  }
+  
+  public func collectionView(
+    _ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+      guard let cell = collectionView.dequeueReusableCell(
+        withReuseIdentifier: ExhibitionCollectionViewCell.cellIdentifier,
+        for: indexPath
+      ) as? ExhibitionCollectionViewCell else {
+        fatalError("Failed to dequeue OverviewCollectionViewCell")
+      }
+      let exhibition = exhibitions[indexPath.row]
+      
+      cell.backgroundColor = CommonAsset.viskitGray10.color
+      cell.bind(exhibition: exhibition)
+      
+      return cell
+    }
+}
+
+@available(iOS 16.0, *)
+extension ExhibitionListView: UICollectionViewDelegateFlowLayout {
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    sizeForItemAt indexPath: IndexPath
+  ) -> CGSize {
+    let width = collectionView.frame.width
+    guard let cell = collectionView.cellForItem(at: indexPath) as? ExhibitionCollectionViewCell else {
+      return CGSize(width: width, height: 74)
+    }
+    let calculatedHeight = cell.calculateHeight(width: width)
+    return CGSize(width: width, height: calculatedHeight)
   }
 }

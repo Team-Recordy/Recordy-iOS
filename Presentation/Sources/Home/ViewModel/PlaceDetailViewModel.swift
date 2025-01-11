@@ -8,6 +8,7 @@
 
 import Common
 import Core
+import Foundation
 
 public enum FilterType: Int {
   case all = 0
@@ -21,18 +22,17 @@ public enum PlaceDetailControlType: String {
 }
 
 public class PlaceDetailViewModel {
+  var selectedPlace: [Place] = []
+  var exhibitions: [Exhibition] = []
+  var reviewFeedList: [Feed] = []
+  var allExhibitions: [Exhibition] = []
+  var freeExhibitions: [Exhibition] = []
+  var endSoonExhibitions: [Exhibition] = []
+  
   var onControlTypeChanged: ((PlaceDetailControlType) -> Void)?
   var onFilterChanged: ((ChipState, ChipState, ChipState) -> Void)?
   var onExhibitionsUpdated: (() -> Void)?
-  
-  var selectedPlace: [Place] = []
-  var exhibitions: [Exhibition] = [] {
-    didSet {
-      onExhibitionsUpdated?()
-    }
-  }
-  var freeExhibitions: [Exhibition] = []
-  var ongoingExhibitions: [Exhibition] = []
+  var onFeedsUpdated:(() -> Void)?
   
   var hasNext = true
   var isFetching = false
@@ -43,13 +43,50 @@ public class PlaceDetailViewModel {
     }
   }
   
+  private(set) var currentFilterType: FilterType = .all
+  
   private(set) var allFilterState: ChipState = .active
   private(set) var freeFilterState: ChipState = .inactive
   private(set) var endSoonFilterState: ChipState = .inactive
   
-  public init(place: Place) {
-    selectedPlace.append(place)
+  public init(
+    place: Place,
+    reviewFeeds: [Feed]
+  ) {
+    selectedPlace = [place]
+    reviewFeedList = reviewFeeds
+    onFeedsUpdated?()
     initFilterState()
+  }
+  
+  private func categorizeExhibitions() {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd"
+    formatter.timeZone = TimeZone.current
+    
+    allExhibitions = exhibitions
+    freeExhibitions = exhibitions.filter { $0.isFree }
+    endSoonExhibitions = exhibitions
+      .filter { exhibition in
+        let endDate = formatter.date(from: exhibition.endDate) ?? Date.distantPast
+        return endDate > Date() // 종료일이 현재 날짜 이후인 항목만 포함
+      }
+      .sorted { first, second in
+        let firstEndDate = formatter.date(from: first.endDate) ?? Date.distantFuture
+        let secondEndDate = formatter.date(from: second.endDate) ?? Date.distantFuture
+        return firstEndDate < secondEndDate // 종료일이 빠른 순으로 정렬
+      }
+  }
+  
+  var filteredExhibitions: [Exhibition] {
+    switch currentFilterType {
+    case .all:
+      return allExhibitions
+    case .free:
+      return freeExhibitions
+    case .endSoon:
+      return endSoonExhibitions
+    }
   }
   
   func getExhibitionList(placeId: Int) {
@@ -68,12 +105,15 @@ public class PlaceDetailViewModel {
             id: exhibition.id,
             name: exhibition.name,
             startDate: exhibition.startDate,
+            endDate: exhibition.endDate,
             isFree: exhibition.isFree
           )
         }
       case .failure(let error):
         print("Error fetching exhibitions: \(error)")
       }
+      categorizeExhibitions()
+      self.onExhibitionsUpdated?()
     }
   }
   
@@ -82,11 +122,23 @@ public class PlaceDetailViewModel {
   }
   
   func updateFilterState(selected: FilterType) {
-    allFilterState = (selected == .all) ? .active : .inactive
-    freeFilterState = (selected == .free) ? .active : .inactive
-    endSoonFilterState = (selected == .endSoon) ? .active : .inactive
+    allFilterState = .inactive
+    freeFilterState = .inactive
+    endSoonFilterState = .inactive
+    
+    switch selected {
+    case .all:
+      allFilterState = .active
+    case .free:
+      freeFilterState = .active
+    case .endSoon:
+      endSoonFilterState = .active
+    }
+    
+    currentFilterType = selected
     
     onFilterChanged?(allFilterState, freeFilterState, endSoonFilterState)
+    onExhibitionsUpdated?()
   }
   
   private func initFilterState() {
