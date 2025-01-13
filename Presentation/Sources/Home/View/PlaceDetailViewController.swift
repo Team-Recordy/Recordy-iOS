@@ -11,7 +11,6 @@ import UIKit
 import Common
 import Core
 
-@available(iOS 16.0, *)
 final public class PlaceDetailViewController: UIViewController{
   
   var viewModel: PlaceDetailViewModel
@@ -26,10 +25,9 @@ final public class PlaceDetailViewController: UIViewController{
   private let exhibitionListView = ExhibitionListView()
   private let reviewFeedView = ReviewFeedView()
   
-  init(place: Place, reviewFeeds: [Feed]) {
+  init(place: Place) {
     self.viewModel = PlaceDetailViewModel(
-      place: place,
-      reviewFeeds: reviewFeeds
+      place: place
     )
     super.init(nibName: nil, bundle: nil)
   }
@@ -51,7 +49,8 @@ final public class PlaceDetailViewController: UIViewController{
     setDelegate()
     bind()
     setTarget()
-  
+    
+    print("2: 🚨\(viewModel.reviewFeedList)🚨")
     viewModel.getExhibitionList(placeId: viewModel.selectedPlace.first?.id ?? 0)
     
     updateFilterButtonState(
@@ -230,7 +229,6 @@ final public class PlaceDetailViewController: UIViewController{
   }
 }
 
-@available(iOS 16.0, *)
 extension PlaceDetailViewController: PlaceDetailControlTypeDelegate {
   public func sendControlType(_ type: PlaceDetailControlType) {
     viewModel.updateControlType(to: type)

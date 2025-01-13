@@ -313,7 +313,7 @@ public class SearchViewController: UIViewController {
           return
         }
         self.updateSearchState(for: query)
-        self.viewModel.getSearchResults(query: query)
+        self.viewModel.getSearchResultsWithDetails(query: query)
       }
       .store(in: &cancellables)
   }
@@ -388,7 +388,51 @@ extension SearchViewController: UICollectionViewDataSource {
   public func collectionView(
     _ collectionView: UICollectionView,
     didSelectItemAt indexPath: IndexPath
-  ) {}
+  ) {
+    switch collectionView {
+    case searchLoadingCollectionView:
+      let result = viewModel.searchResults[indexPath.row]
+      viewModel.getPlace(placeId: result.id) { [weak self] place in
+        guard let self = self else { return }
+        
+        guard let place = place else {
+          return
+        }
+        
+        self.viewModel.getPlaceWithRecords(placeId: place.id, recordSize: place.recordSize) { [weak self] placeWithRecords in
+          guard let self = self else { return }
+          
+          DispatchQueue.main.async {
+            guard let placeWithRecords = placeWithRecords else {
+              return
+            }
+            
+            let placeDetailVC = PlaceDetailViewController(place: placeWithRecords)
+            self.navigationController?.pushViewController(placeDetailVC, animated: true)
+          }
+        }
+      }
+      
+    case searchCompleteCollectionView:
+      let place = viewModel.filteredSearchResults[indexPath.row]
+      
+      viewModel.getPlaceWithRecords(placeId: place.id, recordSize: place.recordSize) { [weak self] updatedPlace in
+        guard let self = self else { return }
+        
+        DispatchQueue.main.async {
+          guard let updatedPlace = updatedPlace else {
+            return
+          }
+          
+          let placeDetailVC = PlaceDetailViewController(place: updatedPlace)
+          self.navigationController?.pushViewController(placeDetailVC, animated: true)
+        }
+      }
+      
+    default:
+      fatalError("Unexpected collection view")
+    }
+  }
 }
 
 extension SearchViewController: UICollectionViewDelegateFlowLayout {

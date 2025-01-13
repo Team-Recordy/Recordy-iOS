@@ -50,11 +50,10 @@ public class PlaceDetailViewModel {
   private(set) var endSoonFilterState: ChipState = .inactive
   
   public init(
-    place: Place,
-    reviewFeeds: [Feed]
+    place: Place
   ) {
     selectedPlace = [place]
-    reviewFeedList = reviewFeeds
+    reviewFeedList = place.recordList
     onFeedsUpdated?()
     initFilterState()
   }

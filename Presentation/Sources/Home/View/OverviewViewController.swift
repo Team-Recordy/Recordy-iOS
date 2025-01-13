@@ -47,7 +47,7 @@ final class OverviewViewController: UIViewController {
     viewModel.onNearPlacesUpdated = { [weak self] in
       guard let self = self else { return }
       self.viewModel.nearPlaces.forEach { place in
-        self.viewModel.getPlaceRecordList(placeId: place.id)
+        self.viewModel.getPlaceRecordList(placeId: place.id, recordSize: place.recordSize)
       }
     }
   }
@@ -184,7 +184,7 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
     
     let selectedPlace = viewModel.nearPlaces[index]
     let reviewFeeds = selectedPlace.recordList
-    let placeDetailVC = PlaceDetailViewController(place: selectedPlace, reviewFeeds: reviewFeeds)
+    let placeDetailVC = PlaceDetailViewController(place: selectedPlace)
     navigationController?.pushViewController(placeDetailVC, animated: true)
   }
 }

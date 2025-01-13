@@ -78,12 +78,12 @@ public class OverviewViewModel {
     }
   }
   
-  func getPlaceRecordList(placeId: Int) {
+  func getPlaceRecordList(placeId: Int, recordSize: Int) {
     isFetching = true
     let apiProvider = APIProvider<APITarget.Records>()
     let request = DTO.GetPlaceRecordListRequest(
       placeId: placeId,
-      size: 10
+      size: recordSize
     )
     
     apiProvider.requestResponsable(.getPlaceRecordList(request), DTO.GetPlaceRecordListResponse.self) { [weak self] result in
