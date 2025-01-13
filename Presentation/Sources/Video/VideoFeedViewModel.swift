@@ -88,7 +88,7 @@ class VideoFeedViewModel {
         response: DTO.GetBookmarkedListResponse.self
       )
     case .test:
-      self.feedList = Feed.mockData
+//      self.feedList = Feed.mockData
       self.onFeedListUpdate?(self.feedList.count)
     default: return
     }
@@ -243,26 +243,26 @@ class VideoFeedViewModel {
           dispatchGroup.leave()
           return
         }
-        let cachedFeed = Feed(
-          id: feed.id,
-          userId: feed.userId,
-          location: feed.location,
-          nickname: feed.nickname,
-          description: feed.description,
-          isBookmarked: feed.isBookmarked,
-          bookmarkCount: feed.bookmarkCount,
-          videoLink: String(describing: cachedUrl),
-          thumbnailLink: feed.thumbnailLink,
-          isMine: feed.isMine
-        )
-        cachedFeeds.append(cachedFeed)
-        dispatchGroup.leave()
+//        let cachedFeed = Feed(
+//          id: feed.id,
+//          userId: feed.userId,
+//          location: feed.location,
+//          nickname: feed.nickname,
+//          description: feed.description,
+//          isBookmarked: feed.isBookmarked,
+//          bookmarkCount: feed.bookmarkCount,
+//          videoLink: String(describing: cachedUrl),
+//          thumbnailLink: feed.thumbnailLink,
+//          isMine: feed.isMine
+//        )
+//        cachedFeeds.append(cachedFeed)
+//        dispatchGroup.leave()
       }
     }
 
-    dispatchGroup.notify(queue: .main) {
-      completion(cachedFeeds)
-    }
+//    dispatchGroup.notify(queue: .main) {
+//      completion(cachedFeeds)
+//    }
   }
 
   func postIsFeedWatched(feed: Feed) {

@@ -176,9 +176,9 @@ class FeedView: UIView {
       $0.font = RecordyFont.caption1.font
     }
 
-    moreButton.do {
-      $0.setImage(CommonAsset.seeMore.image, for: .normal)
-    }
+//    moreButton.do {
+//      $0.setImage(CommonAsset.seeMore.image, for: .normal)
+//    }
   }
 
   private func setUI() {

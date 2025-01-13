@@ -139,11 +139,11 @@ class FeedCell: UICollectionViewCell {
       5,
       text: feed.description
     )
-    feedView.locationLabel.text = feed.location
-    feedView.nicknameButton.setTitle(
-      feed.nickname,
-      for: .normal
-    )
+//    feedView.locationLabel.text = feed.location
+//    feedView.nicknameButton.setTitle(
+//      feed.nickname,
+//      for: .normal
+//    )
     feedView.descriptionTextView.text = feed.description
     feedView.bookmarkButton.setImage(
       feed.isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image,
@@ -190,7 +190,7 @@ class FeedCell: UICollectionViewCell {
     deleteAction?()
   }
 
-  @objc 
+  @objc
   private func moreButtonTapped() {
     moreAction?()
   }

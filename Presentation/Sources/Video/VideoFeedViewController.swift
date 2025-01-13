@@ -24,7 +24,7 @@ public class VideoFeedViewController: UIViewController {
   
   var collectionView: UICollectionView? = nil
   
-  private let recordyToggle = ViskitToggle()
+//  private let recordyToggle = ViskitToggle()
   var isPlayed = false
   var type: VideoFeedType
   var viewModel: VideoFeedViewModel
@@ -63,40 +63,40 @@ public class VideoFeedViewController: UIViewController {
   }
   
   public override func viewDidDisappear(_ animated: Bool) {
-    removeAVPlayers()
+//    removeAVPlayers()
   }
   
   private func setStyle() {
     navigationController?.navigationBar.isHidden = type == .all || type == .following
     view.backgroundColor = CommonAsset.recordyBG.color
-    recordyToggle.do {
-      $0.isHidden = type != .all && type != .following && type != .test
-    }
-    recordyToggle.toggleAction = { [weak self] toggleState in
-      guard let self = self else { return }
-      toggleButtonTapped(type: toggleState == .all ? .following : .all)
-    }
-    if type != .all {
-      navigationController?.navigationBar.topItem?.title = ""
-    }
+//    recordyToggle.do {
+//      $0.isHidden = type != .all && type != .following && type != .test
+//    }
+//    recordyToggle.toggleAction = { [weak self] toggleState in
+//      guard let self = self else { return }
+//      toggleButtonTapped(type: toggleState == .all ? .following : .all)
+//    }
+//    if type != .all {
+//      navigationController?.navigationBar.topItem?.title = ""
+//    }
   }
   
   private func setUI() {
     view.addSubview(collectionView!)
-    view.addSubview(recordyToggle)
-    view.bringSubviewToFront(recordyToggle)
+//    view.addSubview(recordyToggle)
+//    view.bringSubviewToFront(recordyToggle)
   }
   
   private func setAutolayout() {
     collectionView!.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
-    recordyToggle.snp.makeConstraints {
-      $0.top.equalTo(view.safeAreaLayoutGuide).inset(12.adaptiveHeight)
-      $0.centerX.equalToSuperview()
-      $0.width.equalTo(124)
-      $0.height.equalTo(32)
-    }
+//    recordyToggle.snp.makeConstraints {
+//      $0.top.equalTo(view.safeAreaLayoutGuide).inset(12.adaptiveHeight)
+//      $0.centerX.equalToSuperview()
+//      $0.width.equalTo(124)
+//      $0.height.equalTo(32)
+//    }
   }
   
   private func setUpCollectionView() {
@@ -116,8 +116,8 @@ public class VideoFeedViewController: UIViewController {
       FeedCell.self,
       forCellWithReuseIdentifier: FeedCell.cellIdentifier
     )
-    collectionView!.delegate = self
-    collectionView!.dataSource = self
+//    collectionView!.delegate = self
+//    collectionView!.dataSource = self
   }
   
   private func bind() {
@@ -140,13 +140,13 @@ public class VideoFeedViewController: UIViewController {
     }
   }
 
-  @objc private func nicknameButtonTapped(_ sender: UIButton) {
-    guard type != .userProfile && type != .myProfile else { return }
-    let index = sender.tag
-    let feed = viewModel.feedList[index]
-    let userVC = OtherUserProfileViewController(id: feed.uploaderId)
-    self.navigationController?.pushViewController(userVC, animated: true)
-  }
+//  @objc private func nicknameButtonTapped(_ sender: UIButton) {
+//    guard type != .userProfile && type != .myProfile else { return }
+//    let index = sender.tag
+//    let feed = viewModel.feedList[index]
+//    let userVC = OtherUserProfileViewController(id: feed.uploaderId)
+//    self.navigationController?.pushViewController(userVC, animated: true)
+//  }
 
   func toggleButtonTapped(type: VideoFeedType) {
     viewModel.type = type == .all ? .following : .all
@@ -155,26 +155,26 @@ public class VideoFeedViewController: UIViewController {
   }
   
   func sheetAction() {
-    let nextViewController = ReportWithCopyLinkViewController()
-    nextViewController.delegate = self
-    let navigationController = BaseNavigationController(rootViewController: nextViewController)
-
-    if let sheet = navigationController.sheetPresentationController {
-      configureSheet(sheet, height: Sheet.defaultHeight)
+//    let nextViewController = ReportWithCopyLinkViewController()
+//    nextViewController.delegate = self
+//    let navigationController = BaseNavigationController(rootViewController: nextViewController)
+//
+//    if let sheet = navigationController.sheetPresentationController {
+//      configureSheet(sheet, height: Sheet.defaultHeight)
     }
     
-    present(navigationController, animated: true)
+//    present(navigationController, animated: true)
   }
   
   private func configureSheet(_ sheet: UISheetPresentationController, height: CGFloat) {
-    sheet.detents = [.custom { _ in return height.adaptiveHeight }]
-    sheet.prefersGrabberVisible = true
+//    sheet.detents = [.custom { _ in return height.adaptiveHeight }]
+//    sheet.prefersGrabberVisible = true
   }
   
   func updateSheetHeight(_ height: CGFloat) {
-    guard let sheet = presentedViewController?.sheetPresentationController else { return }
-    sheet.animateChanges {
-      sheet.detents = [.custom { _ in return height.adaptiveHeight }]
-    }
-  }
+//    guard let sheet = presentedViewController?.sheetPresentationController else { return }
+//    sheet.animateChanges {
+//      sheet.detents = [.custom { _ in return height.adaptiveHeight }]
+//    }
+//  }
 }

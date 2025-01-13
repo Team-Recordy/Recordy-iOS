@@ -11,15 +11,15 @@ import UIKit
 @available(iOS 16.0, *)
 extension VideoFeedViewController: UICollectionViewDataSource {
 
-  @objc private func nicknameButtonTapped(_ sender: UIButton) {
+  @objc private func  nicknameButtonTapped(_ sender: UIButton) {
     guard type != .userProfile && type != .myProfile else { return }
     let index = sender.tag
     let feed = viewModel.feedList[index]
-    let userViewController = OtherUserProfileViewController(id: feed.userId)
-    navigationController?.pushViewController(
-        userViewController,
-        animated: true
-      )
+//    let userViewController = OtherUserProfileViewController(id: feed.userId)
+//    navigationController?.pushViewController(
+//        userViewController,
+//        animated: true
+//      )
   }
 
   public func collectionView(
