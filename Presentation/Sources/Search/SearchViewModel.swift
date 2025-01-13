@@ -105,14 +105,16 @@ public class SearchViewModel {
     }
   }
   
-  func getSearchResultsWithDetails(query: String) {
+  func getSearchResultsWithDetails(query: String, completion: @escaping () -> Void) {
     isFetching = true
     let apiProvider = APIProvider<APITarget.Search>()
     let request = DTO.GetSearchRequest(query: query)
     self.filteredSearchResults = []
     
     apiProvider.requestResponsable(.getSearch(request), DTO.GetSearchResponse.self) { [weak self] result in
-      guard let self = self else { return }
+      guard let self = self else {
+        completion()
+        return }
       self.isFetching = false
       switch result {
       case .success(let response):
@@ -135,10 +137,12 @@ public class SearchViewModel {
         
         group.notify(queue: .main) {
           self.onCompleteExhibitionsUpdated?()
+          completion()
         }
         
       case .failure(let error):
         print("Error fetching search results: \(error)")
+        completion()
       }
     }
   }

@@ -57,6 +57,7 @@ public class SearchViewController: UIViewController {
   public override func viewDidLoad() {
     super.viewDidLoad()
     
+    navigationController?.isNavigationBarHidden = true
     searchTextfield.delegate = self
     
     setSearchLoadingCollectionView()
@@ -313,7 +314,18 @@ public class SearchViewController: UIViewController {
           return
         }
         self.updateSearchState(for: query)
-        self.viewModel.getSearchResultsWithDetails(query: query)
+        self.viewModel.getSearchResultsWithDetails(query: query) { [weak self] in
+          guard let self = self else { return }
+          
+          DispatchQueue.main.async {
+            if self.viewModel.searchResults.isEmpty {
+              DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+                guard let self = self else { return }
+                self.updateSearchState(for: nil)
+              }
+            }
+          }
+        }
       }
       .store(in: &cancellables)
   }
@@ -327,6 +339,11 @@ public class SearchViewController: UIViewController {
   }
   
   private func updateSearchState(for text: String?) {
+    if text == nil {
+        self.currentState = .empty
+        return
+    }
+    
     DispatchQueue.main.async {
       guard let text = text, !text.isEmpty else {
         self.currentState = .initial
@@ -473,7 +490,9 @@ extension SearchViewController: UITextFieldDelegate {
   
   public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     textField.resignFirstResponder()
-    currentState = .complete
+    if !viewModel.searchResults.isEmpty{
+      currentState = .complete
+    }
     return true
   }
 }

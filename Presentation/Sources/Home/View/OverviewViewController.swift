@@ -29,13 +29,10 @@ final class OverviewViewController: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
-  override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-    navigationController?.isNavigationBarHidden = true
-  }
-  
   public override func viewDidLoad() {
     super.viewDidLoad()
+    
+    navigationController?.isNavigationBarHidden = true
     
     setOverviewCollectionView()
     setStyle()
@@ -53,7 +50,7 @@ final class OverviewViewController: UIViewController {
   }
   
   private func setStyle() {
-    navigationController?.isNavigationBarHidden = true
+    
     
     overviewCollectionView!.do {
       $0.backgroundColor = .clear
