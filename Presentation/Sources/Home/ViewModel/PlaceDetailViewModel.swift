@@ -5,15 +5,23 @@
 //  Created by Chandrala on 10/29/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
+import Foundation
+import MapKit
 
 import Common
 import Core
-import Foundation
+
 
 public enum FilterType: Int {
   case all = 0
   case free = 1
   case endSoon = 2
+}
+
+public enum MapType {
+  case kakao
+  case naver
+  case google
 }
 
 public enum PlaceDetailControlType: String {
@@ -36,7 +44,8 @@ public class PlaceDetailViewModel {
   
   var hasNext = true
   var isFetching = false
-  
+  private let userLatitude: Double
+  private let userLongitude: Double
   private(set) var currentControlType: PlaceDetailControlType = .exhibitionList {
     didSet {
       onControlTypeChanged?(currentControlType)
@@ -50,10 +59,14 @@ public class PlaceDetailViewModel {
   private(set) var endSoonFilterState: ChipState = .inactive
   
   public init(
-    place: Place
+    place: Place,
+    latitude: Double,
+    longitude: Double
   ) {
     selectedPlace = [place]
     reviewFeedList = place.recordList
+    userLatitude = latitude
+    userLongitude = longitude
     onFeedsUpdated?()
     initFilterState()
   }
@@ -142,5 +155,30 @@ public class PlaceDetailViewModel {
   
   private func initFilterState() {
     onFilterChanged?(allFilterState, freeFilterState, endSoonFilterState)
+  }
+  
+  public func openMap(type: MapType, openInWebView: @escaping (String) -> Void) {
+    guard let place = selectedPlace.first,
+          let placeLatitude = selectedPlace.first?.latitude,
+          let placeLongitude = selectedPlace.first?.longitude,
+          let name = place.name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+      return
+    }
+    
+    switch type {
+    case .kakao:
+      let appURL = "kakaomap://route?ep=\(userLatitude),\(userLatitude)&name=\(name)&by=car"
+      let webURL = "https://map.kakao.com/link/to/\(name),\(placeLatitude),\(placeLongitude)"
+      WebViewManager.openURL(appURLString: appURL, webURLString: webURL, openInWebView: openInWebView)
+    case .naver:
+      let appURL = "nmap://route?slat=\(userLatitude)&slng=\(userLongitude)&dlat=\(selectedPlace.first?.latitude)&dlng=\(selectedPlace.first?.longitude)&mode=transit"
+      print("🚨\("nmap://route?slat=\(userLatitude)&slng=\(userLongitude)&dlat=\(placeLatitude)&dlng=\(placeLongitude)&mode=transit")🚨")
+      let webURL = "https://map.naver.com/v5/directions/\(userLatitude),\(userLongitude)/\(placeLatitude),\(placeLongitude)/transit"
+      WebViewManager.openURL(appURLString: appURL, webURLString: webURL, openInWebView: openInWebView)
+    case .google:
+      let appURL = "comgooglemaps://?q=\(userLatitude),\(userLongitude)"
+      let webURL = "https://www.google.com/maps?q=\(placeLatitude),\(placeLongitude)"
+      WebViewManager.openURL(appURLString: appURL, webURLString: webURL, openInWebView: openInWebView)
+    }
   }
 }

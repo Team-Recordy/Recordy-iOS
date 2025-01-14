@@ -36,9 +36,20 @@ public class OverviewViewModel {
   var hasNext = true
   var isFetching = false
   
+  private let locationManager = LocationManager()
+  private(set) var locationState: LocationState = .inactive {
+    didSet {
+      onLocationStateChanged?(locationState)
+    }
+  }
+  
+  private(set) var userLatitude: Double?
+  private(set) var userLongitude: Double?
+  
   var onNearPlacesUpdated: (() -> Void)?
   var onPlaceRecordsUpdated: (() -> Void)?
   var onLocationStateChanged: ((LocationState) -> Void)?
+  var onLocationUpdated: ((Double, Double) -> Void)?
   
   func getNearPlaceList() {
     isFetching = true
@@ -117,13 +128,18 @@ public class OverviewViewModel {
     }
   }
   
-  private(set) var locationState: LocationState = .inactive {
-    didSet {
-      onLocationStateChanged?(locationState)
+  func updateLocation(latitude: Double?, longitude: Double?) {
+    guard let latitude = latitude, let longitude = longitude else {
+      return
     }
+    self.userLatitude = latitude
+    self.userLongitude = longitude
+    locationState = .active
   }
   
-  func toggleLocationState() {
-    locationState = (locationState == .active) ? .inactive : .active
+  func deactivateLocation() {
+    userLatitude = 0
+    userLongitude = 0
+    onLocationStateChanged?(.inactive)
   }
 }

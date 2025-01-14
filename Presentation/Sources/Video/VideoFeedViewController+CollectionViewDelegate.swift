@@ -15,7 +15,7 @@ extension VideoFeedViewController: UICollectionViewDataSource {
     guard type != .userProfile && type != .myProfile else { return }
     let index = sender.tag
     let feed = viewModel.feedList[index]
-    let userViewController = OtherUserProfileViewController(id: feed.userId)
+    let userViewController = OtherUserProfileViewController(id: feed.uploaderId)
     navigationController?.pushViewController(
         userViewController,
         animated: true
