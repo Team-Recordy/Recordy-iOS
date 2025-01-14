@@ -64,18 +64,4 @@ final class SearchPlaceViewModel {
       }
     }
   }
-  //  apiProvider.requestResponsable(
-  //    endPoint,
-  //    response
-  //  ) { [weak self] result in
-  //    guard let self = self else { return }
-  //    self.isFetching = false
-  //    switch result {
-  //    case .success(let response):
-  //      processResponse(response: response)
-  //    case .failure(_):
-  //      self.feedList = []
-  //      self.onFeedListUpdate?(0)
-  //    }
-  //  }
 }
