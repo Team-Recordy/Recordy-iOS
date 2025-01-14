@@ -24,21 +24,18 @@ public class UploadVideoViewController: UIViewController {
   private let warningLabel = UILabel()
   private let scrollView = UIScrollView()
   private let contentView = UIView()
-  private let videoThumbnailLabel = RecordySubtitleLabel(subtitle: "영상")
   let videoThumbnailView = UIView()
   let videoThumbnailSelectButton = UIButton()
   let videoThumbnailAlertLabel = UILabel()
   private let videoThumbnailImageView = UIImageView()
-  private let selectedKeywordLabel = RecordySubtitleLabel(subtitle: "키워드")
 //  private let selectKeywordStackView = RecordySelectKeywordStackView()
-  private let firstKeywordLabel = RecordyKeywordLabel()
-  private let secondKeywordLabel = RecordyKeywordLabel()
-  private let thirdKeywordLabel = RecordyKeywordLabel()
-  private let locationLabel = RecordySubtitleLabel(subtitle: "위치")
-  private let locationTextField = RecordyTextField(placeholder: "영상 속 위치는 어디인가요?")
-  private let locationTextCountLabel = UILabel()
-  private let contentsLabel = RecordySubtitleLabel(subtitle: "내용")
+//  private let contentsLabel = RecordySubtitleLabel(subtitle: "내용")
   private let contentsTextView = RecordyTextView()
+  private let placeButton = PlaceButton()
+  private let displayBackgroundView = UIView()
+  private let displayLabel = UILabel()
+  private let displayTextField = UITextField()
+  private let displayTextCountLabel = UILabel()
   let uploadButton = UIButton()
 
   private let viewModel = UploadVideoViewModel()
@@ -86,22 +83,35 @@ public class UploadVideoViewController: UIViewController {
         for: .touchUpInside
       )
     }
+
     videoThumbnailAlertLabel.do {
       $0.text = "다른 영상 고르기"
       $0.font = RecordyFont.caption2.font
       $0.textColor = CommonAsset.recordyGrey01.color
     }
-//    selectKeywordStackView.keywordButton.do {
-//      $0.addTarget(
-//        self,
-//        action: #selector(selectedKeywordButtonTapped),
-//        for: .touchUpInside
-//      )
-//    }
-    locationTextCountLabel.do {
-      $0.font = RecordyFont.caption2.font
-      $0.textColor = CommonAsset.recordyGrey04.color
+
+    placeButton.do {
+      $0.addTarget(self, action: #selector(placeButtonTapped), for: .touchUpInside)
     }
+
+    displayBackgroundView.do {
+      $0.backgroundColor = CommonAsset.viskitGray10.color
+      $0.cornerRadius(8)
+    }
+
+    displayLabel.do {
+      $0.text = "전시명"
+      $0.font = ViskitFont.body2.font
+      $0.textColor = CommonAsset.viskitGray01.color
+    }
+
+    displayTextField.do {
+      $0.placeholder = "전시명을 입력해 주세요."
+      $0.font = ViskitFont.body2.font
+      $0.textColor = CommonAsset.viskitGray01.color
+      $0.backgroundColor = CommonAsset.viskitGray10.color
+    }
+
     uploadButton.do {
       $0.setTitle("업로드", for: .normal)
       $0.backgroundColor = CommonAsset.recordyMain.color
@@ -123,17 +133,16 @@ public class UploadVideoViewController: UIViewController {
       videoThumbnailSelectButton,
       videoThumbnailAlertLabel
     )
+    displayBackgroundView.addSubviews(
+        displayLabel,
+        displayTextField
+      )
     contentView.addSubviews(
       warningLabel,
-      videoThumbnailLabel,
       videoThumbnailView,
-//      selectKeywordStackView,
-      selectedKeywordLabel,
-      locationLabel,
-      locationTextField,
-      locationTextCountLabel,
-      contentsLabel,
       contentsTextView,
+      placeButton,
+      displayBackgroundView,
       uploadButton
     )
   }
@@ -162,66 +171,11 @@ public class UploadVideoViewController: UIViewController {
       $0.height.equalTo(18.adaptiveHeight)
     }
 
-    videoThumbnailLabel.snp.makeConstraints {
-      $0.top.equalTo(contentView.snp.top).offset(70.adaptiveHeight)
-      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
-      $0.height.equalTo(28.adaptiveHeight)
-    }
-
     videoThumbnailView.snp.makeConstraints {
-      $0.top.equalTo(videoThumbnailLabel.snp.bottom).offset(12.adaptiveHeight)
-      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
+      $0.top.equalTo(warningLabel.snp.bottom).offset(16)
+      $0.centerX.equalToSuperview()
       $0.width.equalTo(180.adaptiveWidth)
       $0.height.equalTo(284.adaptiveHeight)
-    }
-
-    selectedKeywordLabel.snp.makeConstraints {
-      $0.top.equalTo(videoThumbnailImageView.snp.bottom).offset(20.adaptiveHeight)
-      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
-      $0.height.equalTo(28.adaptiveHeight)
-    }
-
-//    selectKeywordStackView.snp.makeConstraints {
-//      $0.top.equalTo(selectedKeywordLabel.snp.bottom).offset(10.adaptiveHeight)
-//      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
-//      $0.height.equalTo(36.adaptiveHeight)
-//    }
-//
-//    locationLabel.snp.makeConstraints {
-//      $0.top.equalTo(selectKeywordStackView.snp.bottom).offset(24.adaptiveHeight)
-//      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
-//      $0.height.equalTo(28.adaptiveHeight)
-//    }
-
-    locationTextField.snp.makeConstraints {
-      $0.top.equalTo(locationLabel.snp.bottom).offset(12.adaptiveHeight)
-      $0.horizontalEdges.equalTo(contentView.snp.horizontalEdges).inset(20.adaptiveWidth)
-      $0.height.equalTo(52.adaptiveHeight)
-    }
-
-    locationTextCountLabel.snp.makeConstraints {
-      $0.top.equalTo(locationTextField.snp.bottom).offset(8.adaptiveHeight)
-      $0.trailing.equalTo(contentView.snp.trailing).offset(-20.adaptiveWidth)
-      $0.height.equalTo(18.adaptiveHeight)
-    }
-
-    contentsLabel.snp.makeConstraints {
-      $0.top.equalTo(locationTextCountLabel.snp.bottom)
-      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
-      $0.height.equalTo(28.adaptiveHeight)
-    }
-    
-    contentsTextView.snp.makeConstraints {
-      $0.top.equalTo(contentsLabel.snp.bottom).offset(12.adaptiveHeight)
-      $0.horizontalEdges.equalTo(contentView.snp.horizontalEdges).inset(20.adaptiveWidth)
-      $0.height.greaterThanOrEqualTo(174.adaptiveHeight)
-    }
-
-    uploadButton.snp.makeConstraints {
-      $0.top.equalTo(contentsTextView.snp.bottom).offset(18.adaptiveHeight)
-      $0.horizontalEdges.equalToSuperview().inset(20.adaptiveWidth)
-      $0.height.equalTo(54.adaptiveHeight)
-      $0.bottom.equalTo(contentView.snp.bottom).inset(82.adaptiveHeight)
     }
 
     videoThumbnailImageView.snp.makeConstraints {
@@ -236,6 +190,35 @@ public class UploadVideoViewController: UIViewController {
       $0.bottom.equalToSuperview().offset(-16.adaptiveHeight)
       $0.centerX.equalToSuperview()
     }
+
+    contentsTextView.snp.makeConstraints {
+      $0.top.equalTo(videoThumbnailView.snp.bottom).offset(12.adaptiveHeight)
+      $0.horizontalEdges.equalTo(contentView.snp.horizontalEdges).inset(20.adaptiveWidth)
+      $0.height.greaterThanOrEqualTo(106.adaptiveHeight)
+    }
+
+    placeButton.snp.makeConstraints {
+      $0.top.equalTo(contentsTextView.snp.bottom).offset(16.adaptiveHeight)
+      $0.horizontalEdges.equalTo(contentView.snp.horizontalEdges).inset(20.adaptiveWidth)
+      $0.height.equalTo(52.adaptiveHeight)
+    }
+
+    displayBackgroundView.snp.makeConstraints {
+      $0.top.equalTo(placeButton.snp.bottom).offset(16.adaptiveHeight)
+      $0.horizontalEdges.equalTo(contentView.snp.horizontalEdges).inset(20.adaptiveWidth)
+      $0.height.equalTo(52.adaptiveHeight)
+    }
+
+    displayLabel.snp.makeConstraints {
+      $0.centerY.equalToSuperview()
+      $0.leading.equalToSuperview().offset(18.adaptiveWidth)
+      $0.trailing.equalTo(displayTextField.snp.leading).offset(-8.adaptiveWidth)
+    }
+
+    displayTextField.snp.makeConstraints {
+      $0.centerY.equalToSuperview()
+      $0.trailing.equalToSuperview().offset(-18.adaptiveWidth)
+    }
   }
 
   func bind() {
@@ -243,43 +226,43 @@ public class UploadVideoViewController: UIViewController {
       .bind(to: videoThumbnailImageView.rx.image)
       .disposed(by: disposeBag)
 
-    viewModel.output.locationTextCount
-      .bind(to: locationTextCountLabel.rx.text)
-      .disposed(by: disposeBag)
+//    viewModel.output.locationTextCount
+//      .bind(to: locationTextCountLabel.rx.text)
+//      .disposed(by: disposeBag)
 
     viewModel.output.contentsTextCount
       .bind(to: contentsTextView.textCountLabel.rx.text)
       .disposed(by: disposeBag)
 
-    locationTextField.rx.text.orEmpty
-      .filter { $0.count <= 20 }
-      .bind(to: viewModel.input.location)
-      .disposed(by: disposeBag)
-
-    locationTextField.rx.controlEvent([.editingDidBegin])
-      .map { RecordyTextFieldState.selected }
-      .bind(to: locationTextField.rx.state)
-      .disposed(by: disposeBag)
-
-    locationTextField.rx.controlEvent([.editingDidEnd])
-      .map { RecordyTextFieldState.unselected }
-      .bind(to: locationTextField.rx.state)
-      .disposed(by: disposeBag)
+//    locationTextField.rx.text.orEmpty
+//      .filter { $0.count <= 20 }
+//      .bind(to: viewModel.input.location)
+//      .disposed(by: disposeBag)
+//
+//    locationTextField.rx.controlEvent([.editingDidBegin])
+//      .map { RecordyTextFieldState.selected }
+//      .bind(to: locationTextField.rx.state)
+//      .disposed(by: disposeBag)
+//
+//    locationTextField.rx.controlEvent([.editingDidEnd])
+//      .map { RecordyTextFieldState.unselected }
+//      .bind(to: locationTextField.rx.state)
+//      .disposed(by: disposeBag)
 
     contentsTextView.textView.rx.text.orEmpty
       .filter { $0.count <= 300 }
       .bind(to: viewModel.input.contents)
       .disposed(by: disposeBag)
 
-    locationTextField.rx.text.orEmpty
-      .subscribe(onNext: { [weak self] text in
-        guard let self = self else { return }
-        if text.count > 20 {
-          self.locationTextField.text = String(text.prefix(20))
-          self.locationTextField.updateTextFieldStyle(for: .error)
-        }
-      })
-      .disposed(by: disposeBag)
+//    locationTextField.rx.text.orEmpty
+//      .subscribe(onNext: { [weak self] text in
+//        guard let self = self else { return }
+//        if text.count > 20 {
+//          self.locationTextField.text = String(text.prefix(20))
+//          self.locationTextField.updateTextFieldStyle(for: .error)
+//        }
+//      })
+//      .disposed(by: disposeBag)
 
     contentsTextView.textView.rx.text.orEmpty
       .subscribe(onNext: { [weak self] text in
@@ -318,20 +301,6 @@ public class UploadVideoViewController: UIViewController {
     }
   }
 
-//  @objc func selectedKeywordButtonTapped() {
-//    let filteringViewController = RecordyFilteringViewController()
-//    filteringViewController.delegate = self
-//    if let sheet = filteringViewController.sheetPresentationController {
-//      sheet.detents = [
-//        .custom { _ in
-//          return 495.adaptiveHeight
-//        }
-//      ]
-//      sheet.prefersGrabberVisible = true
-//    }
-//    self.present(filteringViewController, animated: true)
-//  }
-
   @objc func uploadButtonTapped() {
     viewModel.uploadButtonTapped()
     self.dismiss(animated: true)
@@ -344,6 +313,11 @@ public class UploadVideoViewController: UIViewController {
       }
     }
   }
+
+  @objc func placeButtonTapped() {
+    let nextViewController = SearchPlaceViewController()
+    navigationController?.pushViewController(nextViewController, animated: true)
+  }
 }
 
 @available(iOS 16.0, *)
@@ -352,14 +326,6 @@ extension UploadVideoViewController: SelectVideoDelegate {
     viewModel.input.selectedAsset.accept(data)
   }
 }
-
-//@available(iOS 16.0, *)
-//extension UploadVideoViewController: FilteringDelegate {
-//  public func selectKeywords(_ keywords: [Keyword]) {
-//    viewModel.input.selectedKeywords.accept(keywords)
-//    selectKeywordStackView.updateKeywords(keywords: keywords)
-//  }
-//}
 
 @available(iOS 16.0, *)
 extension Reactive where Base: UploadVideoViewController {

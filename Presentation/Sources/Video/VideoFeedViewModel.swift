@@ -22,7 +22,7 @@ public enum VideoFeedType {
 }
 
 class VideoFeedViewModel {
-
+  
   private(set) var feedList: [Feed] = []
   let apiProvider = APIProvider<APITarget.Records>()
   var type: VideoFeedType
@@ -35,7 +35,7 @@ class VideoFeedViewModel {
   var isToggle = false
   var onFeedListUpdate: ((Int) -> ())?
   var isBookmarked: (() -> ())?
-
+  
   init(
     type: VideoFeedType,
     currentId: Int? = nil,
@@ -93,7 +93,7 @@ class VideoFeedViewModel {
     default: return
     }
   }
-
+  
   private func getPlaceRecordList<T: Codable>(
     endPoint: APITarget.Records,
     response: T.Type
@@ -203,68 +203,66 @@ class VideoFeedViewModel {
       }
     }
   }
-
+  
   func updateFeedList(_ newFeeds: [Feed]) {
     cacheVideos(feeds: newFeeds) { [weak self] cachedFeeds in
       guard let self else { return }
       self.feedList += cachedFeeds
       self.onFeedListUpdate?(cachedFeeds.count)
     }
+  }
+  
+  func cacheVideos(
+    feeds: [Feed],
+    completion: @escaping ([Feed]) -> Void
+  ) {
+    let dispatchGroup = DispatchGroup()
+    var cachedFeeds: [Feed] = []
     
-    func cacheVideos(
-      feeds: [Feed],
-      completion: @escaping ([Feed]) -> Void
-    ) {
-      let dispatchGroup = DispatchGroup()
-      var cachedFeeds: [Feed] = []
-      
-      for feed in feeds {
-        dispatchGroup.enter()
-        VideoCacheManager.shared.downloadAndCacheURL(url: URL(string: feed.videoLink)!) { url in
-          guard let cachedUrl = url else {
-            dispatchGroup.leave()
-            return
-          }
-          let cachedFeed = Feed(
-            id: feed.id,
-            videoLink: feed.videoLink,
-            thumbnailLink: feed.thumbnailLink,
-            description: feed.description,
-            exhibitionName: feed.exhibitionName,
-            placeId: feed.placeId,
-            placeName: feed.placeName,
-            uploaderId: feed.uploaderId,
-            uploaderNickname: feed.uploaderNickname,
-            bookmarkCount: feed.bookmarkCount,
-            isMine: feed.isMine,
-            isBookmarked: feed.isBookmarked
-          )
-          cachedFeeds.append(cachedFeed)
+    for feed in feeds {
+      dispatchGroup.enter()
+      VideoCacheManager.shared.downloadAndCacheURL(url: URL(string: feed.videoLink)!) { url in
+        guard let cachedUrl = url else {
           dispatchGroup.leave()
           return
         }
-//        let cachedFeed = Feed(
-//          id: feed.id,
-//          userId: feed.userId,
-//          location: feed.location,
-//          nickname: feed.nickname,
-//          description: feed.description,
-//          isBookmarked: feed.isBookmarked,
-//          bookmarkCount: feed.bookmarkCount,
-//          videoLink: String(describing: cachedUrl),
-//          thumbnailLink: feed.thumbnailLink,
-//          isMine: feed.isMine
-//        )
-//        cachedFeeds.append(cachedFeed)
-//        dispatchGroup.leave()
+        let cachedFeed = Feed(
+          id: feed.id,
+          videoLink: feed.videoLink,
+          thumbnailLink: feed.thumbnailLink,
+          description: feed.description,
+          exhibitionName: feed.exhibitionName,
+          placeId: feed.placeId,
+          placeName: feed.placeName,
+          uploaderId: feed.uploaderId,
+          uploaderNickname: feed.uploaderNickname,
+          bookmarkCount: feed.bookmarkCount,
+          isMine: feed.isMine,
+          isBookmarked: feed.isBookmarked
+        )
+        
+        //            Feed(
+        //              id: feed.id,
+        //              userId: feed.uploaderId,
+        //              location: feed.,
+        //              nickname: feed.nickname,
+        //              description: feed.description,
+        //              isBookmarked: feed.isBookmarked,
+        //              bookmarkCount: feed.bookmarkCount,
+        //              videoLink: String(describing: cachedUrl),
+        //              thumbnailLink: feed.thumbnailLink,
+        //              isMine: feed.isMine
+        //            )
+        cachedFeeds.append(cachedFeed)
+        dispatchGroup.leave()
       }
     }
-
-//    dispatchGroup.notify(queue: .main) {
-//      completion(cachedFeeds)
-//    }
+    
+    dispatchGroup.notify(queue: .main) {
+      completion(cachedFeeds)
+    }
   }
-
+  
   func postIsFeedWatched(feed: Feed) {
     //    let request = DTO.IsRecordWatchedRequest(recordId: feed.id)
     //    apiProvider.justRequest(.isRecordWatched(request)) { result in
@@ -276,7 +274,7 @@ class VideoFeedViewModel {
     //      }
     //    }
   }
-
+  
   func deleteFeed(_ index: Int) {
     let feed = self.feedList[index]
     let request = DTO.DeleteRecordRequest(record_id: feed.id)

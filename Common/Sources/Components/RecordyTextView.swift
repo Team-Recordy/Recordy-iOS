@@ -15,8 +15,8 @@ public class RecordyTextView: UIView {
 
   public let textView = UITextView().then {
     $0.font = RecordyFont.body2.font
-    $0.textColor = CommonAsset.recordyGrey01.color
-    $0.backgroundColor = CommonAsset.recordyGrey08.color
+    $0.textColor = CommonAsset.viskitGray01.color
+    $0.backgroundColor = CommonAsset.viskitGray10.color
     $0.isScrollEnabled = false
     let horizontalPadding = 14.adaptiveWidth
     let verticalPadding = 14.adaptiveHeight
@@ -33,8 +33,8 @@ public class RecordyTextView: UIView {
   }
 
   private let textViewPlaceHolder = "공간에 대한 나의 생각을 자유롭게 적어주세요!"
-  private let minHeight = 148.adaptiveHeight
-  private let maxHeight = 408.adaptiveHeight
+  private let minHeight = 80.adaptiveHeight
+  private let maxHeight = 272.adaptiveHeight
 
   public override init(frame: CGRect) {
     super.init(frame: frame)
