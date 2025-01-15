@@ -36,18 +36,32 @@ public class OverviewViewModel {
   var hasNext = true
   var isFetching = false
   
+  private let locationManager = LocationManager()
+  private(set) var locationState: LocationState = .inactive {
+    didSet {
+      onLocationStateChanged?(locationState)
+    }
+  }
+  
+  private(set) var userLatitude: Double?
+  private(set) var userLongitude: Double?
+  
   var onNearPlacesUpdated: (() -> Void)?
   var onPlaceRecordsUpdated: (() -> Void)?
   var onLocationStateChanged: ((LocationState) -> Void)?
+  var onLocationUpdated: ((Double, Double) -> Void)?
   
   func getNearPlaceList() {
+    let latitude = userLatitude ?? 37.57858694484229
+    let longitude = userLongitude ?? 126.98009796814407
+    
     isFetching = true
     let apiProvider = APIProvider<APITarget.Places>()
     let request = DTO.GetNearPlaceListRequest(
       number: 0,
       size: 10,
-      latitude: 37.57858694484229,
-      longitude: 126.98009796814407,
+      latitude: latitude,
+      longitude: longitude,
       distance: 400
     )
     
@@ -78,12 +92,12 @@ public class OverviewViewModel {
     }
   }
   
-  func getPlaceRecordList(placeId: Int) {
+  func getPlaceRecordList(placeId: Int, recordSize: Int) {
     isFetching = true
     let apiProvider = APIProvider<APITarget.Records>()
     let request = DTO.GetPlaceRecordListRequest(
       placeId: placeId,
-      size: 10
+      size: recordSize
     )
     
     apiProvider.requestResponsable(.getPlaceRecordList(request), DTO.GetPlaceRecordListResponse.self) { [weak self] result in
@@ -117,13 +131,22 @@ public class OverviewViewModel {
     }
   }
   
-  private(set) var locationState: LocationState = .inactive {
-    didSet {
-      onLocationStateChanged?(locationState)
+  func updateLocation(
+    latitude: Double?,
+    longitude: Double?
+  ) {
+    guard let latitude = latitude, let longitude = longitude else {
+      return
     }
+    self.userLatitude = latitude
+    self.userLongitude = longitude
+    locationState = .active
+    getNearPlaceList()
   }
   
-  func toggleLocationState() {
-    locationState = (locationState == .active) ? .inactive : .active
+  func deactivateLocation() {
+    userLatitude = 0
+    userLongitude = 0
+    onLocationStateChanged?(.inactive)
   }
 }

@@ -57,6 +57,7 @@ public class SearchViewController: UIViewController {
   public override func viewDidLoad() {
     super.viewDidLoad()
     
+    navigationController?.isNavigationBarHidden = true
     searchTextfield.delegate = self
     
     setSearchLoadingCollectionView()
@@ -313,7 +314,18 @@ public class SearchViewController: UIViewController {
           return
         }
         self.updateSearchState(for: query)
-        self.viewModel.getSearchResults(query: query)
+        self.viewModel.getSearchResultsWithDetails(query: query) { [weak self] in
+          guard let self = self else { return }
+          
+          DispatchQueue.main.async {
+            if self.viewModel.searchResults.isEmpty {
+              DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+                guard let self = self else { return }
+                self.updateSearchState(for: nil)
+              }
+            }
+          }
+        }
       }
       .store(in: &cancellables)
   }
@@ -327,6 +339,11 @@ public class SearchViewController: UIViewController {
   }
   
   private func updateSearchState(for text: String?) {
+    if text == nil {
+        self.currentState = .empty
+        return
+    }
+    
     DispatchQueue.main.async {
       guard let text = text, !text.isEmpty else {
         self.currentState = .initial
@@ -388,7 +405,52 @@ extension SearchViewController: UICollectionViewDataSource {
   public func collectionView(
     _ collectionView: UICollectionView,
     didSelectItemAt indexPath: IndexPath
-  ) {}
+  ) {
+    switch collectionView {
+    case searchLoadingCollectionView:
+      let result = viewModel.searchResults[indexPath.row]
+      viewModel.getPlace(placeId: result.id) { [weak self] place in
+        guard let self = self else { return }
+        
+        guard let place = place else {
+          return
+        }
+        
+        self.viewModel.getPlaceWithRecords(placeId: place.id, recordSize: place.recordSize) { [weak self] placeWithRecords in
+          guard let self = self else { return }
+          
+          DispatchQueue.main.async {
+            guard let placeWithRecords = placeWithRecords else {
+              return
+            }
+            
+            //TODO: 값 수정
+            let placeDetailVC = PlaceDetailViewController(place: placeWithRecords, latitude: 37, longitude: -1)
+            self.navigationController?.pushViewController(placeDetailVC, animated: true)
+          }
+        }
+      }
+      
+    case searchCompleteCollectionView:
+      let place = viewModel.filteredSearchResults[indexPath.row]
+      
+      viewModel.getPlaceWithRecords(placeId: place.id, recordSize: place.recordSize) { [weak self] updatedPlace in
+        guard let self = self else { return }
+        
+        DispatchQueue.main.async {
+          guard let updatedPlace = updatedPlace else {
+            return
+          }
+          //TODO: 값 수정
+          let placeDetailVC = PlaceDetailViewController(place: updatedPlace, latitude: 37, longitude: -1)
+          self.navigationController?.pushViewController(placeDetailVC, animated: true)
+        }
+      }
+      
+    default:
+      fatalError("Unexpected collection view")
+    }
+  }
 }
 
 extension SearchViewController: UICollectionViewDelegateFlowLayout {
@@ -429,7 +491,9 @@ extension SearchViewController: UITextFieldDelegate {
   
   public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     textField.resignFirstResponder()
-    currentState = .complete
+    if !viewModel.searchResults.isEmpty{
+      currentState = .complete
+    }
     return true
   }
 }

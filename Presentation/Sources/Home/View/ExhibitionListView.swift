@@ -14,7 +14,6 @@ import Then
 import Common
 import Core
 
-@available(iOS 16.0, *)
 final class ExhibitionListView: UIView {
   private var exhibitions: [Exhibition] = []
   
@@ -163,7 +162,6 @@ final class ExhibitionListView: UIView {
   }
 }
 
-@available(iOS 16.0, *)
 extension ExhibitionListView: UICollectionViewDelegate, UICollectionViewDataSource {
   public func collectionView(
     _ collectionView: UICollectionView,

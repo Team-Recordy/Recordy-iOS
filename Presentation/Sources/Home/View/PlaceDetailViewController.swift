@@ -11,10 +11,12 @@ import UIKit
 import Common
 import Core
 
-@available(iOS 16.0, *)
 final public class PlaceDetailViewController: UIViewController{
   
   var viewModel: PlaceDetailViewModel
+  
+  private var userLatitude: Double
+  private var userLongitude: Double
   
   private let placeNameLabel = UILabel()
   private let detailLocationLabel = UILabel()
@@ -26,10 +28,13 @@ final public class PlaceDetailViewController: UIViewController{
   private let exhibitionListView = ExhibitionListView()
   private let reviewFeedView = ReviewFeedView()
   
-  init(place: Place, reviewFeeds: [Feed]) {
+  init(place: Place, latitude: Double, longitude: Double) {
+    self.userLatitude = latitude
+    self.userLongitude = longitude
     self.viewModel = PlaceDetailViewModel(
       place: place,
-      reviewFeeds: reviewFeeds
+      latitude: userLatitude,
+      longitude: userLongitude
     )
     super.init(nibName: nil, bundle: nil)
   }
@@ -38,20 +43,17 @@ final public class PlaceDetailViewController: UIViewController{
     fatalError("init(coder:) has not been implemented")
   }
   
-  public override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-    navigationController?.isNavigationBarHidden = false
-  }
-  
   public override func viewDidLoad() {
     super.viewDidLoad()
+    navigationController?.isNavigationBarHidden = false
+    
     setStyle()
     setUI()
     setAutolayout()
     setDelegate()
     bind()
     setTarget()
-  
+    
     viewModel.getExhibitionList(placeId: viewModel.selectedPlace.first?.id ?? 0)
     
     updateFilterButtonState(
@@ -167,6 +169,9 @@ final public class PlaceDetailViewController: UIViewController{
   }
   
   private func setTarget() {
+    reviewButton.addTarget(self, action: #selector(onReviewButtonTapped), for: .touchUpInside)
+    findRouteButton.addTarget(self, action: #selector(onFindRouteButtonTapped), for: .touchUpInside)
+    
     exhibitionListView.allFilterButton.tag = FilterType.all.rawValue
     exhibitionListView.freeFilterButton.tag = FilterType.free.rawValue
     exhibitionListView.endSoonFilterButton.tag = FilterType.endSoon.rawValue
@@ -180,7 +185,55 @@ final public class PlaceDetailViewController: UIViewController{
     guard let filterType = FilterType(rawValue: sender.tag) else { return }
     viewModel.updateFilterState(selected: filterType)
   }
-
+  
+  @objc private func onReviewButtonTapped(_ sender: UIButton) {
+    guard let selectedPlace = viewModel.selectedPlace.first else {
+      return
+    }
+    
+    let reviewVC = ReviewWebViewController(platformId: selectedPlace.platformId)
+    reviewVC.modalPresentationStyle = .pageSheet
+    reviewVC.preferredContentSize = CGSize(width: view.frame.width, height: view.frame.height / 2)
+    
+    if let sheet = reviewVC.sheetPresentationController {
+      sheet.detents = [.medium()]
+      sheet.prefersGrabberVisible = true
+    }
+    
+    present(reviewVC, animated: true)
+  }
+  
+  @objc private func onFindRouteButtonTapped() {
+    let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    
+    let kakaoAction = UIAlertAction(title: "카카오맵", style: .default) { [weak self] _ in
+      self?.viewModel.openMap(type: .kakao, openInWebView: { urlString in
+        guard let self = self else { return }
+        WebViewManager.presentWebView(from: self, urlString: urlString)
+      })
+    }
+    let naverAction = UIAlertAction(title: "네이버 지도", style: .default) { [weak self] _ in
+      self?.viewModel.openMap(type: .naver, openInWebView: { urlString in
+        guard let self = self else { return }
+        WebViewManager.presentWebView(from: self, urlString: urlString)
+      })
+    }
+    let googleAction = UIAlertAction(title: "구글 지도", style: .default) { [weak self] _ in
+      self?.viewModel.openMap(type: .google, openInWebView: { urlString in
+        guard let self = self else { return }
+        WebViewManager.presentWebView(from: self, urlString: urlString)
+      })
+    }
+    let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+    
+    alert.addAction(kakaoAction)
+    alert.addAction(naverAction)
+    alert.addAction(googleAction)
+    alert.addAction(cancelAction)
+    
+    present(alert, animated: true)
+  }
+  
   private func bind() {
     viewModel.onControlTypeChanged = { [weak self] type in
       self?.updateView(for: type)
@@ -210,7 +263,7 @@ final public class PlaceDetailViewController: UIViewController{
     }
     
     DispatchQueue.main.async {
-        self.reviewFeedView.updateFeedList(with: self.viewModel.reviewFeedList)
+      self.reviewFeedView.updateFeedList(with: self.viewModel.reviewFeedList)
     }
   }
   
@@ -230,9 +283,9 @@ final public class PlaceDetailViewController: UIViewController{
   }
 }
 
-@available(iOS 16.0, *)
 extension PlaceDetailViewController: PlaceDetailControlTypeDelegate {
   public func sendControlType(_ type: PlaceDetailControlType) {
     viewModel.updateControlType(to: type)
   }
 }
+
