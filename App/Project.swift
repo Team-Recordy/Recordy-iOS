@@ -39,6 +39,7 @@ let infoPlist: [String: Plist.Value] = [
   "KAKAO_NATIVE_APP_KEY": "$(KAKAO_NATIVE_APP_KEY)",
   "BASE_URL": "$(BASE_URL)",
   "NSPhotoLibraryUsageDescription": "앱에서 사진 라이브러리에 접근하려면 권한이 필요합니다.",
+  "NSLocationWhenInUseUsageDescription": "앱 사용 중 사용자의 위치 정보를 이용하려면 권한이 필요합니다.",
   "NSAppTransportSecurity": [
     "NSAllowsArbitraryLoads": true
   ],
