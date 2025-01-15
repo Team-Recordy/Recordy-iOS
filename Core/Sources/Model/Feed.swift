@@ -50,3 +50,64 @@ public struct Feed: Decodable {
     self.isBookmarked = isBookmarked
   }
 }
+
+extension Feed {
+  public static let mockData: [Feed] = [
+    Feed(
+      id: 0,
+      videoLink: "",
+      thumbnailLink: "",
+      description: "",
+      exhibitionName: "",
+      placeId: 1,
+      placeName: "",
+      uploaderId: 0,
+      uploaderNickname: "",
+      bookmarkCount: 0,
+      isMine: false,
+      isBookmarked: false
+    ),
+    Feed(
+      id: 0,
+      videoLink: "",
+      thumbnailLink: "",
+      description: "",
+      exhibitionName: "",
+      placeId: 1,
+      placeName: "",
+      uploaderId: 0,
+      uploaderNickname: "",
+      bookmarkCount: 0,
+      isMine: false,
+      isBookmarked: false
+    ),
+    Feed(
+      id: 0,
+      videoLink: "",
+      thumbnailLink: "",
+      description: "",
+      exhibitionName: "",
+      placeId: 1,
+      placeName: "",
+      uploaderId: 0,
+      uploaderNickname: "",
+      bookmarkCount: 0,
+      isMine: false,
+      isBookmarked: false
+    ),
+    Feed(
+      id: 0,
+      videoLink: "",
+      thumbnailLink: "",
+      description: "",
+      exhibitionName: "",
+      placeId: 1,
+      placeName: "",
+      uploaderId: 0,
+      uploaderNickname: "",
+      bookmarkCount: 0,
+      isMine: false,
+      isBookmarked: false
+    ),
+  ]
+}

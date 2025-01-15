@@ -10,9 +10,7 @@ import Foundation
 
 import Moya
 
-
 public final class APIProvider<T: TargetType>: MoyaProvider<T> {
-  //  typealias APIResult = Result<U: Codable, MoyaError>
   private let interceptor = BaseInterceptor()
   let decoder = JSONDecoder()
 
@@ -55,7 +53,6 @@ public final class APIProvider<T: TargetType>: MoyaProvider<T> {
   }
 
   public static func validateToken(completion: @escaping (Bool) -> Void) {
-
     let apiProvider = APIProvider<APITarget.Preference>()
 
     apiProvider.requestResponsable(.getPreference, DTO.GetPreferenceResponse.self) { result in

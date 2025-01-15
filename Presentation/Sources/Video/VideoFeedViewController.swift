@@ -140,13 +140,13 @@ public class VideoFeedViewController: UIViewController {
     }
   }
 
-//  @objc private func nicknameButtonTapped(_ sender: UIButton) {
-//    guard type != .userProfile && type != .myProfile else { return }
-//    let index = sender.tag
-//    let feed = viewModel.feedList[index]
-//    let userVC = OtherUserProfileViewController(id: feed.uploaderId)
-//    self.navigationController?.pushViewController(userVC, animated: true)
-//  }
+  @objc func nicknameButtonTapped(_ sender: UIButton) {
+    guard type != .userProfile && type != .myProfile else { return }
+    let index = sender.tag
+    let feed = viewModel.feedList[index]
+    let userVC = OtherUserProfileViewController(id: feed.uploaderId)
+    self.navigationController?.pushViewController(userVC, animated: true)
+  }
 
   func toggleButtonTapped(type: VideoFeedType) {
     viewModel.type = type == .all ? .following : .all

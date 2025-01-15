@@ -36,6 +36,7 @@ final class BaseInterceptor: RequestInterceptor {
     completion(.success(request))
   }
   
+  //TODO: retry method 정상적으로 호출되고 있는지 확인해야 함
   func retry(
     _ request: Request,
     for session: Session,
@@ -46,6 +47,7 @@ final class BaseInterceptor: RequestInterceptor {
           request.response?.statusCode == 401,
           let urlString = request.response?.url?.absoluteString,
           !urlString.contains("refresh") else {
+      print("@Log doNotRetryWithError")
       completion(.doNotRetryWithError(error))
       return
     }
