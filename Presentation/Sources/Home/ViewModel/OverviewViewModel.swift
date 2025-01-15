@@ -52,13 +52,16 @@ public class OverviewViewModel {
   var onLocationUpdated: ((Double, Double) -> Void)?
   
   func getNearPlaceList() {
+    let latitude = userLatitude ?? 37.57858694484229
+    let longitude = userLongitude ?? 126.98009796814407
+    
     isFetching = true
     let apiProvider = APIProvider<APITarget.Places>()
     let request = DTO.GetNearPlaceListRequest(
       number: 0,
       size: 10,
-      latitude: 37.57858694484229,
-      longitude: 126.98009796814407,
+      latitude: latitude,
+      longitude: longitude,
       distance: 400
     )
     
@@ -128,13 +131,17 @@ public class OverviewViewModel {
     }
   }
   
-  func updateLocation(latitude: Double?, longitude: Double?) {
+  func updateLocation(
+    latitude: Double?,
+    longitude: Double?
+  ) {
     guard let latitude = latitude, let longitude = longitude else {
       return
     }
     self.userLatitude = latitude
     self.userLongitude = longitude
     locationState = .active
+    getNearPlaceList()
   }
   
   func deactivateLocation() {

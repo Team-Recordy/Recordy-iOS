@@ -151,7 +151,6 @@ final class OverviewViewController: UIViewController {
         latitude: location.coordinate.latitude,
         longitude: location.coordinate.longitude
       )
-      print("locationManager.onLocationUpdate: \(String(location.coordinate.latitude))")
     }
   }
   
