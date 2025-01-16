@@ -25,16 +25,13 @@ public class AWSS3Uploader {
     var uploadError: Error?
 
     PhotoKitManager.getData(of: asset) { [weak self] binaryData in
-      guard let self = self else {
-        print("@Log 메모리에서 제거가 되어요")
-        return }
+      guard let self = self else { return }
       self.apiProvider.requestResponsable(
         .getPresignedUrl,
         DTO.GetPresignedUrlResponse.self
       ) { result in
         switch result {
         case .success(let response):
-          print("@Log .success 일단 드러옴")
           dispatchGroup.enter()
           self.upload(
             binaryData!,
@@ -60,23 +57,19 @@ public class AWSS3Uploader {
             case .failure(let failure):
               uploadError = failure
             }
-            print("@Log leave 2")
             dispatchGroup.leave()
           }
 
           dispatchGroup.notify(queue: .global()) {
-            print("@Log dispatchGroup notify 시작")
             guard uploadError == nil, let videoUrl, let thumbnailUrl else {
               NotificationCenter.default.post(
                 name: .updateDidComplete,
                 object: nil,
                 userInfo: ["message": "업로드에 실패했어요!", "state": "failure"]
               )
-              print("@Log notify 실패")
               completion(.failure(uploadError!))
               return
             }
-            print("@Log notify 성공 - VideoUrl: \(videoUrl), ThumbnailUrl: \(thumbnailUrl)")
             completion(.success((
               videoUrl: videoUrl,
               thumbnailUrl: thumbnailUrl
@@ -84,7 +77,6 @@ public class AWSS3Uploader {
           }
 
         case .failure(let failure):
-          print("@Log .failure")
           NotificationCenter.default.post(
             name: .updateDidComplete,
             object: nil,
@@ -127,7 +119,6 @@ public class AWSS3Uploader {
         completion(.success(nil))
         return
       }
-      print("@Log \(#function) 성공함")
       completion(.success(String(describing: remoteURL)))
     }
     uploadTask.resume()
