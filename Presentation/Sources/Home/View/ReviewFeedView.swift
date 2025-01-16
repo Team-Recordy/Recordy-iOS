@@ -17,11 +17,14 @@ import Core
 final class ReviewFeedView: UIView {
   var feeds: [Feed] = []
   
+  public var onVideoSelectedInReviewFeed: ((Feed) -> Void)?
+  public var onBookmarkButtonTappedInReviewFeed: ((Feed) -> Void)?
+  
   private let reviewFeedCount = UILabel()
   private let emptyFirstLineLabel = UILabel()
   private let emptySecondLineLabel = UILabel()
   private let recordUploadButton = UIButton()
-  private var reviewFeedCollectionView: UICollectionView?
+  public var reviewFeedCollectionView: UICollectionView?
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -156,6 +159,7 @@ final class ReviewFeedView: UIView {
   }
 }
 
+@available(iOS 16.0, *)
 extension ReviewFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
   public func collectionView(
     _ collectionView: UICollectionView,
@@ -173,11 +177,34 @@ extension ReviewFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
       ) as? ThumbnailCollectionViewCell else {
         fatalError("Failed to dequeue OverviewCollectionViewCell")
       }
-      let reviewFeeds = feeds[indexPath.row]
+      var reviewFeed = feeds[indexPath.row]
       
       cell.backgroundColor = CommonAsset.viskitGray10.color
-      cell.configure(feed: reviewFeeds)
+      cell.configure(feed: reviewFeed)
+//      cell.bookmarkButtonEvent = {
+//        self.onBookmarkButtonTappedInReviewFeed?(reviewFeed)
+//      }
       
       return cell
     }
+  
+  public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    guard indexPath.row < feeds.count else { return }
+    
+    let selectedRecord = feeds[indexPath.row]
+    onVideoSelectedInReviewFeed?(selectedRecord)
+  }
+  
+  //  public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+  //    guard indexPath.row < feeds.count else { return }
+  //
+  //    let selectedRecord = feeds[indexPath.row]
+  //    let videoVC = VideoFeedViewController(
+  //      type: .userProfile,
+  //      currentId: selectedRecord.id,
+  //      cursorId: nil,
+  //      userId: selectedRecord.uploaderId
+  //    )
+  //    videoVC.navigationController?.pushViewController(videoVC, animated: true)
+  //  }
 }

@@ -9,13 +9,13 @@
 import Foundation
 
 extension DTO {
-  public struct GetBookmarkedListResponse: BaseResponse {
-    public let nextCursor: Int
+  public struct GetBookmarkedListResponse: Codable {
+    public let nextCursor: Int?
     public let hasNext: Bool
     public let content: [Content]
     
     public init(
-      nextCursor: Int,
+      nextCursor: Int? = nil,
       hasNext: Bool,
       content: [Content]
     ) {

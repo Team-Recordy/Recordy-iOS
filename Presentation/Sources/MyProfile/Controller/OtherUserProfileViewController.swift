@@ -272,9 +272,10 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
   ) {
     let videoFeedViewController = VideoFeedViewController(
       type: .userProfile,
-      currentId: feeds[indexPath.row].id,
+      placeId: 0,
+      exhibitionId: 0,
+      cursorId: nil,
       userId: feeds[indexPath.row].uploaderId
     )
-    self.navigationController?.pushViewController(videoFeedViewController, animated: true)
   }
 }

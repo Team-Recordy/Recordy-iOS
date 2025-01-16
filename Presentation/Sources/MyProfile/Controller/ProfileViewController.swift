@@ -39,6 +39,13 @@ public class ProfileViewController: UIViewController {
     setAutoLayout()
     setDelegate()
     controlTypeChanged()
+    
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleBookmarkStateChange(_:)),
+      name: .bookmarkStateChanged,
+      object: nil
+    )
   }
   
   public override func viewWillAppear(_ animated: Bool) {
@@ -219,7 +226,7 @@ public class ProfileViewController: UIViewController {
   
   func getBookmarkedRecordList() {
     let apiProvider = APIProvider<APITarget.Records>()
-    let request = DTO.GetBookmarkedListRequest(cursorId: 0, size: 100)
+    let request = DTO.GetBookmarkedListRequest(size: 100)
     apiProvider.requestResponsable(.getBookmarkedRecordList(request), DTO.GetBookmarkedListResponse.self) { [weak self] result in
       guard let self = self else { return }
       switch result {
@@ -250,6 +257,27 @@ public class ProfileViewController: UIViewController {
     }
   }
   
+  func postBookmark(feed: Feed, completion: ((Result<Void, Error>) -> Void)? = nil) {
+    let apiProvider = APIProvider<APITarget.Bookmarks>()
+    let request = DTO.PostBookmarkRequest(recordId: feed.id)
+    
+    apiProvider.justRequest(.postBookmark(request)) { [weak self] result in
+      guard let self = self else { return }
+      switch result {
+      case .success:
+        if let recordIndex = self.user?.bookmarkedFeeds?.firstIndex(where: { $0.id == feed.id }) {
+          self.bookmarkView.feeds[recordIndex].isBookmarked = !feed.isBookmarked
+        }
+//        bookmarkView.updateViewState()
+        completion?(.success(()))
+      case .failure(let error):
+        print("Failed to update bookmark: \(error)")
+        completion?(.failure(error))
+      }
+    }
+  }
+
+  
 //  private func getPlaceFeature(from location: String) -> PlaceFeature {
 //    if location.lowercased().contains("free") {
 //      return .free
@@ -259,6 +287,27 @@ public class ProfileViewController: UIViewController {
 //      return .all
 //    }
 //  }
+  
+  @objc private func handleBookmarkStateChange(_ notification: Notification) {
+    guard let userInfo = notification.userInfo,
+          let feed = userInfo["feed"] as? Feed else {
+      return
+    }
+    
+    postBookmark(feed: feed) { [weak self] result in
+      print("🚨Profile -> feed from Thumbnail: \(feed)🚨")
+      guard let self = self else { return }
+      switch result {
+      case .success:
+        print("Bookmark updated successfully.")
+        DispatchQueue.main.async {
+          self.bookmarkView.collectionView.reloadData()
+        }
+      case .failure(let error):
+        print("Failed to update bookmark: \(error)")
+      }
+    }
+  }
   
   @objc private func showFollowers() {
     let followerViewController = FollowViewController(followType: .follower)
@@ -310,7 +359,8 @@ extension ProfileViewController: BookmarkDelegate {
   func bookmarkFeedTapped(feed: Core.Feed) {
     let videoFeedViewController = VideoFeedViewController(
       type: .bookmarked,
-      currentId: feed.id
+      placeId: 0,
+      exhibitionId: 0
     )
     self.navigationController?.pushViewController(videoFeedViewController, animated: true)
   }
@@ -321,7 +371,6 @@ extension ProfileViewController: UserRecordDelegate {
   func userRecordFeedTapped(feed: Feed) {
     let videoFeedViewController = VideoFeedViewController(
       type: .userProfile,
-      currentId: feed.id,
       userId: feed.uploaderId
     )
     self.navigationController?.pushViewController(videoFeedViewController, animated: true)

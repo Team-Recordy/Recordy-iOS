@@ -11,6 +11,7 @@ import UIKit
 import Common
 import Core
 
+@available(iOS 16.0, *)
 final public class PlaceDetailViewController: UIViewController{
   
   var viewModel: PlaceDetailViewModel
@@ -27,6 +28,8 @@ final public class PlaceDetailViewController: UIViewController{
   
   private let exhibitionListView = ExhibitionListView()
   private let reviewFeedView = ReviewFeedView()
+  
+  var updateBookmarkStateInOverview: (() -> Void)?
   
   init(place: Place, latitude: Double, longitude: Double) {
     self.userLatitude = latitude
@@ -60,6 +63,13 @@ final public class PlaceDetailViewController: UIViewController{
       allState: viewModel.allFilterState,
       freeState: viewModel.freeFilterState,
       endSoonState: viewModel.endSoonFilterState
+    )
+    
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleBookmarkStateChange(_:)),
+      name: .bookmarkStateChanged,
+      object: nil
     )
   }
   
@@ -262,6 +272,32 @@ final public class PlaceDetailViewController: UIViewController{
       }
     }
     
+    reviewFeedView.onVideoSelectedInReviewFeed = { [weak self] selectedFeed in
+      guard let self = self else { return }
+      
+      let videoVC = VideoFeedViewController(
+        type: .place,
+        placeId: selectedFeed.placeId,
+        exhibitionId: selectedFeed.id,
+        cursorId: nil,
+        userId: selectedFeed.uploaderId
+      )
+      self.navigationController?.pushViewController(videoVC, animated: true)
+    }
+//    
+//    reviewFeedView.onBookmarkButtonTappedInReviewFeed = { [weak self] record in
+//      guard let self = self else { return }
+//      viewModel.postBookmark(feed: record) { result in
+//        switch result {
+//        case .success:
+//          print("Bookmark updated successfully")
+//          self.updateBookmarkStateInOverview?()
+//        case .failure(let error):
+//          print("Failed to update bookmark: \(error)")
+//        }
+//      }
+//    }
+    
     DispatchQueue.main.async {
       self.reviewFeedView.updateFeedList(with: self.viewModel.reviewFeedList)
     }
@@ -281,8 +317,34 @@ final public class PlaceDetailViewController: UIViewController{
     exhibitionListView.freeFilterButton.setState(state: freeState)
     exhibitionListView.endSoonFilterButton.setState(state: endSoonState)
   }
+  
+  @objc private func handleBookmarkStateChange(_ notification: Notification) {
+    guard let userInfo = notification.userInfo,
+          let feed = userInfo["feed"] as? Feed else {
+      return
+    }
+    
+    viewModel.postBookmark(feed: feed) { [weak self] result in
+      print("🚨PlaceDetail -> feed from Thumbnail: \(feed)🚨")
+      guard let self = self else { return }
+      switch result {
+      case .success:
+        print("Bookmark updated successfully.")
+        DispatchQueue.main.async {
+          self.reviewFeedView.reviewFeedCollectionView?.reloadData()
+        }
+      case .failure(let error):
+        print("Failed to update bookmark: \(error)")
+      }
+    }
+  }
+  
+  deinit {
+    NotificationCenter.default.removeObserver(self, name: .bookmarkStateChanged, object: nil)
+  }
 }
 
+@available(iOS 16.0, *)
 extension PlaceDetailViewController: PlaceDetailControlTypeDelegate {
   public func sendControlType(_ type: PlaceDetailControlType) {
     viewModel.updateControlType(to: type)

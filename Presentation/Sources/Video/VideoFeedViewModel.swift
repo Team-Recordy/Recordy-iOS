@@ -13,12 +13,12 @@ import Core
 public enum VideoFeedType {
   case all
   case following
-  case famous
-  case recent
+  //  case recent
   case userProfile
   case myProfile
   case bookmarked
   case test
+  case place
 }
 
 class VideoFeedViewModel {
@@ -27,8 +27,10 @@ class VideoFeedViewModel {
   let apiProvider = APIProvider<APITarget.Records>()
   var type: VideoFeedType
   var cursorId: Int?
-  var currentId: Int?
+  var placeId: Int?
+  var exhibitionId: Int?
   var userId: Int?
+  var size: Int?
   var hasNext = true
   var pageNumber = 0
   var isFetching = false
@@ -38,12 +40,14 @@ class VideoFeedViewModel {
   
   init(
     type: VideoFeedType,
-    currentId: Int? = nil,
+    placeId: Int? = nil,
+    exhibitionId: Int? = nil,
     cursorId: Int? = nil,
     userId: Int? = nil
   ) {
     self.type = type
-    self.currentId = currentId
+    self.placeId = placeId
+    self.exhibitionId = exhibitionId
     self.cursorId = cursorId
     self.userId = userId
     recordListCase()
@@ -81,15 +85,25 @@ class VideoFeedViewModel {
       getPlaceRecordList(
         endPoint: .getBookmarkedRecordList(
           DTO.GetBookmarkedListRequest(
-            cursorId: 0,
+//            cursorId: 0,
             size: 100
           )
         ),
         response: DTO.GetBookmarkedListResponse.self
       )
     case .test:
-//      self.feedList = Feed.mockData
+      //      self.feedList = Feed.mockData
       self.onFeedListUpdate?(self.feedList.count)
+    case .place:
+      guard let placeId else { return }
+      print("🚨recordListCase 실행🚨")
+      getPlaceRecordList(
+        endPoint: .getPlaceRecordList(
+          DTO.GetPlaceRecordListRequest(placeId: placeId, size: 100)
+        ),
+        response: DTO.GetPlaceRecordListResponse.self
+      )
+      //      self.onFeedListUpdate?(self.feedList.count)
     default: return
     }
   }
@@ -135,7 +149,8 @@ class VideoFeedViewModel {
         )
       }
       updateFeedList(feeds)
-    } else if let followingRecordListResponse = response as? DTO.GetFollowingRecordListResponse {
+    }
+    else if let followingRecordListResponse = response as? DTO.GetFollowingRecordListResponse {
       /// 팔로잉 레코드 조회
       let feeds: [Feed] = followingRecordListResponse.content.map { content in
         Feed(
@@ -156,10 +171,11 @@ class VideoFeedViewModel {
       updateFeedList(feeds)
       hasNext = followingRecordListResponse.hasNext
       cursorId = followingRecordListResponse.nextCursor
-    } else if let userProfileRecordListResponse = response as? DTO.GetUserRecordListResponse {
+    }
+    else if let userProfileRecordListResponse = response as? DTO.GetUserRecordListResponse {
       /// 유저 프로필 레코드 조회
-      guard let currentId else { return }
-      if let index = userProfileRecordListResponse.content.firstIndex(where: { $0.id == currentId }) {
+      guard let placeId else { return }
+      if let index = userProfileRecordListResponse.content.firstIndex(where: { $0.id == placeId }) {
         let feeds: [Feed] = userProfileRecordListResponse.content.map { content in
           Feed(
             id: content.id,
@@ -177,39 +193,66 @@ class VideoFeedViewModel {
           )
         }
         updateFeedList(feeds)
-      } else if let bookmarkedRecordListResponse = response as? DTO.GetBookmarkedListResponse {
-        /// 유저 북마크 레코드 조회
-        guard hasNext else { return }
-        if let index = bookmarkedRecordListResponse.content.firstIndex(where: { $0.id == currentId }) {
-          let newFeeds: [Feed] = Array(bookmarkedRecordListResponse.content[index...]).map { content in
-            Feed(
-              id: content.id,
-              videoLink: content.fileUrl.videoUrl,
-              thumbnailLink: content.fileUrl.thumbnailUrl,
-              description: content.content,
-              exhibitionName: content.exhibitionName,
-              placeId: content.placeId,
-              placeName: content.placeName,
-              uploaderId: content.uploaderId,
-              uploaderNickname: content.uploaderNickname,
-              bookmarkCount: content.bookmarkCount,
-              isMine: content.isMine,
-              isBookmarked: content.isBookmarked
-            )
-          }
-          self.hasNext = bookmarkedRecordListResponse.hasNext
-          updateFeedList(newFeeds)
+      }
+    }
+    else if let bookmarkedRecordListResponse = response as? DTO.GetBookmarkedListResponse {
+      /// 유저 북마크 레코드 조회
+      guard hasNext else { return }
+      if let index = bookmarkedRecordListResponse.content.firstIndex(where: { $0.id == exhibitionId }) {
+        let newFeeds: [Feed] = Array(bookmarkedRecordListResponse.content[index...]).map { content in
+          Feed(
+            id: content.id,
+            videoLink: content.fileUrl.videoUrl,
+            thumbnailLink: content.fileUrl.thumbnailUrl,
+            description: content.content,
+            exhibitionName: content.exhibitionName,
+            placeId: content.placeId,
+            placeName: content.placeName,
+            uploaderId: content.uploaderId,
+            uploaderNickname: content.uploaderNickname,
+            bookmarkCount: content.bookmarkCount,
+            isMine: content.isMine,
+            isBookmarked: content.isBookmarked
+          )
         }
+        self.hasNext = bookmarkedRecordListResponse.hasNext
+        updateFeedList(newFeeds)
+      }
+    }
+    else if let overviewPlaceRecordListResponse = response as? DTO.GetPlaceRecordListResponse {
+      guard hasNext else { return }
+      if let index = overviewPlaceRecordListResponse.content.firstIndex(where: { $0.id == exhibitionId }) {
+        let newFeeds: [Feed] = Array(overviewPlaceRecordListResponse.content[index...]).map { content in
+          Feed(
+            id: content.id,
+            videoLink: content.fileUrl.videoUrl,
+            thumbnailLink: content.fileUrl.thumbnailUrl,
+            description: content.content,
+            exhibitionName: content.exhibitionName,
+            placeId: content.placeId,
+            placeName: content.placeName,
+            uploaderId: content.uploaderId,
+            uploaderNickname: content.uploaderNickname,
+            bookmarkCount: content.bookmarkCount,
+            isMine: content.isMine,
+            isBookmarked: content.isBookmarked
+          )
+        }
+        self.hasNext = overviewPlaceRecordListResponse.hasNext
+        updateFeedList(newFeeds)
+        //        }
       }
     }
   }
   
   func updateFeedList(_ newFeeds: [Feed]) {
-    cacheVideos(feeds: newFeeds) { [weak self] cachedFeeds in
-      guard let self else { return }
-      self.feedList += cachedFeeds
-      self.onFeedListUpdate?(cachedFeeds.count)
-    }
+    self.feedList += newFeeds
+    self.onFeedListUpdate?(newFeeds.count)
+    //    cacheVideos(feeds: newFeeds) { [weak self] cachedFeeds in
+    //      guard let self else { return }
+    //      self.feedList += cachedFeeds
+    //      self.onFeedListUpdate?(cachedFeeds.count)
+    //    }
   }
   
   func cacheVideos(
@@ -240,19 +283,6 @@ class VideoFeedViewModel {
           isMine: feed.isMine,
           isBookmarked: feed.isBookmarked
         )
-        
-        //            Feed(
-        //              id: feed.id,
-        //              userId: feed.uploaderId,
-        //              location: feed.,
-        //              nickname: feed.nickname,
-        //              description: feed.description,
-        //              isBookmarked: feed.isBookmarked,
-        //              bookmarkCount: feed.bookmarkCount,
-        //              videoLink: String(describing: cachedUrl),
-        //              thumbnailLink: feed.thumbnailLink,
-        //              isMine: feed.isMine
-        //            )
         cachedFeeds.append(cachedFeed)
         dispatchGroup.leave()
       }

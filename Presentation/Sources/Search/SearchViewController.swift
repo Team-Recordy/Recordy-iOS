@@ -355,7 +355,8 @@ public class SearchViewController: UIViewController {
   }
 }
 
-extension SearchViewController: UICollectionViewDataSource {
+@available(iOS 16.0, *)
+extension SearchViewController: UICollectionViewDataSource, UICollectionViewDelegate {
   public func collectionView(
     _ collectionView: UICollectionView,
     numberOfItemsInSection section: Int

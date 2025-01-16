@@ -109,7 +109,7 @@ extension APITarget.Records: TargetType {
     case .getBookmarkedRecordList(let getBookmarkedRecordListRequest):
       return .requestParameters(
         parameters: [
-          "cursorId": getBookmarkedRecordListRequest.cursorId,
+//          "cursorId": getBookmarkedRecordListRequest.cursorId,
           "size": getBookmarkedRecordListRequest.size
         ],
         encoding: URLEncoding.queryString
