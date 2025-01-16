@@ -114,11 +114,7 @@ final class UploadVideoViewModel {
           videoUrl: response.videoUrl,
           thumbnailUrl: response.thumbnailUrl
         )
-        print("@Log \(#function)")
-        print("@Log - \(response)")
       case .failure(let error):
-        print("@Log \(#function)")
-        print("error")
       }
     }
   }
@@ -142,8 +138,6 @@ final class UploadVideoViewModel {
     apiProvider.justRequest(.createRecord(request)) { result in
       switch result {
       case .success:
-        print("@Log \(#function)")
-//        print("@Log - \(response)")
         NotificationCenter.default.post(
           name: .updateDidComplete,
           object: nil,

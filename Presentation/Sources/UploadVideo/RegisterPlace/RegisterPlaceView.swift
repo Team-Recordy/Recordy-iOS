@@ -67,15 +67,6 @@ class RegisterPlaceView: UIView {
       $0.center.equalToSuperview()
       $0.horizontalEdges.equalToSuperview().inset(16.adaptiveWidth)
     }
-//    titleLabel.snp.makeConstraints {
-//      $0.centerY.equalToSuperview().offset(-9.adaptiveHeight)
-//      $0.horizontalEdges.equalToSuperview().inset(16.adaptiveWidth)
-//    }
-//
-//    subtitleLabel.snp.makeConstraints {
-//      $0.top.equalTo(titleLabel.snp.bottom).offset(4.adaptiveHeight)
-//      $0.horizontalEdges.equalToSuperview().inset(16.adaptiveWidth)
-//    }
   }
 
   func configure(
