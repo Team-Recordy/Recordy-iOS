@@ -186,6 +186,7 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
       ) as? OverviewCollectionViewCell else {
         fatalError("Failed to dequeue OverviewCollectionViewCell")
       }
+      // TODO: Crash
       let place = viewModel.nearPlaces[indexPath.row]
       cell.backgroundColor = .clear
       cell.bind(place: place, records: place.recordList, index: indexPath.row)

@@ -53,7 +53,10 @@ final class BaseInterceptor: RequestInterceptor {
     }
     let apiProvider = APIProvider<APITarget.Users>()
     let request = DTO.RefreshTokenRequest(authorization: refreshToken)
-    apiProvider.requestResponsable(.refreshToken(request), DTO.RefreshTokenResponse.self) { [weak self] result in
+    apiProvider.requestResponsable(
+      .refreshToken(request),
+      DTO.RefreshTokenResponse.self
+    ) { [weak self] result in
       guard let self = self else { return }
       switch result {
       case .success(let response):

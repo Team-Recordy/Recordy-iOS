@@ -14,6 +14,7 @@ import Common
 
 class PlaceButton: UIButton {
 
+  private let buttonTitleLabel = UILabel()
   private let placeLabel = UILabel()
   private let chevronImageView = UIImageView()
 
@@ -29,6 +30,7 @@ class PlaceButton: UIButton {
 
   private func setUI() {
     addSubviews(
+      buttonTitleLabel,
       placeLabel,
       chevronImageView
     )
@@ -36,7 +38,7 @@ class PlaceButton: UIButton {
     backgroundColor = CommonAsset.viskitGray10.color
     cornerRadius(8)
 
-    placeLabel.do {
+    buttonTitleLabel.do {
       $0.text = "장소"
       $0.font = ViskitFont.body2.font
       $0.textColor = CommonAsset.viskitGray01.color
@@ -47,12 +49,24 @@ class PlaceButton: UIButton {
       $0.tintColor = CommonAsset.viskitGray01.color
       $0.contentMode = .scaleAspectFit
     }
+
+    placeLabel.do {
+      $0.font = ViskitFont.body2.font
+      $0.textColor = CommonAsset.viskitGray01.color
+      $0.textAlignment = .right
+    }
   }
 
   private func setAutoLayout() {
-    placeLabel.snp.makeConstraints {
+    buttonTitleLabel.snp.makeConstraints {
       $0.centerY.equalToSuperview()
       $0.leading.equalToSuperview().offset(20)
+    }
+
+    placeLabel.snp.makeConstraints {
+      $0.centerY.equalToSuperview()
+      $0.leading.equalTo(buttonTitleLabel.snp.trailing).offset(8.adaptiveWidth)
+      $0.trailing.equalTo(chevronImageView.snp.leading).offset(-16.adaptiveWidth)
     }
 
     chevronImageView.snp.makeConstraints {
@@ -60,5 +74,9 @@ class PlaceButton: UIButton {
       $0.trailing.equalToSuperview().offset(-20)
       $0.size.equalTo(18)
     }
+  }
+
+  func configure(text: String) {
+    placeLabel.text = text
   }
 }

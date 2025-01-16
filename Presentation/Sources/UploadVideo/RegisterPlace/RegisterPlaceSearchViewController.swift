@@ -1,8 +1,8 @@
 //
-//  SearchPlaceViewController.swift
+//  RegisterPlaceSearchViewController.swift
 //  Presentation
 //
-//  Created by 한지석 on 1/8/25.
+//  Created by 한지석 on 1/15/25.
 //  Copyright © 2025 com.recordy. All rights reserved.
 //
 
@@ -14,20 +14,15 @@ import Then
 
 import Common
 
-protocol SearchPlaceDelegate: NSObject {
-  func didSelect(place: SearchPlaceViewModel.SearchedPlace)
-}
+final class RegisterPlaceSearchViewController: UIViewController {
 
-final class SearchPlaceViewController: UIViewController {
-  
   private let searchBackgroundView = UIView()
   private let searchImageView = UIImageView()
   private let searchTextField = UITextField()
-  private let registerButton = UIButton()
   private let tableView = UITableView()
-  weak var delegate: SearchPlaceDelegate?
+  private let registerImageView = UIImageView()
 
-  private let viewModel = SearchPlaceViewModel()
+  private let viewModel = RegisterPlaceSearchViewModel()
   private var cancellables = Set<AnyCancellable>()
 
   override func viewDidLoad() {
@@ -43,28 +38,17 @@ final class SearchPlaceViewController: UIViewController {
       .assign(to: \.searchText, on: viewModel)
       .store(in: &cancellables)
 
-    Publishers.CombineLatest(
-      viewModel.$searchText,
-      viewModel.$searchedPlace
-    )
-    .receive(on: DispatchQueue.main)
-    .sink { [weak self] searchText, searchedPlace in
-      guard let self else { return }
-      self.registerButton.isHidden = !(searchText != "" && searchedPlace.isEmpty)
-    }
-    .store(in: &cancellables)
-
     viewModel.$searchedPlace
       .receive(on: RunLoop.main)
       .sink { [weak self] places in
-        guard let self else { return }
-        self.tableView.reloadData()
+        self?.registerImageView.isHidden = !places.isEmpty
+        self?.tableView.reloadData()
       }
       .store(in: &cancellables)
   }
 
   private func setStyle() {
-    title = "장소"
+    title = "장소 등록"
     view.backgroundColor = CommonAsset.viskitBG.color
 
     searchBackgroundView.do {
@@ -79,24 +63,23 @@ final class SearchPlaceViewController: UIViewController {
 
     searchTextField.do {
       $0.font = ViskitFont.body1.font
-      $0.placeholder = "전시 장소를 입력해주세요"
+      $0.placeholder = "장소 또는 상호명으로 입력해주세요."
       $0.tintColor = CommonAsset.viskitGray01.color
-    }
-
-    registerButton.do {
-      $0.setImage(CommonAsset.registerButton.image, for: .normal)
-      $0.addTarget(self, action: #selector(registerButtonTapped), for: .touchUpInside)
     }
 
     tableView.do {
       $0.backgroundColor = .clear
       $0.separatorStyle = .none
       $0.register(
-        SearchPlaceTableViewCell.self,
-        forCellReuseIdentifier: SearchPlaceTableViewCell.cellIdentifier
+        RegisterPlaceSearchCell.self,
+        forCellReuseIdentifier: RegisterPlaceSearchCell.cellIdentifier
       )
       $0.delegate = self
       $0.dataSource = self
+    }
+
+    registerImageView.do {
+      $0.image = CommonAsset.registerPlace.image
     }
   }
   private func setUI() {
@@ -106,10 +89,10 @@ final class SearchPlaceViewController: UIViewController {
     )
     view.addSubviews(
       searchBackgroundView,
-      registerButton,
+      registerImageView,
       tableView
     )
-    view.bringSubviewToFront(registerButton)
+    view.bringSubviewToFront(registerImageView)
   }
   private func setAutolayout() {
     searchBackgroundView.snp.makeConstraints {
@@ -130,46 +113,41 @@ final class SearchPlaceViewController: UIViewController {
       $0.trailing.equalToSuperview().offset(-8.adaptiveWidth)
     }
 
-    registerButton.snp.makeConstraints {
-      $0.center.equalToSuperview()
-      $0.width.equalTo(185.adaptiveWidth)
-      $0.height.equalTo(236.adaptiveHeight)
-    }
-
     tableView.snp.makeConstraints {
       $0.top.equalTo(searchBackgroundView.snp.bottom).offset(20.adaptiveHeight)
       $0.horizontalEdges.bottom.equalToSuperview()
     }
+
+    registerImageView.snp.makeConstraints {
+      $0.top.equalTo(searchBackgroundView.snp.bottom).offset(28.adaptiveHeight)
+      $0.leading.equalToSuperview().offset(24.adaptiveWidth)
+    }
   }
 
-  @objc func registerButtonTapped() {
-    let nextViewController = RegisterPlaceSearchViewController()
-    navigationController?.pushViewController(nextViewController, animated: true)
-  }
 }
 
-extension SearchPlaceViewController: UITableViewDelegate, UITableViewDataSource {
+extension RegisterPlaceSearchViewController: UITableViewDelegate, UITableViewDataSource {
   func tableView(
     _ tableView: UITableView,
     numberOfRowsInSection section: Int
   ) -> Int {
     return viewModel.searchedPlace.count
   }
-  
+
   func tableView(
     _ tableView: UITableView,
     cellForRowAt indexPath: IndexPath
   ) -> UITableViewCell {
     guard let cell = tableView.dequeueReusableCell(
-      withIdentifier: SearchPlaceTableViewCell.cellIdentifier,
+      withIdentifier: RegisterPlaceSearchCell.cellIdentifier,
       for: indexPath
-    ) as? SearchPlaceTableViewCell else {
+    ) as? RegisterPlaceSearchCell else {
       return UITableViewCell()
     }
     cell.configure(viewModel.searchedPlace[indexPath.row])
     return cell
   }
-  
+
   func tableView(
     _ tableView: UITableView,
     heightForRowAt indexPath: IndexPath
@@ -177,13 +155,9 @@ extension SearchPlaceViewController: UITableViewDelegate, UITableViewDataSource 
     return 68
   }
 
-  // TODO: 셀 선택
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    delegate?.didSelect(place: viewModel.searchedPlace[indexPath.row])
-    hideKeyboard()
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-      guard let self else { return }
-      self.navigationController?.popViewController(animated: true)
-    }
+    let selectedPlace = viewModel.searchedPlace[indexPath.row]
+    let nextViewController = RegisterPlaceViewController(selectedPlace: selectedPlace)
+    navigationController?.pushViewController(nextViewController, animated: true)
   }
 }

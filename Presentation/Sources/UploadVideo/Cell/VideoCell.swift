@@ -19,8 +19,8 @@ class VideoCell: UICollectionViewCell {
     $0.contentMode = .scaleToFill
   }
   private let playtimeLabel = UILabel().then {
-    $0.font = RecordyFont.caption2.font
-    $0.textColor = CommonAsset.recordyWhite.color
+    $0.font = ViskitFont.caption2Medium.font
+    $0.textColor = CommonAsset.viskitWhite.color
   }
 
   override init(frame: CGRect) {

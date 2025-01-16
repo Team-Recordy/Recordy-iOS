@@ -11,7 +11,7 @@ import ProjectDescriptionHelpers
 let infoPlist: [String: Plist.Value] = [
   "CFBundleShortVersionString": "1.0.0",
   "CFBundleVersion": "2",
-  "CFBundleDisplayName": "유영",
+  "CFBundleDisplayName": "Viskit",
   "CFBundleURLTypes": [
     [
       "CFBundleTypeRole": "Editor",
@@ -50,8 +50,7 @@ let infoPlist: [String: Plist.Value] = [
 ]
 
 private let settings = Settings.settings(configurations: [
-  .debug(name: "Debug", xcconfig:
-      .relativeToRoot("App/Config/Secrets.xcconfig")),
+  .debug(name: "Debug", xcconfig: .relativeToRoot("App/Config/Secrets.xcconfig")),
   .release(name: "Release", xcconfig: .relativeToRoot("App/Config/Secrets.xcconfig")),
 ])
 
@@ -61,7 +60,7 @@ let project = Project.makeModule(
   name: moduleName,
   destinations: [.iPhone],
   product: .app,
-  bundleId: "app.recordy",
+  bundleId: "app.viskit.recordy",
   infoPlist: .extendingDefault(with: infoPlist),
   resources: ["Resources/**"],
   entitlements: .file(path: "App.entitlements"),
