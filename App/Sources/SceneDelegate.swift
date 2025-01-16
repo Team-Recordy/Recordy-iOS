@@ -8,8 +8,9 @@
 
 import UIKit
 
-import Presentation
+import Common
 import Core
+import Presentation
 
 import KakaoSDKAuth
 
@@ -41,17 +42,52 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     window = UIWindow(frame: windowScene.coordinateSpace.bounds)
     window?.windowScene = windowScene
-    APIProvider<APITarget.Users>.validateToken { login in
-      DispatchQueue.main.async {
-        var rootViewController: UIViewController
-        if login {
-          rootViewController = RecordyTabBarController()
-        } else {
-          rootViewController = UINavigationController(rootViewController: SplashScreenViewController())
-        }
-        self.window?.rootViewController = rootViewController
-        self.window?.makeKeyAndVisible()
+
+    setUpTokenExpiredNotification()
+    checkInitialToken()
+  }
+
+  private func checkInitialToken() {
+    if KeychainManager.shared.read(token: .AccessToken) != nil {
+      let mainVC = RecordyTabBarController()
+      window?.rootViewController = mainVC
+    } else {
+      navigateToLogin()
+    }
+    window?.makeKeyAndVisible()
+  }
+
+  private func setUpTokenExpiredNotification() {
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleTokenExpiration),
+      name: .tokenExpired,
+      object: nil
+    )
+  }
+
+  @objc private func handleTokenExpiration() {
+    if let rootViewController = window?.rootViewController {
+      rootViewController.dismiss(animated: true) { [weak self] in
+        self?.navigateToLogin()
       }
     }
+  }
+
+  private func navigateToLogin() {
+    let loginVC = LoginViewController()
+    let navigationController = UINavigationController(rootViewController: loginVC)
+    navigationController.modalPresentationStyle = .fullScreen
+
+    UIView.transition(with: window!,
+                      duration: 0.3,
+                      options: .transitionCrossDissolve,
+                      animations: {
+      self.window?.rootViewController = navigationController
+    })
+  }
+
+  deinit {
+    NotificationCenter.default.removeObserver(self)
   }
 }

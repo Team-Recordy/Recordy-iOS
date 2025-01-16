@@ -61,6 +61,7 @@ public final class LoginViewController: UIViewController {
       guard let self = self else { return }
       switch result {
       case .success(let accessToken):
+        print("@Log")
         self.postSignInRequest(
           authorization: accessToken,
           platformType: .kakao
@@ -101,6 +102,7 @@ public final class LoginViewController: UIViewController {
     ) { result in
       switch result {
       case .success(let response):
+        print("@Log - \(response)")
         KeychainManager.shared.create(
           token: .AccessToken,
           value: response.accessToken
