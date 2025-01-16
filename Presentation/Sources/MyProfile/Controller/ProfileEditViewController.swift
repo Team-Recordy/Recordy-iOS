@@ -55,6 +55,8 @@ public final class ProfileEditViewController: UIViewController {
       action: #selector(profileImageViewDidTap)
     )
     
+    profileEditView.profileImageView.addGestureRecognizer(tapGesture)
+    
     profileEditView.nextButton.addTarget(
       self,
       action: #selector(nextButtonDidTap),
@@ -100,6 +102,18 @@ public final class ProfileEditViewController: UIViewController {
   }
   
   @objc private func profileImageViewDidTap() {
-    //TODO: 프로필 이미지 선택 (추 후 구현)
+      let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+      
+      let selectImage = UIAlertAction(title: "앨범에서 선택", style: .default) { [weak self] _ in
+        
+      }
+      let deleteImage = UIAlertAction(title: "프로필 사진 삭제", style: .default) { [weak self] _ in
+        
+      }
+
+      alert.addAction(selectImage)
+      alert.addAction(deleteImage)
+      
+      present(alert, animated: true)
   }
 }

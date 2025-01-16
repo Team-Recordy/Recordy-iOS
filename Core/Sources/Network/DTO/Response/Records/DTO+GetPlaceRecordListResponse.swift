@@ -48,7 +48,7 @@ extension DTO.GetPlaceRecordListResponse {
       placeId: Int,
       placeName: String,
       uploaderId: Int,
-      uploaderNickname: String,
+      uploaderNickname: String = "Unknown",
       bookmarkCount: Int,
       isMine: Bool,
       isBookmarked: Bool
@@ -64,6 +64,20 @@ extension DTO.GetPlaceRecordListResponse {
       self.bookmarkCount = bookmarkCount
       self.isMine = isMine
       self.isBookmarked = isBookmarked
+    }
+    public init(from decoder: Decoder) throws {
+      let container = try decoder.container(keyedBy: CodingKeys.self)
+      self.id = try container.decode(Int.self, forKey: .id)
+      self.fileUrl = try container.decode(FileUrl.self, forKey: .fileUrl)
+      self.content = try container.decode(String.self, forKey: .content)
+      self.exhibitionName = try container.decode(String.self, forKey: .exhibitionName)
+      self.placeId = try container.decode(Int.self, forKey: .placeId)
+      self.placeName = try container.decode(String.self, forKey: .placeName)
+      self.uploaderId = try container.decode(Int.self, forKey: .uploaderId)
+      self.uploaderNickname = try container.decodeIfPresent(String.self, forKey: .uploaderNickname) ?? "Unknown"
+      self.bookmarkCount = try container.decode(Int.self, forKey: .bookmarkCount)
+      self.isMine = try container.decode(Bool.self, forKey: .isMine)
+      self.isBookmarked = try container.decode(Bool.self, forKey: .isBookmarked)
     }
   }
 }
