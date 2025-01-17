@@ -14,6 +14,7 @@ import Core
 @available(iOS 16.0, *)
 public final class NicknameViewController: UIViewController {
   
+  private var userNickname: String?
   private let nicknameView = NicknameView()
   
   private var errorMessage: String?
@@ -66,6 +67,7 @@ public final class NicknameViewController: UIViewController {
         if isAvailable {
           currentState = .selected
           nicknameView.nextButton.buttonState = .active
+          self.userNickname = text
         } else {
           currentState = .error
           errorMessage = "ⓘ 이미 사용 중인 닉네임이에요."
@@ -90,7 +92,8 @@ public final class NicknameViewController: UIViewController {
   }
   
   @objc private func nextButtonTapped() {
-    let completeViewController = CompleteViewController()
+    guard let userNickname else { return }
+    let completeViewController = CompleteViewController(nickname: userNickname)
     navigationController?.pushViewController(completeViewController, animated: true)
   }
 }

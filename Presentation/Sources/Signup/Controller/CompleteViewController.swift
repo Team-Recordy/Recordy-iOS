@@ -14,8 +14,18 @@ import Common
 @available(iOS 16.0, *)
 final class CompleteViewController: UIViewController{
   
+  private var nicknameToEnroll: String?
   private let completeView = CompleteView()
   private let nicknameView = NicknameView()
+  
+  init(nickname: String) {
+    self.nicknameToEnroll = nickname
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
   
   override func loadView() {
     view = completeView
@@ -31,7 +41,7 @@ final class CompleteViewController: UIViewController{
   }
   
   @objc private func completeButtonTapped() {
-    guard let text = nicknameView.nicknameTextField.text else { return }
+    guard let text = nicknameToEnroll else { return }
     let apiProvider = APIProvider<APITarget.Users>()
     let userId = UserDefaults.standard.integer(forKey: "userId")
     let request = DTO.SignUpRequest(
