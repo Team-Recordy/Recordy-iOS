@@ -31,13 +31,13 @@ public class RecordyTextField: UITextField {
   
   private func setStyle() {
     layer.cornerRadius = 8
-    font = RecordyFont.body2.font
+    font = ViskitFont.body2.font
     addPadding(left: 18, right: 18)
-    backgroundColor = CommonAsset.recordyGrey08.color
-    textColor = CommonAsset.recordyGrey01.color
+    backgroundColor = CommonAsset.viskitGray10.color
+    textColor = CommonAsset.viskitGray01.color
     self.setPlaceholder(
       placeholder: self.placeholder ?? "",
-      placeholderColor: CommonAsset.recordyGrey04,
+      placeholderColor: CommonAsset.viskitGray06,
       font: .body2
     )
   }
@@ -48,10 +48,10 @@ public class RecordyTextField: UITextField {
       layer.borderColor = UIColor.clear.cgColor
       layer.borderWidth = 0
     case .selected:
-      layer.borderColor = CommonAsset.recordyMain.color.cgColor
+      layer.borderColor = CommonAsset.viskitYellow80.color.cgColor
       layer.borderWidth = 1
     case .error:
-      layer.borderColor = CommonAsset.recordyAlert.color.cgColor
+      layer.borderColor = CommonAsset.viskitAlert01.color.cgColor
       layer.borderWidth = 1
     }
   }

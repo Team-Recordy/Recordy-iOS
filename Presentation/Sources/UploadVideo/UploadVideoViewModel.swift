@@ -115,6 +115,7 @@ final class UploadVideoViewModel {
           thumbnailUrl: response.thumbnailUrl
         )
       case .failure(let error):
+        print("fail to upload: \(error)")
       }
     }
   }

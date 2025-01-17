@@ -10,6 +10,10 @@ import Foundation
 
 import Moya
 
+protocol EmptyDecodable {
+    init()
+}
+
 public final class APIProvider<T: TargetType>: MoyaProvider<T> {
   private let interceptor = BaseInterceptor()
   let decoder = JSONDecoder()
@@ -36,7 +40,7 @@ public final class APIProvider<T: TargetType>: MoyaProvider<T> {
       }
     }
   }
-
+  
   public func requestResponsable<U: Codable>(
     _ target: T,
     _ object: U.Type,
@@ -45,6 +49,20 @@ public final class APIProvider<T: TargetType>: MoyaProvider<T> {
     request(target) { response in
       switch response {
       case .success(let response):
+        // 응답 데이터가 비어 있을 경우 처리
+        let data = response.data
+        if data.isEmpty {
+          // 빈 응답 처리
+          if let emptyResponseType = U.self as? EmptyDecodable.Type {
+            let emptyResponse = emptyResponseType.init() as! U
+            completion(.success(emptyResponse))
+            return
+          } else {
+            completion(.failure(.decodingFailed("Empty response is not decodable to \(U.self)")))
+            return
+          }
+        }
+        // 기존 디코딩 처리
         completion(self.handleResponseStatus(response.statusCode, response.data, U.self))
       case .failure(let error):
         completion(.failure(.requestFailed("@Log - \(error.localizedDescription)")))

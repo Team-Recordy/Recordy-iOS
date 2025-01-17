@@ -52,6 +52,13 @@ final class OverviewViewController: UIViewController {
         self.viewModel.getPlaceRecordList(placeId: place.id, recordSize: place.recordSize)
       }
     }
+    
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleBookmarkStateChange(_:)),
+      name: .bookmarkStateChanged,
+      object: nil
+    )
   }
   
   private func setStyle() {
@@ -154,6 +161,40 @@ final class OverviewViewController: UIViewController {
     }
   }
   
+  private func findIndexPath(for feed: Feed) -> IndexPath? {
+    if let placeIndex = viewModel.nearPlaces.firstIndex(where: { $0.id == feed.placeId }),
+       let recordIndex = viewModel.nearPlaces[placeIndex].recordList.firstIndex(where: { $0.id == feed.id }) {
+      return IndexPath(item: recordIndex, section: placeIndex)
+    }
+    return nil
+  }
+  
+  @objc private func handleBookmarkStateChange(_ notification: Notification) {
+    guard let userInfo = notification.userInfo,
+          let feed = userInfo["feed"] as? Feed else {
+      return
+    }
+    
+    viewModel.postBookmark(feed: feed) { [weak self] result in
+      print("🚨Overview -> feed from Thumbnail: \(feed)🚨")
+      
+      switch result {
+      case .success:
+        print("Bookmark updated successfully.")
+        self?.overviewCollectionView?.reloadData()
+//        if let indexPath = self?.findIndexPath(for: feed) {
+//          DispatchQueue.main.async {
+//            self?.overviewCollectionView?.reloadItems(at: [indexPath])
+//          }
+//        } else {
+//          print("No matching IndexPath found for feed: \(feed.id)")
+//        }
+      case .failure(let error):
+        print("Failed to update bookmark: \(error)")
+      }
+    }
+  }
+  
   @objc private func locationButtonTapped() {
     locationManager.requestAuthorization()
   }
@@ -166,6 +207,10 @@ final class OverviewViewController: UIViewController {
     )
     alert.addAction(UIAlertAction(title: "확인", style: .default))
     present(alert, animated: true)
+  }
+  
+  deinit {
+    NotificationCenter.default.removeObserver(self, name: .bookmarkStateChanged, object: nil)
   }
 }
 
@@ -199,6 +244,22 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
           collectionView.collectionViewLayout.invalidateLayout()
         }
       }
+      cell.onVideoSelectedInCell = { [weak self] selectedFeed in
+        guard let self = self else { return }
+        
+        let placeId = selectedFeed.placeId
+        let exhibitionId = selectedFeed.id
+        let uploaderId = selectedFeed.uploaderId
+        let videoVC = VideoFeedViewController(
+          type: .place,
+          placeId: placeId,
+          exhibitionId: exhibitionId,
+          cursorId: 0,
+          userId: uploaderId
+        )
+        self.navigationController?.pushViewController(videoVC, animated: true)
+      }
+      
       return cell
     }
   
@@ -216,6 +277,9 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
       latitude: latitude,
       longitude: longitude
     )
+    placeDetailVC.updateBookmarkStateInOverview = { [weak self] in
+      self?.viewModel.onPlaceRecordsUpdated?()
+    }
     navigationController?.pushViewController(placeDetailVC, animated: true)
   }
 }
@@ -230,7 +294,6 @@ extension OverviewViewController: UICollectionViewDelegateFlowLayout {
     let place = viewModel.nearPlaces[indexPath.row]
     let overViewCollectionViewCell = OverviewCollectionViewCell()
     overViewCollectionViewCell.bind(place: place, records: [])
-    
     let screenWidth = UIScreen.main.bounds.width
     let cellHeight = overViewCollectionViewCell.contentHeight
     

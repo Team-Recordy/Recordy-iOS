@@ -57,4 +57,15 @@ public struct User {
 public enum LoginState {
   case apple
   case kakao
+  
+  public init(platform: String?) {
+    switch platform {
+    case "KAKAO":
+      self = .kakao
+    case "APPLE":
+      self = .apple
+    default:
+      self = .kakao
+    }
+  }
 }

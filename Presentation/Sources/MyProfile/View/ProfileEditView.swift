@@ -13,14 +13,14 @@ import SnapKit
 import Then
 
 public final class ProfileEditView: UIView {
-  private let profileImageView = UIImageView()
+  public let profileImageView = UIImageView()
   private let cameraImageView = UIImageView()
   private let editTitle = UILabel()
-  let nicknameEditTextField = UITextField()
-  let nicknameCountLabel = UILabel()
-  let errorLabel = UILabel()
-  let successLabel = UILabel()
-  let nextButton = UIButton()
+  public let nicknameEditTextField = UITextField()
+  public let nicknameCountLabel = UILabel()
+  private let errorLabel = UILabel()
+  private let successLabel = UILabel()
+  public let nextButton = UIButton()
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -98,14 +98,15 @@ public final class ProfileEditView: UIView {
   }
   
   private func setUI() {
-    addSubviews(profileImageView,
-                cameraImageView,
-                editTitle,
-                nicknameEditTextField,
-                nicknameCountLabel,
-                errorLabel,
-                successLabel,
-                nextButton)
+    addSubviews(
+      profileImageView,
+      cameraImageView,
+      editTitle,
+      nicknameEditTextField,
+      nicknameCountLabel,
+      errorLabel,
+      successLabel,
+      nextButton)
   }
   
   private func setAutoLayout() {
@@ -163,7 +164,7 @@ extension ProfileEditView {
   }
   
   public func setNickname(_ nickname: String) {
-      nicknameEditTextField.placeholder = nickname
+    nicknameEditTextField.placeholder = nickname
   }
   
   public func updateTextFieldBorderColor(to color: UIColor?) {

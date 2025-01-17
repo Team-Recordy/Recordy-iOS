@@ -5,11 +5,11 @@
       "scale" : "1x"
     },
     {
+      "filename" : "firstIndicator.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "splashBackground.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

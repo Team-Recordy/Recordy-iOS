@@ -14,7 +14,7 @@ import SnapKit
 import Then
 
 public class ThumbnailCollectionViewCell: UICollectionViewCell {
-
+  
   public let gradientLayer = CAGradientLayer()
   public let gradientView = UIView()
   public let label = UILabel()
@@ -25,60 +25,62 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
   public let bookmarkButton = UIButton()
   private let thumbnailImage = UIImageView()
   public let bookmarkImage = UIImageView()
-  public var bookmarkButtonEvent: (() -> Void)?
-
+  var feedForNotification: Feed?
+  
+  //  public var bookmarkButtonEvent: (() -> (Void))?
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     setStyle()
     setUI()
     setAutoLayout()
   }
-
+  
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
-//  public override func layoutSubviews() {
-//    super.layoutSubviews()
-//    gradientLayer.frame = self.bounds
-//  }
-
+  
+  //  public override func layoutSubviews() {
+  //    super.layoutSubviews()
+  //    gradientLayer.frame = self.bounds
+  //  }
+  
   private func setStyle() {
     self.cornerRadius(12)
-
+    
     let colors: [UIColor] = [
       .black.withAlphaComponent(0),
       CommonAsset.recordyBG.color.withAlphaComponent(0.5)
     ]
-
+    
     gradientLayer.do {
       $0.startPoint = CGPoint(x: 0.5, y: 0.0)
       $0.endPoint = CGPoint(x: 0.5, y: 1.0)
       $0.locations = [0.0, 0.3, 1.0]
       $0.colors = colors.map { $0.cgColor }
     }
-
+    
     locationStackView.do {
       $0.axis = .horizontal
       $0.distribution = .fillProportionally
       $0.alignment = .center
       $0.spacing = 6
     }
-
+    
     locationText.do {
       $0.text = "최대열글자들어갑니다"
       $0.font = RecordyFont.caption2.font
       $0.textColor = CommonAsset.recordyGrey01.color
     }
-
+    
     locationImageView.do {
       $0.image = CommonAsset.locationActive.image
     }
-
+    
     bookmarkButton.do {
       $0.addTarget(self, action: #selector(bookmarkButtonTapped), for: .touchUpInside)
     }
-
+    
     bookmarkImage.do {
       $0.contentMode = .scaleAspectFit
       $0.layer.shadowColor = UIColor.black.cgColor
@@ -87,7 +89,7 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
       $0.layer.shadowRadius = 4
       $0.clipsToBounds = false
     }
-
+    
     thumbnailImage.do {
       $0.image = CommonAsset.bottomThumbnail.image
       $0.contentMode = .scaleAspectFill
@@ -103,12 +105,12 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
       locationStackView,
       bookmarkButton
     )
-//    self.bringSubviewToFront(gradientView)
+    //    self.bringSubviewToFront(gradientView)
     locationStackView.addArrangedSubview(locationImageView)
     locationStackView.addArrangedSubview(locationText)
     bookmarkButton.addSubview(bookmarkImage)
   }
-
+  
   private func setAutoLayout() {
     backgroundImageView.snp.makeConstraints {
       $0.edges.equalToSuperview()
@@ -147,17 +149,7 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
       $0.height.equalTo(90.adaptiveHeight)
     }
   }
-
-//  public func configure(with record: MainRecord) {
-//    let image = String(record.thumbnailUrl)
-//    self.backgroundImageView.kf.setImage(
-//      with: URL(string: image),
-//      options: [.cacheOriginalImage]
-//    )
-//    self.locationText.text = record.location
-//    self.bookmarkImage.image = record.isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image
-//  }
-
+  
   public func configure(feed: Feed) {
     let image = String(feed.thumbnailLink)
     self.backgroundImageView.kf.setImage(
@@ -166,13 +158,24 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
     )
     self.locationText.text = feed.exhibitionName
     self.bookmarkImage.image = feed.isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image
+    self.feedForNotification = feed
   }
-
+  
   @objc private func bookmarkButtonTapped() {
-    self.bookmarkButtonEvent?()
+    let newBookmarkState = self.bookmarkImage.image == CommonAsset.bookmarkSelected.image ? false : true
+    updateBookmarkButton(isBookmarked: newBookmarkState)
+    NotificationCenter.default.post(
+      name: .bookmarkStateChanged,
+      object: nil,
+      userInfo: ["feed": feedForNotification as Any]
+    )
   }
-
+  
   public func updateBookmarkButton(isBookmarked: Bool) {
     self.bookmarkImage.image = isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image
   }
+}
+
+public extension Notification.Name {
+  static let bookmarkStateChanged = Notification.Name("bookmarkStateChanged")
 }

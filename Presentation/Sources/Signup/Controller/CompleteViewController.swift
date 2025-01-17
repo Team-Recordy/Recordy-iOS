@@ -14,8 +14,17 @@ import Common
 @available(iOS 16.0, *)
 final class CompleteViewController: UIViewController{
   
+  private var nicknameToEnroll: String?
   private let completeView = CompleteView()
-  private let nicknameView = NicknameView()
+  
+  init(nickname: String) {
+    self.nicknameToEnroll = nickname
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
   
   override func loadView() {
     view = completeView
@@ -24,14 +33,25 @@ final class CompleteViewController: UIViewController{
   public override func viewDidLoad() {
     super.viewDidLoad()
     setStyle()
+    bind()
+    completeView.completeButton.buttonState = .active
   }
   
   private func setStyle() {
+    title = "회원가입 완료"
+    navigationItem.hidesBackButton = true
+    
     completeView.completeButton.addTarget(self, action: #selector(completeButtonTapped), for: .touchUpInside)
   }
   
+  private func bind() {
+    if let nickname = nicknameToEnroll {
+      completeView.setNickname(nickname)
+    }
+  }
+  
   @objc private func completeButtonTapped() {
-    guard let text = nicknameView.nicknameTextField.text else { return }
+    guard let text = nicknameToEnroll else { return }
     let apiProvider = APIProvider<APITarget.Users>()
     let userId = UserDefaults.standard.integer(forKey: "userId")
     let request = DTO.SignUpRequest(

@@ -20,6 +20,8 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
   
   public var onPlaceDetailButtonTapped: ((Int) -> Void)?
   public var onUpdateHeight: (() -> Void)?
+  public var onVideoSelectedInCell: ((Feed) -> Void)?
+//  public var onBookmarkButtonTapped: ((Feed) -> Void)?
   
   private let locationLabel = UILabel()
   private let placeNameLabel = UILabel()
@@ -204,8 +206,18 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
   @objc private func placeDetailButtonTapped(_ sender: UIButton) {
     onPlaceDetailButtonTapped?(sender.tag)
   }
+  
+  public func updateBookmarkState(for feed: Feed) {
+    if let index = records.firstIndex(where: { $0.id == feed.id }) {
+      let indexPath = IndexPath(item: index, section: 0)
+      placeExhibitionCollectionView?.reloadItems(at: [indexPath])
+    } else {
+      print("not found.")
+    }
+  }
 }
 
+@available(iOS 16.0, *)
 extension OverviewCollectionViewCell: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
   public func collectionView(
     _ collectionView: UICollectionView,
@@ -231,9 +243,20 @@ extension OverviewCollectionViewCell: UICollectionViewDataSource, UICollectionVi
     guard indexPath.row < records.count else {
       return cell
     }
-    let record = records[indexPath.row]
-    cell.configure(feed: record)
     
+    var record = records[indexPath.row]
+    
+    cell.configure(feed: record)
+//    cell.bookmarkButtonEvent = { 
+//      self.onBookmarkButtonTapped?(record)
+//    }
     return cell
+  }
+  
+  public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    guard indexPath.row < records.count else { return }
+    
+    let selectedRecord = records[indexPath.row]
+    onVideoSelectedInCell?(selectedRecord)
   }
 }
