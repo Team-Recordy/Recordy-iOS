@@ -63,16 +63,15 @@ extension UIViewController {
   }
 
   public func setupCustomBackButton() {
-    // 기본 백 버튼 숨기기
     self.navigationItem.hidesBackButton = true
 
     let backButton = UIButton(type: .system)
-    backButton.setTitle("Back", for: .normal) // 타이틀 설정
-    backButton.setImage(UIImage(systemName: "arrow.left"), for: .normal) // 이미지 설정
-    backButton.tintColor = .white // 이미지 색상 설정
+    backButton.setTitle("", for: .normal)
+    backButton.setImage(CommonAsset.backButton.image, for: .normal)
+    backButton.tintColor = .white
     backButton.sizeToFit()
 
-    backButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
+    backButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 0)
 
     backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
 
@@ -80,7 +79,7 @@ extension UIViewController {
     self.navigationItem.leftBarButtonItem = backBarButtonItem
   }
 
-  @objc private func backButtonTapped() {
+  @objc public func backButtonTapped() {
     self.navigationController?.popViewController(animated: true)
   }
 }

@@ -40,8 +40,8 @@ public class RecordyTermButton: UIButton {
     }
     
     agreeLabel.do {
-      $0.font = RecordyFont.caption1.font
-      $0.textColor = CommonAsset.recordyGrey03.color
+      $0.font = ViskitFont.caption1Medium.font
+      $0.textColor = CommonAsset.viskitGray02.color
     }
   }
   
@@ -54,8 +54,9 @@ public class RecordyTermButton: UIButton {
   
   private func setAutolayout() {
     agreeImageView.snp.makeConstraints {
-      $0.leading.equalToSuperview().offset(24)
-      $0.width.height.equalTo(16)
+      $0.leading.equalToSuperview().offset(20)
+      $0.width.equalTo(16.adaptiveWidth)
+      $0.height.equalTo(16.adaptiveHeight)
       $0.centerY.equalToSuperview()
     }
     

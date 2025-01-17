@@ -16,7 +16,6 @@ final class CompleteViewController: UIViewController{
   
   private var nicknameToEnroll: String?
   private let completeView = CompleteView()
-  private let nicknameView = NicknameView()
   
   init(nickname: String) {
     self.nicknameToEnroll = nickname
@@ -34,10 +33,21 @@ final class CompleteViewController: UIViewController{
   public override func viewDidLoad() {
     super.viewDidLoad()
     setStyle()
+    bind()
+    completeView.completeButton.buttonState = .active
   }
   
   private func setStyle() {
+    title = "회원가입 완료"
+    navigationItem.hidesBackButton = true
+    
     completeView.completeButton.addTarget(self, action: #selector(completeButtonTapped), for: .touchUpInside)
+  }
+  
+  private func bind() {
+    if let nickname = nicknameToEnroll {
+      completeView.setNickname(nickname)
+    }
   }
   
   @objc private func completeButtonTapped() {

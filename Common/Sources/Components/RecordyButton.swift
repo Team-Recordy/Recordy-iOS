@@ -34,18 +34,18 @@ public class RecordyButton: UIButton {
 
   private func setUI() {
     layer.cornerRadius = 12
-    titleLabel?.font = RecordyFont.button1.font
+    titleLabel?.font = ViskitFont.body1.font
     updateButtonStyle()
   }
   
   private func updateButtonStyle() {
     switch buttonState {
     case .active:
-      backgroundColor = CommonAsset.recordyMain.color
-      setTitleColor(CommonAsset.recordyGrey09.color, for: .normal)
+      backgroundColor = CommonAsset.viskitYellow400.color
+      setTitleColor(CommonAsset.viskitBG.color, for: .normal)
     case .inactive:
-      backgroundColor = CommonAsset.recordyGrey08.color
-      setTitleColor(CommonAsset.recordyGrey04.color, for: .normal)
+      backgroundColor = CommonAsset.viskitGray11.color
+      setTitleColor(CommonAsset.viskitGray08.color, for: .normal)
     }
   }
 }
