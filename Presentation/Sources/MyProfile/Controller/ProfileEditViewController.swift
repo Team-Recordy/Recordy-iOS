@@ -102,18 +102,24 @@ public final class ProfileEditViewController: UIViewController {
   }
   
   @objc private func profileImageViewDidTap() {
-      let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    
+    let selectImage = UIAlertAction(title: "앨범에서 선택", style: .default) { [weak self] _ in
       
-      let selectImage = UIAlertAction(title: "앨범에서 선택", style: .default) { [weak self] _ in
-        
-      }
-      let deleteImage = UIAlertAction(title: "프로필 사진 삭제", style: .default) { [weak self] _ in
-        
-      }
-
-      alert.addAction(selectImage)
-      alert.addAction(deleteImage)
+    }
+    let deleteImage = UIAlertAction(title: "프로필 사진 삭제", style: .default) { [weak self] _ in
       
-      present(alert, animated: true)
+    }
+    let cancel = UIAlertAction(title: "취소", style: .cancel) { [weak self] _ in
+      
+    }
+    
+    deleteImage.setValue(UIColor.systemRed, forKey: "titleTextColor")
+    
+    alert.addAction(selectImage)
+    alert.addAction(deleteImage)
+    alert.addAction(cancel)
+    
+    present(alert, animated: true)
   }
 }

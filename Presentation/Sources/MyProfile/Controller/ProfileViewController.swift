@@ -154,8 +154,11 @@ public class ProfileViewController: UIViewController {
   }
   
   func getUserProfile() {
-    let apiProvider = APIProvider<APITarget.Users>()
     let userId = UserDefaults.standard.integer(forKey: "userId")
+    guard let platform = UserDefaults.standard.string(forKey: "loginPlatform") else { return }
+    let apiProvider = APIProvider<APITarget.Users>()
+    let loginState = LoginState(platform: platform)
+    print("🚨\(platform),\(loginState)🚨")
     let request = DTO.GetProfileRequest(otherUserId: userId)
     apiProvider.requestResponsable(.getProfile(request), DTO.GetProfileResponse.self) { [weak self] result in
       guard let self = self else { return }
@@ -171,7 +174,7 @@ public class ProfileViewController: UIViewController {
           profileImage: response.profileImageUrl,
           feeds: [],
           bookmarkedFeeds: [],
-          loginState: .apple,
+          loginState: loginState,
           recordCount: response.recordCount,
           followerCount: response.followerCount,
           followingCount: response.followingCount
