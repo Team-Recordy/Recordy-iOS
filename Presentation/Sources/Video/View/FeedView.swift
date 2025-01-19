@@ -28,7 +28,6 @@ class FeedView: UIView {
   let placeButton = UIButton()
   let nicknameButton = UIButton()
   let descriptionTextView = UITextView()
-  let deleteButton = UIButton()
   let bookmarkButton = UIButton()
   let bookmarkLabel = UILabel()
   let locationLabel = UILabel()
@@ -72,7 +71,7 @@ class FeedView: UIView {
     locationStackView.do {
       $0.spacing = 4.adaptiveWidth
       $0.axis = .horizontal
-      $0.layer.backgroundColor = (UIColor.black.cgColor).copy(alpha: 0.5)
+      $0.backgroundColor = CommonAsset.viskitGray10.color
       $0.isLayoutMarginsRelativeArrangement = true
       $0.layoutMargins = UIEdgeInsets(
         top: 0,
@@ -90,7 +89,7 @@ class FeedView: UIView {
     }
 
     bookmarkStackView.do {
-      $0.spacing = 7.adaptiveHeight
+      $0.spacing = 6.adaptiveHeight
       $0.axis = .vertical
       $0.alignment = .center
     }
@@ -126,7 +125,7 @@ class FeedView: UIView {
     }
 
     locationImage.do {
-//      $0.image = CommonAsset.location.image
+      $0.image = CommonAsset.icCusror16.image
       $0.contentMode = .scaleAspectFit
     }
 
@@ -155,11 +154,6 @@ class FeedView: UIView {
       $0.font = RecordyFont.body2Long.font
     }
 
-    deleteButton.do {
-      $0.setImage(CommonAsset.deleteButton.image, for: .normal)
-      $0.isHidden = true
-    }
-
     bookmarkButton.do {
       $0.setImage(CommonAsset.bookmarkSelected.image, for: .normal)
     }
@@ -176,9 +170,9 @@ class FeedView: UIView {
       $0.font = RecordyFont.caption1.font
     }
 
-//    moreButton.do {
-//      $0.setImage(CommonAsset.seeMore.image, for: .normal)
-//    }
+    moreButton.do {
+      $0.setImage(CommonAsset.seeMore.image, for: .normal)
+    }
   }
 
   private func setUI() {
@@ -186,8 +180,7 @@ class FeedView: UIView {
 
     [
       bookmarkButton,
-      bookmarkLabel,
-      deleteButton
+      bookmarkLabel
     ].forEach { bookmarkStackView.addArrangedSubview($0) }
 
     [
@@ -248,14 +241,14 @@ class FeedView: UIView {
     }
 
     bookmarkStackView.snp.makeConstraints {
-      $0.bottom.equalTo(safeAreaLayoutGuide).inset(40.adaptiveHeight)
+      $0.bottom.equalTo(moreButton.snp.top).offset(-8.adaptiveHeight)
       $0.trailing.equalTo(safeAreaLayoutGuide).inset(20.adaptiveWidth)
       $0.width.equalTo(40.adaptiveWidth)
     }
 
     locationStackView.snp.makeConstraints {
       $0.leading.equalTo(safeAreaLayoutGuide).inset(20.adaptiveWidth)
-      $0.bottom.equalTo(moreButton.snp.top).offset(8.adaptiveHeight)
+      $0.bottom.equalTo(safeAreaLayoutGuide).offset(-10.adaptiveHeight)
       $0.height.equalTo(28.adaptiveHeight)
     }
 
@@ -264,7 +257,7 @@ class FeedView: UIView {
     }
 
     moreButton.snp.makeConstraints {
-      $0.bottom.equalTo(safeAreaLayoutGuide).inset(10.adaptiveHeight)
+      $0.bottom.equalTo(safeAreaLayoutGuide).offset(-10.adaptiveHeight)
       $0.trailing.equalTo(safeAreaLayoutGuide).inset(20.adaptiveWidth)
       $0.size.equalTo(40.adaptiveHeight)
     }

@@ -54,7 +54,7 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
   }
 
   private func setStyle() {
-    self.view.backgroundColor = .black
+    view.backgroundColor = CommonAsset.viskitBG.color
     profileImage.do {
       $0.image = CommonAsset.profileImage.image
       $0.contentMode = .scaleAspectFit
@@ -271,7 +271,7 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
     didSelectItemAt indexPath: IndexPath
   ) {
     let videoFeedViewController = VideoFeedViewController(
-      type: .userProfile,
+      type: .others,
       placeId: 0,
       exhibitionId: 0,
       cursorId: nil,

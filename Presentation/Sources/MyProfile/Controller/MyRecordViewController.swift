@@ -43,8 +43,8 @@ public class MyRecordViewController: UIViewController {
   }
   
   public func setStyle() {
-    view.backgroundColor = .black
-    
+    view.backgroundColor = CommonAsset.viskitBG.color
+
     emptyRecordView.do {
       $0.image = CommonAsset.mypageCamera.image
       $0.contentMode = .scaleAspectFit

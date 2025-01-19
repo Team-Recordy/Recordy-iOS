@@ -155,12 +155,12 @@ class FeedCell: UICollectionViewCell {
       action: #selector(bookmarkButtonTapped),
       for: .touchUpInside
     )
-    feedView.deleteButton.isHidden = !feed.isMine
-    feedView.deleteButton.addTarget(
-      self,
-      action: #selector(deleteButtonTapped),
-      for: .touchUpInside
-    )
+//    feedView.deleteButton.isHidden = !feed.isMine
+//    feedView.deleteButton.addTarget(
+//      self,
+//      action: #selector(deleteButtonTapped),
+//      for: .touchUpInside
+//    )
     feedView.moreButton
       .addTarget(
         self,

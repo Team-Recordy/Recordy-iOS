@@ -12,17 +12,24 @@ import Core
 
 public enum VideoFeedType {
   case all
-  case following
-  //  case recent
-  case userProfile
-  case myProfile
-  case bookmarked
-  case test
+  case follow
   case place
+  case mine
+  case others
+  case bookmarked
+}
+
+public enum VideoFeedType_new {
+  case all // 전체 랜덤 영상
+  case follow // 팔로우 하는 사람들 랜덤 영상
+  case place // 장소 눌렀을 때 드는 영상
+  case mine // 내 영상 userID = 내꺼
+  case others // 그 사람 userID
+  case bookmarked // 북마크된 영상
 }
 
 class VideoFeedViewModel {
-  
+
   private(set) var feedList: [Feed] = []
   let apiProvider = APIProvider<APITarget.Records>()
   var type: VideoFeedType
@@ -34,10 +41,12 @@ class VideoFeedViewModel {
   var hasNext = true
   var pageNumber = 0
   var isFetching = false
-  var isToggle = false
   var onFeedListUpdate: ((Int) -> ())?
   var isBookmarked: (() -> ())?
-  
+  var newType: VideoFeedType = .all
+  var isPlayed = false
+  var feedUpdated = false
+
   init(
     type: VideoFeedType,
     placeId: Int? = nil,
@@ -52,8 +61,12 @@ class VideoFeedViewModel {
     self.userId = userId
     recordListCase()
   }
-  
-  func recordListCase(toggle: Bool? = nil) {
+
+  func play() {
+    isPlayed = true
+  }
+
+  func recordListCase() {
     guard !isFetching else { return }
     switch type {
     case .all:
@@ -61,7 +74,7 @@ class VideoFeedViewModel {
         endPoint: .getRandomRecordList(DTO.GetRandomRecordListRequest(size: 15)),
         response: DTO.GetRandomRecordListResponse.self
       )
-    case .following:
+    case .follow:
       guard let cursorId else { return }
       getPlaceRecordList(
         endPoint: .getFollowingRecordList(
@@ -69,7 +82,7 @@ class VideoFeedViewModel {
         ),
         response: DTO.GetFollowingRecordListResponse.self
       )
-    case .userProfile:
+    case .others:
       guard let userId else { return }
       getPlaceRecordList(
         endPoint: .getUserRecordList(
@@ -85,15 +98,15 @@ class VideoFeedViewModel {
       getPlaceRecordList(
         endPoint: .getBookmarkedRecordList(
           DTO.GetBookmarkedListRequest(
-//            cursorId: 0,
+            //            cursorId: 0,
             size: 100
           )
         ),
         response: DTO.GetBookmarkedListResponse.self
       )
-    case .test:
-      //      self.feedList = Feed.mockData
-      self.onFeedListUpdate?(self.feedList.count)
+//    case .test:
+//      //      self.feedList = Feed.mockData
+//      self.onFeedListUpdate?(self.feedList.count)
     case .place:
       guard let placeId else { return }
       print("🚨recordListCase 실행🚨")
@@ -107,7 +120,7 @@ class VideoFeedViewModel {
     default: return
     }
   }
-  
+
   private func getPlaceRecordList<T: Codable>(
     endPoint: APITarget.Records,
     response: T.Type
@@ -129,10 +142,10 @@ class VideoFeedViewModel {
       }
     }
   }
-  
+
   private func processResponse<T: Codable>(response: T) {
     if let randomRecordListResponse = response as? DTO.GetRandomRecordListResponse {
-      let feeds: [Feed] = randomRecordListResponse.content.map { content in
+      let feeds: [Feed] = randomRecordListResponse.records.map { content in
         Feed(
           id: content.id,
           videoLink: content.fileUrl.videoUrl,
@@ -244,24 +257,26 @@ class VideoFeedViewModel {
       }
     }
   }
-  
+
   func updateFeedList(_ newFeeds: [Feed]) {
-    self.feedList += newFeeds
-    self.onFeedListUpdate?(newFeeds.count)
+    feedList += newFeeds
+    feedUpdated = true
+    onFeedListUpdate?(newFeeds.count)
+
     //    cacheVideos(feeds: newFeeds) { [weak self] cachedFeeds in
     //      guard let self else { return }
     //      self.feedList += cachedFeeds
     //      self.onFeedListUpdate?(cachedFeeds.count)
     //    }
   }
-  
+
   func cacheVideos(
     feeds: [Feed],
     completion: @escaping ([Feed]) -> Void
   ) {
     let dispatchGroup = DispatchGroup()
     var cachedFeeds: [Feed] = []
-    
+
     for feed in feeds {
       dispatchGroup.enter()
       VideoCacheManager.shared.downloadAndCacheURL(url: URL(string: feed.videoLink)!) { url in
@@ -287,12 +302,12 @@ class VideoFeedViewModel {
         dispatchGroup.leave()
       }
     }
-    
+
     dispatchGroup.notify(queue: .main) {
       completion(cachedFeeds)
     }
   }
-  
+
   func postIsFeedWatched(feed: Feed) {
     //    let request = DTO.IsRecordWatchedRequest(recordId: feed.id)
     //    apiProvider.justRequest(.isRecordWatched(request)) { result in
@@ -304,7 +319,7 @@ class VideoFeedViewModel {
     //      }
     //    }
   }
-  
+
   func deleteFeed(_ index: Int) {
     let feed = self.feedList[index]
     let request = DTO.DeleteRecordRequest(record_id: feed.id)

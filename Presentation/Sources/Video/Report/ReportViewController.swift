@@ -25,7 +25,7 @@ class ReportViewController: UIViewController {
     setAutolayout()
     setTableView()
   }
-  
+
   private func setStyle() {
     self.title = "영상 신고"
   }

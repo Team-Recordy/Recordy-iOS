@@ -44,10 +44,14 @@ extension VideoFeedViewController: UICollectionViewDataSource {
       bounds: collectionView.frame,
       shouldAddPlayer: cell.avPlayer == nil
     )
-    if !isPlayed && indexPath.row == 0 {
-      cell.play()
-      isPlayed = true
-    }
+//    if !viewModel.isPlayed && indexPath.row == 0 && viewModel.feedUpdated {
+//      viewModel.play()
+//      cell.play()
+//    }
+//    if !isPlayed && indexPath.row == 0 && !viewModel.feedList.isEmpty {
+//      cell.play()
+//      isPlayed = true
+//    }
     cell.feedView.nicknameButton.tag = indexPath.row
     cell.feedView.nicknameButton.addTarget(
       self,
