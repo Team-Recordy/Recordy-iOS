@@ -51,11 +51,13 @@ public class UploadVideoViewController: UIViewController {
     title = "영상 업로드"
     view.backgroundColor = CommonAsset.viskitBG.color
 
-//    let rightButton = UIButton(type: .system)
-//    rightButton.setImage(UIImage(systemName: "xmark"), for: .normal)
-//    rightButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
-//    let rightBarButtonItem = UIBarButtonItem(customView: rightButton)
-//    navigationItem.rightBarButtonItem = rightBarButtonItem
+    if navigationController?.viewControllers.first != self {
+      let rightButton = UIButton(type: .system)
+      rightButton.setImage(UIImage(systemName: "xmark"), for: .normal)
+      rightButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+      let rightBarButtonItem = UIBarButtonItem(customView: rightButton)
+      navigationItem.rightBarButtonItem = rightBarButtonItem
+    }
 
     scrollView.do {
       $0.backgroundColor = .clear
@@ -316,12 +318,12 @@ public class UploadVideoViewController: UIViewController {
   }
 
   private func updateUploadButton(enabled: Bool) {
-//    uploadButton.isEnabled = enabled
-//    uploadButton.backgroundColor = enabled ? CommonAsset.viskitYellow400.color : CommonAsset.viskitGray11.color
-//    uploadButton.setTitleColor(
-//      enabled ? CommonAsset.viskitBG.color : CommonAsset.viskitGray08.color,
-//      for: .normal
-//    )
+    uploadButton.isEnabled = enabled
+    uploadButton.backgroundColor = enabled ? CommonAsset.viskitYellow400.color : CommonAsset.viskitGray11.color
+    uploadButton.setTitleColor(
+      enabled ? CommonAsset.viskitBG.color : CommonAsset.viskitGray08.color,
+      for: .normal
+    )
   }
 
   private func updateVideoSelectionState(selected: Bool) {

@@ -105,14 +105,14 @@ class FeedView: UIView {
         trailing: 10
       )
       config.imagePlacement = .trailing
-//      var container = AttributeContainer()
-//      container.font = RecordyFont.caption1.font
-//      container.foregroundColor = CommonAsset.viskitWhite.color
-//      config.attributedTitle = AttributedString(
-//        title,
-//        attributes: container
-//      )
-//      $0.configuration = config
+      var container = AttributeContainer()
+      container.font = ViskitFont.caption1Regular.font
+      container.foregroundColor = CommonAsset.viskitWhite.color
+      config.attributedTitle = AttributedString(
+        title,
+        attributes: container
+      )
+      $0.configuration = config
 
       $0.layer.backgroundColor = (UIColor.black.cgColor).copy(alpha: 0.5)
       $0.layoutMargins = UIEdgeInsets(
@@ -194,18 +194,13 @@ class FeedView: UIView {
     ].forEach { descriptionStackView.addArrangedSubview($0) }
 
     [
+      backgroundView,
+      placeButton,
       descriptionStackView,
       bookmarkStackView,
       locationStackView,
       moreButton
-    ].forEach { backgroundView.addSubview($0) }
-
-    [
-      placeButton,
-      backgroundView
-    ].forEach {
-      addSubview($0)
-    }
+    ].forEach { addSubview($0) }
   }
 
   private func setAutolayout() {
@@ -325,7 +320,7 @@ class FeedView: UIView {
   private func updatePlaceButtonConfiguration() {
     var config = placeButton.configuration
     var container = AttributeContainer()
-    container.font = RecordyFont.caption1.font
+    container.font = ViskitFont.caption1Regular.font
     container.foregroundColor = CommonAsset.viskitWhite.color
     config?.attributedTitle = AttributedString(
       title,

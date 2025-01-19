@@ -13,6 +13,7 @@ import Then
 
 class RecordyPopUpViewController: UIViewController {
 
+  let popUpType: RecordyPopUpType
   let popUpView: RecordyPopUpView
   var rightButtonAction: (() -> Void)?
 
@@ -20,6 +21,7 @@ class RecordyPopUpViewController: UIViewController {
     type: RecordyPopUpType,
     rightButtonAction: (() -> Void)?
   ) {
+    self.popUpType = type
     self.popUpView = RecordyPopUpView(type: type)
     self.rightButtonAction = rightButtonAction
     super.init(nibName: nil, bundle: nil)
@@ -57,7 +59,11 @@ class RecordyPopUpViewController: UIViewController {
   private func setAutoLayout() {
     self.popUpView.snp.makeConstraints {
       $0.width.equalTo(290.adaptiveWidth)
-      $0.height.equalTo(256.adaptiveHeight)
+      if case .register(_) = popUpType {
+        $0.height.equalTo(160.adaptiveHeight)
+      } else {
+        $0.height.equalTo(256.adaptiveHeight)
+      }
       $0.center.equalToSuperview()
     }
   }

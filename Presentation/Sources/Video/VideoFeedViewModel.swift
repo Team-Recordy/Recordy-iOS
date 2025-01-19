@@ -66,6 +66,13 @@ class VideoFeedViewModel {
     isPlayed = true
   }
 
+  func toggle(from videoType: VideoFeedType) {
+    isPlayed = false
+    feedList.removeAll()
+    type = videoType
+    recordListCase()
+  }
+
   func recordListCase() {
     guard !isFetching else { return }
     switch type {
@@ -75,11 +82,8 @@ class VideoFeedViewModel {
         response: DTO.GetRandomRecordListResponse.self
       )
     case .follow:
-      guard let cursorId else { return }
       getPlaceRecordList(
-        endPoint: .getFollowingRecordList(
-          DTO.GetFollowingRecordListRequest(size: 15)
-        ),
+        endPoint: .getFollowingRecordList(DTO.GetFollowingRecordListRequest(size: 15)),
         response: DTO.GetFollowingRecordListResponse.self
       )
     case .others:
@@ -306,6 +310,15 @@ class VideoFeedViewModel {
     dispatchGroup.notify(queue: .main) {
       completion(cachedFeeds)
     }
+  }
+
+  func bookmarkFeed(index: Int) {
+    let isBookmarked = feedList[index].isBookmarked
+    feedList[index].isBookmarked.toggle()
+    feedList[index].bookmarkCount += isBookmarked ? -1 : 1
+    let bookmarkProvider = APIProvider<APITarget.Bookmarks>()
+    let request = DTO.PostBookmarkRequest(recordId: feedList[index].id)
+    bookmarkProvider.justRequest(.postBookmark(request)) { _ in }
   }
 
   func postIsFeedWatched(feed: Feed) {

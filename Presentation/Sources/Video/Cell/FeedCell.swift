@@ -34,7 +34,7 @@ class FeedCell: UICollectionViewCell {
   var isPlayRequested: Bool = false
 
   var bookmarkAction: (() -> Void)?
-  var profileAction: (() -> Void)?
+  var nicknameAction: (() -> Void)?
   var deleteAction: (() -> Void)?
   var moreAction: (() -> Void)?
 
@@ -131,7 +131,7 @@ class FeedCell: UICollectionViewCell {
   func bind(feed: Feed, bounds: CGRect, shouldAddPlayer: Bool) {
     self.feed = feed
 
-//    feedView.updateTitle(feed.placeInfo.title)
+    feedView.updateTitle(feed.placeName)
     if shouldAddPlayer {
       addPlayer(for: URL(string: feed.videoLink)!, bounds: bounds)
     }
@@ -143,6 +143,11 @@ class FeedCell: UICollectionViewCell {
     feedView.nicknameButton.setTitle(
       feed.uploaderNickname,
       for: .normal
+    )
+    feedView.nicknameButton.addTarget(
+      self,
+      action: #selector(nicknameButtonTapped),
+      for: .touchUpInside
     )
     feedView.descriptionTextView.text = feed.description
     feedView.bookmarkButton.setImage(
@@ -178,6 +183,12 @@ class FeedCell: UICollectionViewCell {
       for: .normal
     )
     feedView.bookmarkLabel.text = "\(count)"
+  }
+
+  @objc
+  private func nicknameButtonTapped() {
+    print(#function)
+    nicknameAction?()
   }
 
   @objc

@@ -20,14 +20,12 @@ final class UploadVideoViewModel {
 
   // MARK: - Published Properties
   @Published var selectedAsset: PHAsset?
-  @Published var location: String = ""
   @Published var contents: String = ""
   @Published var exhibitionName: String = ""
   @Published var place: SearchPlaceViewModel.SearchedPlace?
 
   // MARK: - Output Properties
   @Published var thumbnailImage: UIImage?
-  @Published var locationTextCount: String = "0 / 20"
   @Published var contentsTextCount: String = "0 / 300"
   @Published var uploadEnabled: Bool = false
   @Published var uploadVideo: PHAsset?
@@ -52,13 +50,6 @@ final class UploadVideoViewModel {
       .assign(to: \.thumbnailImage, on: self)
       .store(in: &cancellables)
 
-    // Location text count binding
-    $location
-      .map { "\($0.count) / 20" }
-      .assign(to: \.locationTextCount, on: self)
-      .store(in: &cancellables)
-
-    // Contents text count binding
     $contents
       .map {
         if $0 == "공간에 대한 나의 생각을 자유롭게 적어주세요!" {
@@ -70,25 +61,13 @@ final class UploadVideoViewModel {
       .assign(to: \.contentsTextCount, on: self)
       .store(in: &cancellables)
 
-    // Exhibition name text count binding
-    $exhibitionName
-      .map {
-        if $0 == "전시명을 입력해주세요" {
-          return "0 / 300"
-        } else {
-          return "\($0.count) / 300"
-        }
-      }
-      .assign(to: \.locationTextCount, on: self)
-      .store(in: &cancellables)
-
-    // Upload enabled binding
-    Publishers.CombineLatest4($selectedAsset, $location, $contents, $exhibitionName)
-      .map { asset, location, contents, exhibitionName in
+    Publishers.CombineLatest4($selectedAsset, $place, $contents, $exhibitionName)
+      .map { asset, place, contents, exhibitionName in
         return asset != nil &&
-        location.count > 0 &&
+        exhibitionName.count > 0 &&
         contents.count > 0 &&
-        contents != "공간에 대한 나의 생각을 자유롭게 적어주세요!"
+        contents != "공간에 대한 나의 생각을 자유롭게 적어주세요!" &&
+        place != nil
       }
       .assign(to: \.uploadEnabled, on: self)
       .store(in: &cancellables)

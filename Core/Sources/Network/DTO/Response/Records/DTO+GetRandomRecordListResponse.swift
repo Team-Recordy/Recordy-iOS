@@ -17,7 +17,6 @@ extension DTO {
     }
 
     public init(from decoder: Decoder) throws {
-      // 배열을 바로 디코딩
       let container = try decoder.singleValueContainer()
       records = try container.decode([Record].self)
     }

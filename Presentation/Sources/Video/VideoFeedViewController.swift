@@ -69,7 +69,7 @@ public class VideoFeedViewController: UIViewController {
   }
 
   private func setStyle() {
-    navigationController?.navigationBar.isHidden = type == .all || type == .follow
+    navigationController?.isNavigationBarHidden = type == .all || type == .follow
     view.backgroundColor = CommonAsset.recordyBG.color
     recordyToggle.do {
       $0.isHidden = type != .all && type != .follow
@@ -125,19 +125,18 @@ public class VideoFeedViewController: UIViewController {
   private func bind() {
     viewModel.onFeedListUpdate = { [weak self] count in
       guard let self = self else { return }
-      print("🚨 FeedList 업데이트됨, count: \(count)")
       DispatchQueue.main.async {
         self.collectionView?.reloadData()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            if let firstCell = self.collectionView?.cellForItem(at: IndexPath(row: 0, section: 0)) as? FeedCell,
-               !self.viewModel.isPlayed {
-                self.viewModel.play()
-                firstCell.play()
-            }
+          if let firstCell = self.collectionView?.cellForItem(
+            at: IndexPath(row: 0, section: 0)
+          ) as? FeedCell, !self.viewModel.isPlayed {
+            self.viewModel.play()
+            firstCell.play()
+          }
         }
-
+        //TODO: 토글 되었을 때 가능한 상황 추가적 고려 필요
 //        if self.viewModel.isToggle {
-//          //TODO: 토글 되었을 때 가능한 상황 추가적 고려 필요
 //          self.isPlayed = false
 //          self.collectionView!.reloadData()
 //          self.viewModel.isToggle = false
@@ -152,7 +151,8 @@ public class VideoFeedViewController: UIViewController {
   }
 
   @objc func nicknameButtonTapped(_ sender: UIButton) {
-    guard type != .others && type != .mine else { return }
+    print(#function)
+    guard type == .others || type == .mine else { return }
     let index = sender.tag
     let feed = viewModel.feedList[index]
     let userVC = OtherUserProfileViewController(id: feed.uploaderId)
@@ -160,8 +160,7 @@ public class VideoFeedViewController: UIViewController {
   }
 
   func toggleButtonTapped(type: VideoFeedType) {
-    viewModel.type = type == .all ? .follow : .all
-    viewModel.recordListCase()
+    viewModel.toggle(from: type == .all ? .follow : .all)
   }
 
   func sheetAction() {
