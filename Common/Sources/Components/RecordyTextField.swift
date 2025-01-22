@@ -10,12 +10,13 @@ import UIKit
 
 public enum RecordyTextFieldState {
   case unselected
+  case duplicated
   case selected
   case error
+  case invalidPattern
 }
 
 public class RecordyTextField: UITextField {
-  
   public init(
     frame: CGRect = .zero,
     placeholder: String
@@ -50,7 +51,7 @@ public class RecordyTextField: UITextField {
     case .selected:
       layer.borderColor = CommonAsset.viskitYellow80.color.cgColor
       layer.borderWidth = 1
-    case .error:
+    case .error, .duplicated, .invalidPattern:
       layer.borderColor = CommonAsset.viskitAlert01.color.cgColor
       layer.borderWidth = 1
     }

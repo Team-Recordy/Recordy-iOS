@@ -90,11 +90,12 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
   }
   
   private func setStyle() {
+    backgroundColor = CommonAsset.viskitBG.color
     settingTableView.do {
       $0.delegate = self
       $0.dataSource = self
       $0.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-      $0.backgroundColor = .black
+      $0.backgroundColor = .clear
       $0.isScrollEnabled = false
       $0.sectionHeaderTopPadding = 0
       $0.separatorStyle = .none
@@ -144,7 +145,7 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
     cell.textLabel?.text = list[indexPath.row]
     cell.textLabel?.font = ViskitFont.body1.font
     cell.textLabel?.textColor = CommonAsset.viskitGray01.color
-    cell.backgroundColor = .black
+    cell.backgroundColor = .clear
     cell.selectionStyle = .none
     
     if cellArrowImages.indices.contains(

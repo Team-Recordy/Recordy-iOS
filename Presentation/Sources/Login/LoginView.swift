@@ -85,6 +85,7 @@ final class LoginView: UIView {
   
   // TODO: Change BackgroundColor to Gradient
   func setStyle() {
+    backgroundColor = CommonAsset.viskitBG.color
     kakaoLoginButton.cornerRadius(10)
     appleLoginButton.cornerRadius(10)
     

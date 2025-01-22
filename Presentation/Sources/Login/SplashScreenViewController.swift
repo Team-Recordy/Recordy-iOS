@@ -42,7 +42,7 @@ public class SplashScreenViewController: UIViewController {
     logoImageView.snp.makeConstraints {
       $0.width.equalTo(200.adaptiveHeight)
       $0.height.equalTo(61.adaptiveWidth)
-      $0.top.equalToSuperview().offset(298)
+      $0.top.equalToSuperview().offset(220)
       $0.centerX.equalToSuperview()
     }
   }
@@ -50,7 +50,9 @@ public class SplashScreenViewController: UIViewController {
   private func animateLogo() {
     self.logoImageView.snp.remakeConstraints {
       $0.centerX.equalToSuperview()
-      $0.top.equalToSuperview().offset(261)
+      $0.top.equalToSuperview().offset(308)
+      $0.width.equalTo(200.adaptiveWidth)
+      $0.height.equalTo(61.adaptiveHeight)
     }
     
     UIView.animate(withDuration: 1.0, delay: 0, options: [.curveEaseInOut], animations: {

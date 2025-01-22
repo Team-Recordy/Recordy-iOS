@@ -30,7 +30,7 @@ class BookMarkEmptyView: UIView {
   }
   
   private func setStyle() {
-    backgroundColor = .black
+    backgroundColor = CommonAsset.viskitBG.color
     
     imageView.do {
       $0.image = CommonAsset.ledyEmpty1.image
