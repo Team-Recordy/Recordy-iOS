@@ -47,8 +47,9 @@ public class MyRecordView: UIView {
   }
   
   private func setStyle() {
-    backgroundColor = .black
-    
+    backgroundColor = CommonAsset.viskitBG.color
+    emptyView.backgroundColor = CommonAsset.viskitBG.color
+
     countLabel.do {
       $0.textColor = .white
       $0.font = ViskitFont.caption1Regular.font

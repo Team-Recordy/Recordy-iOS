@@ -73,6 +73,7 @@ public class SearchViewController: UIViewController {
   }
   
   private func setStyle() {
+    view.backgroundColor = CommonAsset.viskitBG.color
     navigationController?.isNavigationBarHidden = true
     
     searchContainerView.do {

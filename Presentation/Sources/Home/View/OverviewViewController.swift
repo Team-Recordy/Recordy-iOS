@@ -62,6 +62,8 @@ final class OverviewViewController: UIViewController {
   }
   
   private func setStyle() {
+    view.backgroundColor = CommonAsset.viskitBG.color
+
     overviewCollectionView!.do {
       $0.backgroundColor = .clear
     }

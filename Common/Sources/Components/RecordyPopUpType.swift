@@ -15,7 +15,8 @@ public enum RecordyPopUpType {
   case signOut
   case withdraw
   case delete
-  
+  case register(place: String)
+
   public var image: UIImage {
     return CommonAsset.alertImage.image
   }
@@ -38,6 +39,8 @@ public enum RecordyPopUpType {
       "정말 탈퇴하시겠어요?"
     case .delete:
       "영상을 삭제할까요?"
+    case .register(let place):
+      "'\(place)'를\n등록할까요??"
     }
   }
   
@@ -59,6 +62,8 @@ public enum RecordyPopUpType {
       "소중한 기록들이 모두 사라져요."
     case .delete:
       "해당 기록은 영구 삭제되며, 복구가 불가능해요"
+    case .register:
+      "등록할까요?"
     }
   }
   
@@ -80,6 +85,8 @@ public enum RecordyPopUpType {
       "탈퇴"
     case .delete:
       "삭제하기"
+    case .register:
+      "등록"
     }
   }
   

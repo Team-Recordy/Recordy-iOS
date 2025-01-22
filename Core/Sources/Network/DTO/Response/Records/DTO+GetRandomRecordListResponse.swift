@@ -10,24 +10,21 @@ import Foundation
 
 extension DTO {
   public struct GetRandomRecordListResponse: BaseResponse {
-    public let nextCursor: Int
-    public let hasNext: Bool
-    public let content: [Content]
-    
-    public init(
-      nextCursor: Int,
-      hasNext: Bool,
-      content: [Content]
-    ) {
-      self.nextCursor = nextCursor
-      self.hasNext = hasNext
-      self.content = content
+    public let records: [Record]
+
+    public init(records: [Record]) {
+      self.records = records
+    }
+
+    public init(from decoder: Decoder) throws {
+      let container = try decoder.singleValueContainer()
+      records = try container.decode([Record].self)
     }
   }
 }
 
 extension DTO.GetRandomRecordListResponse {
-  public struct Content: BaseResponse {
+  public struct Record: BaseResponse {
     public let id: Int
     public let fileUrl: FileUrl
     public let content: String
@@ -39,7 +36,7 @@ extension DTO.GetRandomRecordListResponse {
     public let bookmarkCount: Int
     public let isMine: Bool
     public let isBookmarked: Bool
-    
+
     public init(
       id: Int,
       fileUrl: FileUrl,
@@ -68,11 +65,11 @@ extension DTO.GetRandomRecordListResponse {
   }
 }
 
-extension DTO.GetRandomRecordListResponse.Content {
+extension DTO.GetRandomRecordListResponse.Record {
   public struct FileUrl: BaseResponse {
     public let videoUrl: String
     public let thumbnailUrl: String
-    
+
     public init(
       videoUrl: String,
       thumbnailUrl: String
@@ -82,4 +79,3 @@ extension DTO.GetRandomRecordListResponse.Content {
     }
   }
 }
-

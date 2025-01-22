@@ -99,7 +99,7 @@ public class SettingViewController: UIViewController {
   }
   
   private func setStyle() {
-    view.backgroundColor = .black
+    view.backgroundColor = CommonAsset.viskitBG.color
     configureNavigationBar()
   }
   

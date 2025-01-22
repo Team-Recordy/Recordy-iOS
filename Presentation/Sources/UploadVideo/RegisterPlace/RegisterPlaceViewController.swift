@@ -10,6 +10,7 @@ import UIKit
 import SnapKit
 import Then
 
+import Core
 import Common
 
 class RegisterPlaceViewController: UIViewController {
@@ -57,6 +58,8 @@ class RegisterPlaceViewController: UIViewController {
 
     registerButton.do {
       $0.backgroundColor = CommonAsset.viskitYellow400.color
+      $0.titleLabel?.font = ViskitFont.body1.font
+      $0.setTitleColor(CommonAsset.viskitBG.color, for: .normal)
       $0.setTitle("확인", for: .normal)
       $0.cornerRadius(12)
       $0.addTarget(
@@ -96,12 +99,32 @@ class RegisterPlaceViewController: UIViewController {
 
     registerButton.snp.makeConstraints {
       $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-24.adaptiveHeight)
+      $0.height.equalTo(54.adaptiveHeight)
       $0.horizontalEdges.equalToSuperview().inset(20.adaptiveWidth)
     }
   }
 
   @objc func registerButtonTapped() {
-    navigationController?.popViewController(animated: true)
-    navigationController?.popViewController(animated: true)
+    register()
+  }
+
+  private func register() {
+    let apiProvider = APIProvider<APITarget.Places>()
+    let request = DTO.CreatePlaceRequest(
+      id: selectedPlace.id,
+      name: selectedPlace.name,
+      longitude: selectedPlace.position.longitude,
+      latitude: selectedPlace.position.latitude,
+      address: selectedPlace.address
+    )
+
+    showPopUp(type: .register(place: selectedPlace.name)) { [weak self] in
+      guard let self else { return }
+      self.dismiss(animated: false)
+      apiProvider.justRequest(.createPlace(request)) { _ in
+        self.navigationController?.popViewController(animated: true)
+        self.navigationController?.popViewController(animated: true)
+      }
+    }
   }
 }

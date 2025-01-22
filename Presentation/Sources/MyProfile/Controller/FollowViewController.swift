@@ -50,10 +50,8 @@ public class FollowViewController: UIViewController {
   }
   
   private func setStyle() {
-    view.do {
-      $0.backgroundColor = .black
-    }
-    
+    view.backgroundColor = CommonAsset.viskitBG.color
+
     tableView.do {
       $0.dataSource = self
       $0.delegate = self

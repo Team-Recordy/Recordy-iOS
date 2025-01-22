@@ -22,6 +22,7 @@ public final class ProfileEditViewController: UIViewController {
   
   public override func viewDidLoad() {
     super.viewDidLoad()
+    view.backgroundColor = CommonAsset.viskitBG.color
     profileEditView.setNickname(currentNickname)
     setUI()
   }

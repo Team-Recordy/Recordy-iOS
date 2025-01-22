@@ -61,6 +61,7 @@ public class ProfileViewController: UIViewController {
   }
   
   func setStyle() {
+    view.backgroundColor = CommonAsset.viskitBG.color
     configureNavigationBar()
     let rightButton = UIButton(type: .system)
     rightButton.setImage(CommonAsset.settingIcon.image, for: .normal)
@@ -373,7 +374,7 @@ extension ProfileViewController: BookmarkDelegate {
 extension ProfileViewController: UserRecordDelegate {
   func userRecordFeedTapped(feed: Feed) {
     let videoFeedViewController = VideoFeedViewController(
-      type: .userProfile,
+      type: .others,
       userId: feed.uploaderId
     )
     self.navigationController?.pushViewController(videoFeedViewController, animated: true)

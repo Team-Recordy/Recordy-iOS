@@ -74,7 +74,7 @@ final public class PlaceDetailViewController: UIViewController{
   }
   
   private func setStyle() {
-    view.backgroundColor = CommonAsset.viskitBlack.color
+    view.backgroundColor = CommonAsset.viskitBG.color
     title = "전시관"
     
     placeNameLabel.do {
