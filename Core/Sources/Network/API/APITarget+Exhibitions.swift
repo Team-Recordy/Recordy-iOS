@@ -22,7 +22,11 @@ extension APITarget {
 }
 
 extension APITarget.Exhibitions: TargetType {
-  
+
+  public var validationType: ValidationType {
+    .successCodes
+  }
+
   public var baseURL: URL {
     return URL(string: BaseURL.string + "/exhibitions")!
   }

@@ -25,6 +25,11 @@ extension APITarget {
 
 
 extension APITarget.Records: TargetType {
+
+  public var validationType: ValidationType {
+    .successCodes
+  }
+
   public var baseURL: URL {
     return URL(string: BaseURL.string + "/records")!
   }

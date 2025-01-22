@@ -58,7 +58,7 @@ class BookmarkView: UIView {
   }
   
   private func setStyle() {
-    backgroundColor = .black
+    backgroundColor = CommonAsset.viskitBG.color
     
     countLabel.do {
       $0.textColor = .white

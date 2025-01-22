@@ -18,6 +18,11 @@ extension APITarget {
 }
 
 extension APITarget.Preference: TargetType {
+
+  public var validationType: ValidationType {
+    .successCodes
+  }
+  
   public var baseURL: URL {
     return URL(string: BaseURL.string + "/preference")!
   }

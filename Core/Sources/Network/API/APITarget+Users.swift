@@ -30,6 +30,10 @@ extension APITarget {
 
 extension APITarget.Users: TargetType {
 
+  public var validationType: ValidationType {
+    .successCodes
+  }
+  
   public var baseURL: URL {
     return URL(string: BaseURL.string + "/users")!
   }
