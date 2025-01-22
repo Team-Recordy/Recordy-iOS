@@ -71,7 +71,7 @@ extension UIViewController {
     backButton.tintColor = .white
     backButton.sizeToFit()
 
-    backButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 0)
+    backButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 1, bottom: 0, right: 0)
 
     backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
 
@@ -79,7 +79,7 @@ extension UIViewController {
     self.navigationItem.leftBarButtonItem = backBarButtonItem
   }
 
-  @objc public func backButtonTapped() {
+  @objc open func backButtonTapped() {
     self.navigationController?.popViewController(animated: true)
   }
 }

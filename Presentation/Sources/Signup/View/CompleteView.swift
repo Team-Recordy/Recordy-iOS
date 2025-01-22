@@ -21,7 +21,8 @@ final class CompleteView: UIView {
   }
   
   let completeImage = UIImageView()
-  let completeText = UILabel()
+  let upperCompleteText = UILabel()
+  let lowerCompleteText = UILabel()
   let completeButton = RecordyButton()
   private let indicatorImage = UIImageView()
   
@@ -43,10 +44,12 @@ final class CompleteView: UIView {
   }
   
   private func updateNicknameText() {
-    completeText.text = "\(nicknameForText ?? "Unknown")님,\n가입이 완료되었어요!"
+    upperCompleteText.text = "\(nicknameForText ?? "Unknown")님,"
   }
   
   func setStyle() {
+    backgroundColor = CommonAsset.viskitBG.color
+    
     completeImage.do {
       $0.image = CommonAsset.viskitCheck.image
     }
@@ -55,23 +58,31 @@ final class CompleteView: UIView {
       $0.image = CommonAsset.thirdIndicator.image
     }
     
-    completeText.do {
+    upperCompleteText.do {
       $0.font = RecordyFont.title1.font
       $0.textColor = CommonAsset.viskitGray01.color
       $0.textAlignment = .center
       $0.numberOfLines = 0
-      $0.setLineSpacing(lineHeightMultiple: 1.3)
+    }
+    
+    lowerCompleteText.do {
+      $0.text = "가입이 완료되었어요!"
+      $0.font = RecordyFont.title1.font
+      $0.textColor = CommonAsset.viskitGray01.color
+      $0.textAlignment = .center
+      $0.numberOfLines = 0
     }
     
     completeButton.do {
-      $0.setTitle("완료", for: .normal)
+      $0.setTitle("확인", for: .normal)
     }
   }
   
   func setUI() {
     addSubviews(
       completeImage,
-      completeText,
+      upperCompleteText,
+      lowerCompleteText,
       completeButton,
       indicatorImage
     )
@@ -85,8 +96,13 @@ final class CompleteView: UIView {
       $0.centerX.equalToSuperview()
     }
     
-    completeText.snp.makeConstraints {
+    upperCompleteText.snp.makeConstraints {
       $0.top.equalTo(completeImage.snp.bottom).offset(21)
+      $0.centerX.equalToSuperview()
+    }
+    
+    lowerCompleteText.snp.makeConstraints {
+      $0.top.equalTo(upperCompleteText.snp.bottom).offset(5)
       $0.centerX.equalToSuperview()
     }
     

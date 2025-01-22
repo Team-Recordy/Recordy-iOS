@@ -28,7 +28,7 @@ public final class NicknameViewController: UIViewController {
   }
   
   private var errorMessage: String?
-
+  
   public override func loadView() {
     view = nicknameView
   }
@@ -37,6 +37,8 @@ public final class NicknameViewController: UIViewController {
     super.viewDidLoad()
     setStyle()
     bindTextField()
+    
+    nicknameView.nicknameTextField.delegate = self
   }
   
   private func setStyle() {
@@ -50,61 +52,71 @@ public final class NicknameViewController: UIViewController {
   
   private func bindTextField() {
     nicknameView.nicknameTextField.textPublisher
+      .sink { [weak self] text in
+        guard let self = self else { return }
+        let count = text.count
+        self.nicknameView.textFieldCountLabel.text = "\(count) / 10"
+      }
+      .store(in: &cancellables)
+    
+    nicknameView.nicknameTextField.textPublisher
       .debounce(for: .milliseconds(400), scheduler: DispatchQueue.main)
       .removeDuplicates()
       .sink { [weak self] text in
         guard let self = self else { return }
-        self.validateNickname(text)
+        self.updateState(for: text)
       }
       .store(in: &cancellables)
   }
   
-  private func validateNickname(_ text: String) {
-    guard !text.isEmpty else {
+  private func updateState(for text: String?) {
+    guard let text = text, !text.isEmpty else {
       currentState = .unselected
       return
     }
     
-    if !text.isNicknamePatternValid(text) {
-      currentState = .error
-      errorMessage = "ⓘ 한글, 숫자, 밑줄 및 마침표만 사용할 수 있어요."
-      nicknameView.nextButton.buttonState = .inactive
-      return
+    if text.isNicknamePatternValid(text) {
+      checkNickname(text: text)
+    } else {
+      currentState = .invalidPattern
     }
-    
+  }
+  
+  private func checkNickname(text: String) {
     let apiProvider = APIProvider<APITarget.Users>()
     let request = DTO.CheckNicknameRequest(nickname: text)
     
-    apiProvider.requestResponsable(
-      .checkNickname(request),
-      DTO.CheckNicknameResponse.self
+    apiProvider.request(
+      .checkNickname(request)
     ) { [weak self] result in
       guard let self = self else { return }
       DispatchQueue.main.async {
         switch result {
         case .success(let response):
-          if response.errorCode == nil && response.errorMessage == nil {
+          if response.statusCode == 200 {
             self.currentState = .selected
-            self.nicknameView.nextButton.buttonState = .active
             self.userNickname = text
+          }
+        case .failure(let error):
+          if let response = error.response {
+            if response.statusCode == 409 {
+              self.currentState = .duplicated
+            }
           } else {
             self.currentState = .error
-            self.errorMessage = response.errorMessage ?? "ⓘ 이미 사용 중인 닉네임이에요."
-            self.nicknameView.nextButton.buttonState = .inactive
           }
-        case .failure:
-          self.currentState = .error
-          self.errorMessage = "ⓘ 닉네임 검증 중 오류가 발생했어요."
-          self.nicknameView.nextButton.buttonState = .inactive
         }
       }
     }
   }
   
   @objc private func nextButtonTapped() {
-    guard let userNickname else { return }
-    let completeViewController = CompleteViewController(nickname: userNickname)
-    navigationController?.pushViewController(completeViewController, animated: true)
+    if currentState == .selected {
+      guard let userNickname else { return }
+      nicknameView.isHidden = true
+      let completeViewController = CompleteViewController(nickname: userNickname)
+      self.navigationController?.pushViewController(completeViewController, animated: true)
+    }
   }
 }
 
@@ -118,13 +130,5 @@ extension NicknameViewController: UITextFieldDelegate {
     
     let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
     return updatedText.count <= 10
-  }
-  
-  public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    textField.resignFirstResponder()
-    if nicknameView.nextButton.buttonState == .active {
-      nextButtonTapped()
-    }
-    return true
   }
 }
