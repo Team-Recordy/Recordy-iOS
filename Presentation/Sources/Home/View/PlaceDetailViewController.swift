@@ -46,6 +46,16 @@ final public class PlaceDetailViewController: UIViewController{
     fatalError("init(coder:) has not been implemented")
   }
   
+  public override func viewWillAppear(_ animated: Bool) {
+      super.viewWillAppear(animated)
+      self.tabBarController?.tabBar.isHidden = true
+  }
+
+  public override func viewWillDisappear(_ animated: Bool) {
+      super.viewWillDisappear(animated)
+      self.tabBarController?.tabBar.isHidden = false
+  }
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
     navigationController?.isNavigationBarHidden = false
