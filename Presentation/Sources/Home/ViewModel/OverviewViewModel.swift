@@ -37,32 +37,48 @@ public class OverviewViewModel {
   var isFetching = false
   
   private let locationManager = LocationManager()
+  
   private(set) var locationState: LocationState = .inactive {
-    didSet {
+    didSet { 
       onLocationStateChanged?(locationState)
     }
   }
   
-  private(set) var userLatitude: Double?
-  private(set) var userLongitude: Double?
-  
   var onNearPlacesUpdated: (() -> Void)?
   var onPlaceRecordsUpdated: (() -> Void)?
   var onLocationStateChanged: ((LocationState) -> Void)?
-  var onLocationUpdated: ((Double, Double) -> Void)?
+  
+  init() {
+    updateLocationStateFromAuthorizationStatus()
+  }
+  
+  private func updateLocationStateFromAuthorizationStatus() {
+    switch locationManager.currentAuthorizationStatus {
+    case .authorizedAlways, .authorizedWhenInUse:
+      locationState = .active
+    case .denied, .restricted, .notDetermined:
+      locationState = .inactive
+    default:
+      locationState = .inactive
+    }
+  }
+  
+  func updateLocation() {
+    locationState = .active
+  }
   
   func getNearPlaceList() {
-    let latitude = userLatitude ?? 37.57858694484229
-    let longitude = userLongitude ?? 126.98009796814407
+    let latitude = LocationManager.shared.currentLatitude ?? 37.33264473613715
+    let longitude = LocationManager.shared.currentLongitude ?? 127.11934019700556
     
     isFetching = true
     let apiProvider = APIProvider<APITarget.Places>()
     let request = DTO.GetNearPlaceListRequest(
       number: 0,
-      size: 10,
+      size: 100,
       latitude: latitude,
       longitude: longitude,
-      distance: 400
+      distance: 10000000
     )
     
     apiProvider.requestResponsable(.getNearPlaceList(request), DTO.GetNearPlaceListResponse.self) { [weak self] result in
@@ -92,7 +108,7 @@ public class OverviewViewModel {
     }
   }
   
-  func getPlaceRecordList(placeId: Int, recordSize: Int) {
+  func getPlaceRecordList(placeId: Int, recordSize: Int, completion: @escaping () -> Void) {
     isFetching = true
     let apiProvider = APIProvider<APITarget.Records>()
     let request = DTO.GetPlaceRecordListRequest(
@@ -122,12 +138,12 @@ public class OverviewViewModel {
               isBookmarked: content.isBookmarked
             )
           }
-          self.onPlaceRecordsUpdated?()
         }
         
       case .failure(let error):
         print("Error fetching records for placeId \(placeId): \(error)")
       }
+      completion()
     }
   }
   
@@ -149,24 +165,5 @@ public class OverviewViewModel {
         completion?(.failure(error))
       }
     }
-  }
-  
-  func updateLocation(
-    latitude: Double?,
-    longitude: Double?
-  ) {
-    guard let latitude = latitude, let longitude = longitude else {
-      return
-    }
-    self.userLatitude = latitude
-    self.userLongitude = longitude
-    locationState = .active
-    getNearPlaceList()
-  }
-  
-  func deactivateLocation() {
-    userLatitude = 0
-    userLongitude = 0
-    onLocationStateChanged?(.inactive)
   }
 }

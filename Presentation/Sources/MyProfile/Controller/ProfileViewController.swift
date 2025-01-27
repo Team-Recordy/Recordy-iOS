@@ -159,7 +159,6 @@ public class ProfileViewController: UIViewController {
     guard let platform = UserDefaults.standard.string(forKey: "loginPlatform") else { return }
     let apiProvider = APIProvider<APITarget.Users>()
     let loginState = LoginState(platform: platform)
-    print("🚨\(platform),\(loginState)🚨")
     let request = DTO.GetProfileRequest(otherUserId: userId)
     apiProvider.requestResponsable(.getProfile(request), DTO.GetProfileResponse.self) { [weak self] result in
       guard let self = self else { return }
@@ -299,7 +298,6 @@ public class ProfileViewController: UIViewController {
     }
     
     postBookmark(feed: feed) { [weak self] result in
-      print("🚨Profile -> feed from Thumbnail: \(feed)🚨")
       guard let self = self else { return }
       switch result {
       case .success:

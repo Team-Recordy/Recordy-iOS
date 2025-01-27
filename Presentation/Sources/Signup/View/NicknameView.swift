@@ -110,31 +110,29 @@ final class NicknameView: UIView {
     }
   }
   
-  public func updateUI(state: RecordyTextFieldState, errorMessage: String? = nil) {
+  public func updateUI(state: RecordyTextFieldState) {
     switch state {
     case .unselected:
       errorLabel.text = ""
-      nextButton.buttonState = .inactive
       
-    case .selected:
+    case .valid:
       errorLabel.text = "ⓘ 사용 가능한 닉네임이에요!"
       errorLabel.textColor = CommonAsset.viskitYellow80.color
-      nextButton.buttonState = .active
+      
+    case .selected:
+      errorLabel.text = ""
       
     case .duplicated:
       errorLabel.text = "ⓘ 이미 사용 중인 닉네임이에요."
       errorLabel.textColor = CommonAsset.viskitAlert01.color
-      nextButton.buttonState = .inactive
       
     case .invalidPattern:
       errorLabel.text = "ⓘ 한글, 숫자, 밑줄 및 마침표만 사용할 수 있어요."
       errorLabel.textColor = CommonAsset.viskitAlert01.color
-      nextButton.buttonState = .inactive
       
     case .error:
       errorLabel.text = "ⓘ 닉네임 검증 중 오류가 발생했어요."
       errorLabel.textColor = CommonAsset.viskitAlert01.color
-      nextButton.buttonState = .inactive
     }
   }
 }

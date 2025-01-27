@@ -52,7 +52,13 @@ public class SearchViewModel {
       switch result {
       case .success(let response):
         let exhibitions = response.map {
-          Exhibition(id: $0.id, name: $0.name, startDate: $0.startDate, endDate: $0.endDate, isFree: $0.isFree)
+          Exhibition(
+            id: $0.id,
+            name: $0.name,
+            startDate: $0.startDate,
+            endDate: $0.endDate,
+            isFree: $0.isFree
+          )
         }
         completion(exhibitions)
       case .failure(let error):

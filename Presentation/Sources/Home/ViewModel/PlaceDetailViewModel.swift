@@ -44,8 +44,6 @@ public class PlaceDetailViewModel {
   
   var hasNext = true
   var isFetching = false
-  private let userLatitude: Double
-  private let userLongitude: Double
   private(set) var currentControlType: PlaceDetailControlType = .exhibitionList {
     didSet {
       onControlTypeChanged?(currentControlType)
@@ -58,15 +56,9 @@ public class PlaceDetailViewModel {
   private(set) var freeFilterState: ChipState = .inactive
   private(set) var endSoonFilterState: ChipState = .inactive
   
-  public init(
-    place: Place,
-    latitude: Double,
-    longitude: Double
-  ) {
+  public init(place: Place) {
     selectedPlace = [place]
     reviewFeedList = place.recordList
-    userLatitude = latitude
-    userLongitude = longitude
     onFeedsUpdated?()
     initFilterState()
   }
@@ -177,28 +169,43 @@ public class PlaceDetailViewModel {
     onFilterChanged?(allFilterState, freeFilterState, endSoonFilterState)
   }
   
-  public func openMap(type: MapType, openInWebView: @escaping (String) -> Void) {
+  public func openMap(type: MapType) {
     guard let place = selectedPlace.first,
-          let placeLatitude = selectedPlace.first?.latitude,
-          let placeLongitude = selectedPlace.first?.longitude,
-          let name = place.name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
-      return
-    }
+          let userLat = LocationManager.shared.currentLatitude,
+          let userLong = LocationManager.shared.currentLongitude,
+          let placeLat = selectedPlace.first?.latitude,
+          let placeLong = selectedPlace.first?.longitude else { return }
     
     switch type {
     case .kakao:
-      let appURL = "kakaomap://route?ep=\(userLatitude),\(userLatitude)&name=\(name)&by=car"
-      let webURL = "https://map.kakao.com/link/to/\(name),\(placeLatitude),\(placeLongitude)"
-      WebViewManager.openURL(appURLString: appURL, webURLString: webURL, openInWebView: openInWebView)
+      guard let url = URL(string: "kakaomap://route?sp=\(userLat),\(userLong)&ep=\(placeLat),\(placeLong)&by=PUBLICTRANSIT") else { return }
+      guard let appStoreUrl = URL(string: "itms-apps://itunes.apple.com/app/id304608425") else { return }
+      
+      if UIApplication.shared.canOpenURL(url) {
+        UIApplication.shared.open(url)
+      } else {
+        UIApplication.shared.open(appStoreUrl)
+      }
+      
     case .naver:
-      let appURL = "nmap://route?slat=\(userLatitude)&slng=\(userLongitude)&dlat=\(selectedPlace.first?.latitude)&dlng=\(selectedPlace.first?.longitude)&mode=transit"
-      print("🚨\("nmap://route?slat=\(userLatitude)&slng=\(userLongitude)&dlat=\(placeLatitude)&dlng=\(placeLongitude)&mode=transit")🚨")
-      let webURL = "https://map.naver.com/v5/directions/\(userLatitude),\(userLongitude)/\(placeLatitude),\(placeLongitude)/transit"
-      WebViewManager.openURL(appURLString: appURL, webURLString: webURL, openInWebView: openInWebView)
+      guard let url = URL(string: "nmap://route/public?slat=37.4640070&slng=126.9522394&sname=내 위치&dlat=37.5209436&dlng=127.1230074&dname=\(place.name)&appname=com.viskit-iOS") else { return }
+      guard let appStoreURL = URL(string: "http://itunes.apple.com/app/id311867728?mt=8") else { return }
+      
+      if UIApplication.shared.canOpenURL(url) {
+        UIApplication.shared.open(url)
+      } else {
+        UIApplication.shared.open(appStoreURL)
+      }
+      
     case .google:
-      let appURL = "comgooglemaps://?q=\(userLatitude),\(userLongitude)"
-      let webURL = "https://www.google.com/maps?q=\(placeLatitude),\(placeLongitude)"
-      WebViewManager.openURL(appURLString: appURL, webURLString: webURL, openInWebView: openInWebView)
+      guard let url = URL(string: "comgooglemaps://?saddr=\(userLat),\(userLong)&daddr=\(placeLat),\(placeLong)&directionsmode=transit") else { return }
+      guard let appStoreURL = URL(string: "https://apps.apple.com/app/id585027354") else { return }
+
+      if UIApplication.shared.canOpenURL(URL(string:"comgooglemaps://")!) {
+        UIApplication.shared.open(url)
+      } else {
+          UIApplication.shared.open(appStoreURL)
+      }
     }
   }
 }

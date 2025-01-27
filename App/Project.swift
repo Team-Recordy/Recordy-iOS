@@ -34,7 +34,12 @@ let infoPlist: [String: Plist.Value] = [
   "LSApplicationQueriesSchemes": [
     "kakaokompassauth",
     "kakaolink",
-    "kakao$(KAKAO_NATIVE_APP_KEY)"
+    "kakao$(KAKAO_NATIVE_APP_KEY)",
+    "tmap",
+    "nmap",
+    "kakaomap",
+    "comgooglemaps",
+    "comgooglemaps-x-callback"
   ],
   "KAKAO_NATIVE_APP_KEY": "$(KAKAO_NATIVE_APP_KEY)",
   "BASE_URL": "$(BASE_URL)",

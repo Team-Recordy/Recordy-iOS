@@ -12,6 +12,7 @@ public enum RecordyTextFieldState {
   case unselected
   case duplicated
   case selected
+  case valid
   case error
   case invalidPattern
 }
@@ -48,7 +49,7 @@ public class RecordyTextField: UITextField {
     case .unselected:
       layer.borderColor = UIColor.clear.cgColor
       layer.borderWidth = 0
-    case .selected:
+    case .selected, .valid:
       layer.borderColor = CommonAsset.viskitYellow80.color.cgColor
       layer.borderWidth = 1
     case .error, .duplicated, .invalidPattern:

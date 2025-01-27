@@ -22,9 +22,6 @@ final class OverviewViewController: UIViewController {
   private let locationButton = UIButton()
   private var overviewCollectionView: UICollectionView?
   
-  var onLocationUpdate: ((CLLocation) -> Void)?
-  var onAuthorizationDenied: (() -> Void)?
-  
   public init(viewModel: OverviewViewModel) {
     self.viewModel = viewModel
     super.init(nibName: nil, bundle: nil)
@@ -37,8 +34,6 @@ final class OverviewViewController: UIViewController {
   public override func viewDidLoad() {
     super.viewDidLoad()
     
-    navigationController?.isNavigationBarHidden = true
-    
     setOverviewCollectionView()
     setStyle()
     setUI()
@@ -46,12 +41,6 @@ final class OverviewViewController: UIViewController {
     bind()
     
     viewModel.getNearPlaceList()
-    viewModel.onNearPlacesUpdated = { [weak self] in
-      guard let self = self else { return }
-      self.viewModel.nearPlaces.forEach { place in
-        self.viewModel.getPlaceRecordList(placeId: place.id, recordSize: place.recordSize)
-      }
-    }
     
     NotificationCenter.default.addObserver(
       self,
@@ -63,6 +52,7 @@ final class OverviewViewController: UIViewController {
   
   private func setStyle() {
     view.backgroundColor = CommonAsset.viskitBG.color
+    navigationController?.isNavigationBarHidden = true
 
     overviewCollectionView!.do {
       $0.backgroundColor = .clear
@@ -135,8 +125,18 @@ final class OverviewViewController: UIViewController {
   
   private func bind() {
     viewModel.onNearPlacesUpdated = { [weak self] in
-      DispatchQueue.main.async {
-        self?.overviewCollectionView?.reloadData()
+      guard let self = self else { return }
+      let dispatchGroup = DispatchGroup()
+      
+      self.viewModel.nearPlaces.forEach { place in
+        dispatchGroup.enter()
+        self.viewModel.getPlaceRecordList(placeId: place.id, recordSize: place.recordSize) {
+          dispatchGroup.leave()
+        }
+      }
+
+      dispatchGroup.notify(queue: .main) {
+        self.overviewCollectionView?.reloadData()
       }
     }
     
@@ -144,22 +144,10 @@ final class OverviewViewController: UIViewController {
       self?.locationButton.setImage(state.buttonImage, for: .normal)
     }
     
-    viewModel.onPlaceRecordsUpdated = { [weak self] in
-      DispatchQueue.main.async {
-        self?.overviewCollectionView?.reloadData()
-      }
-    }
-    
-    locationManager.onAuthorizationDenied = { [weak self] in
-      self?.showLocationPermissionAlert()
-    }
-    
-    locationManager.onLocationUpdate = { [weak self] location in
+    locationManager.onLocationUpdated = { [weak self] location in
       guard let self = self else { return }
-      self.viewModel.updateLocation(
-        latitude: location.coordinate.latitude,
-        longitude: location.coordinate.longitude
-      )
+      self.viewModel.updateLocation()
+      self.viewModel.getNearPlaceList()
     }
   }
   
@@ -178,19 +166,11 @@ final class OverviewViewController: UIViewController {
     }
     
     viewModel.postBookmark(feed: feed) { [weak self] result in
-      print("🚨Overview -> feed from Thumbnail: \(feed)🚨")
       
       switch result {
       case .success:
         print("Bookmark updated successfully.")
         self?.overviewCollectionView?.reloadData()
-//        if let indexPath = self?.findIndexPath(for: feed) {
-//          DispatchQueue.main.async {
-//            self?.overviewCollectionView?.reloadItems(at: [indexPath])
-//          }
-//        } else {
-//          print("No matching IndexPath found for feed: \(feed.id)")
-//        }
       case .failure(let error):
         print("Failed to update bookmark: \(error)")
       }
@@ -198,17 +178,20 @@ final class OverviewViewController: UIViewController {
   }
   
   @objc private func locationButtonTapped() {
-    locationManager.requestAuthorization()
-  }
-  
-  private func showLocationPermissionAlert() {
-    let alert = UIAlertController(
-      title: "위치 권한 필요",
-      message: "앱 설정에서 위치 권한을 활성화해주세요.",
-      preferredStyle: .alert
-    )
-    alert.addAction(UIAlertAction(title: "확인", style: .default))
-    present(alert, animated: true)
+    let status = locationManager.currentAuthorizationStatus
+    
+    if status == .authorizedWhenInUse || status == .authorizedAlways {
+      self.viewModel.getNearPlaceList()
+      self.showToast(status: .complete, message: "위치를 업데이트 했어요!", height: 70)
+    } else if status == .denied || status == .restricted {
+      DispatchQueue.main.async {
+        self.showPopUp(type: .permission) {
+          UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+        }
+      }
+    } else if status == .notDetermined {
+      locationManager.requestAuthorization()
+    }
   }
   
   deinit {
@@ -267,18 +250,9 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
   
   private func handlePlaceDetailButtonTapped(index: Int) {
     guard index >= 0, index < viewModel.nearPlaces.count else { return }
-    guard let latitude = viewModel.userLatitude,
-          let longitude = viewModel.userLongitude else {
-      print("위치 정보가 설정되지 않았습니다.")
-      return
-    }
     
     let selectedPlace = viewModel.nearPlaces[index]
-    let placeDetailVC = PlaceDetailViewController(
-      place: selectedPlace,
-      latitude: latitude,
-      longitude: longitude
-    )
+    let placeDetailVC = PlaceDetailViewController(place: selectedPlace)
     placeDetailVC.updateBookmarkStateInOverview = { [weak self] in
       self?.viewModel.onPlaceRecordsUpdated?()
     }

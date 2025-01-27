@@ -42,8 +42,8 @@ public class SplashScreenViewController: UIViewController {
     logoImageView.snp.makeConstraints {
       $0.width.equalTo(200.adaptiveHeight)
       $0.height.equalTo(61.adaptiveWidth)
-      $0.top.equalToSuperview().offset(220)
       $0.centerX.equalToSuperview()
+      $0.centerY.equalToSuperview()
     }
   }
   
