@@ -16,7 +16,6 @@ public enum RecordyToastStatus {
     switch self {
     case .complete:
       return CommonAsset.toastCheck.image
-
     case .warning:
       return CommonAsset.toastAlert.image
     }
@@ -27,8 +26,8 @@ public final class RecordyToastMessageView: UIView {
 
   private let toastImage = UIImageView()
   public let toastLabel = UILabel().then {
-    $0.textColor = CommonAsset.recordyGrey01.color
-    $0.font = RecordyFont.body2Long.font
+    $0.textColor = CommonAsset.viskitGray01.color
+    $0.font = ViskitFont.body2.font
   }
 
   public override init(frame: CGRect) {
@@ -51,11 +50,11 @@ public final class RecordyToastMessageView: UIView {
 
 private extension RecordyToastMessageView {
   func setupStyle() {
-    self.backgroundColor = CommonAsset.recordySub01.color
+    self.backgroundColor = CommonAsset.viskitGray07.color
     self.cornerRadius(8)
     self.toastLabel.do {
-      $0.font = RecordyFont.body2Long.font
-      $0.textColor = CommonAsset.recordyGrey01.color
+      $0.textColor = CommonAsset.viskitGray01.color
+      $0.font = ViskitFont.body2.font
     }
   }
 
@@ -70,12 +69,13 @@ private extension RecordyToastMessageView {
     toastImage.snp.makeConstraints {
       $0.centerY.equalToSuperview()
       $0.leading.equalToSuperview().inset(16)
-      $0.width.height.equalTo(24.adaptiveWidth)
+      $0.width.equalTo(12.adaptiveWidth)
+      $0.height.equalTo(10.adaptiveHeight)
     }
 
     toastLabel.snp.makeConstraints {
       $0.centerY.equalToSuperview()
-      $0.leading.equalTo(toastImage.snp.trailing).offset(4)
+      $0.leading.equalTo(toastImage.snp.trailing).offset(8)
     }
   }
 }

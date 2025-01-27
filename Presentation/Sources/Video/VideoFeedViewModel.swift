@@ -113,7 +113,6 @@ class VideoFeedViewModel {
 //      self.onFeedListUpdate?(self.feedList.count)
     case .place:
       guard let placeId else { return }
-      print("🚨recordListCase 실행🚨")
       getPlaceRecordList(
         endPoint: .getPlaceRecordList(
           DTO.GetPlaceRecordListRequest(placeId: placeId, size: 100)
@@ -258,6 +257,30 @@ class VideoFeedViewModel {
         self.hasNext = overviewPlaceRecordListResponse.hasNext
         updateFeedList(newFeeds)
         //        }
+      }
+    }
+  }
+  
+  func getPlaceInFeed(placeId: Int, completion: @escaping (Place?) -> Void) {
+    let apiProvider = APIProvider<APITarget.Places>()
+    apiProvider.requestResponsable(.getPlaceList(id: placeId), DTO.GetPlaceResponse.self) { result in
+      switch result {
+      case .success(let response):
+        let place = Place(
+          id: response.id,
+          name: response.name,
+          address: response.address,
+          platformId: response.platformId,
+          locationId: response.location.id,
+          longitude: response.location.longitude,
+          latitude: response.location.latitude,
+          exhibitionSize: response.exhibitionSize,
+          recordSize: response.recordSize
+        )
+        completion(place)
+      case .failure(let error):
+        print("Error fetching place: \(error)")
+        completion(nil)
       }
     }
   }

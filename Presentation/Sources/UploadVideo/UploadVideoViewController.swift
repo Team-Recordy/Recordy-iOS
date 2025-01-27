@@ -63,6 +63,7 @@ public class UploadVideoViewController: UIViewController {
       $0.backgroundColor = .clear
       $0.showsVerticalScrollIndicator = false
     }
+    
     warningLabel.do {
       $0.text = "ⓘ 주제와 무관한 기록은 무통보로 삭제될 수 있습니다."
       $0.textColor = CommonAsset.recordyGrey03.color
@@ -284,13 +285,20 @@ public class UploadVideoViewController: UIViewController {
       .filter { $0.count <= 300 }
       .assign(to: \.contents, on: viewModel)
       .store(in: &cancellables)
-
+    
     contentsTextView.textView.textPublisher
-      .sink { [weak self] text in
-        guard let text else { return }
-        if text.count > 300 {
-          self?.contentsTextView.textView.text = String(text.prefix(300))
+      .compactMap { $0 }
+      .scan("") { previous, current in
+        // 입력값이 300자를 넘으면 이전 값을 유지
+        if current.count > 300 {
+          return previous
         }
+        return current
+      }
+      .sink { [weak self] text in
+        guard let self else { return }
+        self.contentsTextView.textView.text = text
+        self.contentsTextView.textCountLabel.text = "\(text.count) / 300"
       }
       .store(in: &cancellables)
 

@@ -9,9 +9,20 @@
 import CoreLocation
 
 class LocationManager: NSObject, CLLocationManagerDelegate {
+  static let shared = LocationManager()
+  
   private let locationManager = CLLocationManager()
-  var onLocationUpdate: ((CLLocation) -> Void)?
-  var onAuthorizationDenied: (() -> Void)?
+  
+  var onAuthorizationStatusChanged: ((CLAuthorizationStatus) -> Void)?
+  var onLocationUpdated: ((CLLocation) -> Void)?
+  
+  var currentAuthorizationStatus: CLAuthorizationStatus {
+      return CLLocationManager.authorizationStatus()
+  }
+  
+  private(set) var currentLocation: CLLocation?
+  private(set) var currentLatitude: Double?
+  private(set) var currentLongitude: Double?
   
   override init() {
     super.init()
@@ -19,19 +30,8 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     locationManager.desiredAccuracy = kCLLocationAccuracyBest
   }
   
-  /// 위치 권한 요청
-  func requestAuthorization() {
-    let status = CLLocationManager.authorizationStatus()
-    switch status {
-    case .notDetermined:
-      locationManager.requestWhenInUseAuthorization()
-    case .authorizedWhenInUse, .authorizedAlways:
-      startUpdatingLocation()
-    case .denied, .restricted:
-      onAuthorizationDenied?()
-    default:
-      break
-    }
+  public func requestAuthorization() {
+    locationManager.requestWhenInUseAuthorization()
   }
   
   /// 위치 업데이트 시작
@@ -39,22 +39,19 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
     locationManager.startUpdatingLocation()
   }
   
-  /// 권한 상태 변경 시 호출
   func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-    switch status {
-    case .authorizedWhenInUse, .authorizedAlways:
+    onAuthorizationStatusChanged?(status)
+    if status == .authorizedWhenInUse || status == .authorizedAlways {
       startUpdatingLocation()
-    case .denied, .restricted:
-      onAuthorizationDenied?()
-    default:
-      break
     }
   }
   
-  /// 위치 업데이트 성공 시 호출
   func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-    guard let location = locations.last else { return }
-    onLocationUpdate?(location)
+    if let location = locations.last {
+      currentLatitude = location.coordinate.latitude
+      currentLongitude = location.coordinate.longitude
+      onLocationUpdated?(location)
+    }
     locationManager.stopUpdatingLocation()
   }
   

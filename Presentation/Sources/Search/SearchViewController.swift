@@ -427,7 +427,7 @@ extension SearchViewController: UICollectionViewDataSource, UICollectionViewDele
             }
             
             //TODO: 값 수정
-            let placeDetailVC = PlaceDetailViewController(place: placeWithRecords, latitude: 37, longitude: -1)
+            let placeDetailVC = PlaceDetailViewController(place: placeWithRecords)
             self.navigationController?.pushViewController(placeDetailVC, animated: true)
           }
         }
@@ -444,7 +444,7 @@ extension SearchViewController: UICollectionViewDataSource, UICollectionViewDele
             return
           }
           //TODO: 값 수정
-          let placeDetailVC = PlaceDetailViewController(place: updatedPlace, latitude: 37, longitude: -1)
+          let placeDetailVC = PlaceDetailViewController(place: updatedPlace)
           self.navigationController?.pushViewController(placeDetailVC, animated: true)
         }
       }

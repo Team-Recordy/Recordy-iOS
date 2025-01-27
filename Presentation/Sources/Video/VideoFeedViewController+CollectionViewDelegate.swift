@@ -53,6 +53,18 @@ extension VideoFeedViewController: UICollectionViewDataSource {
       guard let self else { return }
       self.sheetAction()
     }
+    cell.placeAction = { [weak self] in
+      guard let self else { return }
+      let placeId = viewModel.feedList[indexPath.row].placeId
+      viewModel.getPlaceInFeed(placeId: placeId) { place in
+        if let place = place {
+          let placeDetailVC = PlaceDetailViewController(place: place)
+          self.navigationController?.pushViewController(placeDetailVC, animated: true)
+        } else {
+          print("Failed to fetch place.")
+        }
+      }
+    }
     return cell
   }
 

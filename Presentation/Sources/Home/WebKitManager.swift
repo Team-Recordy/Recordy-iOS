@@ -17,7 +17,7 @@ final class WebViewManager {
     }
     
     let webVC = RouteWebViewController(url: url)
-    webVC.modalPresentationStyle = .pageSheet
+    webVC.modalPresentationStyle = .fullScreen
     
     if let sheet = webVC.sheetPresentationController {
       sheet.prefersGrabberVisible = true

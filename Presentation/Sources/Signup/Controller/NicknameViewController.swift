@@ -22,7 +22,7 @@ public final class NicknameViewController: UIViewController {
   
   private var currentState: RecordyTextFieldState = .unselected {
     didSet {
-      nicknameView.updateUI(state: currentState, errorMessage: (currentState == .error) ? errorMessage : nil)
+      nicknameView.updateUI(state: currentState)
       nicknameView.nicknameTextField.updateTextFieldStyle(for: currentState)
     }
   }
@@ -60,7 +60,6 @@ public final class NicknameViewController: UIViewController {
       .store(in: &cancellables)
     
     nicknameView.nicknameTextField.textPublisher
-      .debounce(for: .milliseconds(400), scheduler: DispatchQueue.main)
       .removeDuplicates()
       .sink { [weak self] text in
         guard let self = self else { return }
@@ -71,7 +70,7 @@ public final class NicknameViewController: UIViewController {
   
   private func updateState(for text: String?) {
     guard let text = text, !text.isEmpty else {
-      currentState = .unselected
+      currentState = .valid
       return
     }
     
@@ -94,7 +93,7 @@ public final class NicknameViewController: UIViewController {
         switch result {
         case .success(let response):
           if response.statusCode == 200 {
-            self.currentState = .selected
+            self.currentState = .valid
             self.userNickname = text
           }
         case .failure(let error):
@@ -111,7 +110,7 @@ public final class NicknameViewController: UIViewController {
   }
   
   @objc private func nextButtonTapped() {
-    if currentState == .selected {
+    if currentState == .valid {
       guard let userNickname else { return }
       nicknameView.isHidden = true
       let completeViewController = CompleteViewController(nickname: userNickname)
@@ -130,5 +129,22 @@ extension NicknameViewController: UITextFieldDelegate {
     
     let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
     return updatedText.count <= 10
+  }
+  
+  public func textFieldDidBeginEditing(_ textField: UITextField) {
+    if let textField = textField as? RecordyTextField {
+      textField.placeholder = nil
+      self.currentState = .selected
+    }
+  }
+  
+  public func textFieldDidEndEditing(_ textField: UITextField) {
+    if textField.text?.isEmpty ?? true {
+      textField.placeholder = "닉네임 (한글, 숫자, 밑줄 및 마침표만 사용 가능)"
+    } else if currentState == .valid {
+      nicknameView.nextButton.buttonState = .active
+    } else {
+      self.currentState = .unselected
+    }
   }
 }

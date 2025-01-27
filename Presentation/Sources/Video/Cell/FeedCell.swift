@@ -37,6 +37,7 @@ class FeedCell: UICollectionViewCell {
   var nicknameAction: (() -> Void)?
   var deleteAction: (() -> Void)?
   var moreAction: (() -> Void)?
+  var placeAction:(() -> Void)?
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -130,7 +131,11 @@ class FeedCell: UICollectionViewCell {
 
   func bind(feed: Feed, bounds: CGRect, shouldAddPlayer: Bool) {
     self.feed = feed
-
+    feedView.placeButton.addTarget(
+      self,
+      action: #selector(placeButtonTapped),
+      for: .touchUpInside
+    )
     feedView.updateTitle(feed.placeName)
     if shouldAddPlayer {
       addPlayer(for: URL(string: feed.videoLink)!, bounds: bounds)
@@ -204,5 +209,10 @@ class FeedCell: UICollectionViewCell {
   @objc 
   private func moreButtonTapped() {
     moreAction?()
+  }
+  
+  @objc
+  private func placeButtonTapped() {
+    placeAction?()
   }
 }

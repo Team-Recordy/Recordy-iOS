@@ -16,9 +16,6 @@ final public class PlaceDetailViewController: UIViewController{
   
   var viewModel: PlaceDetailViewModel
   
-  private var userLatitude: Double
-  private var userLongitude: Double
-  
   private let placeNameLabel = UILabel()
   private let detailLocationLabel = UILabel()
   private let findRouteButton = UIButton()
@@ -31,14 +28,8 @@ final public class PlaceDetailViewController: UIViewController{
   
   var updateBookmarkStateInOverview: (() -> Void)?
   
-  init(place: Place, latitude: Double, longitude: Double) {
-    self.userLatitude = latitude
-    self.userLongitude = longitude
-    self.viewModel = PlaceDetailViewModel(
-      place: place,
-      latitude: userLatitude,
-      longitude: userLongitude
-    )
+  init(place: Place) {
+    self.viewModel = PlaceDetailViewModel(place: place)
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -213,7 +204,7 @@ final public class PlaceDetailViewController: UIViewController{
     
     let reviewVC = ReviewWebViewController(platformId: selectedPlace.platformId)
     reviewVC.modalPresentationStyle = .pageSheet
-    reviewVC.preferredContentSize = CGSize(width: view.frame.width, height: view.frame.height / 2)
+    reviewVC.preferredContentSize = CGSize(width: view.frame.width, height: (view.frame.height) * 2 / 3)
     
     if let sheet = reviewVC.sheetPresentationController {
       sheet.detents = [.medium()]
@@ -227,22 +218,13 @@ final public class PlaceDetailViewController: UIViewController{
     let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
     
     let kakaoAction = UIAlertAction(title: "카카오맵", style: .default) { [weak self] _ in
-      self?.viewModel.openMap(type: .kakao, openInWebView: { urlString in
-        guard let self = self else { return }
-        WebViewManager.presentWebView(from: self, urlString: urlString)
-      })
+      self?.viewModel.openMap(type: .kakao)
     }
     let naverAction = UIAlertAction(title: "네이버 지도", style: .default) { [weak self] _ in
-      self?.viewModel.openMap(type: .naver, openInWebView: { urlString in
-        guard let self = self else { return }
-        WebViewManager.presentWebView(from: self, urlString: urlString)
-      })
+      self?.viewModel.openMap(type: .naver)
     }
     let googleAction = UIAlertAction(title: "구글 지도", style: .default) { [weak self] _ in
-      self?.viewModel.openMap(type: .google, openInWebView: { urlString in
-        guard let self = self else { return }
-        WebViewManager.presentWebView(from: self, urlString: urlString)
-      })
+      self?.viewModel.openMap(type: .google)
     }
     let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
     
@@ -335,7 +317,6 @@ final public class PlaceDetailViewController: UIViewController{
     }
     
     viewModel.postBookmark(feed: feed) { [weak self] result in
-      print("🚨PlaceDetail -> feed from Thumbnail: \(feed)🚨")
       guard let self = self else { return }
       switch result {
       case .success:
