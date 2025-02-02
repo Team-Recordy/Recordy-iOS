@@ -197,15 +197,17 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
     onUpdateHeight?()
   }
   
-  private func updateRecords(records: [Feed]) {
+  public func updateRecords(records: [Feed]) {
     self.records = records
     placeExhibitionCollectionView?.reloadData()
   }
   
   public func updateThumbnailBookmark(recordIndex: Int, isBookmarked: Bool) {
     let indexPath = IndexPath(item: recordIndex, section: 0)
-    if let cell = placeExhibitionCollectionView?.cellForItem(at: indexPath) as? ThumbnailCollectionViewCell {
-      cell.updateBookmarkStatus(isBookmarked: isBookmarked)
+    DispatchQueue.main.async {
+      if let cell = self.placeExhibitionCollectionView?.cellForItem(at: indexPath) as? ThumbnailCollectionViewCell {
+        cell.updateBookmarkStatus(isBookmarked: isBookmarked)
+      }
     }
   }
   

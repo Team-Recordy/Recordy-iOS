@@ -31,6 +31,10 @@ final class OverviewViewController: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
+  public override func viewWillAppear(_ animated: Bool) {
+    viewModel.getNearPlaceList()
+  }
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -39,8 +43,6 @@ final class OverviewViewController: UIViewController {
     setUI()
     setAutolayout()
     bind()
-    
-    viewModel.getNearPlaceList()
   }
   
   private func setStyle() {
@@ -179,7 +181,6 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
       ) as? OverviewCollectionViewCell else {
         fatalError("Failed to dequeue OverviewCollectionViewCell")
       }
-      // TODO: Crash
       let place = viewModel.nearPlaces[indexPath.row]
       cell.backgroundColor = .clear
       cell.bind(place: place, records: place.recordList, index: indexPath.row)
@@ -214,6 +215,12 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
           userId: uploaderId
         )
         self.navigationController?.pushViewController(videoVC, animated: true)
+      }
+      viewModel.onBookmarkUpdated = { [weak self] index in
+        guard let self else { return }
+        DispatchQueue.main.async {
+          cell.updateRecords(records: self.viewModel.nearPlaces[index].recordList)
+        }
       }
       return cell
     }

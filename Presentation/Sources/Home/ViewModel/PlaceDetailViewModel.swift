@@ -41,6 +41,7 @@ public class PlaceDetailViewModel {
   var onFilterChanged: ((ChipState, ChipState, ChipState) -> Void)?
   var onExhibitionsUpdated: (() -> Void)?
   var onFeedsUpdated:(() -> Void)?
+  var onBookmarkUpdated: ((Int) -> Void)?
   
   var hasNext = true
   var isFetching = false
@@ -171,8 +172,12 @@ public class PlaceDetailViewModel {
     bookmarkProvider.justRequest(.postBookmark(request)) { result in
       switch result {
       case .success:
-        self.reviewFeedList[index].isBookmarked.toggle()
-        completion?()
+        DispatchQueue.main.async {
+          self.reviewFeedList[index].isBookmarked.toggle()
+          self.onBookmarkUpdated?(index)
+          
+          completion?()
+        }
       case .failure(let error):
         print("북마크 요청 실패: \(error)")
       }

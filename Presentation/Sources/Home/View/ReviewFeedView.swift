@@ -187,7 +187,8 @@ extension ReviewFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
       ) as? ThumbnailCollectionViewCell else {
         fatalError("Failed to dequeue OverviewCollectionViewCell")
       }
-      var reviewFeed = feeds[indexPath.row]
+      
+      let reviewFeed = feeds[indexPath.row]
       
       cell.backgroundColor = CommonAsset.viskitGray10.color
       cell.configure(feed: reviewFeed)

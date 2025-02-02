@@ -13,7 +13,7 @@ import Then
 
 protocol BookmarkDelegate: AnyObject {
   func bookmarkFeedTapped(feed: Feed)
-  func bookmarkButtonTapped(feed: Feed)
+  func bookmarkButtonTapped(feed: Feed, completion: @escaping (Result<Void, Error>) -> Void)
 }
 
 class BookmarkView: UIView {
@@ -135,12 +135,10 @@ extension BookmarkView: UICollectionViewDataSource {
       return UICollectionViewCell()
     }
     cell.configure(feed: feeds[indexPath.row])
-//    cell.bookmarkButtonEvent = { [weak self] in
-//      guard let self = self else { return }
-//      self.feeds[indexPath.row].isBookmarked.toggle()
-//      self.delegate?.bookmarkButtonTapped(feed: self.feeds[indexPath.row])
-//      cell.updateBookmarkButton(isBookmarked: self.feeds[indexPath.row].isBookmarked)
-//    }
+    cell.bookmarkActionInThumbnailCell = { [weak self] in
+      guard let self = self else { return }
+      self.handleBookmarkTapped(for: indexPath.row)
+    }
     return cell
   }
 }
@@ -148,5 +146,26 @@ extension BookmarkView: UICollectionViewDataSource {
 extension BookmarkView: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     delegate?.bookmarkFeedTapped(feed: feeds[indexPath.row])
+  }
+}
+
+extension BookmarkView {
+  private func handleBookmarkTapped(for index: Int) {
+    guard index < feeds.count else { return }
+    
+    feeds[index].isBookmarked.toggle()
+    updateViewState()
+    
+    delegate?.bookmarkButtonTapped(feed: feeds[index]) { [weak self] (result: Result<Void, Error>) in
+      guard let self = self else { return }
+      
+      switch result {
+      case .success:
+        break
+      case .failure:
+        self.feeds[index].isBookmarked.toggle()
+        self.updateViewState()
+      }
+    }
   }
 }

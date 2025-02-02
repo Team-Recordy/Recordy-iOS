@@ -47,6 +47,7 @@ public class OverviewViewModel {
   var onNearPlacesUpdated: (() -> Void)?
   var onPlaceRecordsUpdated: (() -> Void)?
   var onLocationStateChanged: ((LocationState) -> Void)?
+  var onBookmarkUpdated: ((Int) -> Void)?
   
   init() {
     updateLocationStateFromAuthorizationStatus()
@@ -147,11 +148,20 @@ public class OverviewViewModel {
     }
   }
   
-  func postBookmark(placeIndex: Int, recordIndex: Int) {
-    let isBookmarked = nearPlaces[placeIndex].recordList[recordIndex].isBookmarked
-    nearPlaces[placeIndex].recordList[recordIndex].isBookmarked.toggle()
+  func postBookmark(placeIndex: Int, recordIndex: Int, completion: (() -> Void)? = nil) {
+    self.nearPlaces[placeIndex].recordList[recordIndex].isBookmarked.toggle()
     let bookmarkProvider = APIProvider<APITarget.Bookmarks>()
     let request = DTO.PostBookmarkRequest(recordId: nearPlaces[placeIndex].recordList[recordIndex].id)
-    bookmarkProvider.justRequest(.postBookmark(request)) { _ in }
+    bookmarkProvider.justRequest(.postBookmark(request)) { result in
+      switch result {
+      case .success:
+        DispatchQueue.main.async {
+          self.onBookmarkUpdated?(placeIndex)
+          completion?()
+        }
+      case .failure(let error):
+        print("북마크 요청 실패: \(error)")
+      }
+    }
   }
 }

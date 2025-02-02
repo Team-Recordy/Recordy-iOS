@@ -40,7 +40,11 @@ final public class PlaceDetailViewController: UIViewController{
   public override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     self.tabBarController?.tabBar.isHidden = true
-    
+    viewModel.getExhibitionList(placeId: viewModel.selectedPlace.first?.id ?? 0)
+    viewModel.getReviewFeedList(
+      placeId: viewModel.selectedPlace.first?.id ?? 0,
+      recordSize: viewModel.selectedPlace.first?.recordSize ?? 0
+    )
   }
   
   public override func viewWillDisappear(_ animated: Bool) {
@@ -58,8 +62,6 @@ final public class PlaceDetailViewController: UIViewController{
     setDelegate()
     bind()
     setTarget()
-    
-    viewModel.getExhibitionList(placeId: viewModel.selectedPlace.first?.id ?? 0)
     
     updateFilterButtonState(
       allState: viewModel.allFilterState,
@@ -252,6 +254,13 @@ final public class PlaceDetailViewController: UIViewController{
     }
     
     viewModel.onFeedsUpdated = { [weak self] in
+      guard let self = self else { return }
+      DispatchQueue.main.async {
+        self.reviewFeedView.updateFeedList(with: self.viewModel.reviewFeedList)
+      }
+    }
+    
+    viewModel.onBookmarkUpdated = { [weak self] index in
       guard let self = self else { return }
       DispatchQueue.main.async {
         self.reviewFeedView.updateFeedList(with: self.viewModel.reviewFeedList)
