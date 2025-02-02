@@ -25,9 +25,8 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
   public let bookmarkButton = UIButton()
   private let thumbnailImage = UIImageView()
   public let bookmarkImage = UIImageView()
-  var feedForNotification: Feed?
   
-  //  public var bookmarkButtonEvent: (() -> (Void))?
+  public var bookmarkActionInThumbnailCell: (() -> Void)?
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -39,11 +38,6 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
-  //  public override func layoutSubviews() {
-  //    super.layoutSubviews()
-  //    gradientLayer.frame = self.bounds
-  //  }
   
   private func setStyle() {
     self.cornerRadius(12)
@@ -105,7 +99,6 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
       locationStackView,
       bookmarkButton
     )
-    //    self.bringSubviewToFront(gradientView)
     locationStackView.addArrangedSubview(locationImageView)
     locationStackView.addArrangedSubview(locationText)
     bookmarkButton.addSubview(bookmarkImage)
@@ -158,24 +151,13 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
     )
     self.locationText.text = feed.exhibitionName
     self.bookmarkImage.image = feed.isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image
-    self.feedForNotification = feed
   }
   
   @objc private func bookmarkButtonTapped() {
-    let newBookmarkState = self.bookmarkImage.image == CommonAsset.bookmarkSelected.image ? false : true
-    updateBookmarkButton(isBookmarked: newBookmarkState)
-    NotificationCenter.default.post(
-      name: .bookmarkStateChanged,
-      object: nil,
-      userInfo: ["feed": feedForNotification as Any]
-    )
+    bookmarkActionInThumbnailCell?()
   }
-  
-  public func updateBookmarkButton(isBookmarked: Bool) {
+
+  public func updateBookmarkStatus(isBookmarked: Bool) {
     self.bookmarkImage.image = isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image
   }
-}
-
-public extension Notification.Name {
-  static let bookmarkStateChanged = Notification.Name("bookmarkStateChanged")
 }

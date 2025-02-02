@@ -29,6 +29,11 @@ final class SearchPlaceViewController: UIViewController {
 
   private let viewModel = SearchPlaceViewModel()
   private var cancellables = Set<AnyCancellable>()
+  
+  override func viewWillDisappear(_ animated: Bool) {
+      super.viewWillDisappear(animated)
+      view.endEditing(true)
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()

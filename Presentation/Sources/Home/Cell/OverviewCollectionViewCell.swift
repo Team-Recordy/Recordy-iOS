@@ -21,7 +21,7 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
   public var onPlaceDetailButtonTapped: ((Int) -> Void)?
   public var onUpdateHeight: (() -> Void)?
   public var onVideoSelectedInCell: ((Feed) -> Void)?
-//  public var onBookmarkButtonTapped: ((Feed) -> Void)?
+  public var onBookmarkButtonTapped: ((Int) -> Void)?
   
   private let locationLabel = UILabel()
   private let placeNameLabel = UILabel()
@@ -188,7 +188,6 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
     eventCountLabelYellow.text = "\(place.exhibitionSize)개"
     placeDetailButton.tag = index ?? -1
     
-    // recordSize가 0이면 placeExhibitionCollectionView 숨기기
     if place.recordSize == 0 {
       placeExhibitionCollectionView?.isHidden = true
     } else {
@@ -203,17 +202,15 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
     placeExhibitionCollectionView?.reloadData()
   }
   
-  @objc private func placeDetailButtonTapped(_ sender: UIButton) {
-    onPlaceDetailButtonTapped?(sender.tag)
+  public func updateThumbnailBookmark(recordIndex: Int, isBookmarked: Bool) {
+    let indexPath = IndexPath(item: recordIndex, section: 0)
+    if let cell = placeExhibitionCollectionView?.cellForItem(at: indexPath) as? ThumbnailCollectionViewCell {
+      cell.updateBookmarkStatus(isBookmarked: isBookmarked)
+    }
   }
   
-  public func updateBookmarkState(for feed: Feed) {
-    if let index = records.firstIndex(where: { $0.id == feed.id }) {
-      let indexPath = IndexPath(item: index, section: 0)
-      placeExhibitionCollectionView?.reloadItems(at: [indexPath])
-    } else {
-      print("not found.")
-    }
+  @objc private func placeDetailButtonTapped(_ sender: UIButton) {
+    onPlaceDetailButtonTapped?(sender.tag)
   }
 }
 
@@ -239,17 +236,16 @@ extension OverviewCollectionViewCell: UICollectionViewDataSource, UICollectionVi
     ) as? ThumbnailCollectionViewCell else {
       fatalError("Failed to dequeue ThumbnailCollectionViewCell")
     }
-    
     guard indexPath.row < records.count else {
       return cell
     }
-    
     var record = records[indexPath.row]
     
     cell.configure(feed: record)
-//    cell.bookmarkButtonEvent = { 
-//      self.onBookmarkButtonTapped?(record)
-//    }
+    cell.bookmarkActionInThumbnailCell = { [weak self] in
+      guard let self else { return }
+      self.onBookmarkButtonTapped?(indexPath.row)
+    }
     return cell
   }
   

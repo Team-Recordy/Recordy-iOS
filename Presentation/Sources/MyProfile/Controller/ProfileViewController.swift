@@ -40,12 +40,12 @@ public class ProfileViewController: UIViewController {
     setDelegate()
     controlTypeChanged()
     
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(handleBookmarkStateChange(_:)),
-      name: .bookmarkStateChanged,
-      object: nil
-    )
+//    NotificationCenter.default.addObserver(
+//      self,
+//      selector: #selector(handleBookmarkStateChange(_:)),
+//      name: .bookmarkStateChanged,
+//      object: nil
+//    )
   }
   
   public override func viewWillAppear(_ animated: Bool) {

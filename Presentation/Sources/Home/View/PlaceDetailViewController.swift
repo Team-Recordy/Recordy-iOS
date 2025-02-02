@@ -38,13 +38,14 @@ final public class PlaceDetailViewController: UIViewController{
   }
   
   public override func viewWillAppear(_ animated: Bool) {
-      super.viewWillAppear(animated)
-      self.tabBarController?.tabBar.isHidden = true
+    super.viewWillAppear(animated)
+    self.tabBarController?.tabBar.isHidden = true
+    
   }
-
+  
   public override func viewWillDisappear(_ animated: Bool) {
-      super.viewWillDisappear(animated)
-      self.tabBarController?.tabBar.isHidden = false
+    super.viewWillDisappear(animated)
+    self.tabBarController?.tabBar.isHidden = false
   }
   
   public override func viewDidLoad() {
@@ -64,13 +65,6 @@ final public class PlaceDetailViewController: UIViewController{
       allState: viewModel.allFilterState,
       freeState: viewModel.freeFilterState,
       endSoonState: viewModel.endSoonFilterState
-    )
-    
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(handleBookmarkStateChange(_:)),
-      name: .bookmarkStateChanged,
-      object: nil
     )
   }
   
@@ -276,19 +270,21 @@ final public class PlaceDetailViewController: UIViewController{
       )
       self.navigationController?.pushViewController(videoVC, animated: true)
     }
-//    
-//    reviewFeedView.onBookmarkButtonTappedInReviewFeed = { [weak self] record in
-//      guard let self = self else { return }
-//      viewModel.postBookmark(feed: record) { result in
-//        switch result {
-//        case .success:
-//          print("Bookmark updated successfully")
-//          self.updateBookmarkStateInOverview?()
-//        case .failure(let error):
-//          print("Failed to update bookmark: \(error)")
-//        }
-//      }
-//    }
+    
+    reviewFeedView.onBookmarkTappedInReviewFeed = { [weak self] index in
+      guard let self = self else { return }
+      
+      self.viewModel.postBookmark(index: index) { [weak self] in
+        guard let self = self else { return }
+        
+        DispatchQueue.main.async {
+          self.reviewFeedView.updateThumbnailBookmark(
+            recordIndex: index,
+            isBookmarked: self.viewModel.reviewFeedList[index].isBookmarked
+          )
+        }
+      }
+    }
     
     DispatchQueue.main.async {
       self.reviewFeedView.updateFeedList(with: self.viewModel.reviewFeedList)
@@ -308,30 +304,6 @@ final public class PlaceDetailViewController: UIViewController{
     exhibitionListView.allFilterButton.setState(state: allState)
     exhibitionListView.freeFilterButton.setState(state: freeState)
     exhibitionListView.endSoonFilterButton.setState(state: endSoonState)
-  }
-  
-  @objc private func handleBookmarkStateChange(_ notification: Notification) {
-    guard let userInfo = notification.userInfo,
-          let feed = userInfo["feed"] as? Feed else {
-      return
-    }
-    
-    viewModel.postBookmark(feed: feed) { [weak self] result in
-      guard let self = self else { return }
-      switch result {
-      case .success:
-        print("Bookmark updated successfully.")
-        DispatchQueue.main.async {
-          self.reviewFeedView.reviewFeedCollectionView?.reloadData()
-        }
-      case .failure(let error):
-        print("Failed to update bookmark: \(error)")
-      }
-    }
-  }
-  
-  deinit {
-    NotificationCenter.default.removeObserver(self, name: .bookmarkStateChanged, object: nil)
   }
 }
 

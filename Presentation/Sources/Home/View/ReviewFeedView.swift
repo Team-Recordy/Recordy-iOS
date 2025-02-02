@@ -18,7 +18,7 @@ final class ReviewFeedView: UIView {
   var feeds: [Feed] = []
   
   public var onVideoSelectedInReviewFeed: ((Feed) -> Void)?
-  public var onBookmarkButtonTappedInReviewFeed: ((Feed) -> Void)?
+  public var onBookmarkTappedInReviewFeed: ((Int) -> Void)?
   
   private let reviewFeedCount = UILabel()
   private let emptyFirstLineLabel = UILabel()
@@ -129,6 +129,16 @@ final class ReviewFeedView: UIView {
     self.reviewFeedCollectionView?.reloadData()
   }
   
+  public func updateThumbnailBookmark(recordIndex: Int, isBookmarked: Bool) {
+    let indexPath = IndexPath(item: recordIndex, section: 0)
+    DispatchQueue.main.async {
+      if let cell = self.reviewFeedCollectionView?.cellForItem(at: indexPath) as? ThumbnailCollectionViewCell {
+        cell.updateBookmarkStatus(isBookmarked: isBookmarked)
+      }
+//      self.reviewFeedCollectionView?.reloadItems(at: [indexPath])
+    }
+  }
+  
   private func setReviewFeedCollectionView() {
     let layout = UICollectionViewFlowLayout()
     let totalSpacing = 20.adaptiveWidth * 2
@@ -181,10 +191,10 @@ extension ReviewFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
       
       cell.backgroundColor = CommonAsset.viskitGray10.color
       cell.configure(feed: reviewFeed)
-//      cell.bookmarkButtonEvent = {
-//        self.onBookmarkButtonTappedInReviewFeed?(reviewFeed)
-//      }
-      
+      cell.bookmarkActionInThumbnailCell = { [weak self] in
+        guard let self = self else { return }
+        self.onBookmarkTappedInReviewFeed?(indexPath.row)
+      }
       return cell
     }
   
@@ -194,17 +204,4 @@ extension ReviewFeedView: UICollectionViewDelegate, UICollectionViewDataSource {
     let selectedRecord = feeds[indexPath.row]
     onVideoSelectedInReviewFeed?(selectedRecord)
   }
-  
-  //  public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-  //    guard indexPath.row < feeds.count else { return }
-  //
-  //    let selectedRecord = feeds[indexPath.row]
-  //    let videoVC = VideoFeedViewController(
-  //      type: .userProfile,
-  //      currentId: selectedRecord.id,
-  //      cursorId: nil,
-  //      userId: selectedRecord.uploaderId
-  //    )
-  //    videoVC.navigationController?.pushViewController(videoVC, animated: true)
-  //  }
 }
