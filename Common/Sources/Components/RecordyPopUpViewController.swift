@@ -11,7 +11,7 @@ import UIKit
 import SnapKit
 import Then
 
-class RecordyPopUpViewController: UIViewController {
+public class RecordyPopUpViewController: UIViewController {
 
   let popUpType: RecordyPopUpType
   let popUpView: RecordyPopUpView
@@ -31,7 +31,7 @@ class RecordyPopUpViewController: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
-  override func viewDidLoad() {
+  public override func viewDidLoad() {
     super.viewDidLoad()
     setStyle()
     setUI()

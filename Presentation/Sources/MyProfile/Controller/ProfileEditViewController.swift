@@ -127,14 +127,14 @@ public final class ProfileEditViewController: UIViewController {
       style: .destructive
     ) { [weak self] _ in
       guard let self = self else { return }
-      self.profileEditView.profileImageView.image = CommonAsset.ledyEmpty2.image
+      self.profileEditView.profileImageView.image = CommonAsset.profileEdit.image
     }
     
     let cancel = UIAlertAction(
       title: "취소",
       style: .cancel,
       handler: nil
-      )
+    )
     
     deleteImage.setValue(UIColor.systemRed, forKey: "titleTextColor")
     
@@ -144,8 +144,85 @@ public final class ProfileEditViewController: UIViewController {
     
     present(alert, animated: true)
   }
+  
+  @available(iOS 16.0, *)
   private func requestPhotoLibraryPermission() {
+    let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
     
+    switch status {
+    case .authorized, .limited:
+      presentImagePicker()
+    case .notDetermined:
+      PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+        DispatchQueue.main.async {
+          if status == .authorized || status == .limited {
+            self.presentImagePicker()
+          } else {
+            self.showPermissionDeniedAlert()
+          }
+        }
+      }
+    default:
+      showPermissionDeniedAlert()
+    }
+  }
+  
+  private func presentImagePicker() {
+    var config = PHPickerConfiguration()
+    config.filter = .images
+    config.selectionLimit = 1
+    
+    let picker = PHPickerViewController(configuration: config)
+    picker.delegate = self as? PHPickerViewControllerDelegate
+    present(
+      picker,
+      animated: true
+    )
+  }
+  
+  private func showPermissionDeniedAlert() {
+    let alertController = RecordyPopUpViewController(
+      type: .uploadPermission,
+      rightButtonAction: { [weak self] in
+        self?.openSettings()
+      }
+    )
+    alertController.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
+    present(
+      alertController,
+      animated: true
+    )
+  }
+  
+  private func openSettings() {
+    if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+      UIApplication.shared.open(
+        settingsURL,
+        options: [:],
+        completionHandler: nil
+      )
+    }
   }
 }
 
+@available(iOS 16.0, *)
+extension ProfileEditViewController: PHPickerViewControllerDelegate {
+  public func picker(
+    _ picker: PHPickerViewController,
+    didFinishPicking results: [PHPickerResult]
+  ) {
+    picker.dismiss(animated: true)
+    
+    guard let result = results.first else { return }
+    
+    if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
+      result.itemProvider.loadObject(ofClass: UIImage.self) { image, error in
+        DispatchQueue.main.async {
+          if let image = image as? UIImage {
+            self.profileEditView.profileImageView.image = image
+          }
+        }
+      }
+    }
+  }
+}
