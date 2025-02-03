@@ -30,6 +30,10 @@ extension APITarget {
 
 extension APITarget.Users: TargetType {
 
+  public var validationType: ValidationType {
+    .successCodes
+  }
+  
   public var baseURL: URL {
     return URL(string: BaseURL.string + "/users")!
   }
@@ -141,7 +145,7 @@ extension APITarget.Users: TargetType {
     case .signIn(let signInRequest):
       return [
         "Content-Type": "application/json",
-        "Authorization": "Bearer\(signInRequest.authorization)"
+        "Authorization": "Bearer \(signInRequest.authorization)"
       ]
     default: return .none
     }

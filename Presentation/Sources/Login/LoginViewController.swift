@@ -18,7 +18,6 @@ import Common
 @available(iOS 16.0, *)
 public final class LoginViewController: UIViewController {
 
-  let gradientView = RecordyGradientView()
   var rootView = LoginView()
   private var appleLoginCompletion: ((Result<String, Error>) -> Void)?
   private let disposeBag = DisposeBag()
@@ -31,14 +30,6 @@ public final class LoginViewController: UIViewController {
     super.viewDidLoad()
 
     setTarget()
-  }
-
-  func setGradientView() {
-    self.view.addSubview(gradientView)
-    gradientView.snp.makeConstraints {
-      $0.top.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(400.adaptiveHeight)
-    }
   }
 
   func setTarget() {
@@ -61,6 +52,7 @@ public final class LoginViewController: UIViewController {
       guard let self = self else { return }
       switch result {
       case .success(let accessToken):
+        print("@Log")
         self.postSignInRequest(
           authorization: accessToken,
           platformType: .kakao
@@ -101,6 +93,7 @@ public final class LoginViewController: UIViewController {
     ) { result in
       switch result {
       case .success(let response):
+        print("@Log - \(response)")
         KeychainManager.shared.create(
           token: .AccessToken,
           value: response.accessToken
@@ -115,9 +108,13 @@ public final class LoginViewController: UIViewController {
           tabBarController.modalPresentationStyle = .fullScreen
           self.present(tabBarController, animated: false)
         } else {
-          let signUpViewController = BaseNavigationController(rootViewController: TermsViewController())
-          signUpViewController.modalPresentationStyle = .fullScreen
-          self.present(signUpViewController, animated: false)
+          //          let signUpViewController = BaseNavigationController(rootViewController: TermsViewController())
+          //          signUpViewController.modalPresentationStyle = .fullScreen
+          //          self.present(signUpViewController, animated: false)
+          let termsViewController = TermsViewController()
+          let navigationController = BaseNavigationController(rootViewController: termsViewController)
+          navigationController.modalPresentationStyle = .fullScreen
+          self.present(navigationController, animated: true)
         }
       case .failure(let error):
         print("Sign in failed with error: \(error)")

@@ -29,10 +29,15 @@ public final class TermsViewController: UIViewController {
   
   public override func viewDidLoad() {
     super.viewDidLoad()
+    
     setStyle()
   }
   
   private func setStyle() {
+    title = "이용약관"
+    navigationItem.backButtonTitle = ""
+    setupCustomBackButton()
+    
     termsView.agreeAllTermButton.addTarget(self, action: #selector(agreeAllTermButtonTapped), for: .touchUpInside)
     termsView.serviceTermButton.addTarget(self, action: #selector(termButtonTapped(_:)), for: .touchUpInside)
     termsView.infoTermButton.addTarget(self, action: #selector(termButtonTapped(_:)), for: .touchUpInside)
@@ -76,7 +81,13 @@ public final class TermsViewController: UIViewController {
   }
   
   @objc private func nextButtonTapped() {
-    let nicknameViewController = NicknameViewController()
-    self.navigationController?.pushViewController(nicknameViewController, animated: true)
+    if termsView.nextButton.buttonState == .active {
+      let nicknameViewController = NicknameViewController()
+      self.navigationController?.pushViewController(nicknameViewController, animated: true)
+    }
+  }
+  
+  @objc public override func backButtonTapped() {
+    self.dismiss(animated: true, completion: nil)
   }
 }

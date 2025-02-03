@@ -19,13 +19,13 @@ protocol BookmarkDelegate: AnyObject {
 class BookmarkView: UIView {
   private let bookmarkEmptyView = BookMarkEmptyView()
   private let countLabel = UILabel()
-  private lazy var collectionView: UICollectionView = {
+  public lazy var collectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     return collectionView
   }()
   
-  private var feeds: [Feed] = [] {
+  public var feeds: [Feed] = [] {
     didSet {
       updateViewState()
     }
@@ -58,7 +58,7 @@ class BookmarkView: UIView {
   }
   
   private func setStyle() {
-    backgroundColor = .black
+    backgroundColor = CommonAsset.viskitBG.color
     
     countLabel.do {
       $0.textColor = .white
@@ -83,7 +83,7 @@ class BookmarkView: UIView {
     }
   }
   
-  private func updateViewState() {
+  public func updateViewState() {
     let isEmpty = feeds.isEmpty
     bookmarkEmptyView.isHidden = !isEmpty
     collectionView.isHidden = isEmpty
@@ -135,12 +135,12 @@ extension BookmarkView: UICollectionViewDataSource {
       return UICollectionViewCell()
     }
     cell.configure(feed: feeds[indexPath.row])
-    cell.bookmarkButtonEvent = { [weak self] in
-      guard let self = self else { return }
-      self.feeds[indexPath.row].isBookmarked.toggle()
-      self.delegate?.bookmarkButtonTapped(feed: self.feeds[indexPath.row])
-      cell.updateBookmarkButton(isBookmarked: self.feeds[indexPath.row].isBookmarked)
-    }
+//    cell.bookmarkButtonEvent = { [weak self] in
+//      guard let self = self else { return }
+//      self.feeds[indexPath.row].isBookmarked.toggle()
+//      self.delegate?.bookmarkButtonTapped(feed: self.feeds[indexPath.row])
+//      cell.updateBookmarkButton(isBookmarked: self.feeds[indexPath.row].isBookmarked)
+//    }
     return cell
   }
 }

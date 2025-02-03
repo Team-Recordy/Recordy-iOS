@@ -11,7 +11,7 @@ import ProjectDescriptionHelpers
 let infoPlist: [String: Plist.Value] = [
   "CFBundleShortVersionString": "1.0.0",
   "CFBundleVersion": "2",
-  "CFBundleDisplayName": "유영",
+  "CFBundleDisplayName": "Viskit",
   "CFBundleURLTypes": [
     [
       "CFBundleTypeRole": "Editor",
@@ -34,11 +34,17 @@ let infoPlist: [String: Plist.Value] = [
   "LSApplicationQueriesSchemes": [
     "kakaokompassauth",
     "kakaolink",
-    "kakao$(KAKAO_NATIVE_APP_KEY)"
+    "kakao$(KAKAO_NATIVE_APP_KEY)",
+    "tmap",
+    "nmap",
+    "kakaomap",
+    "comgooglemaps",
+    "comgooglemaps-x-callback"
   ],
   "KAKAO_NATIVE_APP_KEY": "$(KAKAO_NATIVE_APP_KEY)",
   "BASE_URL": "$(BASE_URL)",
   "NSPhotoLibraryUsageDescription": "앱에서 사진 라이브러리에 접근하려면 권한이 필요합니다.",
+  "NSLocationWhenInUseUsageDescription": "앱 사용 중 사용자의 위치 정보를 이용하려면 권한이 필요합니다.",
   "NSAppTransportSecurity": [
     "NSAllowsArbitraryLoads": true
   ],
@@ -49,8 +55,7 @@ let infoPlist: [String: Plist.Value] = [
 ]
 
 private let settings = Settings.settings(configurations: [
-  .debug(name: "Debug", xcconfig:
-      .relativeToRoot("App/Config/Secrets.xcconfig")),
+  .debug(name: "Debug", xcconfig: .relativeToRoot("App/Config/Secrets.xcconfig")),
   .release(name: "Release", xcconfig: .relativeToRoot("App/Config/Secrets.xcconfig")),
 ])
 
@@ -60,7 +65,7 @@ let project = Project.makeModule(
   name: moduleName,
   destinations: [.iPhone],
   product: .app,
-  bundleId: "app.recordy",
+  bundleId: "app.viskit.recordy",
   infoPlist: .extendingDefault(with: infoPlist),
   resources: ["Resources/**"],
   entitlements: .file(path: "App.entitlements"),

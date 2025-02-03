@@ -33,21 +33,22 @@ extension UIViewController {
     let toastLabelFrame = CGRect(
       x: 20,
       y: self.view.frame.size.height - (height + 100),
-      width: screenWidth - 40,
-      height: 44
+      width: (screenWidth - 40).adaptiveWidth,
+      height: 44.adaptiveHeight
     )
     let toastView = RecordyToastMessageView(frame: toastLabelFrame)
     toastView.setMessage(text: message, status: status)
     self.view.addSubview(toastView)
     self.view.endEditing(true)
-    UIView.animate(withDuration: 0.5,
-                   delay: 1.8,
-                   options: .curveEaseOut,
-                   animations: {
-      toastView.alpha = 0.0
-    }, completion: { _ in
-      toastView.removeFromSuperview()
-    })
+    UIView.animate(
+      withDuration: 1.0,
+      delay: 1.8,
+      options: .curveEaseOut,
+      animations: {
+        toastView.alpha = 0.0
+      }, completion: { _ in
+        toastView.removeFromSuperview()
+      })
   }
 
   public func showPopUp(
@@ -63,16 +64,15 @@ extension UIViewController {
   }
 
   public func setupCustomBackButton() {
-    // 기본 백 버튼 숨기기
     self.navigationItem.hidesBackButton = true
 
     let backButton = UIButton(type: .system)
-    backButton.setTitle("Back", for: .normal) // 타이틀 설정
-    backButton.setImage(UIImage(systemName: "arrow.left"), for: .normal) // 이미지 설정
-    backButton.tintColor = .white // 이미지 색상 설정
+    backButton.setTitle("", for: .normal)
+    backButton.setImage(CommonAsset.backButton.image, for: .normal)
+    backButton.tintColor = .white
     backButton.sizeToFit()
 
-    backButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
+    backButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
 
     backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
 
@@ -80,7 +80,7 @@ extension UIViewController {
     self.navigationItem.leftBarButtonItem = backBarButtonItem
   }
 
-  @objc private func backButtonTapped() {
+  @objc open func backButtonTapped() {
     self.navigationController?.popViewController(animated: true)
   }
 }

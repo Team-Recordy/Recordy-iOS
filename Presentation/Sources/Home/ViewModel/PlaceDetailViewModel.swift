@@ -5,15 +5,23 @@
 //  Created by Chandrala on 10/29/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
+import Foundation
+import MapKit
 
 import Common
 import Core
-import Foundation
+
 
 public enum FilterType: Int {
   case all = 0
   case free = 1
   case endSoon = 2
+}
+
+public enum MapType {
+  case kakao
+  case naver
+  case google
 }
 
 public enum PlaceDetailControlType: String {
@@ -36,7 +44,6 @@ public class PlaceDetailViewModel {
   
   var hasNext = true
   var isFetching = false
-  
   private(set) var currentControlType: PlaceDetailControlType = .exhibitionList {
     didSet {
       onControlTypeChanged?(currentControlType)
@@ -49,12 +56,9 @@ public class PlaceDetailViewModel {
   private(set) var freeFilterState: ChipState = .inactive
   private(set) var endSoonFilterState: ChipState = .inactive
   
-  public init(
-    place: Place,
-    reviewFeeds: [Feed]
-  ) {
+  public init(place: Place) {
     selectedPlace = [place]
-    reviewFeedList = reviewFeeds
+    reviewFeedList = place.recordList
     onFeedsUpdated?()
     initFilterState()
   }
@@ -117,6 +121,26 @@ public class PlaceDetailViewModel {
     }
   }
   
+  func postBookmark(feed: Feed, completion: ((Result<Void, Error>) -> Void)? = nil) {
+    let apiProvider = APIProvider<APITarget.Bookmarks>()
+    let request = DTO.PostBookmarkRequest(recordId: feed.id)
+    
+    apiProvider.justRequest(.postBookmark(request)) { [weak self] result in
+      guard let self = self else { return }
+      switch result {
+      case .success:
+        if let recordIndex = self.reviewFeedList.firstIndex(where: { $0.id == feed.id }) {
+          self.reviewFeedList[recordIndex].isBookmarked = !feed.isBookmarked
+          self.onFeedsUpdated?()
+        }
+        completion?(.success(()))
+      case .failure(let error):
+        print("Failed to update bookmark: \(error)")
+        completion?(.failure(error))
+      }
+    }
+  }
+  
   func updateControlType(to type: PlaceDetailControlType) {
     currentControlType = type
   }
@@ -143,5 +167,45 @@ public class PlaceDetailViewModel {
   
   private func initFilterState() {
     onFilterChanged?(allFilterState, freeFilterState, endSoonFilterState)
+  }
+  
+  public func openMap(type: MapType) {
+    guard let place = selectedPlace.first,
+          let userLat = LocationManager.shared.currentLatitude,
+          let userLong = LocationManager.shared.currentLongitude,
+          let placeLat = selectedPlace.first?.latitude,
+          let placeLong = selectedPlace.first?.longitude else { return }
+    
+    switch type {
+    case .kakao:
+      guard let url = URL(string: "kakaomap://route?sp=\(userLat),\(userLong)&ep=\(placeLat),\(placeLong)&by=PUBLICTRANSIT") else { return }
+      guard let appStoreUrl = URL(string: "itms-apps://itunes.apple.com/app/id304608425") else { return }
+      
+      if UIApplication.shared.canOpenURL(url) {
+        UIApplication.shared.open(url)
+      } else {
+        UIApplication.shared.open(appStoreUrl)
+      }
+      
+    case .naver:
+      guard let url = URL(string: "nmap://route/public?slat=37.4640070&slng=126.9522394&sname=내 위치&dlat=37.5209436&dlng=127.1230074&dname=\(place.name)&appname=com.viskit-iOS") else { return }
+      guard let appStoreURL = URL(string: "http://itunes.apple.com/app/id311867728?mt=8") else { return }
+      
+      if UIApplication.shared.canOpenURL(url) {
+        UIApplication.shared.open(url)
+      } else {
+        UIApplication.shared.open(appStoreURL)
+      }
+      
+    case .google:
+      guard let url = URL(string: "comgooglemaps://?saddr=\(userLat),\(userLong)&daddr=\(placeLat),\(placeLong)&directionsmode=transit") else { return }
+      guard let appStoreURL = URL(string: "https://apps.apple.com/app/id585027354") else { return }
+
+      if UIApplication.shared.canOpenURL(URL(string:"comgooglemaps://")!) {
+        UIApplication.shared.open(url)
+      } else {
+          UIApplication.shared.open(appStoreURL)
+      }
+    }
   }
 }

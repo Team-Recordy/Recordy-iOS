@@ -12,37 +12,31 @@ import Photos
 import Core
 import Common
 
-import RxSwift
-import RxCocoa
+import Combine
+import CombineCocoa
 import SnapKit
 import Then
 
 @available(iOS 16.0, *)
 public class UploadVideoViewController: UIViewController {
 
-  private let gradientView = RecordyGradientView()
   private let warningLabel = UILabel()
   private let scrollView = UIScrollView()
   private let contentView = UIView()
-  private let videoThumbnailLabel = RecordySubtitleLabel(subtitle: "영상")
   let videoThumbnailView = UIView()
   let videoThumbnailSelectButton = UIButton()
   let videoThumbnailAlertLabel = UILabel()
   private let videoThumbnailImageView = UIImageView()
-  private let selectedKeywordLabel = RecordySubtitleLabel(subtitle: "키워드")
-//  private let selectKeywordStackView = RecordySelectKeywordStackView()
-  private let firstKeywordLabel = RecordyKeywordLabel()
-  private let secondKeywordLabel = RecordyKeywordLabel()
-  private let thirdKeywordLabel = RecordyKeywordLabel()
-  private let locationLabel = RecordySubtitleLabel(subtitle: "위치")
-  private let locationTextField = RecordyTextField(placeholder: "영상 속 위치는 어디인가요?")
-  private let locationTextCountLabel = UILabel()
-  private let contentsLabel = RecordySubtitleLabel(subtitle: "내용")
   private let contentsTextView = RecordyTextView()
+  private let placeButton = PlaceButton()
+  private let displayBackgroundView = UIView()
+  private let displayLabel = UILabel()
+  private let displayTextField = UITextField()
+  private let displayTextCountLabel = UILabel()
   let uploadButton = UIButton()
 
   private let viewModel = UploadVideoViewModel()
-  private let disposeBag = DisposeBag()
+  private var cancellables = Set<AnyCancellable>()
 
   public override func viewDidLoad() {
     super.viewDidLoad()
@@ -54,29 +48,39 @@ public class UploadVideoViewController: UIViewController {
   }
 
   private func setStyle() {
-    title = "내용 작성"
-    view.backgroundColor = CommonAsset.recordyBG.color
-    let rightButton = UIButton(type: .system)
-    rightButton.setImage(UIImage(systemName: "xmark"), for: .normal)
-    rightButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
-    let rightBarButtonItem = UIBarButtonItem(customView: rightButton)
-    navigationItem.rightBarButtonItem = rightBarButtonItem
+    title = "영상 업로드"
+    view.backgroundColor = CommonAsset.viskitBG.color
+
+    if navigationController?.viewControllers.first != self {
+      let rightButton = UIButton(type: .system)
+      rightButton.setImage(UIImage(systemName: "xmark"), for: .normal)
+      rightButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+      let rightBarButtonItem = UIBarButtonItem(customView: rightButton)
+      navigationItem.rightBarButtonItem = rightBarButtonItem
+    }
 
     scrollView.do {
       $0.backgroundColor = .clear
+      $0.showsVerticalScrollIndicator = false
     }
+    
     warningLabel.do {
       $0.text = "ⓘ 주제와 무관한 기록은 무통보로 삭제될 수 있습니다."
       $0.textColor = CommonAsset.recordyGrey03.color
       $0.font = RecordyFont.caption1.font
     }
+
     videoThumbnailView.do {
       $0.cornerRadius(16)
+      $0.backgroundColor = CommonAsset.viskitGray10.color
     }
+
     videoThumbnailImageView.do {
       $0.cornerRadius(16)
       $0.contentMode = .scaleToFill
+      $0.backgroundColor = CommonAsset.viskitGray10.color
     }
+
     videoThumbnailSelectButton.do {
       $0.titleLabel?.font = RecordyFont.caption1.font
       $0.titleLabel?.textColor = CommonAsset.recordyGrey01.color
@@ -86,35 +90,48 @@ public class UploadVideoViewController: UIViewController {
         for: .touchUpInside
       )
     }
+
     videoThumbnailAlertLabel.do {
       $0.text = "다른 영상 고르기"
       $0.font = RecordyFont.caption2.font
       $0.textColor = CommonAsset.recordyGrey01.color
     }
-//    selectKeywordStackView.keywordButton.do {
-//      $0.addTarget(
-//        self,
-//        action: #selector(selectedKeywordButtonTapped),
-//        for: .touchUpInside
-//      )
-//    }
-    locationTextCountLabel.do {
-      $0.font = RecordyFont.caption2.font
-      $0.textColor = CommonAsset.recordyGrey04.color
+
+    displayBackgroundView.do {
+      $0.backgroundColor = CommonAsset.viskitGray10.color
+      $0.cornerRadius(8)
     }
+
+    displayLabel.do {
+      $0.text = "전시명"
+      $0.font = ViskitFont.body2.font
+      $0.textColor = CommonAsset.viskitGray01.color
+    }
+
+    displayTextField.do {
+      $0.placeholder = "전시명을 입력해 주세요."
+      $0.font = ViskitFont.body2.font
+      $0.textColor = CommonAsset.viskitGray01.color
+      $0.backgroundColor = CommonAsset.viskitGray10.color
+      $0.textAlignment = .right
+    }
+
+    displayTextCountLabel.do {
+      $0.font = RecordyFont.caption2.font
+      $0.textColor = CommonAsset.recordyGrey05.color
+    }
+
     uploadButton.do {
       $0.setTitle("업로드", for: .normal)
-      $0.backgroundColor = CommonAsset.recordyMain.color
+      $0.backgroundColor = CommonAsset.viskitGray11.color
       $0.titleLabel?.font = RecordyFont.button1.font
-      $0.titleLabel?.textColor = CommonAsset.recordyGrey09.color
+      $0.titleLabel?.textColor = CommonAsset.viskitGray08.color
       $0.cornerRadius(12)
-      $0.addTarget(self, action: #selector(uploadButtonTapped), for: .touchUpInside)
     }
   }
 
   private func setUI() {
     view.addSubviews(
-      gradientView,
       scrollView
     )
     scrollView.addSubview(contentView)
@@ -123,27 +140,22 @@ public class UploadVideoViewController: UIViewController {
       videoThumbnailSelectButton,
       videoThumbnailAlertLabel
     )
+    displayBackgroundView.addSubviews(
+      displayLabel,
+      displayTextField
+    )
     contentView.addSubviews(
       warningLabel,
-      videoThumbnailLabel,
       videoThumbnailView,
-//      selectKeywordStackView,
-      selectedKeywordLabel,
-      locationLabel,
-      locationTextField,
-      locationTextCountLabel,
-      contentsLabel,
       contentsTextView,
+      placeButton,
+      displayBackgroundView,
+      displayTextCountLabel,
       uploadButton
     )
   }
 
   private func setAutolayout() {
-    gradientView.snp.makeConstraints {
-      $0.top.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(400.adaptiveHeight)
-    }
-
     scrollView.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide)
       $0.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
@@ -157,71 +169,16 @@ public class UploadVideoViewController: UIViewController {
     }
 
     warningLabel.snp.makeConstraints {
-      $0.top.equalTo(contentView.snp.top).offset(40.adaptiveHeight)
+      $0.top.equalTo(contentView.snp.top).offset(8.adaptiveHeight)
       $0.centerX.equalTo(contentView.snp.centerX)
       $0.height.equalTo(18.adaptiveHeight)
     }
 
-    videoThumbnailLabel.snp.makeConstraints {
-      $0.top.equalTo(contentView.snp.top).offset(70.adaptiveHeight)
-      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
-      $0.height.equalTo(28.adaptiveHeight)
-    }
-
     videoThumbnailView.snp.makeConstraints {
-      $0.top.equalTo(videoThumbnailLabel.snp.bottom).offset(12.adaptiveHeight)
-      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
-      $0.width.equalTo(180.adaptiveWidth)
-      $0.height.equalTo(284.adaptiveHeight)
-    }
-
-    selectedKeywordLabel.snp.makeConstraints {
-      $0.top.equalTo(videoThumbnailImageView.snp.bottom).offset(20.adaptiveHeight)
-      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
-      $0.height.equalTo(28.adaptiveHeight)
-    }
-
-//    selectKeywordStackView.snp.makeConstraints {
-//      $0.top.equalTo(selectedKeywordLabel.snp.bottom).offset(10.adaptiveHeight)
-//      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
-//      $0.height.equalTo(36.adaptiveHeight)
-//    }
-//
-//    locationLabel.snp.makeConstraints {
-//      $0.top.equalTo(selectKeywordStackView.snp.bottom).offset(24.adaptiveHeight)
-//      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
-//      $0.height.equalTo(28.adaptiveHeight)
-//    }
-
-    locationTextField.snp.makeConstraints {
-      $0.top.equalTo(locationLabel.snp.bottom).offset(12.adaptiveHeight)
-      $0.horizontalEdges.equalTo(contentView.snp.horizontalEdges).inset(20.adaptiveWidth)
-      $0.height.equalTo(52.adaptiveHeight)
-    }
-
-    locationTextCountLabel.snp.makeConstraints {
-      $0.top.equalTo(locationTextField.snp.bottom).offset(8.adaptiveHeight)
-      $0.trailing.equalTo(contentView.snp.trailing).offset(-20.adaptiveWidth)
-      $0.height.equalTo(18.adaptiveHeight)
-    }
-
-    contentsLabel.snp.makeConstraints {
-      $0.top.equalTo(locationTextCountLabel.snp.bottom)
-      $0.leading.equalTo(contentView.snp.leading).offset(20.adaptiveWidth)
-      $0.height.equalTo(28.adaptiveHeight)
-    }
-    
-    contentsTextView.snp.makeConstraints {
-      $0.top.equalTo(contentsLabel.snp.bottom).offset(12.adaptiveHeight)
-      $0.horizontalEdges.equalTo(contentView.snp.horizontalEdges).inset(20.adaptiveWidth)
-      $0.height.greaterThanOrEqualTo(174.adaptiveHeight)
-    }
-
-    uploadButton.snp.makeConstraints {
-      $0.top.equalTo(contentsTextView.snp.bottom).offset(18.adaptiveHeight)
-      $0.horizontalEdges.equalToSuperview().inset(20.adaptiveWidth)
-      $0.height.equalTo(54.adaptiveHeight)
-      $0.bottom.equalTo(contentView.snp.bottom).inset(82.adaptiveHeight)
+      $0.top.equalTo(warningLabel.snp.bottom).offset(16)
+      $0.centerX.equalToSuperview()
+      $0.width.equalTo(162.adaptiveWidth)
+      $0.height.equalTo(288.adaptiveHeight)
     }
 
     videoThumbnailImageView.snp.makeConstraints {
@@ -236,78 +193,164 @@ public class UploadVideoViewController: UIViewController {
       $0.bottom.equalToSuperview().offset(-16.adaptiveHeight)
       $0.centerX.equalToSuperview()
     }
+
+    contentsTextView.snp.makeConstraints {
+      $0.top.equalTo(videoThumbnailView.snp.bottom).offset(24.adaptiveHeight)
+      $0.horizontalEdges.equalTo(contentView.snp.horizontalEdges).inset(20.adaptiveWidth)
+      $0.height.greaterThanOrEqualTo(106.adaptiveHeight)
+    }
+
+    placeButton.snp.makeConstraints {
+      $0.top.equalTo(contentsTextView.snp.bottom).offset(16.adaptiveHeight)
+      $0.horizontalEdges.equalTo(contentView.snp.horizontalEdges).inset(20.adaptiveWidth)
+      $0.height.equalTo(52.adaptiveHeight)
+    }
+
+    displayBackgroundView.snp.makeConstraints {
+      $0.top.equalTo(placeButton.snp.bottom).offset(16.adaptiveHeight)
+      $0.horizontalEdges.equalTo(contentView.snp.horizontalEdges).inset(20.adaptiveWidth)
+      $0.height.equalTo(52.adaptiveHeight)
+    }
+
+    displayLabel.snp.makeConstraints {
+      $0.centerY.equalToSuperview()
+      $0.leading.equalToSuperview().offset(18.adaptiveWidth)
+      $0.trailing.equalTo(displayTextField.snp.leading).offset(-8.adaptiveWidth)
+    }
+
+    displayTextField.snp.makeConstraints {
+      $0.centerY.equalToSuperview()
+      $0.trailing.equalToSuperview().offset(-18.adaptiveWidth)
+    }
+
+    displayTextCountLabel.snp.makeConstraints {
+      $0.top.equalTo(displayBackgroundView.snp.bottom).offset(8.adaptiveHeight)
+      $0.trailing.equalToSuperview().offset(-20.adaptiveWidth)
+    }
+
+    uploadButton.snp.makeConstraints {
+      $0.top.equalTo(displayTextCountLabel.snp.bottom).offset(22.adaptiveHeight)
+      $0.horizontalEdges.equalToSuperview().inset(20.adaptiveWidth)
+      $0.height.equalTo(54.adaptiveHeight)
+      $0.bottom.equalToSuperview().offset(-14.adaptiveHeight)
+    }
   }
 
-  func bind() {
-    viewModel.output.thumbnailImage
-      .bind(to: videoThumbnailImageView.rx.image)
-      .disposed(by: disposeBag)
+  private func bind() {
+    viewModel.$thumbnailImage
+      .receive(on: DispatchQueue.main)
+      .assign(to: \.image, on: videoThumbnailImageView)
+      .store(in: &cancellables)
 
-    viewModel.output.locationTextCount
-      .bind(to: locationTextCountLabel.rx.text)
-      .disposed(by: disposeBag)
+    viewModel.$contentsTextCount
+      .receive(on: DispatchQueue.main)
+      .map { Optional($0) }
+      .assign(to: \.text, on: contentsTextView.textCountLabel)
+      .store(in: &cancellables)
 
-    viewModel.output.contentsTextCount
-      .bind(to: contentsTextView.textCountLabel.rx.text)
-      .disposed(by: disposeBag)
+    viewModel.$uploadEnabled
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] enabled in
+        self?.updateUploadButton(enabled: enabled)
+      }
+      .store(in: &cancellables)
 
-    locationTextField.rx.text.orEmpty
-      .filter { $0.count <= 20 }
-      .bind(to: viewModel.input.location)
-      .disposed(by: disposeBag)
-
-    locationTextField.rx.controlEvent([.editingDidBegin])
-      .map { RecordyTextFieldState.selected }
-      .bind(to: locationTextField.rx.state)
-      .disposed(by: disposeBag)
-
-    locationTextField.rx.controlEvent([.editingDidEnd])
-      .map { RecordyTextFieldState.unselected }
-      .bind(to: locationTextField.rx.state)
-      .disposed(by: disposeBag)
-
-    contentsTextView.textView.rx.text.orEmpty
-      .filter { $0.count <= 300 }
-      .bind(to: viewModel.input.contents)
-      .disposed(by: disposeBag)
-
-    locationTextField.rx.text.orEmpty
-      .subscribe(onNext: { [weak self] text in
-        guard let self = self else { return }
-        if text.count > 20 {
-          self.locationTextField.text = String(text.prefix(20))
-          self.locationTextField.updateTextFieldStyle(for: .error)
-        }
-      })
-      .disposed(by: disposeBag)
-
-    contentsTextView.textView.rx.text.orEmpty
-      .subscribe(onNext: { [weak self] text in
-        if text.count > 300 {
-          self?.contentsTextView.textView.text = String(text.prefix(300))
-        }
-      })
-      .disposed(by: disposeBag)
-
-    viewModel.output.uploadEnabled
-      .bind(to: self.rx.uploadButtonEnabled)
-      .disposed(by: disposeBag)
-
-    viewModel.output.thumbnailImage
+    viewModel.$thumbnailImage
+      .receive(on: DispatchQueue.main)
       .map { $0 != nil }
-      .bind(to: self.rx.uploadVideoSelected)
-      .disposed(by: disposeBag)
+      .sink { [weak self] selected in
+        self?.updateVideoSelectionState(selected: selected)
+      }
+      .store(in: &cancellables)
+
+    viewModel.$place
+      .receive(on: DispatchQueue.main)
+      .compactMap { $0 }
+      .sink { [weak self] place in
+        self?.placeButton.configure(text: place.name)
+      }
+      .store(in: &cancellables)
+
+    viewModel.$exhibitionName
+      .receive(on: DispatchQueue.main)
+      .compactMap { $0 }
+      .sink { [weak self] name in
+        guard let self else { return }
+        displayTextCountLabel.text = "\(name.count) / 10"
+      }
+      .store(in: &cancellables)
+
+    contentsTextView.textView.textPublisher
+      .compactMap { $0 }
+      .filter { $0.count <= 300 }
+      .assign(to: \.contents, on: viewModel)
+      .store(in: &cancellables)
+    
+    contentsTextView.textView.textPublisher
+      .compactMap { $0 }
+      .scan("") { previous, current in
+        // 입력값이 300자를 넘으면 이전 값을 유지
+        if current.count > 300 {
+          return previous
+        }
+        return current
+      }
+      .sink { [weak self] text in
+        guard let self else { return }
+        self.contentsTextView.textView.text = text
+        self.contentsTextView.textCountLabel.text = "\(text.count) / 300"
+      }
+      .store(in: &cancellables)
+
+    displayTextField.textPublisher
+      .assign(to: \.exhibitionName, on: viewModel)
+      .store(in: &cancellables)
+
+    videoThumbnailSelectButton.tapPublisher
+      .sink { [weak self] _ in
+        self?.videoThumbnailSelectButtonTapped()
+      }
+      .store(in: &cancellables)
+
+    uploadButton.tapPublisher
+      .sink { [weak self] _ in
+        self?.uploadButtonTapped()
+      }
+      .store(in: &cancellables)
+
+    placeButton.tapPublisher
+      .sink { [weak self] _ in
+        self?.placeButtonTapped()
+      }
+      .store(in: &cancellables)
+  }
+
+  private func updateUploadButton(enabled: Bool) {
+    uploadButton.isEnabled = enabled
+    uploadButton.backgroundColor = enabled ? CommonAsset.viskitYellow400.color : CommonAsset.viskitGray11.color
+    uploadButton.setTitleColor(
+      enabled ? CommonAsset.viskitBG.color : CommonAsset.viskitGray08.color,
+      for: .normal
+    )
+  }
+
+  private func updateVideoSelectionState(selected: Bool) {
+    videoThumbnailSelectButton.setTitle(selected ? "" : "영상 선택", for: .normal)
+    videoThumbnailAlertLabel.isHidden = !selected
+    videoThumbnailView.backgroundColor = selected ? .clear : CommonAsset.recordyGrey08.color
   }
 
   @objc func videoThumbnailSelectButtonTapped() {
     viewModel.getPhotoPermission { [weak self] access in
       guard let self = self else { return }
       if access {
-        let selectVideoViewController = SelectVideoViewController()
-        selectVideoViewController.delegate = self
-        let navigationController = BaseNavigationController(rootViewController: selectVideoViewController)
-        navigationController.modalPresentationStyle = .fullScreen
-        self.present(navigationController, animated: true)
+        DispatchQueue.main.async {
+          let selectVideoViewController = SelectVideoViewController()
+          selectVideoViewController.delegate = self
+          let navigationController = BaseNavigationController(rootViewController: selectVideoViewController)
+          navigationController.modalPresentationStyle = .fullScreen
+          self.present(navigationController, animated: true)
+        }
       } else {
         DispatchQueue.main.async {
           self.showPopUp(type: .permission) {
@@ -317,20 +360,6 @@ public class UploadVideoViewController: UIViewController {
       }
     }
   }
-
-//  @objc func selectedKeywordButtonTapped() {
-//    let filteringViewController = RecordyFilteringViewController()
-//    filteringViewController.delegate = self
-//    if let sheet = filteringViewController.sheetPresentationController {
-//      sheet.detents = [
-//        .custom { _ in
-//          return 495.adaptiveHeight
-//        }
-//      ]
-//      sheet.prefersGrabberVisible = true
-//    }
-//    self.present(filteringViewController, animated: true)
-//  }
 
   @objc func uploadButtonTapped() {
     viewModel.uploadButtonTapped()
@@ -344,46 +373,24 @@ public class UploadVideoViewController: UIViewController {
       }
     }
   }
+
+  @objc func placeButtonTapped() {
+    let nextViewController = SearchPlaceViewController()
+    nextViewController.delegate = self
+    navigationController?.pushViewController(nextViewController, animated: true)
+  }
 }
 
 @available(iOS 16.0, *)
 extension UploadVideoViewController: SelectVideoDelegate {
   func selectVideo(_ data: PHAsset) {
-    viewModel.input.selectedAsset.accept(data)
+    viewModel.selectedAsset = data
   }
 }
-
-//@available(iOS 16.0, *)
-//extension UploadVideoViewController: FilteringDelegate {
-//  public func selectKeywords(_ keywords: [Keyword]) {
-//    viewModel.input.selectedKeywords.accept(keywords)
-//    selectKeywordStackView.updateKeywords(keywords: keywords)
-//  }
-//}
 
 @available(iOS 16.0, *)
-extension Reactive where Base: UploadVideoViewController {
-  var uploadButtonEnabled: Binder<Bool> {
-    return Binder(self.base) { viewController, value in
-      viewController.uploadButton.isEnabled = value
-      viewController.uploadButton.backgroundColor = value ? CommonAsset.recordyMain.color : CommonAsset.recordyGrey08.color
-      viewController.uploadButton.setTitleColor(value ? CommonAsset.recordyGrey09.color : CommonAsset.recordyGrey04.color, for: .normal)
-    }
-  }
-
-  var uploadVideoSelected: Binder<Bool> {
-    return Binder(self.base) { viewController, value in
-      viewController.videoThumbnailSelectButton.setTitle(value ? "" : "영상 선택", for: .normal)
-      viewController.videoThumbnailAlertLabel.isHidden = !value
-      viewController.videoThumbnailView.backgroundColor = value ? .clear : CommonAsset.recordyGrey08.color
-    }
-  }
-}
-
-extension Reactive where Base: RecordyTextField {
-  var state: Binder<RecordyTextFieldState> {
-    return Binder(self.base) { textField, state in
-      textField.updateTextFieldStyle(for: state)
-    }
+extension UploadVideoViewController: SearchPlaceDelegate {
+  func didSelect(place: SearchPlaceViewModel.SearchedPlace) {
+    viewModel.place = place
   }
 }

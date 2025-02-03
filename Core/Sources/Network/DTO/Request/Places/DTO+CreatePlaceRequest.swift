@@ -15,15 +15,15 @@ extension DTO {
     
     public let id: String
     public let name: String
-    public let longitude: Int
-    public let latitude: Int
+    public let longitude: Double
+    public let latitude: Double
     public let address: String
     
     public init(
       id: String,
       name: String,
-      longitude: Int,
-      latitude: Int,
+      longitude: Double,
+      latitude: Double,
       address: String
     ) {
       self.id = id

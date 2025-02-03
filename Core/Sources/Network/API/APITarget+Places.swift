@@ -20,7 +20,11 @@ extension APITarget {
 }
 
 extension APITarget.Places: TargetType {
-  
+
+  public var validationType: ValidationType {
+    .successCodes
+  }
+
   public var baseURL: URL {
     return URL(string: BaseURL.string + "/places")!
   }

@@ -15,17 +15,15 @@ import Common
 
 final class LoginView: UIView {
 
-  let gradientView = RecordyGradientView()
-
-  let recordyLogo = UIImageView().then {
-    $0.image = CommonAsset.loginAppLogo.image
+  let viskitLogo = UIImageView().then {
+    $0.image = CommonAsset.viskitLogo.image
     $0.contentMode = .scaleAspectFit
   }
   
   let projectIntro = UITextField().then {
-    $0.text = "내 취향의 공간 기록을 발견하는 곳"
-    $0.font = RecordyFont.body1.font
-    $0.textColor = CommonAsset.recordyGrey01.color
+    $0.text = "내가 찾던 공간을 먼저 만나는 곳"
+    $0.font = ViskitFont.body1.font
+    $0.textColor = CommonAsset.viskitWhite.color
   }
   
   let kakaoStackView = UIStackView().then {
@@ -87,14 +85,17 @@ final class LoginView: UIView {
   
   // TODO: Change BackgroundColor to Gradient
   func setStyle() {
+    backgroundColor = CommonAsset.viskitBG.color
     kakaoLoginButton.cornerRadius(10)
     appleLoginButton.cornerRadius(10)
+    
+    self.bringSubviewToFront(kakaoLoginButton)
+    self.bringSubviewToFront(appleLoginButton)
   }
   
   func setUI() {
     self.addSubviews(
-      gradientView,
-      recordyLogo,
+      viskitLogo,
       projectIntro,
       kakaoLoginButton,
       appleLoginButton
@@ -105,13 +106,12 @@ final class LoginView: UIView {
     appleStackView.addArrangedSubview(appleLogo)
     appleStackView.addArrangedSubview(appleButtonText)
     appleLoginButton.addSubview(appleStackView)
+    
+    kakaoLoginButton.isUserInteractionEnabled = true
+    appleLoginButton.isUserInteractionEnabled = true
   }
   
   func setAutoLayout() {
-    self.gradientView.snp.makeConstraints {
-      $0.top.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(400.adaptiveHeight)
-    }
 
     self.kakaoLogo.snp.makeConstraints {
       $0.width.height.equalTo(24)
@@ -121,20 +121,21 @@ final class LoginView: UIView {
       $0.width.height.equalTo(24)
     }
     
-    self.recordyLogo.snp.makeConstraints {
+    self.viskitLogo.snp.makeConstraints {
       $0.centerX.equalToSuperview()
-      $0.top.equalToSuperview().offset(274)
-      $0.width.height.equalTo(120)
+      $0.top.equalToSuperview().offset(308)
+      $0.width.equalTo(200.adaptiveWidth)
+      $0.height.equalTo(61.adaptiveHeight)
     }
     
     self.projectIntro.snp.makeConstraints {
       $0.centerX.equalToSuperview()
-      $0.top.equalTo(recordyLogo.snp.bottom).offset(24)
+      $0.top.equalTo(viskitLogo.snp.bottom).offset(24)
     }
 
     self.kakaoLoginButton.snp.makeConstraints {
-      $0.top.equalTo(projectIntro.snp.bottom).offset(152)
-      $0.height.equalTo(48)
+      $0.top.equalTo(projectIntro.snp.bottom).offset(149)
+      $0.height.equalTo(54.adaptiveHeight)
       $0.leading.equalToSuperview().offset(20)
       $0.trailing.equalToSuperview().offset(-20)
     }
@@ -144,8 +145,8 @@ final class LoginView: UIView {
     }
     
     self.appleLoginButton.snp.makeConstraints {
-      $0.top.equalTo(kakaoLoginButton.snp.bottom).offset(12)
-      $0.height.equalTo(48)
+      $0.top.equalTo(kakaoLoginButton.snp.bottom).offset(8)
+      $0.height.equalTo(54.adaptiveHeight)
       $0.leading.equalToSuperview().offset(20)
       $0.trailing.equalToSuperview().offset(-20)
     }

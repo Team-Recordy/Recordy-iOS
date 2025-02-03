@@ -15,16 +15,15 @@ import Common
 @available(iOS 16.0, *)
 public class SplashScreenViewController: UIViewController {
   
-  let gradientView = RecordyGradientView()
   let logoImageView = UIImageView().then {
-    $0.image = CommonAsset.loginAppLogo.image
+    $0.image = CommonAsset.viskitLogo.image
     $0.contentMode = .scaleAspectFit
     $0.translatesAutoresizingMaskIntoConstraints = false
   }
   
   public override func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = CommonAsset.recordyBG.color
+    view.backgroundColor = CommonAsset.viskitBG.color
     setUI()
     setLogoImageView()
   }
@@ -36,28 +35,24 @@ public class SplashScreenViewController: UIViewController {
   
   func setUI() {
     view.addSubview(logoImageView)
-    view.addSubview(gradientView)
   }
   
   private func setLogoImageView() {
-    gradientView.snp.makeConstraints {
-      $0.top.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(400.adaptiveHeight)
-    }
 
     logoImageView.snp.makeConstraints {
-      $0.width.equalTo(173)
-      $0.height.equalTo(126)
-      $0.top.equalToSuperview().offset(253)
+      $0.width.equalTo(200.adaptiveHeight)
+      $0.height.equalTo(61.adaptiveWidth)
       $0.centerX.equalToSuperview()
+      $0.centerY.equalToSuperview()
     }
   }
   
   private func animateLogo() {
     self.logoImageView.snp.remakeConstraints {
       $0.centerX.equalToSuperview()
-      $0.top.equalToSuperview().offset(274)
-      $0.width.height.equalTo(120)
+      $0.top.equalToSuperview().offset(308)
+      $0.width.equalTo(200.adaptiveWidth)
+      $0.height.equalTo(61.adaptiveHeight)
     }
     
     UIView.animate(withDuration: 1.0, delay: 0, options: [.curveEaseInOut], animations: {

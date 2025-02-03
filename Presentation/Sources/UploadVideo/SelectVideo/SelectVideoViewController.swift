@@ -26,8 +26,8 @@ public class SelectVideoViewController: UIViewController {
   private let gradientView = RecordyGradientView()
   private let warningLabel = UILabel().then {
     $0.text = "ⓘ 최대 1분의 1080p 영상을 올려주세요."
-    $0.textColor = CommonAsset.recordyGrey03.color
-    $0.font = RecordyFont.caption1.font
+    $0.textColor = CommonAsset.viskitGray03.color
+    $0.font = ViskitFont.caption1Regular.font
   }
 
   var collectionView: UICollectionView? = nil
@@ -56,20 +56,15 @@ public class SelectVideoViewController: UIViewController {
     self.navigationItem.rightBarButtonItem = rightBarButtonItem
 
     self.title = "영상 선택"
-    self.view.backgroundColor = CommonAsset.recordyBG.color
+    self.view.backgroundColor = CommonAsset.viskitBG.color
   }
 
   private func setUI() {
-    self.view.addSubview(self.gradientView)
     self.view.addSubview(self.warningLabel)
     self.view.addSubview(self.collectionView!)
   }
 
   private func setAutoLayout() {
-    self.gradientView.snp.makeConstraints {
-      $0.top.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(400.adaptiveHeight)
-    }
     self.warningLabel.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide).offset(9.adaptiveHeight)
       $0.centerX.equalToSuperview()
@@ -82,10 +77,15 @@ public class SelectVideoViewController: UIViewController {
 
   private func setUpCollectionView() {
     let layout = UICollectionViewFlowLayout()
+    let spacing: CGFloat = 3
+    layout.minimumInteritemSpacing = spacing
+    layout.minimumLineSpacing = spacing
+    layout.sectionInset = .zero
     self.collectionView = UICollectionView(
       frame: .zero,
       collectionViewLayout: layout
     )
+    self.collectionView!.backgroundColor = .clear
     self.collectionView!.register(
       VideoCell.self,
       forCellWithReuseIdentifier: VideoCell.cellIdentifier
@@ -156,27 +156,10 @@ extension SelectVideoViewController: UICollectionViewDelegateFlowLayout {
     layout collectionViewLayout: UICollectionViewLayout,
     sizeForItemAt indexPath: IndexPath
   ) -> CGSize {
-    let padding: CGFloat = 4
-    let width: CGFloat = (UIScreen.main.bounds.width - padding * 4) / 4
-    return CGSize(
-      width: width,
-      height: width
-    )
-  }
-
-  public func collectionView(
-    _ collectionView: UICollectionView,
-    layout collectionViewLayout: UICollectionViewLayout,
-    minimumLineSpacingForSectionAt section: Int
-  ) -> CGFloat {
-    return 4
-  }
-
-  public func collectionView(
-    _ collectionView: UICollectionView,
-    layout collectionViewLayout: UICollectionViewLayout,
-    minimumInteritemSpacingForSectionAt section: Int
-  ) -> CGFloat {
-    return 4
+    let spacing: CGFloat = 3
+    let width = collectionView.frame.inset(by: collectionView.contentInset).width
+    let availableWidth = width - (spacing * 3)
+    let size = floor(availableWidth / 4)
+    return CGSize(width: size, height: size)
   }
 }

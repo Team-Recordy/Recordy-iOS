@@ -11,17 +11,6 @@ import UIKit
 @available(iOS 16.0, *)
 extension VideoFeedViewController: UICollectionViewDataSource {
 
-  @objc private func  nicknameButtonTapped(_ sender: UIButton) {
-    guard type != .userProfile && type != .myProfile else { return }
-    let index = sender.tag
-    let feed = viewModel.feedList[index]
-//    let userViewController = OtherUserProfileViewController(id: feed.userId)
-//    navigationController?.pushViewController(
-//        userViewController,
-//        animated: true
-//      )
-  }
-
   public func collectionView(
     _ collectionView: UICollectionView,
     numberOfItemsInSection section: Int
@@ -44,19 +33,17 @@ extension VideoFeedViewController: UICollectionViewDataSource {
       bounds: collectionView.frame,
       shouldAddPlayer: cell.avPlayer == nil
     )
-    if !isPlayed && indexPath.row == 0 {
-      cell.play()
-      isPlayed = true
+    cell.nicknameAction = { [weak self] in
+      guard let self,
+              self.type != .others && self.type != .mine
+      else { return }
+      let feed = viewModel.feedList[indexPath.row]
+      let userVC = OtherUserProfileViewController(id: feed.uploaderId)
+      self.navigationController?.pushViewController(userVC, animated: true)
     }
-    cell.feedView.nicknameButton.tag = indexPath.row
-    cell.feedView.nicknameButton.addTarget(
-      self,
-      action: #selector(nicknameButtonTapped),
-      for: .touchUpInside
-    )
     cell.bookmarkAction = { [weak self] in
       guard let self else { return }
-//      self.viewModel.bookmarkButtonTapped(indexPath.row)
+      self.viewModel.bookmarkFeed(index: indexPath.row)
       cell.updateBookmarkStatus(
         count: self.viewModel.feedList[indexPath.row].bookmarkCount,
         isBookmarked: self.viewModel.feedList[indexPath.row].isBookmarked
@@ -65,6 +52,18 @@ extension VideoFeedViewController: UICollectionViewDataSource {
     cell.moreAction = { [weak self] in
       guard let self else { return }
       self.sheetAction()
+    }
+    cell.placeAction = { [weak self] in
+      guard let self else { return }
+      let placeId = viewModel.feedList[indexPath.row].placeId
+      viewModel.getPlaceInFeed(placeId: placeId) { place in
+        if let place = place {
+          let placeDetailVC = PlaceDetailViewController(place: place)
+          self.navigationController?.pushViewController(placeDetailVC, animated: true)
+        } else {
+          print("Failed to fetch place.")
+        }
+      }
     }
     return cell
   }

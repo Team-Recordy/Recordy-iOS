@@ -8,7 +8,7 @@
 import ProjectDescription
 
 extension Project {
-  private static let organizationName = "com.recordy."
+  private static let organizationName = "com."
   private static let deploymentTarget = "15.0"
 
   public static func makeModule(

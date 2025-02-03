@@ -13,12 +13,12 @@ import Then
 
 public enum ToggleState {
   case all
-  case following
+  case follow
 }
 
 public class ViskitToggle: UIButton {
 
-  var toggleState: ToggleState = .following {
+  var toggleState: ToggleState = .follow {
     didSet {
       self.update()
     }
@@ -37,7 +37,7 @@ public class ViskitToggle: UIButton {
     setStyle()
     setUI()
     setAutolayout()
-    setState(state: .following)
+    setState(state: .all)
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -130,7 +130,7 @@ public class ViskitToggle: UIButton {
   }
 
   public func toggle() {
-    toggleState == .all ? setState(state: .following) : setState(state: .all)
+    toggleState == .all ? setState(state: .follow) : setState(state: .all)
   }
 
   func setState(state: ToggleState) {

@@ -39,6 +39,13 @@ public class ProfileViewController: UIViewController {
     setAutoLayout()
     setDelegate()
     controlTypeChanged()
+    
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleBookmarkStateChange(_:)),
+      name: .bookmarkStateChanged,
+      object: nil
+    )
   }
   
   public override func viewWillAppear(_ animated: Bool) {
@@ -54,6 +61,7 @@ public class ProfileViewController: UIViewController {
   }
   
   func setStyle() {
+    view.backgroundColor = CommonAsset.viskitBG.color
     configureNavigationBar()
     let rightButton = UIButton(type: .system)
     rightButton.setImage(CommonAsset.settingIcon.image, for: .normal)
@@ -147,8 +155,10 @@ public class ProfileViewController: UIViewController {
   }
   
   func getUserProfile() {
-    let apiProvider = APIProvider<APITarget.Users>()
     let userId = UserDefaults.standard.integer(forKey: "userId")
+    guard let platform = UserDefaults.standard.string(forKey: "loginPlatform") else { return }
+    let apiProvider = APIProvider<APITarget.Users>()
+    let loginState = LoginState(platform: platform)
     let request = DTO.GetProfileRequest(otherUserId: userId)
     apiProvider.requestResponsable(.getProfile(request), DTO.GetProfileResponse.self) { [weak self] result in
       guard let self = self else { return }
@@ -164,7 +174,7 @@ public class ProfileViewController: UIViewController {
           profileImage: response.profileImageUrl,
           feeds: [],
           bookmarkedFeeds: [],
-          loginState: .apple,
+          loginState: loginState,
           recordCount: response.recordCount,
           followerCount: response.followerCount,
           followingCount: response.followingCount
@@ -219,7 +229,7 @@ public class ProfileViewController: UIViewController {
   
   func getBookmarkedRecordList() {
     let apiProvider = APIProvider<APITarget.Records>()
-    let request = DTO.GetBookmarkedListRequest(cursorId: 0, size: 100)
+    let request = DTO.GetBookmarkedListRequest(size: 100)
     apiProvider.requestResponsable(.getBookmarkedRecordList(request), DTO.GetBookmarkedListResponse.self) { [weak self] result in
       guard let self = self else { return }
       switch result {
@@ -250,6 +260,27 @@ public class ProfileViewController: UIViewController {
     }
   }
   
+  func postBookmark(feed: Feed, completion: ((Result<Void, Error>) -> Void)? = nil) {
+    let apiProvider = APIProvider<APITarget.Bookmarks>()
+    let request = DTO.PostBookmarkRequest(recordId: feed.id)
+    
+    apiProvider.justRequest(.postBookmark(request)) { [weak self] result in
+      guard let self = self else { return }
+      switch result {
+      case .success:
+        if let recordIndex = self.user?.bookmarkedFeeds?.firstIndex(where: { $0.id == feed.id }) {
+          self.bookmarkView.feeds[recordIndex].isBookmarked = !feed.isBookmarked
+        }
+//        bookmarkView.updateViewState()
+        completion?(.success(()))
+      case .failure(let error):
+        print("Failed to update bookmark: \(error)")
+        completion?(.failure(error))
+      }
+    }
+  }
+
+  
 //  private func getPlaceFeature(from location: String) -> PlaceFeature {
 //    if location.lowercased().contains("free") {
 //      return .free
@@ -259,6 +290,26 @@ public class ProfileViewController: UIViewController {
 //      return .all
 //    }
 //  }
+  
+  @objc private func handleBookmarkStateChange(_ notification: Notification) {
+    guard let userInfo = notification.userInfo,
+          let feed = userInfo["feed"] as? Feed else {
+      return
+    }
+    
+    postBookmark(feed: feed) { [weak self] result in
+      guard let self = self else { return }
+      switch result {
+      case .success:
+        print("Bookmark updated successfully.")
+        DispatchQueue.main.async {
+          self.bookmarkView.collectionView.reloadData()
+        }
+      case .failure(let error):
+        print("Failed to update bookmark: \(error)")
+      }
+    }
+  }
   
   @objc private func showFollowers() {
     let followerViewController = FollowViewController(followType: .follower)
@@ -310,7 +361,8 @@ extension ProfileViewController: BookmarkDelegate {
   func bookmarkFeedTapped(feed: Core.Feed) {
     let videoFeedViewController = VideoFeedViewController(
       type: .bookmarked,
-      currentId: feed.id
+      placeId: 0,
+      exhibitionId: 0
     )
     self.navigationController?.pushViewController(videoFeedViewController, animated: true)
   }
@@ -320,8 +372,7 @@ extension ProfileViewController: BookmarkDelegate {
 extension ProfileViewController: UserRecordDelegate {
   func userRecordFeedTapped(feed: Feed) {
     let videoFeedViewController = VideoFeedViewController(
-      type: .userProfile,
-      currentId: feed.id,
+      type: .others,
       userId: feed.uploaderId
     )
     self.navigationController?.pushViewController(videoFeedViewController, animated: true)

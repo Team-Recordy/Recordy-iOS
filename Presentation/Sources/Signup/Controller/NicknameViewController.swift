@@ -6,6 +6,7 @@
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
 
+import Combine
 import UIKit
 
 import Common
@@ -14,15 +15,19 @@ import Core
 @available(iOS 16.0, *)
 public final class NicknameViewController: UIViewController {
   
+  private var userNickname: String?
   private let nicknameView = NicknameView()
-  
-  private var errorMessage: String?
+  private var cancellables = Set<AnyCancellable>()
+  private let textSubject = PassthroughSubject<String, Never>()
   
   private var currentState: RecordyTextFieldState = .unselected {
     didSet {
-      nicknameView.updateUI(state: currentState, errorMessage: (currentState == .error) ? errorMessage : nil)
+      nicknameView.updateUI(state: currentState)
+      nicknameView.nicknameTextField.updateTextFieldStyle(for: currentState)
     }
   }
+  
+  private var errorMessage: String?
   
   public override func loadView() {
     view = nicknameView
@@ -31,67 +36,86 @@ public final class NicknameViewController: UIViewController {
   public override func viewDidLoad() {
     super.viewDidLoad()
     setStyle()
-    setDelegate()
-  }
-  
-  func setStyle() {
-    nicknameView.nicknameTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
-    nicknameView.nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
-    setTapGesture()
-  }
-  
-  private func setDelegate() {
+    bindTextField()
+    
     nicknameView.nicknameTextField.delegate = self
   }
   
-  private func getNicknameRequest(completion: @escaping (Bool) -> Void) {
-    let apiProvider = APIProvider<APITarget.Users>()
-    let request = DTO.CheckNicknameRequest(nickname: nicknameView.nicknameTextField.text!)
-    apiProvider.justRequest(.checkNickname(request)) { result in
-      switch result {
-      case .success:
-        completion(true)
-      case .failure:
-        completion(false)
-      }
-    }
-  }
-  
-  private func updateTextFieldState(_ text: String) {
-    if text.isEmpty {
-      currentState = .unselected
-    } else if text.isNicknamePatternValid(text) {
-      getNicknameRequest { [weak self] isAvailable in
-        guard let self = self else { return }
-        if isAvailable {
-          currentState = .selected
-          nicknameView.nextButton.buttonState = .active
-        } else {
-          currentState = .error
-          errorMessage = "ⓘ 이미 사용 중인 닉네임이에요."
-          nicknameView.nextButton.buttonState = .inactive
-        }
-      }
-    } else {
-      currentState = .error
-      errorMessage = "ⓘ 한글, 숫자, 밑줄 및 마침표만 사용할 수 있어요."
-      nicknameView.nextButton.buttonState = .inactive
-    }
-  }
-  
-  private func setTapGesture() {
-    let tapGesture = UITapGestureRecognizer(
-      target: self,
-      action: #selector(
-        dismissKeyboard
-      )
-    )
+  private func setStyle() {
+    title = "닉네임 설정"
+    setupCustomBackButton()
+    
+    nicknameView.nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
     view.addGestureRecognizer(tapGesture)
   }
   
+  private func bindTextField() {
+    nicknameView.nicknameTextField.textPublisher
+      .sink { [weak self] text in
+        guard let self = self else { return }
+        let count = text.count
+        self.nicknameView.textFieldCountLabel.text = "\(count) / 10"
+      }
+      .store(in: &cancellables)
+    
+    nicknameView.nicknameTextField.textPublisher
+      .removeDuplicates()
+      .sink { [weak self] text in
+        guard let self = self else { return }
+        self.updateState(for: text)
+      }
+      .store(in: &cancellables)
+  }
+  
+  private func updateState(for text: String?) {
+    guard let text = text, !text.isEmpty else {
+      currentState = .valid
+      return
+    }
+    
+    if text.isNicknamePatternValid(text) {
+      checkNickname(text: text)
+    } else {
+      currentState = .invalidPattern
+    }
+  }
+  
+  private func checkNickname(text: String) {
+    let apiProvider = APIProvider<APITarget.Users>()
+    let request = DTO.CheckNicknameRequest(nickname: text)
+    
+    apiProvider.request(
+      .checkNickname(request)
+    ) { [weak self] result in
+      guard let self = self else { return }
+      DispatchQueue.main.async {
+        switch result {
+        case .success(let response):
+          if response.statusCode == 200 {
+            self.currentState = .valid
+            self.userNickname = text
+          }
+        case .failure(let error):
+          if let response = error.response {
+            if response.statusCode == 409 {
+              self.currentState = .duplicated
+            }
+          } else {
+            self.currentState = .error
+          }
+        }
+      }
+    }
+  }
+  
   @objc private func nextButtonTapped() {
-    let completeViewController = CompleteViewController()
-    navigationController?.pushViewController(completeViewController, animated: true)
+    if currentState == .valid {
+      guard let userNickname else { return }
+      nicknameView.isHidden = true
+      let completeViewController = CompleteViewController(nickname: userNickname)
+      self.navigationController?.pushViewController(completeViewController, animated: true)
+    }
   }
 }
 
@@ -104,30 +128,23 @@ extension NicknameViewController: UITextFieldDelegate {
     }
     
     let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
-    
-    updateTextFieldState(updatedText)
-    
     return updatedText.count <= 10
   }
   
-  @objc private func textFieldDidChange(_ textField: UITextField) {
-    updateTextFieldState(textField.text ?? "")
-  }
-  
-  public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    textField.resignFirstResponder()
-    
-    if nicknameView.nextButton.buttonState == .active {
-      nextButtonTapped()
-    }
-    return true
-  }
-  
   public func textFieldDidBeginEditing(_ textField: UITextField) {
-    updateTextFieldState(textField.text ?? "")
+    if let textField = textField as? RecordyTextField {
+      textField.placeholder = nil
+      self.currentState = .selected
+    }
   }
   
   public func textFieldDidEndEditing(_ textField: UITextField) {
-    updateTextFieldState(textField.text ?? "")
+    if textField.text?.isEmpty ?? true {
+      textField.placeholder = "닉네임 (한글, 숫자, 밑줄 및 마침표만 사용 가능)"
+    } else if currentState == .valid {
+      nicknameView.nextButton.buttonState = .active
+    } else {
+      self.currentState = .unselected
+    }
   }
 }

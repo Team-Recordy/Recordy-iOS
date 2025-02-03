@@ -26,11 +26,10 @@ final public class PlaceDetailViewController: UIViewController{
   private let exhibitionListView = ExhibitionListView()
   private let reviewFeedView = ReviewFeedView()
   
-  init(place: Place, reviewFeeds: [Feed]) {
-    self.viewModel = PlaceDetailViewModel(
-      place: place,
-      reviewFeeds: reviewFeeds
-    )
+  var updateBookmarkStateInOverview: (() -> Void)?
+  
+  init(place: Place) {
+    self.viewModel = PlaceDetailViewModel(place: place)
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -39,19 +38,26 @@ final public class PlaceDetailViewController: UIViewController{
   }
   
   public override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-    navigationController?.isNavigationBarHidden = false
+      super.viewWillAppear(animated)
+      self.tabBarController?.tabBar.isHidden = true
+  }
+
+  public override func viewWillDisappear(_ animated: Bool) {
+      super.viewWillDisappear(animated)
+      self.tabBarController?.tabBar.isHidden = false
   }
   
   public override func viewDidLoad() {
     super.viewDidLoad()
+    navigationController?.isNavigationBarHidden = false
+    
     setStyle()
     setUI()
     setAutolayout()
     setDelegate()
     bind()
     setTarget()
-  
+    
     viewModel.getExhibitionList(placeId: viewModel.selectedPlace.first?.id ?? 0)
     
     updateFilterButtonState(
@@ -59,10 +65,17 @@ final public class PlaceDetailViewController: UIViewController{
       freeState: viewModel.freeFilterState,
       endSoonState: viewModel.endSoonFilterState
     )
+    
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleBookmarkStateChange(_:)),
+      name: .bookmarkStateChanged,
+      object: nil
+    )
   }
   
   private func setStyle() {
-    view.backgroundColor = CommonAsset.viskitBlack.color
+    view.backgroundColor = CommonAsset.viskitBG.color
     title = "전시관"
     
     placeNameLabel.do {
@@ -167,6 +180,9 @@ final public class PlaceDetailViewController: UIViewController{
   }
   
   private func setTarget() {
+    reviewButton.addTarget(self, action: #selector(onReviewButtonTapped), for: .touchUpInside)
+    findRouteButton.addTarget(self, action: #selector(onFindRouteButtonTapped), for: .touchUpInside)
+    
     exhibitionListView.allFilterButton.tag = FilterType.all.rawValue
     exhibitionListView.freeFilterButton.tag = FilterType.free.rawValue
     exhibitionListView.endSoonFilterButton.tag = FilterType.endSoon.rawValue
@@ -180,7 +196,46 @@ final public class PlaceDetailViewController: UIViewController{
     guard let filterType = FilterType(rawValue: sender.tag) else { return }
     viewModel.updateFilterState(selected: filterType)
   }
-
+  
+  @objc private func onReviewButtonTapped(_ sender: UIButton) {
+    guard let selectedPlace = viewModel.selectedPlace.first else {
+      return
+    }
+    
+    let reviewVC = ReviewWebViewController(platformId: selectedPlace.platformId)
+    reviewVC.modalPresentationStyle = .pageSheet
+    reviewVC.preferredContentSize = CGSize(width: view.frame.width, height: (view.frame.height) * 2 / 3)
+    
+    if let sheet = reviewVC.sheetPresentationController {
+      sheet.detents = [.medium()]
+      sheet.prefersGrabberVisible = true
+    }
+    
+    present(reviewVC, animated: true)
+  }
+  
+  @objc private func onFindRouteButtonTapped() {
+    let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    
+    let kakaoAction = UIAlertAction(title: "카카오맵", style: .default) { [weak self] _ in
+      self?.viewModel.openMap(type: .kakao)
+    }
+    let naverAction = UIAlertAction(title: "네이버 지도", style: .default) { [weak self] _ in
+      self?.viewModel.openMap(type: .naver)
+    }
+    let googleAction = UIAlertAction(title: "구글 지도", style: .default) { [weak self] _ in
+      self?.viewModel.openMap(type: .google)
+    }
+    let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+    
+    alert.addAction(kakaoAction)
+    alert.addAction(naverAction)
+    alert.addAction(googleAction)
+    alert.addAction(cancelAction)
+    
+    present(alert, animated: true)
+  }
+  
   private func bind() {
     viewModel.onControlTypeChanged = { [weak self] type in
       self?.updateView(for: type)
@@ -209,8 +264,34 @@ final public class PlaceDetailViewController: UIViewController{
       }
     }
     
+    reviewFeedView.onVideoSelectedInReviewFeed = { [weak self] selectedFeed in
+      guard let self = self else { return }
+      
+      let videoVC = VideoFeedViewController(
+        type: .place,
+        placeId: selectedFeed.placeId,
+        exhibitionId: selectedFeed.id,
+        cursorId: nil,
+        userId: selectedFeed.uploaderId
+      )
+      self.navigationController?.pushViewController(videoVC, animated: true)
+    }
+//    
+//    reviewFeedView.onBookmarkButtonTappedInReviewFeed = { [weak self] record in
+//      guard let self = self else { return }
+//      viewModel.postBookmark(feed: record) { result in
+//        switch result {
+//        case .success:
+//          print("Bookmark updated successfully")
+//          self.updateBookmarkStateInOverview?()
+//        case .failure(let error):
+//          print("Failed to update bookmark: \(error)")
+//        }
+//      }
+//    }
+    
     DispatchQueue.main.async {
-        self.reviewFeedView.updateFeedList(with: self.viewModel.reviewFeedList)
+      self.reviewFeedView.updateFeedList(with: self.viewModel.reviewFeedList)
     }
   }
   
@@ -228,6 +309,30 @@ final public class PlaceDetailViewController: UIViewController{
     exhibitionListView.freeFilterButton.setState(state: freeState)
     exhibitionListView.endSoonFilterButton.setState(state: endSoonState)
   }
+  
+  @objc private func handleBookmarkStateChange(_ notification: Notification) {
+    guard let userInfo = notification.userInfo,
+          let feed = userInfo["feed"] as? Feed else {
+      return
+    }
+    
+    viewModel.postBookmark(feed: feed) { [weak self] result in
+      guard let self = self else { return }
+      switch result {
+      case .success:
+        print("Bookmark updated successfully.")
+        DispatchQueue.main.async {
+          self.reviewFeedView.reviewFeedCollectionView?.reloadData()
+        }
+      case .failure(let error):
+        print("Failed to update bookmark: \(error)")
+      }
+    }
+  }
+  
+  deinit {
+    NotificationCenter.default.removeObserver(self, name: .bookmarkStateChanged, object: nil)
+  }
 }
 
 @available(iOS 16.0, *)
@@ -236,3 +341,4 @@ extension PlaceDetailViewController: PlaceDetailControlTypeDelegate {
     viewModel.updateControlType(to: type)
   }
 }
+

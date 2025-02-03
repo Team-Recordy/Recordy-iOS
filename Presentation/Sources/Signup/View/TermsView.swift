@@ -15,8 +15,6 @@ import Common
 
 final class TermsView: UIView {
   
-  let gradientView = RecordyGradientView()
-  let termImage = UIImageView()
   let termText = UILabel()
   let agreeAllTermButton = AgreeAllTermButton()
   let serviceTermButton = RecordyTermButton()
@@ -24,8 +22,8 @@ final class TermsView: UIView {
   let ageTermButton = RecordyTermButton()
   let serviceMoreButton = MoreButton(url: "https://bohyunnkim.notion.site/e5c0a49d73474331a21b1594736ee0df")
   let infoMoreButton = MoreButton(url: "https://bohyunnkim.notion.site/c2bdf3572df1495c92aedd0437158cf0?pvs=74")
-  let ageMoreButton = MoreButton(url: "https://bohyunnkim.notion.site/98d0fa7eac84431ab6f6dd63be0fb8ff?pvs=74")
   let nextButton = RecordyButton()
+  let indicatorImage = UIImageView()
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -39,16 +37,11 @@ final class TermsView: UIView {
   }
   
   func setStyle() {
-    backgroundColor = CommonAsset.recordyBG.color
-    
-    termImage.do {
-      $0.image = CommonAsset.signupImage.image
-      $0.contentMode = .scaleAspectFit
-    }
+    backgroundColor = CommonAsset.viskitBG.color
     
     termText.do {
-      $0.text = "유영하러 오신 것을\n환영합니다!"
-      $0.font = RecordyFont.title1.font
+      $0.text = "비스킷 이용을 위해\n필수 약관에 동의해 주세요."
+      $0.font = ViskitFont.title1.font
       $0.textColor = CommonAsset.recordyGrey01.color
       $0.numberOfLines = 0
       $0.setLineSpacing(lineHeightMultiple: 1.3)
@@ -70,12 +63,14 @@ final class TermsView: UIView {
       $0.setTitle("다음", for: .normal)
       $0.buttonState = .inactive
     }
+    
+    indicatorImage.do {
+      $0.image = CommonAsset.firstIndicator.image
+    }
   }
   
   func setUI() {
     addSubviews(
-      gradientView,
-      termImage,
       termText,
       agreeAllTermButton,
       serviceTermButton,
@@ -83,54 +78,42 @@ final class TermsView: UIView {
       ageTermButton,
       serviceMoreButton,
       infoMoreButton,
-      ageMoreButton,
-      nextButton
+      nextButton,
+      indicatorImage
     )
   }
   
   func setAutoLayout() {
-    gradientView.snp.makeConstraints {
-      $0.top.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(400.adaptiveHeight)
-    }
-    
-    termImage.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(148)
-      $0.leading.equalToSuperview().offset(20)
-      $0.height.equalTo(92.adaptiveHeight)
-      $0.width.equalTo(92.adaptiveWidth)
-    }
-    
     termText.snp.makeConstraints {
-      $0.top.equalTo(termImage.snp.bottom).offset(8)
+      $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(54)
       $0.leading.equalToSuperview().offset(20)
     }
     
     agreeAllTermButton.snp.makeConstraints {
       $0.top.equalTo(termText.snp.bottom).offset(32)
       $0.horizontalEdges.equalToSuperview().inset(20)
-      $0.height.equalTo(48)
+      $0.height.equalTo(54.adaptiveHeight)
     }
     
     serviceTermButton.snp.makeConstraints {
       $0.top.equalTo(agreeAllTermButton.snp.bottom).offset(8)
       $0.leading.equalToSuperview().offset(20)
       $0.trailing.equalTo(serviceMoreButton.snp.leading).offset(-10)
-      $0.height.equalTo(40)
+      $0.height.equalTo(40.adaptiveHeight)
     }
     
     infoTermButton.snp.makeConstraints {
       $0.top.equalTo(serviceTermButton.snp.bottom)
       $0.leading.equalToSuperview().offset(20)
       $0.trailing.equalTo(infoMoreButton.snp.leading).offset(-10)
-      $0.height.equalTo(40)
+      $0.height.equalTo(40.adaptiveHeight)
     }
     
     ageTermButton.snp.makeConstraints {
       $0.top.equalTo(infoTermButton.snp.bottom)
       $0.leading.equalToSuperview().offset(20)
-      $0.trailing.equalTo(ageMoreButton.snp.leading).offset(-10)
-      $0.height.equalTo(40)
+      $0.trailing.equalToSuperview().offset(-20)
+      $0.height.equalTo(40.adaptiveHeight)
     }
     
     serviceMoreButton.snp.makeConstraints {
@@ -147,17 +130,16 @@ final class TermsView: UIView {
       $0.height.equalTo(18.adaptiveHeight)
     }
     
-    ageMoreButton.snp.makeConstraints {
-      $0.top.equalTo(infoMoreButton.snp.bottom).offset(22)
-      $0.trailing.equalToSuperview().offset(-40)
-      $0.width.equalTo(32.adaptiveWidth)
-      $0.height.equalTo(18.adaptiveHeight)
-    }
-    
     nextButton.snp.makeConstraints {
       $0.horizontalEdges.equalToSuperview().inset(20)
       $0.bottom.equalTo(safeAreaLayoutGuide).inset(14)
       $0.height.equalTo(54.adaptiveHeight)
+    }
+    
+    indicatorImage.snp.makeConstraints {
+      $0.horizontalEdges.equalToSuperview()
+      $0.bottom.equalTo(nextButton.snp.top).offset(-14)
+      $0.height.equalTo(26.adaptiveHeight)
     }
   }
 }

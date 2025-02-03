@@ -15,8 +15,8 @@ public class RecordyTextView: UIView {
 
   public let textView = UITextView().then {
     $0.font = RecordyFont.body2.font
-    $0.textColor = CommonAsset.recordyGrey01.color
-    $0.backgroundColor = CommonAsset.recordyGrey08.color
+    $0.textColor = CommonAsset.viskitGray01.color
+    $0.backgroundColor = CommonAsset.viskitGray10.color
     $0.isScrollEnabled = false
     let horizontalPadding = 14.adaptiveWidth
     let verticalPadding = 14.adaptiveHeight
@@ -29,12 +29,12 @@ public class RecordyTextView: UIView {
   }
   public let textCountLabel = UILabel().then {
     $0.font = RecordyFont.caption2.font
-    $0.textColor = CommonAsset.recordyGrey04.color
+    $0.textColor = CommonAsset.recordyGrey05.color
   }
 
   private let textViewPlaceHolder = "공간에 대한 나의 생각을 자유롭게 적어주세요!"
-  private let minHeight = 148.adaptiveHeight
-  private let maxHeight = 408.adaptiveHeight
+  private let minHeight = 80.adaptiveHeight
+  private let maxHeight = 272.adaptiveHeight
 
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -51,7 +51,7 @@ public class RecordyTextView: UIView {
   private func setStyle() {
     self.textView.text = textViewPlaceHolder
     self.textView.cornerRadius(8)
-    self.textView.textColor = CommonAsset.recordyGrey04.color
+    self.textView.textColor = CommonAsset.recordyGrey05.color
   }
 
   private func setUI() {
@@ -86,20 +86,20 @@ extension RecordyTextView: UITextViewDelegate {
   public func textViewDidBeginEditing(_ textView: UITextView) {
     if textView.text == textViewPlaceHolder {
       textView.text = nil
-      textView.textColor = CommonAsset.recordyGrey01.color
+      textView.textColor = CommonAsset.viskitGray05.color
     }
-    self.textView.layer.borderColor = CommonAsset.recordyMain.color.cgColor
-    self.textView.layer.borderWidth = 1
-    self.textCountLabel.textColor = CommonAsset.recordyMain.color
+    textView.textColor = CommonAsset.viskitGray01.color
+    self.textCountLabel.textColor = CommonAsset.viskitGray01.color
   }
 
   public func textViewDidEndEditing(_ textView: UITextView) {
     if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-        textView.text = textViewPlaceHolder
-        textView.textColor = CommonAsset.recordyGrey04.color
+      textView.text = textViewPlaceHolder
+      textView.textColor = CommonAsset.viskitGray05.color
+      self.textCountLabel.textColor = CommonAsset.viskitGray05.color
+    } else {
+      textView.textColor = CommonAsset.viskitGray01.color
+      self.textCountLabel.textColor = CommonAsset.viskitGray01.color
     }
-    self.textView.layer.borderColor = UIColor.clear.cgColor
-    self.textView.layer.borderWidth = 0
-    self.textCountLabel.textColor = CommonAsset.recordyGrey04.color
   }
 }

@@ -25,7 +25,7 @@ public final class RecordyTabBarController: UITabBarController, UITabBarControll
   
   private func setStyle() {
     let appearance = UITabBarAppearance()
-    appearance.backgroundColor = CommonAsset.viskitBlack.color
+    appearance.backgroundColor = CommonAsset.viskitBG.color
     let font = UIFont.systemFont(ofSize: 0)
     appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
       .font: font
@@ -35,6 +35,13 @@ public final class RecordyTabBarController: UITabBarController, UITabBarControll
     tabBar.tintColor = .clear
     tabBar.standardAppearance = appearance
     tabBar.scrollEdgeAppearance = appearance
+    tabBar.layer.borderWidth = 0
+    tabBar.layer.borderColor = UIColor.clear.cgColor
+    
+    let border = CALayer()
+    border.frame = CGRect(x: 0, y: 0, width: tabBar.bounds.width, height: 0.5)
+    border.backgroundColor = CommonAsset.viskitGray06.color.cgColor
+    tabBar.layer.addSublayer(border)
   }
   
   private func setTabBarItem() {

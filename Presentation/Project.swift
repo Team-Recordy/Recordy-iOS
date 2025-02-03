@@ -18,5 +18,6 @@ let project = Project.makeModule(
   dependencies: [
     .Project.Common,
     .external(name: "Lottie", condition: .none),
+    .external(name: "CombineCocoa", condition: .none)
   ]
 )

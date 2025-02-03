@@ -34,9 +34,10 @@ class FeedCell: UICollectionViewCell {
   var isPlayRequested: Bool = false
 
   var bookmarkAction: (() -> Void)?
-  var profileAction: (() -> Void)?
+  var nicknameAction: (() -> Void)?
   var deleteAction: (() -> Void)?
   var moreAction: (() -> Void)?
+  var placeAction:(() -> Void)?
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -130,8 +131,12 @@ class FeedCell: UICollectionViewCell {
 
   func bind(feed: Feed, bounds: CGRect, shouldAddPlayer: Bool) {
     self.feed = feed
-
-//    feedView.updateTitle(feed.placeInfo.title)
+    feedView.placeButton.addTarget(
+      self,
+      action: #selector(placeButtonTapped),
+      for: .touchUpInside
+    )
+    feedView.updateTitle(feed.placeName)
     if shouldAddPlayer {
       addPlayer(for: URL(string: feed.videoLink)!, bounds: bounds)
     }
@@ -139,11 +144,16 @@ class FeedCell: UICollectionViewCell {
       5,
       text: feed.description
     )
-//    feedView.locationLabel.text = feed.location
-//    feedView.nicknameButton.setTitle(
-//      feed.nickname,
-//      for: .normal
-//    )
+    feedView.locationLabel.text = feed.exhibitionName
+    feedView.nicknameButton.setTitle(
+      feed.uploaderNickname,
+      for: .normal
+    )
+    feedView.nicknameButton.addTarget(
+      self,
+      action: #selector(nicknameButtonTapped),
+      for: .touchUpInside
+    )
     feedView.descriptionTextView.text = feed.description
     feedView.bookmarkButton.setImage(
       feed.isBookmarked ? CommonAsset.bookmarkSelected.image : CommonAsset.bookmarkUnselected.image,
@@ -155,12 +165,12 @@ class FeedCell: UICollectionViewCell {
       action: #selector(bookmarkButtonTapped),
       for: .touchUpInside
     )
-    feedView.deleteButton.isHidden = !feed.isMine
-    feedView.deleteButton.addTarget(
-      self,
-      action: #selector(deleteButtonTapped),
-      for: .touchUpInside
-    )
+//    feedView.deleteButton.isHidden = !feed.isMine
+//    feedView.deleteButton.addTarget(
+//      self,
+//      action: #selector(deleteButtonTapped),
+//      for: .touchUpInside
+//    )
     feedView.moreButton
       .addTarget(
         self,
@@ -181,6 +191,12 @@ class FeedCell: UICollectionViewCell {
   }
 
   @objc
+  private func nicknameButtonTapped() {
+    print(#function)
+    nicknameAction?()
+  }
+
+  @objc
   private func bookmarkButtonTapped() {
     bookmarkAction?()
   }
@@ -193,5 +209,10 @@ class FeedCell: UICollectionViewCell {
   @objc
   private func moreButtonTapped() {
     moreAction?()
+  }
+  
+  @objc
+  private func placeButtonTapped() {
+    placeAction?()
   }
 }

@@ -14,12 +14,19 @@ import Then
 import Common
 
 final class CompleteView: UIView {
+  private var nicknameForText: String? {
+    didSet {
+      updateNicknameText()
+    }
+  }
   
-  let gradientView = RecordyGradientView()
   let completeImage = UIImageView()
-  let primaryCompleteText = UILabel()
-  let secondaryCompleteText = UILabel()
+  let upperCompleteText = UILabel()
+  let lowerCompleteText = UILabel()
   let completeButton = RecordyButton()
+  private let indicatorImage = UIImageView()
+  
+  public var getNickname: (() -> String)?
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -32,58 +39,70 @@ final class CompleteView: UIView {
     fatalError("init(coder:) has not been implemented")
   }
   
+  func setNickname(_ nickname: String) {
+    self.nicknameForText = nickname
+  }
+  
+  private func updateNicknameText() {
+    upperCompleteText.text = "\(nicknameForText ?? "Unknown")님,"
+  }
+  
   func setStyle() {
+    backgroundColor = CommonAsset.viskitBG.color
+    
     completeImage.do {
-      $0.image = CommonAsset.signupComplete.image
+      $0.image = CommonAsset.viskitCheck.image
     }
     
-    primaryCompleteText.do {
-      $0.text = "회원가입이 완료되었어요!"
+    indicatorImage.do {
+      $0.image = CommonAsset.thirdIndicator.image
+    }
+    
+    upperCompleteText.do {
       $0.font = RecordyFont.title1.font
-      $0.textColor = CommonAsset.recordyGrey01.color
+      $0.textColor = CommonAsset.viskitGray01.color
+      $0.textAlignment = .center
+      $0.numberOfLines = 0
     }
     
-    secondaryCompleteText.do {
-      $0.text = "지금 영상을 둘러보고 나만의 공간 취향을 발견해 보세요"
-      $0.font = RecordyFont.body2.font
-      $0.textColor = CommonAsset.recordyGrey03.color
+    lowerCompleteText.do {
+      $0.text = "가입이 완료되었어요!"
+      $0.font = RecordyFont.title1.font
+      $0.textColor = CommonAsset.viskitGray01.color
+      $0.textAlignment = .center
+      $0.numberOfLines = 0
     }
     
     completeButton.do {
-      $0.setTitle("완료", for: .normal)
+      $0.setTitle("확인", for: .normal)
     }
   }
   
   func setUI() {
     addSubviews(
-      gradientView,
       completeImage,
-      primaryCompleteText,
-      secondaryCompleteText,
-      completeButton
+      upperCompleteText,
+      lowerCompleteText,
+      completeButton,
+      indicatorImage
     )
   }
   
   func setAutoLayout() {
-    gradientView.snp.makeConstraints {
-      $0.top.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(400.adaptiveHeight)
-    }
-    
     completeImage.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(294)
-      $0.width.equalTo(100.adaptiveWidth)
-      $0.height.equalTo(100.adaptiveHeight)
+      $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(183)
+      $0.width.equalTo(120.adaptiveWidth)
+      $0.height.equalTo(120.adaptiveHeight)
       $0.centerX.equalToSuperview()
     }
     
-    primaryCompleteText.snp.makeConstraints {
-      $0.top.equalTo(completeImage.snp.bottom).offset(16)
+    upperCompleteText.snp.makeConstraints {
+      $0.top.equalTo(completeImage.snp.bottom).offset(21)
       $0.centerX.equalToSuperview()
     }
     
-    secondaryCompleteText.snp.makeConstraints {
-      $0.top.equalTo(primaryCompleteText.snp.bottom).offset(10)
+    lowerCompleteText.snp.makeConstraints {
+      $0.top.equalTo(upperCompleteText.snp.bottom).offset(5)
       $0.centerX.equalToSuperview()
     }
     
@@ -91,6 +110,12 @@ final class CompleteView: UIView {
       $0.horizontalEdges.equalToSuperview().inset(20)
       $0.bottom.equalTo(safeAreaLayoutGuide).inset(14)
       $0.height.equalTo(54.adaptiveHeight)
+    }
+    
+    indicatorImage.snp.makeConstraints {
+      $0.horizontalEdges.equalToSuperview()
+      $0.bottom.equalTo(completeButton.snp.top).offset(-14)
+      $0.height.equalTo(26.adaptiveHeight)
     }
   }
 }

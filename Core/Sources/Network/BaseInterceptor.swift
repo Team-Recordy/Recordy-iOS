@@ -13,7 +13,8 @@ import Alamofire
 final class BaseInterceptor: RequestInterceptor {
   
   let keychainManager = KeychainManager.shared
-  
+  private let lock = NSLock()
+
   func adapt(
     _ urlRequest: URLRequest,
     for session: Session,
@@ -24,7 +25,7 @@ final class BaseInterceptor: RequestInterceptor {
       return completion(.success(request))
     }
     request.headers.add(.contentType("application/json"))
-    if request.url?.absoluteString.contains("/refresh") == false {
+    if request.url?.absoluteString.contains("/token") == false {
       if let accessToken = keychainManager.read(token: .AccessToken) {
         request.headers.add(.authorization(bearerToken: accessToken))
       }
@@ -36,6 +37,7 @@ final class BaseInterceptor: RequestInterceptor {
     completion(.success(request))
   }
   
+  //TODO: retry method 정상적으로 호출되고 있는지 확인해야 함
   func retry(
     _ request: Request,
     for session: Session,
@@ -45,14 +47,23 @@ final class BaseInterceptor: RequestInterceptor {
     guard let refreshToken = keychainManager.read(token: .RefreshToken),
           request.response?.statusCode == 401,
           let urlString = request.response?.url?.absoluteString,
-          !urlString.contains("refresh") else {
+          !urlString.contains("token") else {
+      print("@Log doNotRetryWithError")
       completion(.doNotRetryWithError(error))
       return
     }
+
+    lock.lock()
+    defer { lock.unlock() }
+
     let apiProvider = APIProvider<APITarget.Users>()
-    let request = DTO.RefreshTokenRequest(authorization: refreshToken)
-    apiProvider.requestResponsable(.refreshToken(request), DTO.RefreshTokenResponse.self) { [weak self] result in
+    let request = DTO.RefreshTokenRequest(authorization: "Bearer \(refreshToken)")
+    apiProvider.requestResponsable(
+      .refreshToken(request),
+      DTO.RefreshTokenResponse.self
+    ) { [weak self] result in
       guard let self = self else { return }
+
       switch result {
       case .success(let response):
         self.keychainManager.create(

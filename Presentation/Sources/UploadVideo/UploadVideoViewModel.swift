@@ -7,44 +7,39 @@
 //
 
 import Foundation
+import Combine
+import CombineCocoa
 import Photos
 import UIKit
 
 import Core
 import Common
 
-import RxSwift
-import RxCocoa
 
 final class UploadVideoViewModel {
 
-  struct Input {
-    let selectedAsset = BehaviorRelay<PHAsset?>(value: nil)
-    let location = BehaviorRelay<String>(value: "")
-    let contents = BehaviorRelay<String>(value: "")
-    let exhibitionName = BehaviorRelay<String>(value: "")
-  }
+  // MARK: - Published Properties
+  @Published var selectedAsset: PHAsset?
+  @Published var contents: String = ""
+  @Published var exhibitionName: String = ""
+  @Published var place: SearchPlaceViewModel.SearchedPlace?
 
-  struct Output {
-    let thumbnailImage = BehaviorRelay<UIImage?>(value: nil)
-    let locationTextCount = BehaviorRelay<String>(value: "0 / 20")
-    let contentsTextCount = BehaviorRelay<String>(value: "0 / 300")
-    let uploadEnabled = BehaviorRelay<Bool>(value: false)
-    let uploadVideo = BehaviorRelay<PHAsset?>(value: nil)
-  }
+  // MARK: - Output Properties
+  @Published var thumbnailImage: UIImage?
+  @Published var contentsTextCount: String = "0 / 300"
+  @Published var uploadEnabled: Bool = false
+  @Published var uploadVideo: PHAsset?
 
-  private let disposeBag = DisposeBag()
-  let input = Input()
-  let output = Output()
   let apiProvider = APIProvider<APITarget.Records>()
   let awsUploader = AWSS3Uploader()
+  private var cancellables = Set<AnyCancellable>()
 
   init() {
     self.bind()
   }
 
   func bind() {
-    input.selectedAsset
+    $selectedAsset
       .compactMap { asset -> UIImage? in
         guard let asset = asset else { return nil }
         return PhotoKitManager.getAssetThumbnail(
@@ -52,46 +47,30 @@ final class UploadVideoViewModel {
           size: CGSize(width: 180, height: 284)
         )
       }
-      .bind(to: output.thumbnailImage)
-      .disposed(by: disposeBag)
+      .assign(to: \.thumbnailImage, on: self)
+      .store(in: &cancellables)
 
-    input.location
-      .map { "\($0.count) / 20" }
-      .bind(to: output.locationTextCount)
-      .disposed(by: disposeBag)
-
-    input.contents
+    $contents
       .map {
         if $0 == "공간에 대한 나의 생각을 자유롭게 적어주세요!" {
-          "0 / 300"
+          return "0 / 300"
         } else {
-          "\($0.count) / 300"
+          return "\($0.count) / 300"
         }
       }
-      .bind(to: output.contentsTextCount)
-      .disposed(by: disposeBag)
+      .assign(to: \.contentsTextCount, on: self)
+      .store(in: &cancellables)
 
-    input.exhibitionName
-      .map {
-        if $0 == "전시명을 입력해주세요" {
-          "0 / 300"
-        } else {
-          "\($0.count) / 300"
-        }
+    Publishers.CombineLatest4($selectedAsset, $place, $contents, $exhibitionName)
+      .map { asset, place, contents, exhibitionName in
+        return asset != nil &&
+        exhibitionName.count > 0 &&
+        contents.count > 0 &&
+        contents != "공간에 대한 나의 생각을 자유롭게 적어주세요!" &&
+        place != nil
       }
-      .bind(to: output.locationTextCount)
-      .disposed(by: disposeBag)
-    
-    Observable.combineLatest(
-      input.selectedAsset,
-      input.location,
-      input.contents,
-      input.exhibitionName
-    ).map { asset, location, contents, exhibitionName in
-      return asset != nil && location.count > 0 && contents.count > 0 && contents != "공간에 대한 나의 생각을 자유롭게 적어주세요!"
-    }
-    .bind(to: output.uploadEnabled)
-    .disposed(by: disposeBag)
+      .assign(to: \.uploadEnabled, on: self)
+      .store(in: &cancellables)
   }
 
   func getPhotoPermission(completionHandler: @escaping (Bool) -> Void) {
@@ -99,7 +78,7 @@ final class UploadVideoViewModel {
   }
 
   func uploadButtonTapped() {
-    guard let asset = input.selectedAsset.value,
+    guard let asset = selectedAsset,
           let thumbnailData = PhotoKitManager.getAssetThumbnailData(asset: asset)
     else { return }
 
@@ -115,7 +94,7 @@ final class UploadVideoViewModel {
           thumbnailUrl: response.thumbnailUrl
         )
       case .failure(let error):
-        print("error")
+        print("fail to upload: \(error)")
       }
     }
   }
@@ -125,24 +104,17 @@ final class UploadVideoViewModel {
     thumbnailUrl: String
   ) {
     var encodedString = ""
+    guard let id = place?.id else { return }
     let request = DTO.CreateRecordRequest(
       fileUrl: DTO.CreateRecordRequest.FileUrl(
         videoUrl: videoUrl,
         thumbnailUrl: thumbnailUrl
       ),
-      content: input.contents.value,
-      exhibitionName: input.exhibitionName.value,
-      
-      //TODO: 선택한 장소로 Id 넣어야 함
-      placeId: 0
-//      location: input.location.value,
-//      content: input.contents.value,
-//      keywords: encodedString,
-//      fileUrl: DTO.CreateRecordRequest.FileUrl(
-//        videoUrl: videoUrl,
-//        thumbnailUrl: thumbnailUrl
-      )
-    
+      content: contents,
+      exhibitionName: exhibitionName,
+      placeId: id
+    )
+
     apiProvider.justRequest(.createRecord(request)) { result in
       switch result {
       case .success:

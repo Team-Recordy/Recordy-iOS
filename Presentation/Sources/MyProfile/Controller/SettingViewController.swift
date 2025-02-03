@@ -26,7 +26,10 @@ public class SettingViewController: UIViewController {
       ],
       headerTitle: "계정",
       footerView: nil,
-      cellArrowImages: [CommonAsset.indicator.image]
+      cellArrowImages: [
+        CommonAsset.indicator.image,
+        CommonAsset.apple.image
+      ]
     )
   }()
   
@@ -53,12 +56,13 @@ public class SettingViewController: UIViewController {
   let extraTableView: CustomTableView = {
     let footerLabel = UILabel()
     footerLabel.do {
+      $0.backgroundColor = .clear
       $0.textColor = CommonAsset.viskitGray01.color
       $0.font = ViskitFont.caption2Medium.font
       $0.text = "앱 버전 1.1.1"
     }
     let footerView = UIView()
-    footerView.backgroundColor = .black
+    footerView.backgroundColor = .clear
     
     footerView.addSubview(footerLabel)
     footerLabel.snp.makeConstraints {
@@ -99,8 +103,9 @@ public class SettingViewController: UIViewController {
   }
   
   private func setStyle() {
-    view.backgroundColor = .black
+    view.backgroundColor = CommonAsset.viskitBG.color
     configureNavigationBar()
+    setupCustomBackButton()
   }
   
   private func setUI() {
@@ -158,7 +163,6 @@ public class SettingViewController: UIViewController {
   
   private func configureNavigationBar() {
     navigationItem.title = "설정"
-    navigationItem.backButtonTitle = ""
     if let navigationBar = navigationController?.navigationBar {
       navigationBar.tintColor = .white
       navigationBar.titleTextAttributes = [

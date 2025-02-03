@@ -36,19 +36,49 @@ public class OverviewViewModel {
   var hasNext = true
   var isFetching = false
   
+  private let locationManager = LocationManager()
+  
+  private(set) var locationState: LocationState = .inactive {
+    didSet { 
+      onLocationStateChanged?(locationState)
+    }
+  }
+  
   var onNearPlacesUpdated: (() -> Void)?
   var onPlaceRecordsUpdated: (() -> Void)?
   var onLocationStateChanged: ((LocationState) -> Void)?
   
+  init() {
+    updateLocationStateFromAuthorizationStatus()
+  }
+  
+  private func updateLocationStateFromAuthorizationStatus() {
+    switch locationManager.currentAuthorizationStatus {
+    case .authorizedAlways, .authorizedWhenInUse:
+      locationState = .active
+    case .denied, .restricted, .notDetermined:
+      locationState = .inactive
+    default:
+      locationState = .inactive
+    }
+  }
+  
+  func updateLocation() {
+    locationState = .active
+  }
+  
   func getNearPlaceList() {
+    let latitude = LocationManager.shared.currentLatitude ?? 37.33264473613715
+    let longitude = LocationManager.shared.currentLongitude ?? 127.11934019700556
+    
     isFetching = true
     let apiProvider = APIProvider<APITarget.Places>()
     let request = DTO.GetNearPlaceListRequest(
       number: 0,
-      size: 10,
-      latitude: 37.57858694484229,
-      longitude: 126.98009796814407,
-      distance: 400
+      size: 100,
+      latitude: latitude,
+      longitude: longitude,
+      distance: 10000000
     )
     
     apiProvider.requestResponsable(.getNearPlaceList(request), DTO.GetNearPlaceListResponse.self) { [weak self] result in
@@ -78,12 +108,12 @@ public class OverviewViewModel {
     }
   }
   
-  func getPlaceRecordList(placeId: Int) {
+  func getPlaceRecordList(placeId: Int, recordSize: Int, completion: @escaping () -> Void) {
     isFetching = true
     let apiProvider = APIProvider<APITarget.Records>()
     let request = DTO.GetPlaceRecordListRequest(
       placeId: placeId,
-      size: 10
+      size: recordSize
     )
     
     apiProvider.requestResponsable(.getPlaceRecordList(request), DTO.GetPlaceRecordListResponse.self) { [weak self] result in
@@ -108,22 +138,32 @@ public class OverviewViewModel {
               isBookmarked: content.isBookmarked
             )
           }
-          self.onPlaceRecordsUpdated?()
         }
         
       case .failure(let error):
         print("Error fetching records for placeId \(placeId): \(error)")
       }
+      completion()
     }
   }
   
-  private(set) var locationState: LocationState = .inactive {
-    didSet {
-      onLocationStateChanged?(locationState)
+  func postBookmark(feed: Feed, completion: ((Result<Void, Error>) -> Void)? = nil) {
+    let apiProvider = APIProvider<APITarget.Bookmarks>()
+    let request = DTO.PostBookmarkRequest(recordId: feed.id)
+    
+    apiProvider.justRequest(.postBookmark(request)) { [weak self] result in
+      guard let self = self else { return }
+      switch result {
+      case .success:
+        if let placeIndex = self.nearPlaces.firstIndex(where: { $0.id == feed.placeId }),
+           let recordIndex = self.nearPlaces[placeIndex].recordList.firstIndex(where: { $0.id == feed.id }) {
+          self.nearPlaces[placeIndex].recordList[recordIndex].isBookmarked = !feed.isBookmarked
+        }
+        completion?(.success(()))
+      case .failure(let error):
+        print("Failed to update bookmark: \(error)")
+        completion?(.failure(error))
+      }
     }
-  }
-  
-  func toggleLocationState() {
-    locationState = (locationState == .active) ? .inactive : .active
   }
 }

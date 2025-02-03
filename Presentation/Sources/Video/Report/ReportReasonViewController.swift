@@ -32,6 +32,10 @@ class ReportReasonViewController: UIViewController {
     reasonTextView.becomeFirstResponder()
   }
 
+  override func viewDidDisappear(_ animated: Bool) {
+    hideKeyboard()
+  }
+
   private func setStyle() {
     title = "기타"
 
