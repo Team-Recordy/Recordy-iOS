@@ -172,7 +172,7 @@ public class VideoFeedViewController: UIViewController {
 //      configureSheet(sheet, height: Sheet.defaultHeight)
     }
 
-    present(navigationController, animated: true)
+//    func present(_: navigationController, animated: true)
   }
 
   private func configureSheet(_ sheet: UISheetPresentationController, height: CGFloat) {
