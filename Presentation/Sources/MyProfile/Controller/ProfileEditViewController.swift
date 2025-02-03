@@ -13,7 +13,7 @@ import Photos
 import PhotosUI
 
 @available(iOS 16.0, *)
-public final class ProfileEditViewController: UIViewController {
+public final class ProfileEditViewController: UIViewController, CustomImagePickerDelegate {
   
   private let profileEditView = ProfileEditView()
   private let currentNickname: String = "레코디"
@@ -156,12 +156,12 @@ public final class ProfileEditViewController: UIViewController {
     
     switch status {
     case .authorized, .limited:
-      presentImagePicker()
+      presentCustomImagePicker()
     case .notDetermined:
       PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
         DispatchQueue.main.async {
           if status == .authorized || status == .limited {
-            self.presentImagePicker()
+            self.presentCustomImagePicker()
           } else {
             self.showPermissionDeniedAlert()
           }
@@ -172,17 +172,10 @@ public final class ProfileEditViewController: UIViewController {
     }
   }
   
-  private func presentImagePicker() {
-    var config = PHPickerConfiguration()
-    config.filter = .images
-    config.selectionLimit = 1
-    
-    let picker = PHPickerViewController(configuration: config)
-    picker.delegate = self
-    present(
-      picker,
-      animated: true
-    )
+  private func presentCustomImagePicker() {
+    let imagePickerVC = CustomImagePickerViewController()
+    imagePickerVC.delegate = self
+    navigationController?.pushViewController(imagePickerVC, animated: true)
   }
   
   private func showPermissionDeniedAlert() {
@@ -207,6 +200,12 @@ public final class ProfileEditViewController: UIViewController {
         completionHandler: nil
       )
     }
+  }
+  
+  public func didSelectedImage(_ image: UIImage) {
+    profileEditView.profileImageView.image = image
+    isProfileImageChanged = true
+    updateCompleteButtonState()
   }
 }
 
