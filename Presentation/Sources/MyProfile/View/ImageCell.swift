@@ -15,7 +15,7 @@ import SnapKit
 import Then
 
 final class ImageCell: UICollectionViewCell {
-  static let identifier = "ImageCell"
+  static let identifier = "Photo"
   
   private let imageView = UIImageView()
   private let selectionIndicator = UIView()
@@ -79,16 +79,21 @@ final class ImageCell: UICollectionViewCell {
     let imageManager = PHImageManager.default()
     let options = PHImageRequestOptions()
     options.deliveryMode = .fastFormat
+    options.isSynchronous = false
     
     imageManager.requestImage(
       for: asset,
       targetSize: bounds.size,
       contentMode: .aspectFill,
       options: options
-    ) { image, _ in
-      self.imageView.image = image
+    ) { [weak self] image, _ in
+      guard let self = self, let image = image else { return }
+      DispatchQueue.main.async {
+        self.imageView.image = image
+      }
     }
   }
+  
   
   func setSelected(selected: Bool) {
     selectionIndicator.layer.borderColor = isSelected ? CommonAsset.viskitKakaoYellow.color.cgColor : UIColor.clear.cgColor
@@ -96,3 +101,4 @@ final class ImageCell: UICollectionViewCell {
   }
   
 }
+

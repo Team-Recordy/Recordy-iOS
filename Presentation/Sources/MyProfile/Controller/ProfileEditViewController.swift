@@ -10,7 +10,6 @@ import UIKit
 import Common
 
 import Photos
-import PhotosUI
 
 @available(iOS 16.0, *)
 public final class ProfileEditViewController: UIViewController {
@@ -33,6 +32,7 @@ public final class ProfileEditViewController: UIViewController {
   private func setUI() {
     buttonAction()
     configureNavigationBar()
+    setupCustomBackButton()
   }
   
   private func configureNavigationBar() {
@@ -93,7 +93,7 @@ public final class ProfileEditViewController: UIViewController {
       profileEditView.showErrorLabel(withMessage: "ⓘ 이미 사용 중인 닉네임이에요.")
       profileEditView.updateButtonState(isEnabled: false)
       return
-    } //TODO: Server에서 존재하는 닉네임인지 확인 요청 필요, 우선은 currentNickname으로 확인
+    }
     
     profileEditView.showSuccessLabel()
     profileEditView.updateButtonState(isEnabled: true)
@@ -119,9 +119,9 @@ public final class ProfileEditViewController: UIViewController {
       title: "앨범에서 선택",
       style: .default
     ) { [weak self] _ in
-      self?.requestPhotoLibraryPermission()
-      
+      self?.presentImagePicker()
     }
+    
     let deleteImage = UIAlertAction(
       title: "프로필 사진 삭제",
       style: .destructive
@@ -145,84 +145,16 @@ public final class ProfileEditViewController: UIViewController {
     present(alert, animated: true)
   }
   
-  @available(iOS 16.0, *)
-  private func requestPhotoLibraryPermission() {
-    let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
-    
-    switch status {
-    case .authorized, .limited:
-      presentImagePicker()
-    case .notDetermined:
-      PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-        DispatchQueue.main.async {
-          if status == .authorized || status == .limited {
-            self.presentImagePicker()
-          } else {
-            self.showPermissionDeniedAlert()
-          }
-        }
-      }
-    default:
-      showPermissionDeniedAlert()
-    }
-  }
-  
-  private func presentImagePicker() {
-    var config = PHPickerConfiguration()
-    config.filter = .images
-    config.selectionLimit = 1
-    
-    let picker = PHPickerViewController(configuration: config)
-    picker.delegate = self as? PHPickerViewControllerDelegate
-    present(
-      picker,
-      animated: true
-    )
-  }
-  
-  private func showPermissionDeniedAlert() {
-    let alertController = RecordyPopUpViewController(
-      type: .uploadPermission,
-      rightButtonAction: { [weak self] in
-        self?.openSettings()
-      }
-    )
-    alertController.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
-    present(
-      alertController,
-      animated: true
-    )
-  }
-  
-  private func openSettings() {
-    if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-      UIApplication.shared.open(
-        settingsURL,
-        options: [:],
-        completionHandler: nil
-      )
-    }
+  public func presentImagePicker() {
+    let imagePickerVC = CustomImagePickerViewController()
+    imagePickerVC.delegate = self
+    navigationController?.pushViewController(imagePickerVC, animated: true)
   }
 }
 
 @available(iOS 16.0, *)
-extension ProfileEditViewController: PHPickerViewControllerDelegate {
-  public func picker(
-    _ picker: PHPickerViewController,
-    didFinishPicking results: [PHPickerResult]
-  ) {
-    picker.dismiss(animated: true)
-    
-    guard let result = results.first else { return }
-    
-    if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
-      result.itemProvider.loadObject(ofClass: UIImage.self) { image, error in
-        DispatchQueue.main.async {
-          if let image = image as? UIImage {
-            self.profileEditView.profileImageView.image = image
-          }
-        }
-      }
-    }
+extension ProfileEditViewController: CustomImagePickerDelegate {
+  public func didSelectedImage(_ image: UIImage) {
+    profileEditView.profileImageView.image = image
   }
 }

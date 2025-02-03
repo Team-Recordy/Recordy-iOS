@@ -13,12 +13,12 @@ import Common
 import SnapKit
 import Then
 
-protocol CustomImagePickerDelegate: AnyObject {
+public protocol CustomImagePickerDelegate: AnyObject {
   func didSelectedImage(_ image: UIImage)
 }
 
-final class CustomImagePickerViewController: UIViewController {
-  weak var delegate: CustomImagePickerDelegate?
+public final class CustomImagePickerViewController: UIViewController {
+  public weak var delegate: CustomImagePickerDelegate?
   
   private var assets: [PHAsset] = []
   private var selectedIndex: IndexPath?
@@ -29,8 +29,18 @@ final class CustomImagePickerViewController: UIViewController {
   )
   private lazy var completeButton = UIButton()
   
-  override func viewDidLoad() {
+  public init() {
+    super.init(
+      nibName: nil,
+      bundle: nil
+    )
+  }
+  
+  public override func viewDidLoad() {
     super.viewDidLoad()
+    photoCollectionView.delegate = self
+    photoCollectionView.dataSource = self
+    
     setUI()
     setStyle()
     setLayout()
@@ -72,7 +82,15 @@ final class CustomImagePickerViewController: UIViewController {
       )
       $0.titleLabel?.font = ViskitFont.title3.font
       $0.isEnabled = false
-      $0.addTarget(self, action: #selector(completeSelection), for: .touchUpInside)
+      $0.addTarget(
+        self,
+        action: #selector(completeSelection),
+        for: .touchUpInside
+      )
+      $0.setTitleColor(
+        CommonAsset.viskitGray08.color,
+        for: .normal
+      )
     }
     
   }
@@ -98,7 +116,106 @@ final class CustomImagePickerViewController: UIViewController {
     }
   }
   
-  @objc private func completeSelection() {
-    //TODO: 이미지 선택이 되었을 경우, 완료 버튼 활성화 및, 완료 버튼 눌렀을 때 ImagePicker 없어지도록.
+  private func fetchImages() {
+    let status = PHPhotoLibrary.authorizationStatus()
+    
+    guard status == .authorized || status == .limited else {
+      PHPhotoLibrary.requestAuthorization { newStatus in
+        if newStatus == .authorized || newStatus == .limited {
+          self.fetchImages()
+        }
+      }
+      return
+    }
+    
+    let fetchOptions = PHFetchOptions()
+    fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+    let fetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions)
+    
+    fetchResult.enumerateObjects { asset, _, _ in
+      self.assets.append(asset)
+    }
+    
+    DispatchQueue.main.async {
+      self.photoCollectionView.reloadData()
+    }
   }
+}
+
+extension CustomImagePickerViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    numberOfItemsInSection section: Int
+  ) -> Int {
+    return assets.count
+  }
+  
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    cellForItemAt indexPath: IndexPath
+  ) -> UICollectionViewCell {
+    guard let cell = collectionView.dequeueReusableCell(
+      withReuseIdentifier: ImageCell.identifier,
+      for: indexPath
+    ) as? ImageCell else {
+      return UICollectionViewCell()
+    }
+    
+    let asset = assets[indexPath.item]
+    cell.configure(with: asset)
+    
+    let isSelected = indexPath == selectedIndex
+    cell.setSelected(selected: isSelected)
+    
+    return cell
+  }
+  
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    didSelectItemAt indexPath: IndexPath
+  ) {
+    if let previousIndex = selectedIndex,
+       let previousCell = collectionView.cellForItem(at: previousIndex) as? ImageCell {
+      previousCell.setSelected(selected: false)
+    }
+    
+    if selectedIndex == indexPath {
+      selectedIndex = nil
+    } else {
+      selectedIndex = indexPath
+    }
+    
+    if let cell = collectionView.cellForItem(at: indexPath) as? ImageCell {
+      cell.setSelected(selected: selectedIndex != nil)
+    }
+    
+    let isSelected = selectedIndex != nil
+    completeButton.isEnabled = isSelected
+    completeButton.setTitleColor(isSelected ? CommonAsset.viskitGray01.color : CommonAsset.viskitGray08.color, for: .normal)
+  }
+  
+  @objc private func completeSelection() {
+    guard let selectedIndex = selectedIndex else { return }
+    let asset = assets[selectedIndex.item]
+    
+    let options = PHImageRequestOptions()
+    options.deliveryMode = .highQualityFormat
+    options.resizeMode = .exact
+    options.isSynchronous = false
+    
+    PHImageManager.default().requestImage(
+      for: asset,
+      targetSize: PHImageManagerMaximumSize,
+      contentMode: .aspectFit,
+      options: options
+    ) { [weak self] image, _ in
+      if let image = image {
+        DispatchQueue.main.async {
+          self?.delegate?.didSelectedImage(image)
+          self?.navigationController?.popViewController(animated: true)
+        }
+      }
+    }
+  }
+  
 }
