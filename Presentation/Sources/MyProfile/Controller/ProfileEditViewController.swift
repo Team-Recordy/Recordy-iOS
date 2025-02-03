@@ -18,6 +18,9 @@ public final class ProfileEditViewController: UIViewController {
   private let currentNickname: String = "레코디"
   private let maxNicknameLength: Int = 10
   
+  private var isNicknameChanged = false
+  private var isProfileImageChanged = false
+  
   public override func loadView() {
     self.view = profileEditView
   }
@@ -33,6 +36,7 @@ public final class ProfileEditViewController: UIViewController {
     buttonAction()
     configureNavigationBar()
     setupCustomBackButton()
+    updateCompleteButtonState()
   }
   
   private func configureNavigationBar() {
@@ -79,24 +83,23 @@ public final class ProfileEditViewController: UIViewController {
     
     if text.isEmpty {
       profileEditView.baseSetting()
-      profileEditView.updateButtonState(isEnabled: false)
-      return
-    }
-    
-    if !text.isNicknamePatternValid(text) {
+      isNicknameChanged = false
+    } else if !text.isNicknamePatternValid(text) {
       profileEditView.showErrorLabel(withMessage: "ⓘ 한글, 숫자, 밑줄 및 마침표만 사용할 수 있어요.")
-      profileEditView.updateButtonState(isEnabled: false)
-      return
-    }
-    
-    if text == currentNickname {
+      isNicknameChanged = false
+    } else if text == currentNickname {
       profileEditView.showErrorLabel(withMessage: "ⓘ 이미 사용 중인 닉네임이에요.")
-      profileEditView.updateButtonState(isEnabled: false)
-      return
+      isNicknameChanged = false
+    } else {
+      profileEditView.showSuccessLabel()
+      isNicknameChanged = true
     }
-    
-    profileEditView.showSuccessLabel()
-    profileEditView.updateButtonState(isEnabled: true)
+    updateCompleteButtonState()
+  }
+  
+  private func updateCompleteButtonState() {
+    let isEnabled = isNicknameChanged || isProfileImageChanged
+    profileEditView.updateButtonState(isEnabled: isEnabled)
   }
   
   @available(iOS 16.0, *)
@@ -128,6 +131,8 @@ public final class ProfileEditViewController: UIViewController {
     ) { [weak self] _ in
       guard let self = self else { return }
       self.profileEditView.profileImageView.image = CommonAsset.profileEdit.image
+      self.isProfileImageChanged = true
+      self.updateCompleteButtonState()
     }
     
     let cancel = UIAlertAction(
@@ -156,5 +161,7 @@ public final class ProfileEditViewController: UIViewController {
 extension ProfileEditViewController: CustomImagePickerDelegate {
   public func didSelectedImage(_ image: UIImage) {
     profileEditView.profileImageView.image = image
+    isProfileImageChanged = true
+    updateCompleteButtonState()
   }
 }
