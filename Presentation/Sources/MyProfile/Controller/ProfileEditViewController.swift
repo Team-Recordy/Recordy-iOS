@@ -9,6 +9,9 @@
 import UIKit
 import Common
 
+import Photos
+import PhotosUI
+
 @available(iOS 16.0, *)
 public final class ProfileEditViewController: UIViewController {
   
@@ -99,21 +102,39 @@ public final class ProfileEditViewController: UIViewController {
   @available(iOS 16.0, *)
   @objc private func nextButtonDidTap() {
     let profileViewController = ProfileViewController()
-    navigationController?.pushViewController(profileViewController, animated: true)
+    navigationController?.pushViewController(
+      profileViewController,
+      animated: true
+    )
   }
   
   @objc private func profileImageViewDidTap() {
-    let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    let alert = UIAlertController(
+      title: nil,
+      message: nil,
+      preferredStyle: .actionSheet
+    )
     
-    let selectImage = UIAlertAction(title: "앨범에서 선택", style: .default) { [weak self] _ in
+    let selectImage = UIAlertAction(
+      title: "앨범에서 선택",
+      style: .default
+    ) { [weak self] _ in
+      self?.requestPhotoLibraryPermission()
       
     }
-    let deleteImage = UIAlertAction(title: "프로필 사진 삭제", style: .default) { [weak self] _ in
-      
+    let deleteImage = UIAlertAction(
+      title: "프로필 사진 삭제",
+      style: .destructive
+    ) { [weak self] _ in
+      guard let self = self else { return }
+      self.profileEditView.profileImageView.image = CommonAsset.ledyEmpty2.image
     }
-    let cancel = UIAlertAction(title: "취소", style: .cancel) { [weak self] _ in
-      
-    }
+    
+    let cancel = UIAlertAction(
+      title: "취소",
+      style: .cancel,
+      handler: nil
+      )
     
     deleteImage.setValue(UIColor.systemRed, forKey: "titleTextColor")
     
@@ -123,4 +144,8 @@ public final class ProfileEditViewController: UIViewController {
     
     present(alert, animated: true)
   }
+  private func requestPhotoLibraryPermission() {
+    
+  }
 }
+
