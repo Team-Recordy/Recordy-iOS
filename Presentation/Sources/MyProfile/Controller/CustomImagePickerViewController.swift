@@ -17,33 +17,35 @@ public protocol CustomImagePickerDelegate: AnyObject {
   func didSelectedImage(_ image: UIImage)
 }
 
-public final class CustomImagePickerViewController: UIViewController {
+public final class CustomImagePickerViewController: UIViewController, UICollectionViewDelegateFlowLayout {
+  
   public weak var delegate: CustomImagePickerDelegate?
   
   private var assets: [PHAsset] = []
   private var selectedIndex: IndexPath?
+  
   private let collectionViewLayout = UICollectionViewFlowLayout()
   private let photoCollectionView = UICollectionView(
     frame: .zero,
     collectionViewLayout: UICollectionViewFlowLayout()
   )
+  
   private lazy var completeButton = UIButton()
   
   public init() {
-    super.init(
-      nibName: nil,
-      bundle: nil
-    )
+    super.init(nibName: nil, bundle: nil)
   }
   
   public override func viewDidLoad() {
     super.viewDidLoad()
+    
     photoCollectionView.delegate = self
     photoCollectionView.dataSource = self
     
     setUI()
     setStyle()
     setLayout()
+    fetchImages()
   }
   
   required init?(coder: NSCoder) {
@@ -60,15 +62,30 @@ public final class CustomImagePickerViewController: UIViewController {
     setupCustomBackButton()
     
     collectionViewLayout.do {
-      $0.minimumInteritemSpacing = 3
-      $0.minimumLineSpacing = 3
-      $0.itemSize = CGSize(width: 90, height: 90)
-      $0.sectionInset = .zero
+      let itemsPerRow: CGFloat = 4
+      let itemSpacing: CGFloat = 3
+      let sectionPadding: CGFloat = 3 * 2
+      let totalSpacing = itemSpacing * (itemsPerRow - 1) + sectionPadding
+      let itemWidth = floor((UIScreen.main.bounds.width - totalSpacing) / itemsPerRow)
+      
+      $0.minimumInteritemSpacing = itemSpacing
+      $0.minimumLineSpacing = itemSpacing
+      $0.itemSize = CGSize(
+        width: itemWidth,
+        height: itemWidth
+      )
+      $0.sectionInset = UIEdgeInsets(
+        top: 3,
+        left: 3,
+        bottom: 3,
+        right: 3
+      )
     }
     
     photoCollectionView.do {
       $0.backgroundColor = CommonAsset.viskitBG.color
       $0.register(ImageCell.self, forCellWithReuseIdentifier: ImageCell.identifier)
+      $0.collectionViewLayout = collectionViewLayout
     }
     
     completeButton.do {
@@ -92,13 +109,13 @@ public final class CustomImagePickerViewController: UIViewController {
         for: .normal
       )
     }
-    
   }
   
   private func setLayout() {
     photoCollectionView.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide)
-      $0.leading.trailing.equalToSuperview()
+      $0.horizontalEdges.equalToSuperview()
+      $0.bottom.equalTo(view.safeAreaLayoutGuide)
     }
   }
   
@@ -117,27 +134,35 @@ public final class CustomImagePickerViewController: UIViewController {
   }
   
   private func fetchImages() {
-    let status = PHPhotoLibrary.authorizationStatus()
-    
-    guard status == .authorized || status == .limited else {
-      PHPhotoLibrary.requestAuthorization { newStatus in
-        if newStatus == .authorized || newStatus == .limited {
-          self.fetchImages()
+    DispatchQueue.global(qos: .userInitiated).async {
+      let status = PHPhotoLibrary.authorizationStatus()
+      
+      guard status == .authorized || status == .limited else {
+        PHPhotoLibrary.requestAuthorization { newStatus in
+          if newStatus == .authorized || newStatus == .limited {
+            self.fetchImages()
+          }
         }
+        return
       }
-      return
-    }
-    
-    let fetchOptions = PHFetchOptions()
-    fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-    let fetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-    
-    fetchResult.enumerateObjects { asset, _, _ in
-      self.assets.append(asset)
-    }
-    
-    DispatchQueue.main.async {
-      self.photoCollectionView.reloadData()
+      
+      let fetchOptions = PHFetchOptions()
+      fetchOptions.sortDescriptors = [NSSortDescriptor(
+        key: "creationDate",
+        ascending: false
+      )]
+      let fetchResult = PHAsset.fetchAssets(
+        with: .image,
+        options: fetchOptions
+      )
+      var newAssets: [PHAsset] = []
+      fetchResult.enumerateObjects { asset, _, _ in
+        newAssets.append(asset)
+      }
+      DispatchQueue.main.async {
+        self.assets = newAssets
+        self.photoCollectionView.reloadData()
+      }
     }
   }
 }
@@ -162,7 +187,10 @@ extension CustomImagePickerViewController: UICollectionViewDataSource, UICollect
     }
     
     let asset = assets[indexPath.item]
-    cell.configure(with: asset)
+    cell.configure(
+      with: asset,
+      indexPath: indexPath
+    )
     
     let isSelected = indexPath == selectedIndex
     cell.setSelected(selected: isSelected)
@@ -191,7 +219,10 @@ extension CustomImagePickerViewController: UICollectionViewDataSource, UICollect
     
     let isSelected = selectedIndex != nil
     completeButton.isEnabled = isSelected
-    completeButton.setTitleColor(isSelected ? CommonAsset.viskitGray01.color : CommonAsset.viskitGray08.color, for: .normal)
+    completeButton.setTitleColor(
+      isSelected ? CommonAsset.viskitGray01.color : CommonAsset.viskitGray08.color,
+      for: .normal
+    )
   }
   
   @objc private func completeSelection() {
@@ -217,5 +248,4 @@ extension CustomImagePickerViewController: UICollectionViewDataSource, UICollect
       }
     }
   }
-  
 }

@@ -20,6 +20,7 @@ final class ImageCell: UICollectionViewCell {
   private let imageView = UIImageView()
   private let selectionIndicator = UIView()
   private let checkmark = UIImageView()
+  private let loadingIndicator = UIActivityIndicatorView(style: .medium)
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -35,9 +36,11 @@ final class ImageCell: UICollectionViewCell {
   private func setUI() {
     contentView.addSubviews(
       imageView,
-      selectionIndicator
+      selectionIndicator,
+      loadingIndicator
     )
     selectionIndicator.addSubview(checkmark)
+    
   }
   
   private func setStyle() {
@@ -56,6 +59,10 @@ final class ImageCell: UICollectionViewCell {
       $0.isHidden = true
       $0.layer.cornerRadius = 16/2
     }
+    loadingIndicator.do {
+      $0.hidesWhenStopped = true
+      $0.color = .gray
+    }
   }
   
   private func setLayout() {
@@ -73,32 +80,49 @@ final class ImageCell: UICollectionViewCell {
       $0.edges.equalTo(selectionIndicator)
       $0.width.height.equalTo(16)
     }
+    
+    loadingIndicator.snp.makeConstraints {
+      $0.center.equalToSuperview()
+    }
   }
   
-  func configure(with asset: PHAsset) {
+  func configure(
+    with asset: PHAsset,
+    indexPath: IndexPath
+  ) {
     let imageManager = PHImageManager.default()
     let options = PHImageRequestOptions()
     options.deliveryMode = .fastFormat
     options.isSynchronous = false
+    self.tag = indexPath.item
+    
+    imageView.image = nil
+    imageView.alpha = 0
+    loadingIndicator.startAnimating()
     
     imageManager.requestImage(
       for: asset,
-      targetSize: bounds.size,
+      targetSize: PHImageManagerMaximumSize,
       contentMode: .aspectFill,
       options: options
     ) { [weak self] image, _ in
-      guard let self = self, let image = image else { return }
+      guard let self = self else { return }
+      if self.tag != indexPath.item { return }
       DispatchQueue.main.async {
-        self.imageView.image = image
+        if let image = image {
+          self.imageView.image = image
+          self.imageView.alpha = 1
+        }
+        self.loadingIndicator.stopAnimating()
       }
     }
   }
   
-  
   func setSelected(selected: Bool) {
-    selectionIndicator.layer.borderColor = isSelected ? CommonAsset.viskitKakaoYellow.color.cgColor : UIColor.clear.cgColor
+    imageView.layer.borderColor = isSelected ? CommonAsset.viskitKakaoYellow.color.cgColor : UIColor.clear.cgColor
+    imageView.layer.borderWidth = selected ? 1 : 0
     checkmark.isHidden = !selected
   }
-  
 }
+
 
