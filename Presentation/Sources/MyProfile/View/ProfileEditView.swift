@@ -112,6 +112,8 @@ public final class ProfileEditView: UIView {
   private func setAutoLayout() {
     profileImageView.snp.makeConstraints {
       $0.top.equalTo(safeAreaLayoutGuide).offset(36)
+      $0.width.equalTo(120.adaptiveWidth)
+      $0.height.equalTo(120.adaptiveHeight)
       $0.centerX.equalToSuperview()
     }
     

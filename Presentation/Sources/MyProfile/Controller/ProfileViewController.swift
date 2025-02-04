@@ -142,16 +142,53 @@ public class ProfileViewController: UIViewController {
   }
   
   private func setUserProfile() {
-    guard let user = user else { return }
-    let followerAttributedText = NSMutableAttributedString(string: "\(user.followerCount)", attributes: [.font: RecordyFont.body2.font])
-    followerAttributedText.append(NSAttributedString(string: " 명의 팔로워", attributes: [.font: RecordyFont.body2.font, .foregroundColor: CommonAsset.recordyGrey03.color]))
-    self.profileInfoView.followerButton.setAttributedTitle(followerAttributedText, for: .normal)
-    let followingAttributedText = NSMutableAttributedString(string: "\(user.followingCount)", attributes: [.font: RecordyFont.body2.font])
-    followingAttributedText.append(NSAttributedString(string: " 명의 팔로잉", attributes: [.font: RecordyFont.body2.font, .foregroundColor: CommonAsset.recordyGrey03.color]))
-    self.profileInfoView.followingButton.setAttributedTitle(followingAttributedText, for: .normal)
-    self.profileInfoView.userName.text = user.nickname
-    let url = URL(string: user.profileImage)!
-    self.profileInfoView.profileImage.kf.setImage(with: url)
+      guard let user = user else {
+          return
+      }
+      let followerAttributedText = NSMutableAttributedString(
+        string: "\(user.followerCount)",
+        attributes: [.font: RecordyFont.body2.font]
+      )
+      followerAttributedText
+          .append(
+            NSAttributedString(string: " 명의 팔로워",
+                attributes: [
+                    .font: RecordyFont.body2.font,
+                    .foregroundColor: CommonAsset.recordyGrey03.color
+                ]
+            )
+          )
+      self.profileInfoView.followerButton
+          .setAttributedTitle(
+            followerAttributedText,
+            for: .normal
+          )
+      let followingAttributedText = NSMutableAttributedString(
+        string: "\(user.followingCount)",
+        attributes: [.font: RecordyFont.body2.font]
+      )
+      followingAttributedText
+          .append(
+            NSAttributedString(string: " 명의 팔로잉",
+                attributes: [
+                    .font: RecordyFont.body2.font,
+                    .foregroundColor: CommonAsset.recordyGrey03.color
+                ]
+            )
+          )
+      self.profileInfoView.followingButton
+          .setAttributedTitle(
+            followingAttributedText,
+            for: .normal
+          )
+      self.profileInfoView.userName.text = user.nickname
+      let url = URL(
+        string: user.profileImage
+      )!
+      self.profileInfoView.profileImage.kf
+          .setImage(
+            with: url
+          )
   }
   
   func getUserProfile() {
@@ -191,9 +228,18 @@ public class ProfileViewController: UIViewController {
   func getMyRecordList() {
     let apiProvider = APIProvider<APITarget.Records>()
     let userId = UserDefaults.standard.integer(forKey: "userId")
-    let request = DTO.GetUserRecordListRequest(otherUserId: userId, cursorId: 0, size: 100)
+      let request = DTO.GetUserRecordListRequest(
+        otherUserId: userId,
+        cursorId: 0,
+        size: 100
+      )
     
-    apiProvider.requestResponsable(.getUserRecordList(request), DTO.GetUserRecordListResponse.self) { [weak self] result in
+      apiProvider.requestResponsable(
+        .getUserRecordList(
+            request
+        ),
+        DTO.GetUserRecordListResponse.self
+      ) { [weak self] result in
       guard let self = self else { return }
       switch result {
       case .success(let response):
@@ -230,7 +276,10 @@ public class ProfileViewController: UIViewController {
   func getBookmarkedRecordList() {
     let apiProvider = APIProvider<APITarget.Records>()
     let request = DTO.GetBookmarkedListRequest(size: 100)
-    apiProvider.requestResponsable(.getBookmarkedRecordList(request), DTO.GetBookmarkedListResponse.self) { [weak self] result in
+      apiProvider.requestResponsable(
+        .getBookmarkedRecordList(request),
+        DTO.GetBookmarkedListResponse.self
+      ) { [weak self] result in
       guard let self = self else { return }
       switch result {
       case .success(let response):

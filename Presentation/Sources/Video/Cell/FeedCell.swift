@@ -206,7 +206,7 @@ class FeedCell: UICollectionViewCell {
     deleteAction?()
   }
 
-  @objc 
+  @objc
   private func moreButtonTapped() {
     moreAction?()
   }

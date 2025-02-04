@@ -65,7 +65,7 @@ public class VideoFeedViewController: UIViewController {
   }
 
   public override func viewDidDisappear(_ animated: Bool) {
-    removeAVPlayers()
+//    removeAVPlayers()
   }
 
   private func setStyle() {
@@ -85,20 +85,20 @@ public class VideoFeedViewController: UIViewController {
 
   private func setUI() {
     view.addSubview(collectionView!)
-    view.addSubview(recordyToggle)
-    view.bringSubviewToFront(recordyToggle)
+//    view.addSubview(recordyToggle)
+//    view.bringSubviewToFront(recordyToggle)
   }
 
   private func setAutolayout() {
     collectionView!.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
-    recordyToggle.snp.makeConstraints {
-      $0.top.equalTo(view.safeAreaLayoutGuide).inset(12.adaptiveHeight)
-      $0.centerX.equalToSuperview()
-      $0.width.equalTo(124)
-      $0.height.equalTo(32)
-    }
+//    recordyToggle.snp.makeConstraints {
+//      $0.top.equalTo(view.safeAreaLayoutGuide).inset(12.adaptiveHeight)
+//      $0.centerX.equalToSuperview()
+//      $0.width.equalTo(124)
+//      $0.height.equalTo(32)
+//    }
   }
 
   private func setUpCollectionView() {
@@ -118,8 +118,8 @@ public class VideoFeedViewController: UIViewController {
       FeedCell.self,
       forCellWithReuseIdentifier: FeedCell.cellIdentifier
     )
-    collectionView!.delegate = self
-    collectionView!.dataSource = self
+//    collectionView!.delegate = self
+//    collectionView!.dataSource = self
   }
 
   private func bind() {
@@ -164,26 +164,26 @@ public class VideoFeedViewController: UIViewController {
   }
 
   func sheetAction() {
-    let nextViewController = ReportWithCopyLinkViewController()
-    nextViewController.delegate = self
-    let navigationController = BaseNavigationController(rootViewController: nextViewController)
-
-    if let sheet = navigationController.sheetPresentationController {
-      configureSheet(sheet, height: Sheet.defaultHeight)
+//    let nextViewController = ReportWithCopyLinkViewController()
+//    nextViewController.delegate = self
+//    let navigationController = BaseNavigationController(rootViewController: nextViewController)
+//
+//    if let sheet = navigationController.sheetPresentationController {
+//      configureSheet(sheet, height: Sheet.defaultHeight)
     }
 
-    present(navigationController, animated: true)
+//    func present(_: navigationController, animated: true)
   }
 
   private func configureSheet(_ sheet: UISheetPresentationController, height: CGFloat) {
-    sheet.detents = [.custom { _ in return height.adaptiveHeight }]
-    sheet.prefersGrabberVisible = true
+//    sheet.detents = [.custom { _ in return height.adaptiveHeight }]
+//    sheet.prefersGrabberVisible = true
   }
 
   func updateSheetHeight(_ height: CGFloat) {
-    guard let sheet = presentedViewController?.sheetPresentationController else { return }
-    sheet.animateChanges {
-      sheet.detents = [.custom { _ in return height.adaptiveHeight }]
-    }
-  }
+//    guard let sheet = presentedViewController?.sheetPresentationController else { return }
+//    sheet.animateChanges {
+//      sheet.detents = [.custom { _ in return height.adaptiveHeight }]
+//    }
+//  }
 }

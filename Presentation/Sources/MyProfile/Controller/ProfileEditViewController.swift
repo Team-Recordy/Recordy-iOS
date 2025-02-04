@@ -9,12 +9,18 @@
 import UIKit
 import Common
 
+import Photos
+import PhotosUI
+
 @available(iOS 16.0, *)
-public final class ProfileEditViewController: UIViewController {
+public final class ProfileEditViewController: UIViewController, CustomImagePickerDelegate {
   
   private let profileEditView = ProfileEditView()
   private let currentNickname: String = "레코디"
   private let maxNicknameLength: Int = 10
+  
+  private var isNicknameChanged = false
+  private var isProfileImageChanged = false
   
   public override func loadView() {
     self.view = profileEditView
@@ -30,6 +36,8 @@ public final class ProfileEditViewController: UIViewController {
   private func setUI() {
     buttonAction()
     configureNavigationBar()
+    setupCustomBackButton()
+    updateCompleteButtonState()
   }
   
   private func configureNavigationBar() {
@@ -76,44 +84,63 @@ public final class ProfileEditViewController: UIViewController {
     
     if text.isEmpty {
       profileEditView.baseSetting()
-      profileEditView.updateButtonState(isEnabled: false)
-      return
-    }
-    
-    if !text.isNicknamePatternValid(text) {
+      isNicknameChanged = false
+    } else if !text.isNicknamePatternValid(text) {
       profileEditView.showErrorLabel(withMessage: "ⓘ 한글, 숫자, 밑줄 및 마침표만 사용할 수 있어요.")
-      profileEditView.updateButtonState(isEnabled: false)
-      return
-    }
-    
-    if text == currentNickname {
+      isNicknameChanged = false
+    } else if text == currentNickname {
       profileEditView.showErrorLabel(withMessage: "ⓘ 이미 사용 중인 닉네임이에요.")
-      profileEditView.updateButtonState(isEnabled: false)
-      return
-    } //TODO: Server에서 존재하는 닉네임인지 확인 요청 필요, 우선은 currentNickname으로 확인
-    
-    profileEditView.showSuccessLabel()
-    profileEditView.updateButtonState(isEnabled: true)
+      isNicknameChanged = false
+    } else {
+      profileEditView.showSuccessLabel()
+      isNicknameChanged = true
+    }
+    updateCompleteButtonState()
+  }
+  
+  private func updateCompleteButtonState() {
+    let isEnabled = isNicknameChanged || isProfileImageChanged
+    profileEditView.updateButtonState(isEnabled: isEnabled)
   }
   
   @available(iOS 16.0, *)
   @objc private func nextButtonDidTap() {
     let profileViewController = ProfileViewController()
-    navigationController?.pushViewController(profileViewController, animated: true)
+    navigationController?.pushViewController(
+      profileViewController,
+      animated: true
+    )
   }
   
   @objc private func profileImageViewDidTap() {
-    let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    let alert = UIAlertController(
+      title: nil,
+      message: nil,
+      preferredStyle: .actionSheet
+    )
     
-    let selectImage = UIAlertAction(title: "앨범에서 선택", style: .default) { [weak self] _ in
-      
+    let selectImage = UIAlertAction(
+      title: "앨범에서 선택",
+      style: .default
+    ) { [weak self] _ in
+      self?.requestPhotoLibraryPermission()
     }
-    let deleteImage = UIAlertAction(title: "프로필 사진 삭제", style: .default) { [weak self] _ in
-      
+    
+    let deleteImage = UIAlertAction(
+      title: "프로필 사진 삭제",
+      style: .destructive
+    ) { [weak self] _ in
+      guard let self = self else { return }
+      self.profileEditView.profileImageView.image = CommonAsset.profileEdit.image
+      self.isProfileImageChanged = true
+      self.updateCompleteButtonState()
     }
-    let cancel = UIAlertAction(title: "취소", style: .cancel) { [weak self] _ in
-      
-    }
+    
+    let cancel = UIAlertAction(
+      title: "취소",
+      style: .cancel,
+      handler: nil
+    )
     
     deleteImage.setValue(UIColor.systemRed, forKey: "titleTextColor")
     
@@ -122,5 +149,88 @@ public final class ProfileEditViewController: UIViewController {
     alert.addAction(cancel)
     
     present(alert, animated: true)
+  }
+  
+  private func requestPhotoLibraryPermission() {
+    let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+    
+    switch status {
+    case .authorized, .limited:
+      presentCustomImagePicker()
+    case .notDetermined:
+      PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+        DispatchQueue.main.async {
+          if status == .authorized || status == .limited {
+            self.presentCustomImagePicker()
+          } else {
+            self.showPermissionDeniedAlert()
+          }
+        }
+      }
+    default:
+      showPermissionDeniedAlert()
+    }
+  }
+  
+  private func presentCustomImagePicker() {
+    let imagePickerVC = CustomImagePickerViewController()
+    imagePickerVC.delegate = self
+    navigationController?.pushViewController(imagePickerVC, animated: true)
+  }
+  
+  private func showPermissionDeniedAlert() {
+    let alertController = RecordyPopUpViewController(
+      type: .uploadPermission,
+      rightButtonAction: { [weak self] in
+        self?.openSettings()
+      }
+    )
+    alertController.modalPresentationStyle = UIModalPresentationStyle.overFullScreen
+    present(
+      alertController,
+      animated: true
+    )
+  }
+  
+  private func openSettings() {
+    if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+      UIApplication.shared.open(
+        settingsURL,
+        options: [:],
+        completionHandler: nil
+      )
+    }
+  }
+  
+  public func didSelectedImage(_ image: UIImage) {
+    profileEditView.profileImageView.image = image
+    isProfileImageChanged = true
+    updateCompleteButtonState()
+  }
+}
+
+@available(iOS 16.0, *)
+extension ProfileEditViewController: PHPickerViewControllerDelegate {
+  public func picker(
+    _ picker: PHPickerViewController,
+    didFinishPicking results: [PHPickerResult]
+  ) {
+    picker.dismiss(animated: true)
+    
+    guard let result = results.first else { return }
+    
+    if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
+      result.itemProvider.loadObject(ofClass: UIImage.self) {
+        image,
+        error in
+        DispatchQueue.main.async {
+          if let image = image as? UIImage {
+            self.profileEditView.profileImageView.image = image
+            self.isProfileImageChanged = true
+            self.updateCompleteButtonState()
+          }
+        }
+      }
+    }
   }
 }

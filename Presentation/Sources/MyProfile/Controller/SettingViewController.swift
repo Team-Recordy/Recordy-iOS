@@ -163,6 +163,7 @@ public class SettingViewController: UIViewController {
   
   private func configureNavigationBar() {
     navigationItem.title = "설정"
+    navigationItem.backButtonTitle = ""
     if let navigationBar = navigationController?.navigationBar {
       navigationBar.tintColor = .white
       navigationBar.titleTextAttributes = [

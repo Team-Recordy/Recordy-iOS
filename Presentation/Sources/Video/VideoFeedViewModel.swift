@@ -330,9 +330,9 @@ class VideoFeedViewModel {
       }
     }
 
-    dispatchGroup.notify(queue: .main) {
-      completion(cachedFeeds)
-    }
+//    dispatchGroup.notify(queue: .main) {
+//      completion(cachedFeeds)
+//    }
   }
 
   func bookmarkFeed(index: Int) {

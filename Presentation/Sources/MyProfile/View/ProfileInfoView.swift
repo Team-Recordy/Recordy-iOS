@@ -34,11 +34,12 @@ public class ProfileInfoView: UIView {
   }
   
   private func setLayout() {
-    addSubview(profileImage)
-    addSubview(userName)
-    addSubview(followerButton)
-    addSubview(middleDivider)
-    addSubview(followingButton)
+    addSubviews(
+      profileImage,
+      userName,
+      followerButton,
+      middleDivider,
+      followingButton)
   }
   
   public func setStyle() {
@@ -113,15 +114,15 @@ public class ProfileInfoView: UIView {
     }
   }
   
-//  func updateView(with model: ProfileUserModel) {
-//    userName.text = model.name
-//    
-//    let followerAttributedText = NSMutableAttributedString(string: "\(model.followerCount)", attributes: [.font: RecordyFont.body2.font])
-//    followerAttributedText.append(NSAttributedString(string: " 명의 팔로워", attributes: [.font: RecordyFont.body2.font, .foregroundColor: CommonAsset.recordyGrey03.color]))
-//    followerButton.setAttributedTitle(followerAttributedText, for: .normal)
-//    
-//    let followingAttributedText = NSMutableAttributedString(string: "\(model.followingCount)", attributes: [.font: RecordyFont.body2.font])
-//    followingAttributedText.append(NSAttributedString(string: " 명의 팔로잉", attributes: [.font: RecordyFont.body2.font, .foregroundColor: CommonAsset.recordyGrey03.color]))
-//    followingButton.setAttributedTitle(followingAttributedText, for: .normal)
-//  }
+  //  func updateView(with model: ProfileUserModel) {
+  //    userName.text = model.name
+  //
+  //    let followerAttributedText = NSMutableAttributedString(string: "\(model.followerCount)", attributes: [.font: RecordyFont.body2.font])
+  //    followerAttributedText.append(NSAttributedString(string: " 명의 팔로워", attributes: [.font: RecordyFont.body2.font, .foregroundColor: CommonAsset.recordyGrey03.color]))
+  //    followerButton.setAttributedTitle(followerAttributedText, for: .normal)
+  //
+  //    let followingAttributedText = NSMutableAttributedString(string: "\(model.followingCount)", attributes: [.font: RecordyFont.body2.font])
+  //    followingAttributedText.append(NSAttributedString(string: " 명의 팔로잉", attributes: [.font: RecordyFont.body2.font, .foregroundColor: CommonAsset.recordyGrey03.color]))
+  //    followingButton.setAttributedTitle(followingAttributedText, for: .normal)
+  //  }
 }
