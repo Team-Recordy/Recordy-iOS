@@ -34,7 +34,8 @@ public class UploadVideoViewController: UIViewController {
   private let displayTextField = UITextField()
   private let displayTextCountLabel = UILabel()
   let uploadButton = UIButton()
-
+  let placeRegistered = PassthroughSubject<SearchPlaceViewModel.SearchedPlace, Never>()
+  
   private let viewModel = UploadVideoViewModel()
   private var cancellables = Set<AnyCancellable>()
 
@@ -323,6 +324,14 @@ public class UploadVideoViewController: UIViewController {
         self?.placeButtonTapped()
       }
       .store(in: &cancellables)
+    
+    placeRegistered
+      .receive(on: DispatchQueue.main)
+      .sink { [weak self] place in
+        guard let self = self else { return }
+        self.viewModel.place = place
+      }
+      .store(in: &cancellables)
   }
 
   private func updateUploadButton(enabled: Bool) {
@@ -376,7 +385,7 @@ public class UploadVideoViewController: UIViewController {
 
   @objc func placeButtonTapped() {
     let nextViewController = SearchPlaceViewController()
-    nextViewController.delegate = self
+    nextViewController.placeRegistered = placeRegistered
     navigationController?.pushViewController(nextViewController, animated: true)
   }
 }

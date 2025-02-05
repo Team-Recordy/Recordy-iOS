@@ -24,6 +24,7 @@ final class RegisterPlaceSearchViewController: UIViewController {
 
   private let viewModel = RegisterPlaceSearchViewModel()
   private var cancellables = Set<AnyCancellable>()
+  var placeRegistered: PassthroughSubject<SearchPlaceViewModel.SearchedPlace, Never>?
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -158,6 +159,7 @@ extension RegisterPlaceSearchViewController: UITableViewDelegate, UITableViewDat
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let selectedPlace = viewModel.searchedPlace[indexPath.row]
     let nextViewController = RegisterPlaceViewController(selectedPlace: selectedPlace)
+    nextViewController.placeRegistered = placeRegistered
     navigationController?.pushViewController(nextViewController, animated: true)
   }
 }

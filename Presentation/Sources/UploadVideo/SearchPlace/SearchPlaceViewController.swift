@@ -26,6 +26,7 @@ final class SearchPlaceViewController: UIViewController {
   private let registerButton = UIButton()
   private let tableView = UITableView()
   weak var delegate: SearchPlaceDelegate?
+  var placeRegistered: PassthroughSubject<SearchPlaceViewModel.SearchedPlace, Never>?
 
   private let viewModel = SearchPlaceViewModel()
   private var cancellables = Set<AnyCancellable>()
@@ -149,6 +150,7 @@ final class SearchPlaceViewController: UIViewController {
 
   @objc func registerButtonTapped() {
     let nextViewController = RegisterPlaceSearchViewController()
+    nextViewController.placeRegistered = placeRegistered
     navigationController?.pushViewController(nextViewController, animated: true)
   }
 }
