@@ -41,6 +41,7 @@ public class PlaceDetailViewModel {
   var onFilterChanged: ((ChipState, ChipState, ChipState) -> Void)?
   var onExhibitionsUpdated: (() -> Void)?
   var onFeedsUpdated:(() -> Void)?
+  var onBookmarkUpdated: ((Int) -> Void)?
   
   var hasNext = true
   var isFetching = false
@@ -121,26 +122,68 @@ public class PlaceDetailViewModel {
     }
   }
   
-  func postBookmark(feed: Feed, completion: ((Result<Void, Error>) -> Void)? = nil) {
-    let apiProvider = APIProvider<APITarget.Bookmarks>()
-    let request = DTO.PostBookmarkRequest(recordId: feed.id)
+  func getReviewFeedList(placeId: Int, recordSize: Int) {
+    isFetching = true
+    let apiProvider = APIProvider<APITarget.Records>()
+    let request = DTO.GetPlaceRecordListRequest(
+      placeId: placeId,
+      size: recordSize
+    )
     
-    apiProvider.justRequest(.postBookmark(request)) { [weak self] result in
+    apiProvider.requestResponsable(.getPlaceRecordList(request), DTO.GetPlaceRecordListResponse.self) { [weak self] result in
       guard let self = self else { return }
+      self.isFetching = false
       switch result {
-      case .success:
-        if let recordIndex = self.reviewFeedList.firstIndex(where: { $0.id == feed.id }) {
-          self.reviewFeedList[recordIndex].isBookmarked = !feed.isBookmarked
-          self.onFeedsUpdated?()
+      case .success(let response):
+        let fetchedFeeds = response.content.map { content in
+          Feed(
+            id: content.id,
+            videoLink: content.fileUrl.videoUrl,
+            thumbnailLink: content.fileUrl.thumbnailUrl,
+            description: content.content,
+            exhibitionName: content.exhibitionName,
+            placeId: content.placeId,
+            placeName: content.placeName,
+            uploaderId: content.uploaderId,
+            uploaderNickname: content.uploaderNickname,
+            bookmarkCount: content.bookmarkCount,
+            isMine: content.isMine,
+            isBookmarked: content.isBookmarked
+          )
         }
-        completion?(.success(()))
+        
+        if let index = self.selectedPlace.firstIndex(where: { $0.id == placeId }) {
+            self.selectedPlace[index].recordList = fetchedFeeds
+        }
+        
+        self.reviewFeedList = fetchedFeeds
+        self.onFeedsUpdated?()
+        
       case .failure(let error):
-        print("Failed to update bookmark: \(error)")
-        completion?(.failure(error))
+        print("Error fetching review feed list: \(error)")
       }
     }
   }
   
+  func postBookmark(index: Int, completion: (() -> Void)? = nil) {
+    let bookmarkProvider = APIProvider<APITarget.Bookmarks>()
+    let request = DTO.PostBookmarkRequest(recordId: reviewFeedList[index].id)
+    
+    bookmarkProvider.justRequest(.postBookmark(request)) { result in
+      switch result {
+      case .success:
+        DispatchQueue.main.async {
+          self.reviewFeedList[index].isBookmarked.toggle()
+          self.onBookmarkUpdated?(index)
+          
+          completion?()
+        }
+      case .failure(let error):
+        print("북마크 요청 실패: \(error)")
+      }
+    }
+  }
+    
   func updateControlType(to type: PlaceDetailControlType) {
     currentControlType = type
   }

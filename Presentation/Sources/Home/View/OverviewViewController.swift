@@ -31,6 +31,10 @@ final class OverviewViewController: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
+  public override func viewWillAppear(_ animated: Bool) {
+    viewModel.getNearPlaceList()
+  }
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -39,15 +43,6 @@ final class OverviewViewController: UIViewController {
     setUI()
     setAutolayout()
     bind()
-    
-    viewModel.getNearPlaceList()
-    
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(handleBookmarkStateChange(_:)),
-      name: .bookmarkStateChanged,
-      object: nil
-    )
   }
   
   private func setStyle() {
@@ -151,32 +146,6 @@ final class OverviewViewController: UIViewController {
     }
   }
   
-  private func findIndexPath(for feed: Feed) -> IndexPath? {
-    if let placeIndex = viewModel.nearPlaces.firstIndex(where: { $0.id == feed.placeId }),
-       let recordIndex = viewModel.nearPlaces[placeIndex].recordList.firstIndex(where: { $0.id == feed.id }) {
-      return IndexPath(item: recordIndex, section: placeIndex)
-    }
-    return nil
-  }
-  
-  @objc private func handleBookmarkStateChange(_ notification: Notification) {
-    guard let userInfo = notification.userInfo,
-          let feed = userInfo["feed"] as? Feed else {
-      return
-    }
-    
-    viewModel.postBookmark(feed: feed) { [weak self] result in
-      
-      switch result {
-      case .success:
-        print("Bookmark updated successfully.")
-        self?.overviewCollectionView?.reloadData()
-      case .failure(let error):
-        print("Failed to update bookmark: \(error)")
-      }
-    }
-  }
-  
   @objc private func locationButtonTapped() {
     let status = locationManager.currentAuthorizationStatus
     
@@ -192,10 +161,6 @@ final class OverviewViewController: UIViewController {
     } else if status == .notDetermined {
       locationManager.requestAuthorization()
     }
-  }
-  
-  deinit {
-    NotificationCenter.default.removeObserver(self, name: .bookmarkStateChanged, object: nil)
   }
 }
 
@@ -216,13 +181,20 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
       ) as? OverviewCollectionViewCell else {
         fatalError("Failed to dequeue OverviewCollectionViewCell")
       }
-      // TODO: Crash
       let place = viewModel.nearPlaces[indexPath.row]
       cell.backgroundColor = .clear
       cell.bind(place: place, records: place.recordList, index: indexPath.row)
       cell.onPlaceDetailButtonTapped = { [weak self] tag in
         guard let self = self else { return }
         self.handlePlaceDetailButtonTapped(index: tag)
+      }
+      cell.onBookmarkButtonTapped = { [weak self] recordIndex in
+        guard let self = self else { return }
+        self.viewModel.postBookmark(
+          placeIndex: indexPath.row,
+          recordIndex: recordIndex
+        )
+        cell.updateThumbnailBookmark(recordIndex: recordIndex, isBookmarked: viewModel.nearPlaces[indexPath.row].recordList[recordIndex].isBookmarked)
       }
       cell.onUpdateHeight = {
         DispatchQueue.main.async {
@@ -244,7 +216,12 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
         )
         self.navigationController?.pushViewController(videoVC, animated: true)
       }
-      
+      viewModel.onBookmarkUpdated = { [weak self] index in
+        guard let self else { return }
+        DispatchQueue.main.async {
+          cell.updateRecords(records: self.viewModel.nearPlaces[index].recordList)
+        }
+      }
       return cell
     }
   

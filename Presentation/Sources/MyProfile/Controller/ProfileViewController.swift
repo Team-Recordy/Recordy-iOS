@@ -5,6 +5,7 @@
 //  Created by 송여경 on 7/16/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
+
 import UIKit
 import SnapKit
 import Then
@@ -39,13 +40,6 @@ public class ProfileViewController: UIViewController {
     setAutoLayout()
     setDelegate()
     controlTypeChanged()
-    
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(handleBookmarkStateChange(_:)),
-      name: .bookmarkStateChanged,
-      object: nil
-    )
   }
   
   public override func viewWillAppear(_ animated: Bool) {
@@ -391,18 +385,23 @@ extension ProfileViewController: ControlTypeDelegate {
 
 @available(iOS 16.0, *)
 extension ProfileViewController: BookmarkDelegate {
-  func bookmarkButtonTapped(feed: Feed) {
+  func bookmarkButtonTapped(feed: Feed, completion: @escaping (Result<Void, Error>) -> Void) {
     let apiProvider = APIProvider<APITarget.Bookmarks>()
     let request = DTO.PostBookmarkRequest(recordId: feed.id)
+    
     apiProvider.justRequest(.postBookmark(request)) { [weak self] result in
       guard let self = self else { return }
+      
       switch result {
-      case .success(_):
+      case .success:
         DispatchQueue.main.async {
           self.updateProfile()
         }
-      case .failure(let failure):
-        print(failure)
+        completion(.success(()))
+        
+      case .failure(let error):
+        print("Bookmark API 실패: \(error)")
+        completion(.failure(error))
       }
     }
   }

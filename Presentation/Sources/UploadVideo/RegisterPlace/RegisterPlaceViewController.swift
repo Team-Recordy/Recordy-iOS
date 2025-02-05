@@ -9,10 +9,10 @@
 import UIKit
 import SnapKit
 import Then
+import Combine
 
 import Core
 import Common
-
 class RegisterPlaceViewController: UIViewController {
 
   private let titleLabel = UILabel()
@@ -20,9 +20,17 @@ class RegisterPlaceViewController: UIViewController {
   private let addressView = RegisterPlaceView()
   private let registerButton = UIButton()
   private let selectedPlace: RegisterPlaceSearchViewModel.Place
-
+  private let placeToRegister: SearchPlaceViewModel.SearchedPlace
+  var placeRegistered: PassthroughSubject<SearchPlaceViewModel.SearchedPlace, Never>?
+  
   init(selectedPlace: RegisterPlaceSearchViewModel.Place) {
     self.selectedPlace = selectedPlace
+    self.placeToRegister = SearchPlaceViewModel.SearchedPlace(
+      id: Int(selectedPlace.id) ?? 0,
+      type: "PLACE",
+      address: selectedPlace.address,
+      name: selectedPlace.name
+    )
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -121,7 +129,9 @@ class RegisterPlaceViewController: UIViewController {
     showPopUp(type: .register(place: selectedPlace.name)) { [weak self] in
       guard let self else { return }
       self.dismiss(animated: false)
+      self.placeRegistered?.send(self.placeToRegister)
       apiProvider.justRequest(.createPlace(request)) { _ in
+        self.navigationController?.popViewController(animated: true)
         self.navigationController?.popViewController(animated: true)
         self.navigationController?.popViewController(animated: true)
       }

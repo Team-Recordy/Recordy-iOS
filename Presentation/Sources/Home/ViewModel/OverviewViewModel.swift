@@ -47,6 +47,7 @@ public class OverviewViewModel {
   var onNearPlacesUpdated: (() -> Void)?
   var onPlaceRecordsUpdated: (() -> Void)?
   var onLocationStateChanged: ((LocationState) -> Void)?
+  var onBookmarkUpdated: ((Int) -> Void)?
   
   init() {
     updateLocationStateFromAuthorizationStatus()
@@ -147,22 +148,19 @@ public class OverviewViewModel {
     }
   }
   
-  func postBookmark(feed: Feed, completion: ((Result<Void, Error>) -> Void)? = nil) {
-    let apiProvider = APIProvider<APITarget.Bookmarks>()
-    let request = DTO.PostBookmarkRequest(recordId: feed.id)
-    
-    apiProvider.justRequest(.postBookmark(request)) { [weak self] result in
-      guard let self = self else { return }
+  func postBookmark(placeIndex: Int, recordIndex: Int, completion: (() -> Void)? = nil) {
+    self.nearPlaces[placeIndex].recordList[recordIndex].isBookmarked.toggle()
+    let bookmarkProvider = APIProvider<APITarget.Bookmarks>()
+    let request = DTO.PostBookmarkRequest(recordId: nearPlaces[placeIndex].recordList[recordIndex].id)
+    bookmarkProvider.justRequest(.postBookmark(request)) { result in
       switch result {
       case .success:
-        if let placeIndex = self.nearPlaces.firstIndex(where: { $0.id == feed.placeId }),
-           let recordIndex = self.nearPlaces[placeIndex].recordList.firstIndex(where: { $0.id == feed.id }) {
-          self.nearPlaces[placeIndex].recordList[recordIndex].isBookmarked = !feed.isBookmarked
+        DispatchQueue.main.async {
+          self.onBookmarkUpdated?(placeIndex)
+          completion?()
         }
-        completion?(.success(()))
       case .failure(let error):
-        print("Failed to update bookmark: \(error)")
-        completion?(.failure(error))
+        print("북마크 요청 실패: \(error)")
       }
     }
   }
