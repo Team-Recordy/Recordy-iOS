@@ -27,6 +27,7 @@ final class UploadVideoViewModel {
   // MARK: - Output Properties
   @Published var thumbnailImage: UIImage?
   @Published var contentsTextCount: String = "0 / 300"
+  @Published var exhibitionNameCount: String = "0 / 20"
   @Published var uploadEnabled: Bool = false
   @Published var uploadVideo: PHAsset?
 
@@ -48,17 +49,6 @@ final class UploadVideoViewModel {
         )
       }
       .assign(to: \.thumbnailImage, on: self)
-      .store(in: &cancellables)
-
-    $contents
-      .map {
-        if $0 == "공간에 대한 나의 생각을 자유롭게 적어주세요!" {
-          return "0 / 300"
-        } else {
-          return "\($0.count) / 300"
-        }
-      }
-      .assign(to: \.contentsTextCount, on: self)
       .store(in: &cancellables)
 
     Publishers.CombineLatest4($selectedAsset, $place, $contents, $exhibitionName)
@@ -103,7 +93,6 @@ final class UploadVideoViewModel {
     videoUrl: String,
     thumbnailUrl: String
   ) {
-    var encodedString = ""
     guard let id = place?.id else { return }
     let request = DTO.CreateRecordRequest(
       fileUrl: DTO.CreateRecordRequest.FileUrl(
@@ -121,7 +110,7 @@ final class UploadVideoViewModel {
         NotificationCenter.default.post(
           name: .updateDidComplete,
           object: nil,
-          userInfo: ["message": "업로드가 완료되었어요!", "state": "success"]
+          userInfo: ["message": "영상이 정상적으로 업로드되었어요!", "state": "success"]
         )
       case .failure:
         NotificationCenter.default.post(

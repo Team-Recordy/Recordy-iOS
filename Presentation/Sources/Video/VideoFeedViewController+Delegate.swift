@@ -30,4 +30,8 @@ extension VideoFeedViewController: ReportWithCopyLinkDelegate {
   func cancel() {
     updateSheetHeight(Sheet.defaultHeight)
   }
+
+  func reason() {
+    updateSheetHeight(Sheet.reasonHeight)
+  }
 }

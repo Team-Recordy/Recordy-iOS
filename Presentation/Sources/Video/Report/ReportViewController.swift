@@ -9,6 +9,7 @@
 import UIKit
 
 import Common
+import Core
 
 import SnapKit
 import Then
@@ -17,6 +18,17 @@ class ReportViewController: UIViewController {
   
   private let tableView = UITableView()
   private let reportCase = ReportCase.allCases
+  private let id: Int
+  weak var delegate: ReportWithCopyLinkDelegate?
+
+  init(id: Int) {
+    self.id = id
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -51,6 +63,39 @@ class ReportViewController: UIViewController {
       )
     }
   }
+
+  private func postReport(reportCase: ReportCase) {
+    let request = DTO.PostReport(
+      recordId: id,
+      reason: reportCase.reason,
+      content: ""
+    )
+
+    let apiProvider = APIProvider<APITarget.Report>()
+
+    apiProvider.justRequest(.postReport(request)) { result in
+      switch result {
+      case .success:
+        NotificationCenter.default.post(
+          name: .reportDidComplete,
+          object: nil,
+          userInfo: [
+            "message": "정상적으로 신고되었습니다.",
+            "state": "success"
+          ]
+        )
+      case .failure:
+        NotificationCenter.default.post(
+          name: .reportDidComplete,
+          object: nil,
+          userInfo: [
+            "message": "신고에 실패했어요.",
+            "state": "failure"
+          ]
+        )
+      }
+    }
+  }
 }
 
 extension ReportViewController: UITableViewDelegate {
@@ -60,13 +105,15 @@ extension ReportViewController: UITableViewDelegate {
   ) {
     let reportCase = self.reportCase[indexPath.row]
     if reportCase == .etc {
-      let nextViewController = ReportReasonViewController()
+      let nextViewController = ReportReasonViewController(id: id)
+      nextViewController.delegate = delegate
+      delegate?.reason()
       navigationController?.pushViewController(
         nextViewController,
         animated: true
       )
     } else {
-      /// API Call
+      postReport(reportCase: reportCase)
       dismiss(animated: true)
     }
   }

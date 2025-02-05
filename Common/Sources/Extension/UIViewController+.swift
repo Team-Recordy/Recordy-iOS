@@ -32,8 +32,8 @@ extension UIViewController {
     let screenWidth = self.view.frame.size.width
     let toastLabelFrame = CGRect(
       x: 20,
-      y: self.view.frame.size.height - (height + 100),
-      width: (screenWidth - 40).adaptiveWidth,
+      y: self.view.frame.size.height - (height + 110),
+      width: (screenWidth - 40),
       height: 44.adaptiveHeight
     )
     let toastView = RecordyToastMessageView(frame: toastLabelFrame)

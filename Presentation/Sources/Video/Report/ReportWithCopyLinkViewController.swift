@@ -18,6 +18,16 @@ class ReportWithCopyLinkViewController: UIViewController {
   private lazy var copyLinkButton = UIButton()
   private lazy var reportButton = UIButton()
   weak var delegate: ReportWithCopyLinkDelegate?
+  private let id: Int
+
+  init(id: Int) {
+    self.id = id
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -116,12 +126,11 @@ class ReportWithCopyLinkViewController: UIViewController {
   @objc
   private func reportButtonTapped() {
     delegate?.didTapReport()
-    let nextViewController = ReportViewController()
+    let nextViewController = ReportViewController(id: id)
+    nextViewController.delegate = delegate
     navigationController?.pushViewController(
-        nextViewController,
-        animated: true
+      nextViewController,
+      animated: true
     )
   }
 }
-
-

@@ -192,7 +192,6 @@ class FeedCell: UICollectionViewCell {
 
   @objc
   private func nicknameButtonTapped() {
-    print(#function)
     nicknameAction?()
   }
 

@@ -42,4 +42,23 @@ enum ReportCase: CaseIterable {
       "기타"
     }
   }
+
+  var reason: String {
+    switch self {
+    case .spam:
+      "SPAM_PROMOTION"
+    case .pornography:
+      "OBSCENE_CONTENT"
+    case .illegal:
+      "ILLEGAL_CONTENT"
+    case .swear:
+      "HATE_SPEECH"
+    case .privacy:
+      "PERSONAL_INFO"
+    case .unpleasant:
+      "OFFENDING_CONTENT"
+    case .etc:
+      "OTHER"
+    }
+  }
 }

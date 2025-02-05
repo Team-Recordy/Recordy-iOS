@@ -17,7 +17,17 @@ enum RecordyTabBarType: CaseIterable {
   case upload
   case video
   case profile
-
+  
+  var index: Int {
+    switch self {
+    case .home: return 0
+    case .search: return 1
+    case .upload: return 2
+    case .video: return 3
+    case .profile: return 4
+    }
+  }
+  
   var active: UIImage {
     switch self {
     case .home:

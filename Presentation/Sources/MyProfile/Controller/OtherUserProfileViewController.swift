@@ -54,6 +54,9 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
   }
 
   private func setStyle() {
+    navigationController?.isNavigationBarHidden = false
+    title = "프로필"
+    
     view.backgroundColor = CommonAsset.viskitBG.color
     profileImage.do {
       $0.image = CommonAsset.profileImage.image

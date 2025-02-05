@@ -17,9 +17,9 @@ class RegisterPlaceView: UIView {
   private let titleLabel = UILabel()
   private let subtitleLabel = UILabel()
   private let stackView: UIStackView = {
-      let stack = UIStackView()
+    let stack = UIStackView()
 
-      return stack
+    return stack
   }()
 
   override init(frame: CGRect) {

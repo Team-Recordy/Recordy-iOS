@@ -345,15 +345,15 @@ class VideoFeedViewModel {
   }
 
   func postIsFeedWatched(feed: Feed) {
-    //    let request = DTO.IsRecordWatchedRequest(recordId: feed.id)
-    //    apiProvider.justRequest(.isRecordWatched(request)) { result in
-    //      switch result {
-    //      case .success:
-    //        print("@Log - success")
-    //      case .failure(let failure):
-    //        print(failure)
-    //      }
-    //    }
+//    let request = DTO.IsRecordWatchedRequest(recordId: feed.id)
+//    apiProvider.justRequest(.isRecordWatched(request)) { result in
+//      switch result {
+//      case .success:
+//        print("@Log - success")
+//      case .failure(let failure):
+//        print(failure)
+//      }
+//    }
   }
 
   func deleteFeed(_ index: Int) {
