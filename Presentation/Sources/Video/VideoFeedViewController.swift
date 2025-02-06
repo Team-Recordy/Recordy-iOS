@@ -169,8 +169,12 @@ public class VideoFeedViewController: UIViewController {
 
     let currentFeed = viewModel.feedList[visibleIndexPath.row]
     let feedId = currentFeed.id
+    let isMine = currentFeed.isMine
 
-    let nextViewController = ReportWithCopyLinkViewController(id: feedId)
+    let nextViewController = ReportWithCopyLinkViewController(
+      id: feedId,
+      isMine: isMine
+    )
     nextViewController.delegate = self
     let navigationController = BaseNavigationController(rootViewController: nextViewController)
 

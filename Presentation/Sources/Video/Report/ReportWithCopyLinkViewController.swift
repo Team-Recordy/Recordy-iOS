@@ -9,6 +9,7 @@
 import UIKit
 
 import Common
+import Core
 
 import SnapKit
 import Then
@@ -17,11 +18,17 @@ class ReportWithCopyLinkViewController: UIViewController {
 
   private lazy var copyLinkButton = UIButton()
   private lazy var reportButton = UIButton()
+  private lazy var deleteButton = UIButton()
   weak var delegate: ReportWithCopyLinkDelegate?
   private let id: Int
+  private let isMine: Bool
 
-  init(id: Int) {
+  init(
+    id: Int,
+    isMine: Bool
+  ) {
     self.id = id
+    self.isMine = isMine
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -96,12 +103,44 @@ class ReportWithCopyLinkViewController: UIViewController {
           for: .touchUpInside
         )
     }
+
+    deleteButton.do {
+      var config = UIButton.Configuration.plain()
+      config.image = CommonAsset.deleteButton.image
+      config.contentInsets = NSDirectionalEdgeInsets(
+        top: 12,
+        leading: 20,
+        bottom: 12,
+        trailing: 16
+      )
+      config.imagePlacement = .leading
+      config.imagePadding = 16
+      var container = AttributeContainer()
+      container.font = ViskitFont.body1.font
+      container.foregroundColor = CommonAsset.viskitWhite.color
+      config.attributedTitle = AttributedString(
+        "삭제하기",
+        attributes: container
+      )
+      $0.configuration = config
+      $0.contentHorizontalAlignment = .left
+      $0.addTarget(
+          self,
+          action: #selector(deleteButtonTapped),
+          for: .touchUpInside
+        )
+    }
+
+    copyLinkButton.isHidden = isMine
+    reportButton.isHidden = isMine
+    deleteButton.isHidden = !isMine
   }
 
   private func setUI() {
     [
       copyLinkButton,
-      reportButton
+      reportButton,
+      deleteButton
     ].forEach { view.addSubview($0) }
   }
 
@@ -113,6 +152,11 @@ class ReportWithCopyLinkViewController: UIViewController {
     }
     reportButton.snp.makeConstraints {
       $0.top.equalTo(copyLinkButton.snp.bottom)
+      $0.horizontalEdges.equalToSuperview()
+      $0.height.equalTo(52.adaptiveHeight)
+    }
+    deleteButton.snp.makeConstraints {
+      $0.top.equalToSuperview().offset(36.adaptiveHeight)
       $0.horizontalEdges.equalToSuperview()
       $0.height.equalTo(52.adaptiveHeight)
     }
@@ -132,5 +176,30 @@ class ReportWithCopyLinkViewController: UIViewController {
       nextViewController,
       animated: true
     )
+  }
+
+  private func deleteRecord() {
+    let request = DTO.DeleteRecordRequest(recordId: id)
+    let apiProvider = APIProvider<APITarget.Records>()
+    apiProvider.justRequest(.deleteRecord(request)) { response in
+      switch response {
+      case .success(let success):
+        print(success)
+      case .failure(let failure):
+        print(failure)
+      }
+    }
+  }
+
+  @objc
+  private func deleteButtonTapped() {
+    showPopUp(type: .delete) {
+      self.deleteRecord()
+      self.dismiss(animated: true) {
+        self.dismiss(animated: true) {
+          self.delegate?.delete(id: self.id)
+        }
+      }
+    }
   }
 }

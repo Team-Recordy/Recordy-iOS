@@ -30,7 +30,7 @@ public enum VideoFeedType_new {
 
 class VideoFeedViewModel {
 
-  private(set) var feedList: [Feed] = []
+  var feedList: [Feed] = []
   let apiProvider = APIProvider<APITarget.Records>()
   var type: VideoFeedType
   var cursorId: Int?
@@ -108,9 +108,6 @@ class VideoFeedViewModel {
         ),
         response: DTO.GetBookmarkedListResponse.self
       )
-//    case .test:
-//      //      self.feedList = Feed.mockData
-//      self.onFeedListUpdate?(self.feedList.count)
     case .place:
       guard let placeId else { return }
       getPlaceRecordList(
@@ -119,7 +116,6 @@ class VideoFeedViewModel {
         ),
         response: DTO.GetPlaceRecordListResponse.self
       )
-      //      self.onFeedListUpdate?(self.feedList.count)
     default: return
     }
   }
@@ -129,7 +125,7 @@ class VideoFeedViewModel {
     response: T.Type
   ) {
     guard !isFetching else { return }
-    isFetching = true
+      isFetching = true
     apiProvider.requestResponsable(
       endPoint,
       response
@@ -191,25 +187,26 @@ class VideoFeedViewModel {
     else if let userProfileRecordListResponse = response as? DTO.GetUserRecordListResponse {
       /// 유저 프로필 레코드 조회
       guard let placeId else { return }
-      if let index = userProfileRecordListResponse.content.firstIndex(where: { $0.id == placeId }) {
-        let feeds: [Feed] = userProfileRecordListResponse.content.map { content in
-          Feed(
-            id: content.id,
-            videoLink: content.fileUrl.videoUrl,
-            thumbnailLink: content.fileUrl.thumbnailUrl,
-            description: content.content,
-            exhibitionName: content.exhibitionName,
-            placeId: content.placeId,
-            placeName: content.placeName,
-            uploaderId: content.uploaderId,
-            uploaderNickname: content.uploaderNickname,
-            bookmarkCount: content.bookmarkCount,
-            isMine: content.isMine,
-            isBookmarked: content.isBookmarked
-          )
-        }
-        updateFeedList(feeds)
+      var feeds: [Feed] = userProfileRecordListResponse.content.map { content in
+        Feed(
+          id: content.id,
+          videoLink: content.fileUrl.videoUrl,
+          thumbnailLink: content.fileUrl.thumbnailUrl,
+          description: content.content,
+          exhibitionName: content.exhibitionName,
+          placeId: content.placeId,
+          placeName: content.placeName,
+          uploaderId: content.uploaderId,
+          uploaderNickname: content.uploaderNickname,
+          bookmarkCount: content.bookmarkCount,
+          isMine: content.isMine,
+          isBookmarked: content.isBookmarked
+        )
       }
+      if let index = userProfileRecordListResponse.content.firstIndex(where: { $0.id == placeId }) {
+        feeds = Array(feeds[index...])
+      }
+      updateFeedList(feeds)
     }
     else if let bookmarkedRecordListResponse = response as? DTO.GetBookmarkedListResponse {
       /// 유저 북마크 레코드 조회
@@ -342,30 +339,5 @@ class VideoFeedViewModel {
     let bookmarkProvider = APIProvider<APITarget.Bookmarks>()
     let request = DTO.PostBookmarkRequest(recordId: feedList[index].id)
     bookmarkProvider.justRequest(.postBookmark(request)) { _ in }
-  }
-
-  func postIsFeedWatched(feed: Feed) {
-//    let request = DTO.IsRecordWatchedRequest(recordId: feed.id)
-//    apiProvider.justRequest(.isRecordWatched(request)) { result in
-//      switch result {
-//      case .success:
-//        print("@Log - success")
-//      case .failure(let failure):
-//        print(failure)
-//      }
-//    }
-  }
-
-  func deleteFeed(_ index: Int) {
-    let feed = self.feedList[index]
-    let request = DTO.DeleteRecordRequest(record_id: feed.id)
-    apiProvider.justRequest(.deleteRecord(request)) { result in
-      switch result {
-      case .success(let success):
-        print(success)
-      case .failure(let failure):
-        print(failure)
-      }
-    }
   }
 }

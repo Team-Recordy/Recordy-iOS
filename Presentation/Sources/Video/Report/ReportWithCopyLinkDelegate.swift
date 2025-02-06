@@ -13,4 +13,5 @@ protocol ReportWithCopyLinkDelegate: AnyObject {
   func copy()
   func cancel()
   func reason()
+  func delete(id: Int)
 }

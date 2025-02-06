@@ -27,7 +27,6 @@ extension VideoFeedViewController: UICollectionViewDataSource {
       for: indexPath
     ) as! FeedCell
     let feed = viewModel.feedList[indexPath.row]
-    cell.delegate = self
     cell.bind(
       feed: feed,
       bounds: collectionView.frame,
