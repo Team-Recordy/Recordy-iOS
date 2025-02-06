@@ -30,11 +30,6 @@ final class SearchPlaceViewController: UIViewController {
 
   private let viewModel = SearchPlaceViewModel()
   private var cancellables = Set<AnyCancellable>()
-  
-  override func viewWillDisappear(_ animated: Bool) {
-      super.viewWillDisappear(animated)
-      view.endEditing(true)
-  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -42,6 +37,12 @@ final class SearchPlaceViewController: UIViewController {
     setUI()
     setAutolayout()
     bindViewModel()
+    hideKeyboard()
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    view.endEditing(true)
   }
 
   private func bindViewModel() {
@@ -87,6 +88,8 @@ final class SearchPlaceViewController: UIViewController {
       $0.font = ViskitFont.body1.font
       $0.placeholder = "전시 장소를 입력해주세요"
       $0.tintColor = CommonAsset.viskitGray01.color
+      $0.returnKeyType = .done
+      $0.delegate = self
     }
 
     registerButton.do {
@@ -192,5 +195,12 @@ extension SearchPlaceViewController: UITableViewDelegate, UITableViewDataSource 
       guard let self else { return }
       self.navigationController?.popViewController(animated: true)
     }
+  }
+}
+
+extension SearchPlaceViewController: UITextFieldDelegate {
+  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    textField.resignFirstResponder()
+    return true
   }
 }

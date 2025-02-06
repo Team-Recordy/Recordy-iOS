@@ -12,9 +12,10 @@ import Common
 
 @available(iOS 16.0, *)
 public final class RecordyTabBarController: UITabBarController, UITabBarControllerDelegate {
-  
+
   private var recordyTabBar = RecordyTabBar()
-  
+  private var previousSelectedIndex: Int = 0
+
   public override func viewDidLoad() {
     super.viewDidLoad()
     self.setValue(recordyTabBar, forKey: "tabBar")
@@ -22,7 +23,7 @@ public final class RecordyTabBarController: UITabBarController, UITabBarControll
     setTabBarItem()
     setDelegate()
   }
-  
+
   private func setStyle() {
     let appearance = UITabBarAppearance()
     appearance.backgroundColor = CommonAsset.viskitBG.color
@@ -37,20 +38,39 @@ public final class RecordyTabBarController: UITabBarController, UITabBarControll
     tabBar.scrollEdgeAppearance = appearance
     tabBar.layer.borderWidth = 0
     tabBar.layer.borderColor = UIColor.clear.cgColor
-    
+
     let border = CALayer()
     border.frame = CGRect(x: 0, y: 0, width: tabBar.bounds.width, height: 0.5)
     border.backgroundColor = CommonAsset.viskitGray06.color.cgColor
     tabBar.layer.addSublayer(border)
   }
-  
+
   private func setTabBarItem() {
     let viewControllers = RecordyTabBarType.allCases.map { createTabBarItem(type: $0) }
     setViewControllers(viewControllers, animated: false)
   }
-  
+
   private func setDelegate() {
     self.delegate = self
+  }
+
+  public func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+    guard let index = tabBarController.viewControllers?.firstIndex(of: viewController) else {
+      return true
+    }
+
+    if index == RecordyTabBarType.upload.index {
+      let uploadVC = UploadVideoViewController()
+      let navController = BaseNavigationController(rootViewController: uploadVC)
+      navController.modalPresentationStyle = .fullScreen
+      present(navController, animated: true)
+
+      selectedIndex = previousSelectedIndex
+      return false
+    }
+
+    previousSelectedIndex = index
+    return true
   }
 }
 
@@ -60,23 +80,23 @@ final class RecordyTabBar: UITabBar {
     size.height += 15
     return size
   }
-  
+
   override func layoutSubviews() {
     super.layoutSubviews()
-    
+
     guard let tabBarItems = items else { return }
-    
+
     let itemWidth: CGFloat = 32
     let itemSpacing: CGFloat = 39
     let totalWidth = CGFloat(tabBarItems.count) * itemWidth + CGFloat(tabBarItems.count - 1) * itemSpacing
     var xOffset: CGFloat = (self.bounds.width - totalWidth) / 2
-    
+
     let sortedTabBarViews = subviews.compactMap { $0 as? UIControl }
       .sorted { $0.frame.minX < $1.frame.minX }
-    
+
     for (index, tabBarItemView) in sortedTabBarViews.enumerated() {
       guard index < tabBarItems.count else { continue }
-      
+
       tabBarItemView.frame = CGRect(
         x: xOffset,
         y: tabBarItemView.frame.origin.y,

@@ -52,13 +52,13 @@ public class UploadVideoViewController: UIViewController {
     title = "영상 업로드"
     view.backgroundColor = CommonAsset.viskitBG.color
 
-    if navigationController?.viewControllers.first != self {
-      let rightButton = UIButton(type: .system)
-      rightButton.setImage(UIImage(systemName: "xmark"), for: .normal)
-      rightButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
-      let rightBarButtonItem = UIBarButtonItem(customView: rightButton)
-      navigationItem.rightBarButtonItem = rightBarButtonItem
-    }
+    let rightButton = UIButton(type: .system)
+    rightButton.setImage(UIImage(systemName: "xmark"), for: .normal)
+    rightButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+    let rightBarButtonItem = UIBarButtonItem(customView: rightButton)
+    navigationItem.rightBarButtonItem = rightBarButtonItem
+
+    displayTextField.delegate = self
 
     scrollView.do {
       $0.backgroundColor = .clear
@@ -119,7 +119,8 @@ public class UploadVideoViewController: UIViewController {
 
     displayTextCountLabel.do {
       $0.font = RecordyFont.caption2.font
-      $0.textColor = CommonAsset.recordyGrey05.color
+      $0.textColor = CommonAsset.viskitGray05.color
+      $0.text = "0 / 20"
     }
 
     uploadButton.do {
@@ -243,11 +244,11 @@ public class UploadVideoViewController: UIViewController {
       .assign(to: \.image, on: videoThumbnailImageView)
       .store(in: &cancellables)
 
-    viewModel.$contentsTextCount
-      .receive(on: DispatchQueue.main)
-      .map { Optional($0) }
-      .assign(to: \.text, on: contentsTextView.textCountLabel)
-      .store(in: &cancellables)
+//    viewModel.$contentsTextCount
+//      .receive(on: DispatchQueue.main)
+//      .map { Optional($0) }
+//      .assign(to: \.text, on: contentsTextView.textCountLabel)
+//      .store(in: &cancellables)
 
     viewModel.$uploadEnabled
       .receive(on: DispatchQueue.main)
@@ -271,40 +272,27 @@ public class UploadVideoViewController: UIViewController {
         self?.placeButton.configure(text: place.name)
       }
       .store(in: &cancellables)
-
-    viewModel.$exhibitionName
-      .receive(on: DispatchQueue.main)
-      .compactMap { $0 }
-      .sink { [weak self] name in
-        guard let self else { return }
-        displayTextCountLabel.text = "\(name.count) / 10"
-      }
-      .store(in: &cancellables)
-
-    contentsTextView.textView.textPublisher
-      .compactMap { $0 }
-      .filter { $0.count <= 300 }
-      .assign(to: \.contents, on: viewModel)
-      .store(in: &cancellables)
     
     contentsTextView.textView.textPublisher
+      .receive(on: DispatchQueue.main)
       .compactMap { $0 }
-      .scan("") { previous, current in
-        // 입력값이 300자를 넘으면 이전 값을 유지
-        if current.count > 300 {
-          return previous
-        }
-        return current
-      }
+      .map { $0.count > 300 ? String($0.prefix(300)) : $0 }
       .sink { [weak self] text in
         guard let self else { return }
-        self.contentsTextView.textView.text = text
-        self.contentsTextView.textCountLabel.text = "\(text.count) / 300"
+        self.viewModel.contents = text
+        var textCount = text.count
+        if text == "공간에 대한 나의 생각을 자유롭게 적어주세요!" { textCount = 0 }
+        self.contentsTextView.textCountLabel.text = "\(textCount) / 300"
       }
       .store(in: &cancellables)
 
     displayTextField.textPublisher
-      .assign(to: \.exhibitionName, on: viewModel)
+      .map { $0.count > 20 ? String($0.prefix(20)) : $0 }
+      .sink { [weak self] text in
+        guard let self else { return }
+        self.viewModel.exhibitionName = text
+        self.displayTextCountLabel.text = "\(text.count) / 20"
+      }
       .store(in: &cancellables)
 
     videoThumbnailSelectButton.tapPublisher
@@ -385,8 +373,34 @@ public class UploadVideoViewController: UIViewController {
 
   @objc func placeButtonTapped() {
     let nextViewController = SearchPlaceViewController()
-    nextViewController.placeRegistered = placeRegistered
+    nextViewController.delegate = self
     navigationController?.pushViewController(nextViewController, animated: true)
+  }
+}
+
+@available(iOS 16.0, *)
+extension UploadVideoViewController: UITextFieldDelegate {
+  public func textField(
+    _ textField: UITextField,
+    shouldChangeCharactersIn range: NSRange,
+    replacementString string: String
+  ) -> Bool {
+    let currentText = textField.text ?? ""
+    let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
+
+    return newText.count <= 20
+  }
+
+  public func textFieldDidBeginEditing(_ textField: UITextField) {
+    displayTextCountLabel.textColor = CommonAsset.viskitGray01.color
+  }
+
+  public func textFieldDidEndEditing(_ textField: UITextField) {
+    if textField.text == "" {
+      displayTextCountLabel.textColor = CommonAsset.viskitGray05.color
+    } else {
+      displayTextCountLabel.textColor = CommonAsset.viskitGray01.color
+    }
   }
 }
 

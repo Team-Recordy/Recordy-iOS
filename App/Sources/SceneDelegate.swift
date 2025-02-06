@@ -43,35 +43,28 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     window = UIWindow(frame: windowScene.coordinateSpace.bounds)
     window?.windowScene = windowScene
 
-    setUpTokenExpiredNotification()
+    let loginVC = LoginViewController()
+    let navigationController = UINavigationController(rootViewController: loginVC)
+    window?.rootViewController = navigationController
+    window?.makeKeyAndVisible()
+
     checkInitialToken()
   }
 
   private func checkInitialToken() {
     if KeychainManager.shared.read(token: .AccessToken) != nil {
+      if !KeychainManager.shared.isRefreshTokenValid() {
+        KeychainManager.shared.delete(token: .AccessToken)
+        KeychainManager.shared.delete(token: .RefreshToken)
+        navigateToLogin()
+        return
+      }
       let mainVC = RecordyTabBarController()
       window?.rootViewController = mainVC
     } else {
       navigateToLogin()
     }
     window?.makeKeyAndVisible()
-  }
-
-  private func setUpTokenExpiredNotification() {
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(handleTokenExpiration),
-      name: .tokenExpired,
-      object: nil
-    )
-  }
-
-  @objc private func handleTokenExpiration() {
-    if let rootViewController = window?.rootViewController {
-      rootViewController.dismiss(animated: true) { [weak self] in
-        self?.navigateToLogin()
-      }
-    }
   }
 
   private func navigateToLogin() {

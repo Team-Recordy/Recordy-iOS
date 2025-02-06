@@ -11,13 +11,6 @@ import UIKit
 import Core
 
 @available(iOS 16.0, *)
-extension VideoFeedViewController: FeedWatchDelegate {
-  func play(feed: Feed) {
-    viewModel.postIsFeedWatched(feed: feed)
-  }
-}
-
-@available(iOS 16.0, *)
 extension VideoFeedViewController: ReportWithCopyLinkDelegate {
   func didTapReport() {
     updateSheetHeight(Sheet.expandedHeight)
@@ -29,5 +22,16 @@ extension VideoFeedViewController: ReportWithCopyLinkDelegate {
 
   func cancel() {
     updateSheetHeight(Sheet.defaultHeight)
+  }
+
+  func reason() {
+    updateSheetHeight(Sheet.reasonHeight)
+  }
+
+  func delete(id: Int) {
+    if let index = viewModel.feedList.firstIndex(where: { $0.id == id }) {
+      viewModel.feedList.remove(at: index)
+      collectionView!.reloadData()
+    }
   }
 }

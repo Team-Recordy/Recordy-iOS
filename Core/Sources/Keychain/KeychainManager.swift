@@ -81,4 +81,13 @@ public class KeychainManager {
     let status = SecItemDelete(keychainQuery)
     assert(status == noErr, "@Log - Failed to delete token")
   }
+
+  public func isRefreshTokenValid() -> Bool {
+    guard let expirationDate = UserDefaults.standard.object(forKey: "RefreshTokenExpiration") as? Date,
+          let refreshToken = read(token: .RefreshToken) else {
+      return false
+    }
+
+    return Date() < expirationDate && !refreshToken.isEmpty
+  }
 }

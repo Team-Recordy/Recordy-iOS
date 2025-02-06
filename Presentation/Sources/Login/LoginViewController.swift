@@ -103,6 +103,12 @@ public final class LoginViewController: UIViewController {
           value: response.refreshToken
         )
         UserDefaults.standard.set(response.userId, forKey: "userId")
+        let expirationDate = Calendar.current.date(
+          byAdding: .day,
+          value: 14,
+          to: Date()
+        )
+        UserDefaults.standard.set(expirationDate, forKey: "RefreshTokenExpiration")
         if response.isSignedUp {
           let tabBarController = RecordyTabBarController()
           tabBarController.modalPresentationStyle = .fullScreen

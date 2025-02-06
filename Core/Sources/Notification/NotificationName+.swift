@@ -10,4 +10,5 @@ import Foundation
 
 public extension Notification.Name {
   static let updateDidComplete = Notification.Name("updateDidComplete")
+  static let reportDidComplete = Notification.Name("reportDidComplete")
 }

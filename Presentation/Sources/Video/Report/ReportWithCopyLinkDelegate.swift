@@ -12,4 +12,6 @@ protocol ReportWithCopyLinkDelegate: AnyObject {
   func didTapReport()
   func copy()
   func cancel()
+  func reason()
+  func delete(id: Int)
 }

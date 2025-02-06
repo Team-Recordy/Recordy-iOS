@@ -12,6 +12,42 @@ public class BaseNavigationController: UINavigationController {
   public override func viewDidLoad() {
     super.viewDidLoad()
     configureNavigationBar()
+    addObserver()
+  }
+
+  private func addObserver() {
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(updateDidComplete), // selector 이름을 명확하게 변경
+      name: .updateDidComplete,
+      object: nil
+    )
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(reportDidComplete),
+      name: .reportDidComplete,
+      object: nil
+    )
+  }
+
+  @objc private func updateDidComplete(_ notification: Notification) {
+    guard let userInfo = notification.userInfo,
+          let message = userInfo["message"] as? String,
+          let stateString = userInfo["state"] as? String else {
+      return
+    }
+    let status: RecordyToastStatus = stateString == "success" ? .complete : .warning
+    self.showToast(status: status, message: message, height: 44)
+  }
+
+  @objc private func reportDidComplete(_ notification: Notification) {
+    guard let userInfo = notification.userInfo,
+          let message = userInfo["message"] as? String,
+          let stateString = userInfo["state"] as? String else {
+      return
+    }
+    let status: RecordyToastStatus = stateString == "success" ? .complete : .warning
+    self.showToast(status: status, message: message, height: 44)
   }
 
   private func configureNavigationBar() {

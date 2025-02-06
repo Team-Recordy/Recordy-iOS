@@ -20,6 +20,7 @@ public class VideoFeedViewController: UIViewController {
   enum Sheet {
     static let defaultHeight: CGFloat = 152
     static let expandedHeight: CGFloat = 566
+    static let reasonHeight: CGFloat = 243
   }
 
   var collectionView: UICollectionView? = nil
@@ -54,12 +55,12 @@ public class VideoFeedViewController: UIViewController {
   public override func viewDidLoad() {
     super.viewDidLoad()
     setUpCollectionView()
-    setStyle()
     setUI()
     setAutolayout()
   }
 
   public override func viewWillAppear(_ animated: Bool) {
+    setStyle()
     bind()
     viewModel.recordListCase()
   }
@@ -164,7 +165,16 @@ public class VideoFeedViewController: UIViewController {
   }
 
   func sheetAction() {
-    let nextViewController = ReportWithCopyLinkViewController()
+    guard let visibleIndexPath = collectionView?.indexPathsForVisibleItems.first else { return }
+
+    let currentFeed = viewModel.feedList[visibleIndexPath.row]
+    let feedId = currentFeed.id
+    let isMine = currentFeed.isMine
+
+    let nextViewController = ReportWithCopyLinkViewController(
+      id: feedId,
+      isMine: isMine
+    )
     nextViewController.delegate = self
     let navigationController = BaseNavigationController(rootViewController: nextViewController)
 
@@ -172,7 +182,7 @@ public class VideoFeedViewController: UIViewController {
       configureSheet(sheet, height: Sheet.defaultHeight)
     }
 
-    present(_: navigationController, animated: true)
+    present(navigationController, animated: true)
   }
 
   private func configureSheet(_ sheet: UISheetPresentationController, height: CGFloat) {

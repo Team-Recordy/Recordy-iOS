@@ -65,7 +65,7 @@ let project = Project.makeModule(
   name: moduleName,
   destinations: [.iPhone],
   product: .app,
-  bundleId: "app.viskit.recordy",
+  bundleId: "viskit-iOS",
   infoPlist: .extendingDefault(with: infoPlist),
   resources: ["Resources/**"],
   entitlements: .file(path: "App.entitlements"),

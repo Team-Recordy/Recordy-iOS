@@ -51,7 +51,7 @@ extension APITarget.Records: TargetType {
     case .getBookmarkedRecordList:
       return "bookmarks"
     case .deleteRecord(let deleteRecordRequest):
-      return "\(deleteRecordRequest.record_id)"
+      return "\(deleteRecordRequest.recordId)"
     }
   }
 

@@ -54,6 +54,9 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
   }
 
   private func setStyle() {
+    navigationController?.isNavigationBarHidden = false
+    title = "프로필"
+    
     view.backgroundColor = CommonAsset.viskitBG.color
     profileImage.do {
       $0.image = CommonAsset.profileImage.image
@@ -223,6 +226,7 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
           )
         }
         self.feeds += feeds
+        self.cursorId = response.nextCursor ?? 0
         DispatchQueue.main.async {
           self.collectionView!.reloadData()
           self.setCountLabelText()
@@ -275,10 +279,11 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
   ) {
     let videoFeedViewController = VideoFeedViewController(
       type: .others,
-      placeId: 0,
-      exhibitionId: 0,
-      cursorId: nil,
+      placeId: feeds[indexPath.row].id,
+      exhibitionId: nil,
+      cursorId: cursorId,
       userId: feeds[indexPath.row].uploaderId
     )
+    navigationController?.pushViewController(videoFeedViewController, animated: true)
   }
 }

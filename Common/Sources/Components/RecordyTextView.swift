@@ -29,7 +29,7 @@ public class RecordyTextView: UIView {
   }
   public let textCountLabel = UILabel().then {
     $0.font = RecordyFont.caption2.font
-    $0.textColor = CommonAsset.recordyGrey05.color
+    $0.textColor = CommonAsset.viskitGray05.color
   }
 
   private let textViewPlaceHolder = "공간에 대한 나의 생각을 자유롭게 적어주세요!"
@@ -72,6 +72,17 @@ public class RecordyTextView: UIView {
 }
 
 extension RecordyTextView: UITextViewDelegate {
+  public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+    if textView.text == textViewPlaceHolder {
+      return true
+    }
+
+    let currentText = textView.text ?? ""
+    let newText = (currentText as NSString).replacingCharacters(in: range, with: text)
+
+    return newText.count <= 300
+  }
+
   public func textViewDidChange(_ textView: UITextView) {
     let currentSize = self.textView.sizeThatFits(
       CGSize(
