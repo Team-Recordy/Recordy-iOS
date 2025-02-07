@@ -124,7 +124,7 @@ class FeedView: UIView {
     }
 
     locationImage.do {
-      $0.image = CommonAsset.icCusror16.image
+      $0.image = CommonAsset.locationCursor.image
       $0.contentMode = .scaleAspectFit
     }
 

@@ -17,34 +17,34 @@ import Kingfisher
 
 @available(iOS 16.0, *)
 public class OtherUserProfileViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
-
+  
   private let profileImage = UIImageView()
   private let userName = UILabel()
   private let followerButton = UIButton()
   private let followingButton = MediumButton()
   private let countLabel = UILabel()
   private var collectionView: UICollectionView?
-
+  
   private var feeds: [Feed] = []
   private var user: User?
   private let id: Int
   private var cursorId: Int = 0
-
+  
   init(id: Int) {
     self.id = id
     super.init(nibName: nil, bundle: nil)
   }
-
+  
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
+  
   override public func viewDidLoad() {
     super.viewDidLoad()
-
+    
     followingButton.addTarget(self, action: #selector(followButtonTap), for: .touchUpInside)
     followerButton.addTarget(self, action: #selector(showOtherFollowers), for: .touchUpInside)
-
+    
     setUpCollectionView()
     setStyle()
     setUI()
@@ -52,12 +52,13 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
     getOtherRecordList()
     getUserInfo()
   }
-
+  
   private func setStyle() {
     navigationController?.isNavigationBarHidden = false
     title = "프로필"
-    
     view.backgroundColor = CommonAsset.viskitBG.color
+    setupCustomBackButton()
+    
     profileImage.do {
       $0.image = CommonAsset.profileImage.image
       $0.contentMode = .scaleAspectFit
@@ -91,12 +92,12 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
       $0.numberOfLines = 1
       $0.textAlignment = .right
     }
-
+    
     collectionView!.do {
       $0.backgroundColor = .clear
     }
   }
-
+  
   private func setUI() {
     self.view.addSubview(profileImage)
     self.view.addSubview(userName)
@@ -105,7 +106,7 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
     self.view.addSubview(countLabel)
     self.view.addSubview(collectionView!)
   }
-
+  
   private func setAutoLayout() {
     profileImage.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(20)
@@ -136,26 +137,26 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
       $0.width.equalTo(161.adaptiveWidth)
       $0.height.equalTo(18.adaptiveHeight)
     }
-
+    
     collectionView!.snp.makeConstraints {
       $0.top.equalTo(countLabel.snp.bottom).offset(8)
       $0.leading.trailing.bottom.equalToSuperview()
     }
   }
-
+  
   private func setUpCollectionView() {
     let layout = UICollectionViewFlowLayout()
     layout.itemSize = CGSize(width: 170, height: 288)
     layout.minimumLineSpacing = 10
     layout.minimumInteritemSpacing = 10
     layout.sectionInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
-
+    
     collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     collectionView!.dataSource = self
     collectionView!.delegate = self
     collectionView!.register(ThumbnailCollectionViewCell.self, forCellWithReuseIdentifier: ThumbnailCollectionViewCell.cellIdentifier)
   }
-
+  
   private func setCountLabelText() {
     let whiteText = "• \(feeds.count)"
     let greyText = " 개의 기록"
@@ -163,7 +164,7 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
     attributedText.append(NSAttributedString(string: greyText, attributes: [NSAttributedString.Key.foregroundColor: CommonAsset.recordyGrey03.color]))
     countLabel.attributedText = attributedText
   }
-
+  
   private func setUserProfile() {
     guard let user = user else { return }
     let attributedText = NSMutableAttributedString(string: "\(user.followerCount)", attributes: [.font: RecordyFont.body2.font])
@@ -174,7 +175,7 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
     self.profileImage.kf.setImage(with: url)
     self.followingButton.mediumState = user.isFollowing ? .active : .inactive
   }
-
+  
   func getUserInfo() {
     let apiProvider = APIProvider<APITarget.Users>()
     let request = DTO.GetProfileRequest(otherUserId: id)
@@ -182,21 +183,22 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
       guard let self = self else { return }
       switch result {
       case .success(let response):
-//        self.user = User(
-//          isMine: response.id,
-//          id: response.nickname,
-//          nickname: response.followerCount,
-//          follower: response.followingCount,
-//          following: response.isFollowing,
-//          isFollowing: response.profileImageUrl
-//        )
+        self.user = User(
+          id: response.id,
+          nickname: response.nickname,
+          isFollowing: response.isFollowing,
+          profileImage: response.profileImageUrl,
+          recordCount: response.recordCount,
+          followerCount: response.followerCount,
+          followingCount: response.followingCount
+        )
         self.setUserProfile()
       case .failure(let failure):
         print(failure)
       }
     }
   }
-
+  
   func getOtherRecordList() {
     let apiProvider = APIProvider<APITarget.Records>()
     let request = DTO.GetUserRecordListRequest(
@@ -236,7 +238,7 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
       }
     }
   }
-
+  
   @objc private func followButtonTap() {
     self.followingButton.mediumState = self.followingButton.mediumState == .active ? .inactive : .active
     let apiProvider = APIProvider<APITarget.Users>()
@@ -251,14 +253,28 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
       }
     }
   }
-
+  
+  func postBookmark(recordIndex: Int) {
+    self.feeds[recordIndex].isBookmarked.toggle()
+    let bookmarkProvider = APIProvider<APITarget.Bookmarks>()
+    let request = DTO.PostBookmarkRequest(recordId: feeds[recordIndex].id)
+    bookmarkProvider.justRequest(.postBookmark(request)) { result in }
+  }
+  
+  private func updateThumbnailBookmark(recordIndex: Int, isBookmarked: Bool) {
+    DispatchQueue.main.async {
+      let indexPath = IndexPath(item: recordIndex, section: 0)
+      self.collectionView?.reloadItems(at: [indexPath])
+    }
+  }
+  
   @objc private func showOtherFollowers() {
   }
-
+  
   public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return feeds.count
   }
-
+  
   public func collectionView(
     _ collectionView: UICollectionView,
     cellForItemAt indexPath: IndexPath
@@ -270,9 +286,20 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
       return UICollectionViewCell()
     }
     cell.configure(feed: feeds[indexPath.row])
+    cell.bookmarkActionInThumbnailCell = { [weak self] in
+      guard let self = self else { return }
+      let recordId = self.feeds[indexPath.row].id
+      if let index = self.feeds.firstIndex(where: { $0.id == recordId }) {
+        self.postBookmark(recordIndex: index)
+        self.updateThumbnailBookmark(
+          recordIndex: index,
+          isBookmarked: self.feeds[index].isBookmarked
+        )
+      }
+    }
     return cell
   }
-
+  
   public func collectionView(
     _ collectionView: UICollectionView,
     didSelectItemAt indexPath: IndexPath
