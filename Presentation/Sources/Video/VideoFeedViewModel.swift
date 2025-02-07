@@ -29,7 +29,7 @@ public enum VideoFeedType_new {
 }
 
 class VideoFeedViewModel {
-
+  
   var feedList: [Feed] = []
   let apiProvider = APIProvider<APITarget.Records>()
   var type: VideoFeedType
@@ -46,7 +46,7 @@ class VideoFeedViewModel {
   var newType: VideoFeedType = .all
   var isPlayed = false
   var feedUpdated = false
-
+  
   init(
     type: VideoFeedType,
     placeId: Int? = nil,
@@ -61,18 +61,18 @@ class VideoFeedViewModel {
     self.userId = userId
     recordListCase()
   }
-
+  
   func play() {
     isPlayed = true
   }
-
+  
   func toggle(from videoType: VideoFeedType) {
     isPlayed = false
     feedList.removeAll()
     type = videoType
     recordListCase()
   }
-
+  
   func recordListCase() {
     guard !isFetching else { return }
     switch type {
@@ -119,13 +119,13 @@ class VideoFeedViewModel {
     default: return
     }
   }
-
+  
   private func getPlaceRecordList<T: Codable>(
     endPoint: APITarget.Records,
     response: T.Type
   ) {
     guard !isFetching else { return }
-      isFetching = true
+    isFetching = true
     apiProvider.requestResponsable(
       endPoint,
       response
@@ -141,7 +141,7 @@ class VideoFeedViewModel {
       }
     }
   }
-
+  
   private func processResponse<T: Codable>(response: T) {
     if let randomRecordListResponse = response as? DTO.GetRandomRecordListResponse {
       let feeds: [Feed] = randomRecordListResponse.records.map { content in
@@ -162,9 +162,9 @@ class VideoFeedViewModel {
       }
       updateFeedList(feeds)
     }
-    else if let followingRecordListResponse = response as? DTO.GetFollowingRecordListResponse {
+    if let followingRecordListResponse = response as? DTO.GetFollowingRecordListResponse {
       /// 팔로잉 레코드 조회
-      let feeds: [Feed] = followingRecordListResponse.content.map { content in
+      let feeds: [Feed] = followingRecordListResponse.map { content in
         Feed(
           id: content.id,
           videoLink: content.fileUrl.videoUrl,
@@ -181,8 +181,8 @@ class VideoFeedViewModel {
         )
       }
       updateFeedList(feeds)
-      hasNext = followingRecordListResponse.hasNext
-      cursorId = followingRecordListResponse.nextCursor
+      //      hasNext = followingRecordListResponse.hasNext
+      //      cursorId = followingRecordListResponse.nextCursor
     }
     else if let userProfileRecordListResponse = response as? DTO.GetUserRecordListResponse {
       /// 유저 프로필 레코드 조회
@@ -281,26 +281,26 @@ class VideoFeedViewModel {
       }
     }
   }
-
+  
   func updateFeedList(_ newFeeds: [Feed]) {
     feedList += newFeeds
     feedUpdated = true
     onFeedListUpdate?(newFeeds.count)
-
+    
     //    cacheVideos(feeds: newFeeds) { [weak self] cachedFeeds in
     //      guard let self else { return }
     //      self.feedList += cachedFeeds
     //      self.onFeedListUpdate?(cachedFeeds.count)
     //    }
   }
-
+  
   func cacheVideos(
     feeds: [Feed],
     completion: @escaping ([Feed]) -> Void
   ) {
     let dispatchGroup = DispatchGroup()
     var cachedFeeds: [Feed] = []
-
+    
     for feed in feeds {
       dispatchGroup.enter()
       VideoCacheManager.shared.downloadAndCacheURL(url: URL(string: feed.videoLink)!) { url in
@@ -326,12 +326,12 @@ class VideoFeedViewModel {
         dispatchGroup.leave()
       }
     }
-
+    
     dispatchGroup.notify(queue: .main) {
       completion(cachedFeeds)
     }
   }
-
+  
   func bookmarkFeed(index: Int) {
     let isBookmarked = feedList[index].isBookmarked
     feedList[index].isBookmarked.toggle()

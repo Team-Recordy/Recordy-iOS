@@ -77,7 +77,7 @@ public class VideoFeedViewController: UIViewController {
     }
     recordyToggle.toggleAction = { [weak self] toggleState in
       guard let self = self else { return }
-      toggleButtonTapped(type: toggleState == .all ? .follow : .all)
+      toggleButtonTapped(type: toggleState == .all ? .follow : .follow)
     }
     if type != .all {
       navigationController?.navigationBar.topItem?.title = ""
@@ -161,7 +161,7 @@ public class VideoFeedViewController: UIViewController {
   }
 
   func toggleButtonTapped(type: VideoFeedType) {
-    viewModel.toggle(from: type == .all ? .follow : .all)
+    viewModel.toggle(from: type == .all ? .follow : .follow)
   }
 
   func sheetAction() {
