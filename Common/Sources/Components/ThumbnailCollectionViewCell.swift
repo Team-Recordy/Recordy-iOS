@@ -1,5 +1,5 @@
 //
-//  RecentCollectionViewCell.swift
+//  ThumbnailCollectionViewCell.swift
 //  Common
 //
 //  Created by Chandrala on 7/15/24.
@@ -19,7 +19,6 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
   public let gradientView = UIView()
   public let label = UILabel()
   public let backgroundImageView = UIImageView()
-  public let locationStackView = UIStackView()
   public let locationText = UILabel()
   public let locationImageView = UIImageView()
   public let bookmarkButton = UIButton()
@@ -54,21 +53,14 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
       $0.colors = colors.map { $0.cgColor }
     }
     
-    locationStackView.do {
-      $0.axis = .horizontal
-      $0.distribution = .fillProportionally
-      $0.alignment = .center
-      $0.spacing = 6
-    }
-    
     locationText.do {
-      $0.text = "최대열글자들어갑니다"
+      $0.text = ""
       $0.font = RecordyFont.caption2.font
       $0.textColor = CommonAsset.recordyGrey01.color
     }
     
     locationImageView.do {
-      $0.image = CommonAsset.locationActive.image
+      $0.image = CommonAsset.locationCursor.image
     }
     
     bookmarkButton.do {
@@ -92,15 +84,16 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
   }
   private func setUI() {
     gradientView.layer.addSublayer(gradientLayer)
+    
     self.addSubviews(
       backgroundImageView,
       gradientView,
       thumbnailImage,
-      locationStackView,
-      bookmarkButton
+      bookmarkButton,
+      locationImageView,
+      locationText
     )
-    locationStackView.addArrangedSubview(locationImageView)
-    locationStackView.addArrangedSubview(locationText)
+    
     bookmarkButton.addSubview(bookmarkImage)
   }
   
@@ -108,34 +101,37 @@ public class ThumbnailCollectionViewCell: UICollectionViewCell {
     backgroundImageView.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
+    
     gradientView.snp.makeConstraints {
       $0.horizontalEdges.bottom.equalToSuperview()
       $0.height.equalTo(60.adaptiveHeight)
     }
-    locationStackView.snp.makeConstraints {
-      $0.horizontalEdges.equalToSuperview().inset(6)
-      $0.bottom.equalToSuperview().inset(12)
-    }
+    
     locationImageView.snp.makeConstraints {
-      $0.leading.equalToSuperview().offset(6)
-      $0.width.equalTo(12.adaptiveWidth)
-      $0.height.equalTo(12.adaptiveHeight)
-      $0.centerY.equalToSuperview()
+      $0.leading.equalToSuperview().offset(12)
+      $0.bottom.equalToSuperview().offset(-15)
+      $0.width.equalTo(16.adaptiveWidth)
+      $0.height.equalTo(16.adaptiveHeight)
     }
+    
     locationText.snp.makeConstraints {
-      $0.centerY.equalToSuperview()
+      $0.centerY.equalTo(locationImageView)
+      $0.leading.equalTo(locationImageView.snp.trailing).offset(3)
     }
+    
     bookmarkButton.snp.makeConstraints {
       $0.width.equalTo(40.adaptiveWidth)
       $0.height.equalTo(40.adaptiveHeight)
       $0.top.equalToSuperview()
       $0.trailing.equalToSuperview()
     }
+    
     bookmarkImage.snp.makeConstraints {
       $0.centerX.centerY.equalToSuperview()
       $0.width.equalTo(14.adaptiveWidth)
       $0.height.equalTo(16.adaptiveHeight)
     }
+    
     thumbnailImage.snp.makeConstraints {
       $0.bottom.horizontalEdges.equalToSuperview()
       $0.width.equalToSuperview()

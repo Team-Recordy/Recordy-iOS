@@ -33,6 +33,7 @@ final class OverviewViewController: UIViewController {
   
   public override func viewWillAppear(_ animated: Bool) {
     viewModel.getNearPlaceList()
+    navigationController?.isNavigationBarHidden = true
   }
   
   public override func viewDidLoad() {
@@ -47,7 +48,6 @@ final class OverviewViewController: UIViewController {
   
   private func setStyle() {
     view.backgroundColor = CommonAsset.viskitBG.color
-    navigationController?.isNavigationBarHidden = true
 
     overviewCollectionView!.do {
       $0.backgroundColor = .clear
@@ -190,10 +190,12 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
       }
       cell.onBookmarkButtonTapped = { [weak self] recordIndex in
         guard let self = self else { return }
-        self.viewModel.postBookmark(
-          placeIndex: indexPath.row,
-          recordIndex: recordIndex
-        )
+        self.viewModel.postBookmark(placeIndex: indexPath.row, recordIndex: recordIndex) {
+          DispatchQueue.main.async {
+            let indexPath = IndexPath(item: indexPath.row, section: 0)
+            self.overviewCollectionView?.reloadItems(at: [indexPath])
+          }
+        }
         cell.updateThumbnailBookmark(recordIndex: recordIndex, isBookmarked: viewModel.nearPlaces[indexPath.row].recordList[recordIndex].isBookmarked)
       }
       cell.onUpdateHeight = {
@@ -217,9 +219,10 @@ extension OverviewViewController: UICollectionViewDelegate, UICollectionViewData
         self.navigationController?.pushViewController(videoVC, animated: true)
       }
       viewModel.onBookmarkUpdated = { [weak self] index in
-        guard let self else { return }
+        guard let self = self else { return }
         DispatchQueue.main.async {
-          cell.updateRecords(records: self.viewModel.nearPlaces[index].recordList)
+          let indexPath = IndexPath(item: index, section: 0)
+          self.overviewCollectionView?.reloadItems(at: [indexPath])
         }
       }
       return cell
