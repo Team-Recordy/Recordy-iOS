@@ -87,9 +87,7 @@ class FollowerCell: UITableViewCell {
       profileImageView.image = UIImage(named: "default_profile")
     }
     usernameLabel.text = follower.nickname
-    
-    followButton.isHidden = (follower.nickname == "비스킷")
-    
+
     updateFollowButton(isFollowed: follower.isFollowing)
   }
   

@@ -107,7 +107,7 @@ class FollowViewModel {
         userId: String($0.id),
         profileImage: $0.profileImageUrl,
         nickname: $0.nickname,
-        isFollowing: $0.isFollowing
+        isFollowing: $0.nickname != "비스킷"
       )
     }
     

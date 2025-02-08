@@ -112,7 +112,10 @@ extension FollowViewController: UITableViewDataSource, UITableViewDelegate {
     return viewModel.followers.count
   }
   
-  public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  public func tableView(
+    _ tableView: UITableView,
+    cellForRowAt indexPath: IndexPath
+  ) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(
       withIdentifier: "FollowerCell",
       for: indexPath
@@ -121,20 +124,18 @@ extension FollowViewController: UITableViewDataSource, UITableViewDelegate {
     let follower = viewModel.followers[indexPath.row]
     cell.configure(with: follower)
     
-    cell.followButton.do {
-      if indexPath.row == 0 && followType == .following {
-        $0.isHidden = true
-      } else {
-        $0.isHidden = false
-        cell.updateFollowButton(isFollowed: follower.isFollowing)
-      }
+    cell.followButton.isHidden = false
+    
+    if follower.nickname == "비스킷" {
+      cell.followButton.isHidden = true
+    } else {
+      cell.updateFollowButton(isFollowed: follower.isFollowing)
     }
     
     cell.followButtonEvent = { [weak self] in
       guard let self = self else { return }
       self.viewModel.postFollowRequest(at: indexPath.row)
     }
-    
     return cell
   }
   
