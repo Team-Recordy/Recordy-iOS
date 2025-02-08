@@ -67,6 +67,7 @@ public class ProfileViewController: UIViewController {
     super.viewWillAppear(animated)
     updateProfile()
     self.tabBarController?.tabBar.isHidden = false
+    configureNavigationBar()
   }
   
   @objc private func updateProfile() {
@@ -414,11 +415,11 @@ extension ProfileViewController: BookmarkDelegate {
   }
   
   func bookmarkFeedTapped(feed: Core.Feed) {
-      let videoFeedViewController = VideoFeedViewController(
-        type: .bookmarked,
-        cursorId: cursorId
-      )
-      self.navigationController?.pushViewController(videoFeedViewController, animated: true)
+    let videoFeedViewController = VideoFeedViewController(
+      type: .bookmarked,
+      cursorId: cursorId
+    )
+    self.navigationController?.pushViewController(videoFeedViewController, animated: true)
   }
 }
 

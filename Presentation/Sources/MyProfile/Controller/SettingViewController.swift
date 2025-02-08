@@ -1,5 +1,5 @@
 //
-//  SetViewController.swift
+//  SettingViewController.swift
 //  Presentation
 //
 //  Created by 송여경 on 7/12/24.
@@ -17,6 +17,7 @@ import Common
 @available(iOS 16.0, *)
 public class SettingViewController: UIViewController {
   private let id: Int
+  private var loginType: String = "APPLE"
   
   init(id: Int) {
     self.id = id
@@ -27,7 +28,7 @@ public class SettingViewController: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
-  let accountTableView: CustomTableView = {
+  private lazy var accountTableView: CustomTableView = {
     return CustomTableView(
       type: .account,
       list: [
@@ -38,7 +39,7 @@ public class SettingViewController: UIViewController {
       footerView: nil,
       cellArrowImages: [
         CommonAsset.indicator.image,
-        CommonAsset.apple.image
+        loginType == "KAKAO" ? CommonAsset.kakao.image : CommonAsset.apple.image
       ]
     )
   }()
@@ -90,7 +91,6 @@ public class SettingViewController: UIViewController {
       footerView: footerView,
       cellArrowImages: [
         CommonAsset.indicator.image,
-        CommonAsset.indicator.image,
         CommonAsset.indicator.image
       ]
     )
@@ -102,6 +102,7 @@ public class SettingViewController: UIViewController {
   public override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     tabBarController?.tabBar.isHidden = true
+    getLoginPlatformType()
   }
   
   public override func viewDidLoad() {
@@ -182,22 +183,39 @@ public class SettingViewController: UIViewController {
       ]
     }
   }
+  
+  private func getLoginPlatformType() {
+    if let savedPlatform = UserDefaults.standard.string(forKey: "PlatformType") {
+      self.loginType = savedPlatform
+    } else {
+      self.loginType = "APPLE"
+    }
+    print("로그인 타입: \(self.loginType)")
+    
+    DispatchQueue.main.async {
+      self.updateLoginIcon()
+    }
+  }
+  
+  private func updateLoginIcon() {
+    accountTableView.cellArrowImages[1] = loginType == "KAKAO" ? CommonAsset.kakao.image : CommonAsset.apple.image
+    
+    if let tableView = accountTableView.subviews.first(where: { $0 is UITableView }) as? UITableView {
+      tableView.reloadData()
+    } else {
+      print("error")
+    }
+  }
 }
 
 @available(iOS 16.0, *)
 extension SettingViewController: SignOutDelegate {
   func signOut() {
     self.showPopUp(type: .signOut) {
-      let apiProvider = APIProvider<APITarget.Users>()
-      apiProvider.justRequest(.signOut) { result in
-        switch result {
-        case .success(let success):
-          KeychainManager.shared.delete(token: .AccessToken)
-          KeychainManager.shared.delete(token: .RefreshToken)
-        case .failure(let failure):
-          print(failure)
-        }
-      }
+      KeychainManager.shared.delete(token: .AccessToken)
+      KeychainManager.shared.delete(token: .RefreshToken)
+      UserDefaults.standard.removeObject(forKey: "PlatformType")
+      
       self.dismiss(animated: false)
       let loginViewController = SplashScreenViewController()
       loginViewController.modalPresentationStyle = .fullScreen
@@ -210,16 +228,10 @@ extension SettingViewController: SignOutDelegate {
 extension SettingViewController: WithDrawDelegate {
   func withDraw() {
     self.showPopUp(type: .withdraw) {
-      let apiProvider = APIProvider<APITarget.Users>()
-      apiProvider.justRequest(.withdraw) { result in
-        switch result {
-        case .success(let success):
-          KeychainManager.shared.delete(token: .AccessToken)
-          KeychainManager.shared.delete(token: .RefreshToken)
-        case .failure(let failure):
-          print(failure)
-        }
-      }
+      KeychainManager.shared.delete(token: .AccessToken)
+      KeychainManager.shared.delete(token: .RefreshToken)
+      UserDefaults.standard.removeObject(forKey: "PlatformType")
+      
       self.dismiss(animated: false)
       let loginViewController = SplashScreenViewController()
       loginViewController.modalPresentationStyle = .fullScreen
