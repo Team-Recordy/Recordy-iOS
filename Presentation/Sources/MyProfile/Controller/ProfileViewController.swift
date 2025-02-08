@@ -58,7 +58,7 @@ public class ProfileViewController: UIViewController {
     NotificationCenter.default.addObserver(
       self,
       selector: #selector(updateProfile),
-      name: NSNotification.Name("VideoUploadCompleted"),
+      name: .updateDidComplete,
       object: nil
     )
   }
@@ -73,6 +73,10 @@ public class ProfileViewController: UIViewController {
     getUserProfile()
     getMyRecordList()
     getBookmarkedRecordList()
+    
+    DispatchQueue.main.async {
+      self.myRecordView.collectionView.reloadData()
+    }
   }
   
   func setStyle() {
@@ -410,12 +414,11 @@ extension ProfileViewController: BookmarkDelegate {
   }
   
   func bookmarkFeedTapped(feed: Core.Feed) {
-    let videoFeedViewController = VideoFeedViewController(
-      type: .bookmarked,
-      placeId: 0,
-      exhibitionId: 0
-    )
-    self.navigationController?.pushViewController(videoFeedViewController, animated: true)
+      let videoFeedViewController = VideoFeedViewController(
+        type: .bookmarked,
+        cursorId: cursorId
+      )
+      self.navigationController?.pushViewController(videoFeedViewController, animated: true)
   }
 }
 
@@ -424,6 +427,9 @@ extension ProfileViewController: UserRecordDelegate {
   func userRecordFeedTapped(feed: Feed) {
     let videoFeedViewController = VideoFeedViewController(
       type: .others,
+      placeId: feed.id,
+      exhibitionId: nil,
+      cursorId: cursorId,
       userId: feed.uploaderId
     )
     self.navigationController?.pushViewController(videoFeedViewController, animated: true)
