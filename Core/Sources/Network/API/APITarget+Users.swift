@@ -29,7 +29,7 @@ extension APITarget {
 }
 
 extension APITarget.Users: TargetType {
-
+  
   public var validationType: ValidationType {
     .successCodes
   }
@@ -37,7 +37,7 @@ extension APITarget.Users: TargetType {
   public var baseURL: URL {
     return URL(string: BaseURL.string + "/users")!
   }
-
+  
   public var path: String {
     switch self {
     case .refreshToken:
@@ -64,10 +64,10 @@ extension APITarget.Users: TargetType {
       "following"
     case .getFollowerList:
       "follower"
-
+      
     }
   }
-
+  
   public var method: Moya.Method {
     switch self {
     case .refreshToken:
@@ -96,7 +96,7 @@ extension APITarget.Users: TargetType {
       return .get
     }
   }
-
+  
   public var task: Moya.Task {
     switch self {
     case .signUp(let signUpRequest):
@@ -120,26 +120,28 @@ extension APITarget.Users: TargetType {
         encoding: JSONEncoding.default
       )
     case .getFollowingList(let getFollowingListRequest):
+      var parameters: [String: Any] = ["size": getFollowingListRequest.size]
+      if let cursorId = getFollowingListRequest.cursorId {
+        parameters["cursorId"] = cursorId
+      }
       return .requestParameters(
-        parameters: [
-          "cursorId": getFollowingListRequest.cursorId,
-          "size": getFollowingListRequest.size
-        ],
+        parameters: parameters,
         encoding: URLEncoding.queryString
       )
     case .getFollowerList(let getFollowerListRequest):
+      var parameters: [String: Any] = ["size": getFollowerListRequest.size]
+      if let cursorId = getFollowerListRequest.cursorId {
+        parameters["cursorId"] = cursorId
+      }
       return .requestParameters(
-        parameters: [
-          "cursorId": getFollowerListRequest.cursorId,
-          "size": getFollowerListRequest.size
-        ],
+        parameters: parameters,
         encoding: URLEncoding.queryString
       )
     default:
       return .requestPlain
     }
   }
-
+  
   public var headers: [String : String]? {
     switch self {
     case .signIn(let signInRequest):

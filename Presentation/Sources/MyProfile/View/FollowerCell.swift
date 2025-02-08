@@ -44,7 +44,7 @@ class FollowerCell: UITableViewCell {
       $0.textColor = CommonAsset.recordyGrey01.color
     }
     
-    contentView.backgroundColor = .black
+    contentView.backgroundColor = CommonAsset.viskitBG.color
     
     followButton.addTarget(self, action: #selector(followButtonTapped), for: .touchUpInside)
   }
@@ -80,15 +80,19 @@ class FollowerCell: UITableViewCell {
   @objc private func followButtonTapped() {
     self.followButtonEvent?()
   }
-//  
-//  func configure(with follower: Follower) {
-//    let url = URL(string: follower.profileImage)
-//    profileImageView.kf.setImage(with: url)
-//    usernameLabel.text = follower.username
-//    followButton.isHidden = follower.username == "유영"
-//    updateFollowButton(isFollowed: follower.isFollowing)
-//  }
-//  
+  func configure(with follower: Follow) {
+    if let url = URL(string: follower.profileImage) {
+      profileImageView.kf.setImage(with: url, placeholder: UIImage(named: "default_profile"))
+    } else {
+      profileImageView.image = UIImage(named: "default_profile")
+    }
+    usernameLabel.text = follower.nickname
+    
+    followButton.isHidden = (follower.nickname == "비스킷")
+    
+    updateFollowButton(isFollowed: follower.isFollowing)
+  }
+  
   func updateFollowButton(isFollowed: Bool) {
     followButton.mediumState = isFollowed ? .active : .inactive
   }

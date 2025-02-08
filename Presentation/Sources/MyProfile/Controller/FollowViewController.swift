@@ -32,7 +32,10 @@ public class FollowViewController: UIViewController {
   init(followType: FollowType) {
     self.followType = followType
     self.viewModel = FollowViewModel(followType: followType)
-    super.init(nibName: nil, bundle: nil)
+    super.init(
+      nibName: nil,
+      bundle: nil
+    )
   }
   
   required init?(coder: NSCoder) {
@@ -45,19 +48,23 @@ public class FollowViewController: UIViewController {
     setUI()
     setAutoLayout()
     bind()
+    setupCustomBackButton()
     
     self.navigationController?.navigationBar.topItem?.title = ""
-    
-    
+    viewModel.fetchUsers()
   }
+  
   
   private func setStyle() {
     view.backgroundColor = CommonAsset.viskitBG.color
-
+    
     tableView.do {
       $0.dataSource = self
       $0.delegate = self
-      $0.register(FollowerCell.self, forCellReuseIdentifier: "FollowerCell")
+      $0.register(
+        FollowerCell.self,
+        forCellReuseIdentifier: "FollowerCell"
+      )
     }
     
     self.title = followType.title
@@ -81,15 +88,19 @@ public class FollowViewController: UIViewController {
   }
   
   private func bind() {
-    viewModel.followersDidChange = { [weak self] (followers: [Follow]) in
+    viewModel.followersDidChange = { [weak self] _ in
       guard let self = self else { return }
-      self.tableView.reloadData()
+      DispatchQueue.main.async {
+        self.tableView.reloadData()
+      }
     }
     
     viewModel.isEmptyDidChange = { [weak self] isEmpty in
       guard let self = self else { return }
-      self.tableView.isHidden = isEmpty
-      self.emptyView.isHidden = !isEmpty
+      DispatchQueue.main.async {
+        self.tableView.isHidden = isEmpty
+        self.emptyView.isHidden = !isEmpty
+      }
     }
   }
 }
@@ -108,7 +119,7 @@ extension FollowViewController: UITableViewDataSource, UITableViewDelegate {
     ) as! FollowerCell
     
     let follower = viewModel.followers[indexPath.row]
-//    cell.configure(with: follower)
+    cell.configure(with: follower)
     
     cell.followButton.do {
       if indexPath.row == 0 && followType == .following {
@@ -123,6 +134,7 @@ extension FollowViewController: UITableViewDataSource, UITableViewDelegate {
       guard let self = self else { return }
       self.viewModel.postFollowRequest(at: indexPath.row)
     }
+    
     return cell
   }
   
@@ -130,6 +142,9 @@ extension FollowViewController: UITableViewDataSource, UITableViewDelegate {
     let follow = viewModel.followers[indexPath.row]
     let userId = Int(follow.userId) ?? 0
     let userVC = OtherUserProfileViewController(id: userId)
-    self.navigationController?.pushViewController(userVC, animated: true)
+    self.navigationController?.pushViewController(
+      userVC,
+      animated: true
+    )
   }
 }

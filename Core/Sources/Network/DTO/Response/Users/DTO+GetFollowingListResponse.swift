@@ -14,7 +14,7 @@ extension DTO {
     public let nextCursor: Int?
     /// 다음 페이지 여부
     public let hasNext: Bool
-    /// 다음 커서
+    /// 유저 목록
     public let content: [Content]
     
     public init(
@@ -30,14 +30,10 @@ extension DTO {
 }
 
 extension DTO.GetFollowingListResponse {
-  public struct Content: BaseResponse {
-    /// 사용자
+  public struct Content: Codable {
     public let id: Int
-    /// 닉네임
     public let nickname: String
-    /// 프로필 사진
     public let profileImageUrl: String
-    /// 팔로우 여부
     public let isFollowing: Bool
     
     public init(

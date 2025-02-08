@@ -10,11 +10,8 @@ import Foundation
 
 extension DTO {
   public struct GetFollowerListResponse: BaseResponse {
-    /// 다음 커서
     public let nextCursor: Int?
-    /// 다음 페이지 여부
     public let hasNext: Bool
-    /// 다음 커서
     public let content: [Content]
     
     public init(
@@ -29,24 +26,8 @@ extension DTO {
   }
 }
 
-
 extension DTO.GetFollowerListResponse {
   public struct Content: Codable {
-    public let userInfo: UserInfo
-    public let following: Bool
-    
-    public init(
-      userInfo: UserInfo,
-      following: Bool
-    ) {
-      self.userInfo = userInfo
-      self.following = following
-    }
-  }
-}
-
-extension DTO.GetFollowerListResponse.Content {
-  public struct UserInfo: Codable {
     public let id: Int
     public let nickname: String
     public let profileImageUrl: String
