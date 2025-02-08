@@ -21,6 +21,16 @@ public final class ProfileEditViewController: UIViewController, CustomImagePicke
   
   private var isNicknameChanged = false
   private var isProfileImageChanged = false
+  private let id: Int
+  
+  init(id: Int) {
+    self.id = id
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
   
   public override func loadView() {
     self.view = profileEditView
@@ -105,7 +115,7 @@ public final class ProfileEditViewController: UIViewController, CustomImagePicke
   
   @available(iOS 16.0, *)
   @objc private func nextButtonDidTap() {
-    let profileViewController = ProfileViewController()
+    let profileViewController = ProfileViewController(id: id)
     navigationController?.pushViewController(
       profileViewController,
       animated: true

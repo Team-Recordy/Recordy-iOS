@@ -72,7 +72,12 @@ extension UIViewController {
     backButton.tintColor = .white
     backButton.sizeToFit()
 
-    backButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+    backButton.contentEdgeInsets = UIEdgeInsets(
+      top: 0,
+      left: 0,
+      bottom: 0,
+      right: 0
+    )
 
     backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
 

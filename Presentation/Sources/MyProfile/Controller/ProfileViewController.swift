@@ -27,6 +27,19 @@ public class ProfileViewController: UIViewController {
   let bookmarkView = BookmarkView()
   var user: User?
   
+  private var feeds: [Feed] = []
+  private let id: Int
+  private var cursorId: Int = 0
+  
+  init(id: Int) {
+    self.id = id
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
   var controlType: ControlType = .record {
     didSet {
       controlTypeChanged()
@@ -40,6 +53,14 @@ public class ProfileViewController: UIViewController {
     setAutoLayout()
     setDelegate()
     controlTypeChanged()
+    getUserProfile()
+    
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(updateProfile),
+      name: NSNotification.Name("VideoUploadCompleted"),
+      object: nil
+    )
   }
   
   public override func viewWillAppear(_ animated: Bool) {
@@ -48,7 +69,7 @@ public class ProfileViewController: UIViewController {
     self.tabBarController?.tabBar.isHidden = false
   }
   
-  private func updateProfile() {
+  @objc private func updateProfile() {
     getUserProfile()
     getMyRecordList()
     getBookmarkedRecordList()
@@ -136,83 +157,76 @@ public class ProfileViewController: UIViewController {
   }
   
   private func setUserProfile() {
-      guard let user = user else {
-          return
-      }
-      let followerAttributedText = NSMutableAttributedString(
-        string: "\(user.followerCount)",
-        attributes: [.font: RecordyFont.body2.font]
+    guard let user = user else {
+      return
+    }
+    let followerAttributedText = NSMutableAttributedString(
+      string: "\(user.followerCount)",
+      attributes: [.font: RecordyFont.body2.font]
+    )
+    followerAttributedText
+      .append(
+        NSAttributedString(string: " 명의 팔로워",
+                           attributes: [
+                            .font: RecordyFont.body2.font,
+                            .foregroundColor: CommonAsset.recordyGrey03.color
+                           ]
+                          )
       )
-      followerAttributedText
-          .append(
-            NSAttributedString(string: " 명의 팔로워",
-                attributes: [
-                    .font: RecordyFont.body2.font,
-                    .foregroundColor: CommonAsset.recordyGrey03.color
-                ]
-            )
-          )
-      self.profileInfoView.followerButton
-          .setAttributedTitle(
-            followerAttributedText,
-            for: .normal
-          )
-      let followingAttributedText = NSMutableAttributedString(
-        string: "\(user.followingCount)",
-        attributes: [.font: RecordyFont.body2.font]
+    self.profileInfoView.followerButton
+      .setAttributedTitle(
+        followerAttributedText,
+        for: .normal
       )
-      followingAttributedText
-          .append(
-            NSAttributedString(string: " 명의 팔로잉",
-                attributes: [
-                    .font: RecordyFont.body2.font,
-                    .foregroundColor: CommonAsset.recordyGrey03.color
-                ]
-            )
-          )
-      self.profileInfoView.followingButton
-          .setAttributedTitle(
-            followingAttributedText,
-            for: .normal
-          )
-      self.profileInfoView.userName.text = user.nickname
-      let url = URL(
-        string: user.profileImage
-      )!
-      self.profileInfoView.profileImage.kf
-          .setImage(
-            with: url
-          )
+    let followingAttributedText = NSMutableAttributedString(
+      string: "\(user.followingCount)",
+      attributes: [.font: RecordyFont.body2.font]
+    )
+    followingAttributedText
+      .append(
+        NSAttributedString(string: " 명의 팔로잉",
+                           attributes: [
+                            .font: RecordyFont.body2.font,
+                            .foregroundColor: CommonAsset.recordyGrey03.color
+                           ]
+                          )
+      )
+    self.profileInfoView.followingButton
+      .setAttributedTitle(
+        followingAttributedText,
+        for: .normal
+      )
+    self.profileInfoView.userName.text = user.nickname
+    let url = URL(
+      string: user.profileImage
+    )!
+    self.profileInfoView.profileImage.kf
+      .setImage(
+        with: url
+      )
   }
   
   func getUserProfile() {
-    let userId = UserDefaults.standard.integer(forKey: "userId")
-    guard let platform = UserDefaults.standard.string(forKey: "loginPlatform") else { return }
     let apiProvider = APIProvider<APITarget.Users>()
-    let loginState = LoginState(platform: platform)
-    let request = DTO.GetProfileRequest(otherUserId: userId)
-    apiProvider.requestResponsable(.getProfile(request), DTO.GetProfileResponse.self) { [weak self] result in
-      guard let self = self else { return }
+    let request = DTO.GetProfileRequest(otherUserId: id)
+    apiProvider.requestResponsable(
+      .getProfile(
+        request
+      ),
+      DTO.GetProfileResponse.self
+    ) { [weak self] result in guard let self = self else {return}
       switch result {
       case .success(let response):
         self.user = User(
-          isMine: true,
           id: response.id,
           nickname: response.nickname,
-          follower: [],
-          following: [],
           isFollowing: response.isFollowing,
           profileImage: response.profileImageUrl,
-          feeds: [],
-          bookmarkedFeeds: [],
-          loginState: loginState,
           recordCount: response.recordCount,
           followerCount: response.followerCount,
           followingCount: response.followingCount
         )
-        DispatchQueue.main.async {
-          self.setUserProfile()
-        }
+        self.setUserProfile()
       case .failure(let failure):
         print(failure)
       }
@@ -221,48 +235,37 @@ public class ProfileViewController: UIViewController {
   
   func getMyRecordList() {
     let apiProvider = APIProvider<APITarget.Records>()
-    let userId = UserDefaults.standard.integer(forKey: "userId")
-      let request = DTO.GetUserRecordListRequest(
-        otherUserId: userId,
-        cursorId: 0,
-        size: 100
-      )
-    
-      apiProvider.requestResponsable(
-        .getUserRecordList(
-            request
-        ),
-        DTO.GetUserRecordListResponse.self
-      ) { [weak self] result in
+    let request = DTO.GetUserRecordListRequest(
+      otherUserId: id,
+      cursorId: 0,
+      size: 100
+    )
+    apiProvider.requestResponsable(.getUserRecordList(request),DTO.GetUserRecordListResponse.self) { [weak self] result in
       guard let self = self else { return }
       switch result {
       case .success(let response):
-        let feeds = response.content.map { content in
+        let feeds = response.content.map {
           Feed(
-            id: content.id,
-            videoLink: content.fileUrl.videoUrl,
-            thumbnailLink: content.fileUrl.thumbnailUrl,
-            description: content.content,
-            exhibitionName: content.exhibitionName,
-            placeId: content.placeId,
-            placeName: content.placeName,
-            uploaderId: content.uploaderId,
-            uploaderNickname: content.uploaderNickname,
-            bookmarkCount: content.bookmarkCount,
-            isMine: content.isMine,
-            isBookmarked: content.isBookmarked
+            id: $0.id,
+            videoLink: $0.fileUrl.videoUrl,
+            thumbnailLink: $0.fileUrl.thumbnailUrl,
+            description: $0.content,
+            exhibitionName: $0.exhibitionName,
+            placeId: $0.placeId,
+            placeName: $0.placeName,
+            uploaderId: $0.uploaderId,
+            uploaderNickname: $0.uploaderNickname,
+            bookmarkCount: $0.bookmarkCount,
+            isMine: $0.isMine,
+            isBookmarked: $0.isBookmarked
           )
         }
+        self.feeds = feeds
         DispatchQueue.main.async {
-          self.user?.feeds = feeds
           self.myRecordView.getMyRecordList(feeds: feeds)
-          self.setUserProfile()
         }
       case .failure(let failure):
-        print("Failed to get user record list: \(failure)")
-        DispatchQueue.main.async {
-          self.showErrorAlert(message: "기록을 불러오는데 실패했습니다. 다시 시도해주세요.")
-        }
+        print(failure.localizedDescription)
       }
     }
   }
@@ -270,10 +273,10 @@ public class ProfileViewController: UIViewController {
   func getBookmarkedRecordList() {
     let apiProvider = APIProvider<APITarget.Records>()
     let request = DTO.GetBookmarkedListRequest(size: 100)
-      apiProvider.requestResponsable(
-        .getBookmarkedRecordList(request),
-        DTO.GetBookmarkedListResponse.self
-      ) { [weak self] result in
+    apiProvider.requestResponsable(
+      .getBookmarkedRecordList(request),
+      DTO.GetBookmarkedListResponse.self
+    ) { [weak self] result in
       guard let self = self else { return }
       switch result {
       case .success(let response):
@@ -314,7 +317,7 @@ public class ProfileViewController: UIViewController {
         if let recordIndex = self.user?.bookmarkedFeeds?.firstIndex(where: { $0.id == feed.id }) {
           self.bookmarkView.feeds[recordIndex].isBookmarked = !feed.isBookmarked
         }
-//        bookmarkView.updateViewState()
+        //        bookmarkView.updateViewState()
         completion?(.success(()))
       case .failure(let error):
         print("Failed to update bookmark: \(error)")
@@ -322,17 +325,17 @@ public class ProfileViewController: UIViewController {
       }
     }
   }
-
   
-//  private func getPlaceFeature(from location: String) -> PlaceFeature {
-//    if location.lowercased().contains("free") {
-//      return .free
-//    } else if location.lowercased().contains("closing soon") {
-//      return .closingSoon
-//    } else {
-//      return .all
-//    }
-//  }
+  
+  //  private func getPlaceFeature(from location: String) -> PlaceFeature {
+  //    if location.lowercased().contains("free") {
+  //      return .free
+  //    } else if location.lowercased().contains("closing soon") {
+  //      return .closingSoon
+  //    } else {
+  //      return .all
+  //    }
+  //  }
   
   @objc private func handleBookmarkStateChange(_ notification: Notification) {
     guard let userInfo = notification.userInfo,
@@ -365,7 +368,7 @@ public class ProfileViewController: UIViewController {
   }
   
   @objc private func settingButtonTapped() {
-    let settingViewController = SettingViewController()
+    let settingViewController = SettingViewController(id: id)
     self.navigationController?.pushViewController(settingViewController, animated: true)
   }
   

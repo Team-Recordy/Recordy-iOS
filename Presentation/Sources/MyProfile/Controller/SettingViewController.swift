@@ -16,6 +16,16 @@ import Common
 
 @available(iOS 16.0, *)
 public class SettingViewController: UIViewController {
+  private let id: Int
+  
+  init(id: Int) {
+    self.id = id
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
   
   let accountTableView: CustomTableView = {
     return CustomTableView(
@@ -221,7 +231,7 @@ extension SettingViewController: WithDrawDelegate {
 @available(iOS 16.0, *)
 extension SettingViewController: AccountActionDelegate {
   func didTapProfileEdit() {
-    let profileEditVC = ProfileEditViewController()
+    let profileEditVC = ProfileEditViewController(id: id)
     navigationController?.pushViewController(profileEditVC, animated: true)
   }
 }

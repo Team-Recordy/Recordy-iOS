@@ -96,7 +96,7 @@ public class MyRecordView: UIView {
     
     if !isEmpty {
       setCountLabelText()
-      collectionView.reloadData()
+      self.collectionView.reloadData()
     }
   }
   
