@@ -14,7 +14,7 @@ enum FollowType {
     case .follower:
       return "팔로워"
     case .following:
-      return "팔로우"
+      return "팔로잉"
     }
   }
 }
@@ -24,7 +24,7 @@ public class FollowViewController: UIViewController {
   private let followType: FollowType
   private let viewModel: FollowViewModel
   private let tableView = UITableView().then {
-    $0.backgroundColor = .black
+    $0.backgroundColor = CommonAsset.viskitBG.color
     $0.separatorStyle = .none
   }
   private let emptyView = FollowerEmptyView()
@@ -47,6 +47,8 @@ public class FollowViewController: UIViewController {
     bind()
     
     self.navigationController?.navigationBar.topItem?.title = ""
+    
+    
   }
   
   private func setStyle() {
@@ -70,11 +72,11 @@ public class FollowViewController: UIViewController {
   
   private func setAutoLayout() {
     emptyView.snp.makeConstraints {
-      $0.edges.equalTo(view.safeAreaLayoutGuide)
+      $0.edges.equalToSuperview()
     }
     
     tableView.snp.makeConstraints {
-      $0.edges.equalTo(view.safeAreaLayoutGuide)
+      $0.edges.equalToSuperview()
     }
   }
   
