@@ -8,23 +8,40 @@
 
 import UIKit
 import Common
+import Core
 
 import Photos
 import PhotosUI
 
+protocol ProfileEditViewControllerDelegate: AnyObject {
+  func didUpdateProfile(
+    nickname: String,
+    profileImageUrl: String
+  )
+}
+
 @available(iOS 16.0, *)
 public final class ProfileEditViewController: UIViewController, CustomImagePickerDelegate {
   
+  weak var delegate: ProfileEditViewControllerDelegate?
+  
   private let profileEditView = ProfileEditView()
-  private let currentNickname: String = "레코디"
+  private let currentNickname: String
   private let maxNicknameLength: Int = 10
+  private let currentProfileImage: String
   
   private var isNicknameChanged = false
   private var isProfileImageChanged = false
   private let id: Int
   
-  init(id: Int) {
+  init(
+    id: Int,
+    currentNickname: String,
+    currentProfileImage: String
+  ) {
     self.id = id
+    self.currentNickname = currentNickname
+    self.currentProfileImage = currentProfileImage
     super.init(nibName: nil, bundle: nil)
   }
   
@@ -39,8 +56,12 @@ public final class ProfileEditViewController: UIViewController, CustomImagePicke
   public override func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = CommonAsset.viskitBG.color
-    profileEditView.setNickname(currentNickname)
+    profileEditView.nicknameEditTextField.text = currentNickname
+    profileEditView.baseSetting()
+    textFieldDidChange(profileEditView.nicknameEditTextField)
     setUI()
+    
+    hideKeyboard()
   }
   
   private func setUI() {
@@ -92,34 +113,59 @@ public final class ProfileEditViewController: UIViewController, CustomImagePicke
       profileEditView.nicknameCountLabel.text = "\(maxNicknameLength) / \(maxNicknameLength)"
     }
     
-    if text.isEmpty {
+    if text.isEmpty || text == currentNickname {
       profileEditView.baseSetting()
       isNicknameChanged = false
     } else if !text.isNicknamePatternValid(text) {
       profileEditView.showErrorLabel(withMessage: "ⓘ 한글, 숫자, 밑줄 및 마침표만 사용할 수 있어요.")
+      profileEditView.nicknameEditTextField.textColor = CommonAsset.recordyWhite.color
       isNicknameChanged = false
-    } else if text == currentNickname {
-      profileEditView.showErrorLabel(withMessage: "ⓘ 이미 사용 중인 닉네임이에요.")
-      isNicknameChanged = false
-    } else {
+    } else { // TODO: 이미 사용중 인 것 추가하기
       profileEditView.showSuccessLabel()
+      profileEditView.nicknameEditTextField.textColor = CommonAsset.recordyWhite.color
       isNicknameChanged = true
     }
     updateCompleteButtonState()
   }
   
   private func updateCompleteButtonState() {
-    let isEnabled = isNicknameChanged || isProfileImageChanged
+    guard let newNickname = profileEditView.nicknameEditTextField.text else {
+      return
+    }
+    let isEnabled = (isNicknameChanged && !newNickname.isEmpty &&
+                     newNickname != currentNickname) || isProfileImageChanged
     profileEditView.updateButtonState(isEnabled: isEnabled)
   }
   
   @available(iOS 16.0, *)
   @objc private func nextButtonDidTap() {
-    let profileViewController = ProfileViewController(id: id)
-    navigationController?.pushViewController(
-      profileViewController,
-      animated: true
-    )
+    guard let newNickname = profileEditView.nicknameEditTextField.text else {
+      return
+    }
+    //
+    //    let finalProfileImageUrl = isProfileImageChanged ? "https://yourimageuploadservice.com/uploaded_profile.jpg" : currentProfileImage
+    //
+    //    delegate?.didUpdateProfile(nickname: newNickname, profileImageUrl: finalProfileImageUrl)
+    //
+    //    updateUserProfile(newNickname, finalProfileImageUrl) { result in
+    //      switch result {
+    //      case .success:
+    //        NotificationCenter.default.post(name: .updateDidComplete, object: nil, userInfo: ["nickname": newNickname, "profileImageUrl": finalProfileImageUrl])
+    //      case .failure(let error):
+    //        print("프로필 업데이트 실패: \(error)")
+    //      }
+    //    }
+    //
+    navigationController?.popViewController(animated: true)
+  }
+  
+  private func updateUserProfile(_ newNickname: String, _ newProfileImageUrl: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    let apiProvider = APIProvider<APITarget.Users>()
+    let request = DTO.EditUserInfoRequest(nickname: newNickname, profileImageUrl: newProfileImageUrl)
+    
+    apiProvider.justRequest(.editProfile(request)) { result in
+      completion(result)
+    }
   }
   
   @objc private func profileImageViewDidTap() {

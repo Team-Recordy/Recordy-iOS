@@ -16,12 +16,16 @@ import Common
 
 @available(iOS 16.0, *)
 public class SettingViewController: UIViewController {
-  private let id: Int
-  private var loginType: String = "APPLE"
   
-  init(id: Int) {
-    self.id = id
-    super.init(nibName: nil, bundle: nil)
+  private var loginType: String = "APPLE"
+  private let user: User
+  
+  init(user: User) {
+    self.user = user
+    super.init(
+      nibName: nil,
+      bundle: nil
+    )
   }
   
   required init?(coder: NSCoder) {
@@ -243,7 +247,29 @@ extension SettingViewController: WithDrawDelegate {
 @available(iOS 16.0, *)
 extension SettingViewController: AccountActionDelegate {
   func didTapProfileEdit() {
-    let profileEditVC = ProfileEditViewController(id: id)
-    navigationController?.pushViewController(profileEditVC, animated: true)
+    let profileEditVC = ProfileEditViewController(
+      id: user.id,
+      currentNickname: user.nickname,
+      currentProfileImage: user.profileImage
+    )
+//    profileEditVC.delegate = self
+    navigationController?.pushViewController(
+      profileEditVC,
+      animated: true
+    )
   }
 }
+//
+//@available(iOS 16.0, *)
+//extension SettingViewController: ProfileEditViewControllerDelegate {
+//    func didUpdateProfile(nickname: String, profileImage: UIImage?) {
+//        if let navigationController = self.navigationController {
+//            for viewController in navigationController.viewControllers {
+//                if let profileVC = viewController as? ProfileViewController {
+//                    profileVC.didUpdateProfile(nickname: nickname, profileImage: profileImage)
+//                    break
+//                }
+//            }
+//        }
+//    }
+//}

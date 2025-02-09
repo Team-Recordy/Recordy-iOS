@@ -12,6 +12,7 @@ import Then
 
 import Core
 import Common
+import Kingfisher
 
 enum ControlType: String {
   case record = "내 기록"
@@ -19,7 +20,7 @@ enum ControlType: String {
 }
 
 @available(iOS 16.0, *)
-public class ProfileViewController: UIViewController {
+public class ProfileViewController: UIViewController, ProfileEditViewControllerDelegate {
   
   let profileInfoView = ProfileInfoView()
   let segmentControlView = ProfileSegmentControllView()
@@ -58,6 +59,12 @@ public class ProfileViewController: UIViewController {
     NotificationCenter.default.addObserver(
       self,
       selector: #selector(updateProfile),
+      name: .updateDidComplete,
+      object: nil
+    )
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleProfileUpdate(_:)),
       name: .updateDidComplete,
       object: nil
     )
@@ -171,13 +178,15 @@ public class ProfileViewController: UIViewController {
     )
     followerAttributedText
       .append(
-        NSAttributedString(string: " 명의 팔로워",
-                           attributes: [
-                            .font: RecordyFont.body2.font,
-                            .foregroundColor: CommonAsset.recordyGrey03.color
-                           ]
-                          )
+        NSAttributedString(
+          string: " 명의 팔로워",
+          attributes: [
+            .font: RecordyFont.body2.font,
+            .foregroundColor: CommonAsset.recordyGrey03.color
+          ]
+        )
       )
+    
     self.profileInfoView.followerButton
       .setAttributedTitle(
         followerAttributedText,
@@ -275,6 +284,22 @@ public class ProfileViewController: UIViewController {
     }
   }
   
+  @objc private func handleProfileUpdate(_ notification: Notification) {
+    guard let userInfo = notification.userInfo,
+          var updatedNickname = userInfo["nickname"] as? String,
+          let updatedProfileImageUrl = userInfo["profileImageUrl"] as? String else { return }
+    
+    user?.nickname = updatedNickname
+    user?.profileImage = updatedProfileImageUrl
+    
+    DispatchQueue.main.async {
+      self.profileInfoView.userName.text = updatedNickname
+      if let url = URL(string: updatedProfileImageUrl) {
+        self.profileInfoView.profileImage.kf.setImage(with: url)
+      }
+    }
+  }
+  
   func getBookmarkedRecordList() {
     let apiProvider = APIProvider<APITarget.Records>()
     let request = DTO.GetBookmarkedListRequest(size: 100)
@@ -322,7 +347,6 @@ public class ProfileViewController: UIViewController {
         if let recordIndex = self.user?.bookmarkedFeeds?.firstIndex(where: { $0.id == feed.id }) {
           self.bookmarkView.feeds[recordIndex].isBookmarked = !feed.isBookmarked
         }
-        //        bookmarkView.updateViewState()
         completion?(.success(()))
       case .failure(let error):
         print("Failed to update bookmark: \(error)")
@@ -330,17 +354,6 @@ public class ProfileViewController: UIViewController {
       }
     }
   }
-  
-  
-  //  private func getPlaceFeature(from location: String) -> PlaceFeature {
-  //    if location.lowercased().contains("free") {
-  //      return .free
-  //    } else if location.lowercased().contains("closing soon") {
-  //      return .closingSoon
-  //    } else {
-  //      return .all
-  //    }
-  //  }
   
   @objc private func handleBookmarkStateChange(_ notification: Notification) {
     guard let userInfo = notification.userInfo,
@@ -352,7 +365,6 @@ public class ProfileViewController: UIViewController {
       guard let self = self else { return }
       switch result {
       case .success:
-        print("Bookmark updated successfully.")
         DispatchQueue.main.async {
           self.bookmarkView.collectionView.reloadData()
         }
@@ -373,8 +385,9 @@ public class ProfileViewController: UIViewController {
   }
   
   @objc private func settingButtonTapped() {
-    let settingViewController = SettingViewController(id: id)
-    self.navigationController?.pushViewController(settingViewController, animated: true)
+    guard let user else { return }
+    let settingVC = SettingViewController(user: user)
+    navigationController?.pushViewController(settingVC, animated: true)
   }
   
   func showErrorAlert(message: String) {
@@ -441,5 +454,23 @@ extension ProfileViewController: UserRecordDelegate {
     let navigationController = BaseNavigationController(rootViewController: uploadViewController)
     navigationController.modalPresentationStyle = .fullScreen
     present(navigationController, animated: true)
+  }
+}
+
+@available(iOS 16.0, *)
+extension ProfileViewController: ProfileEditViewControllerDelegate {
+  func didUpdateProfile(nickname: String, profileImageUrl: String) {
+    self.profileInfoView.userName.text = nickname
+    
+    UserDefaults.standard.set(nickname, forKey: "nickname")
+    
+    if let url = URL(string: profileImageUrl) {
+      self.profileInfoView.profileImage.kf.setImage(with: url)
+    }
+    
+    user?.nickname = nickname
+    user?.profileImage = profileImageUrl
+    
+    print("🔄 Profile UI updated: \(nickname), \(profileImageUrl)")
   }
 }
