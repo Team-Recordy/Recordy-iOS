@@ -9,7 +9,7 @@
 import Foundation
 
 extension DTO {
-  public struct PresignedImageUrlResponse: BaseResponse {
+  public struct GetPresignedImageUrlResponse: BaseResponse {
     public let presignedUrl: String
     
     public init(

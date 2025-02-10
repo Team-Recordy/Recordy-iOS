@@ -12,5 +12,10 @@ extension DTO {
   public struct GetPresignedImageUrlRequest: BaseRequest {
     public let fileName: String
     public let fileType: String
+    
+    public init(fileName: String, fileType: String) {
+      self.fileName = fileName
+      self.fileType = fileType
+    }
   }
 }

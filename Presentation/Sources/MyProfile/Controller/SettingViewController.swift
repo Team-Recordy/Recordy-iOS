@@ -15,10 +15,10 @@ import Core
 import Common
 
 @available(iOS 16.0, *)
-public class SettingViewController: UIViewController {
+public class SettingViewController: UIViewController, ProfileEditViewControllerDelegate {
   
   private var loginType: String = "APPLE"
-  private let user: User
+  private var user: User
   
   init(user: User) {
     self.user = user
@@ -115,6 +115,13 @@ public class SettingViewController: UIViewController {
     setUI()
     setAutoLayout()
     setDelegate()
+    
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleProfileUpdate(_:)),
+      name: .updateDidComplete,
+      object: nil
+    )
   }
   
   private func setStyle() {
@@ -162,6 +169,33 @@ public class SettingViewController: UIViewController {
       $0.top.equalTo(secondDivider.snp.bottom)
       $0.leading.trailing.bottom.equalToSuperview()
     }
+  }
+  
+  @objc private func handleProfileUpdate(_ notification: Notification) {
+    guard let userInfo = notification.userInfo,
+          let updatedNickname = userInfo["nickname"] as? String,
+          let updatedProfileImageUrl = userInfo["profileImageUrl"] as? String else { return }
+    
+    user.nickname = updatedNickname
+    user.profileImage = updatedProfileImageUrl
+  }
+  
+  func didUpdateProfile(nickname: String, profileImageUrl: String) {
+    print(
+      "✅ SettingViewController received profile update: \(nickname), \(profileImageUrl)"
+    )
+    
+    user.nickname = nickname
+    user.profileImage = profileImageUrl
+    
+    NotificationCenter.default.post(
+      name: .updateDidComplete,
+      object: nil,
+      userInfo: [
+        "nickname": nickname,
+        "profileImageUrl": profileImageUrl
+      ]
+    )
   }
   
   private func setDelegate() {
@@ -252,24 +286,10 @@ extension SettingViewController: AccountActionDelegate {
       currentNickname: user.nickname,
       currentProfileImage: user.profileImage
     )
-//    profileEditVC.delegate = self
+    profileEditVC.delegate = self
     navigationController?.pushViewController(
       profileEditVC,
       animated: true
     )
   }
 }
-//
-//@available(iOS 16.0, *)
-//extension SettingViewController: ProfileEditViewControllerDelegate {
-//    func didUpdateProfile(nickname: String, profileImage: UIImage?) {
-//        if let navigationController = self.navigationController {
-//            for viewController in navigationController.viewControllers {
-//                if let profileVC = viewController as? ProfileViewController {
-//                    profileVC.didUpdateProfile(nickname: nickname, profileImage: profileImage)
-//                    break
-//                }
-//            }
-//        }
-//    }
-//}

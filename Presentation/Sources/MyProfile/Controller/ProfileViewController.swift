@@ -84,6 +84,7 @@ public class ProfileViewController: UIViewController, ProfileEditViewControllerD
     
     DispatchQueue.main.async {
       self.myRecordView.collectionView.reloadData()
+      self.bookmarkView.collectionView.reloadData()
     }
   }
   
@@ -223,14 +224,16 @@ public class ProfileViewController: UIViewController, ProfileEditViewControllerD
   func getUserProfile() {
     let apiProvider = APIProvider<APITarget.Users>()
     let request = DTO.GetProfileRequest(otherUserId: id)
+    
     apiProvider.requestResponsable(
-      .getProfile(
-        request
-      ),
+      .getProfile(request),
       DTO.GetProfileResponse.self
-    ) { [weak self] result in guard let self = self else {return}
+    ) { [weak self] result in
+      guard let self = self else { return }
+      
       switch result {
       case .success(let response):
+
         self.user = User(
           id: response.id,
           nickname: response.nickname,
@@ -240,9 +243,13 @@ public class ProfileViewController: UIViewController, ProfileEditViewControllerD
           followerCount: response.followerCount,
           followingCount: response.followingCount
         )
-        self.setUserProfile()
-      case .failure(let failure):
-        print(failure)
+        
+        DispatchQueue.main.async {
+          self.setUserProfile()
+        }
+        
+      case .failure(let error):
+        print("프로필 업로드 실패: \(error.localizedDescription)")
       }
     }
   }
@@ -286,7 +293,7 @@ public class ProfileViewController: UIViewController, ProfileEditViewControllerD
   
   @objc private func handleProfileUpdate(_ notification: Notification) {
     guard let userInfo = notification.userInfo,
-          var updatedNickname = userInfo["nickname"] as? String,
+          let updatedNickname = userInfo["nickname"] as? String,
           let updatedProfileImageUrl = userInfo["profileImageUrl"] as? String else { return }
     
     user?.nickname = updatedNickname
@@ -387,13 +394,35 @@ public class ProfileViewController: UIViewController, ProfileEditViewControllerD
   @objc private func settingButtonTapped() {
     guard let user else { return }
     let settingVC = SettingViewController(user: user)
-    navigationController?.pushViewController(settingVC, animated: true)
+    navigationController?.pushViewController(
+      settingVC,
+      animated: true
+    )
   }
   
   func showErrorAlert(message: String) {
     let alert = UIAlertController(title: "오류", message: message, preferredStyle: .alert)
     alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
     self.present(alert, animated: true, completion: nil)
+  }
+  
+  func updateUserProfile(nickname: String, profileImageUrl: String, accessToken: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    let apiProvider = APIProvider<APITarget.Users>()
+    let request = DTO.EditUserInfoRequest(
+      nickname: nickname,
+      profileImageUrl: profileImageUrl
+    )
+    
+    apiProvider.requestResponsable(.editProfile(request), DTO.GetProfileResponse.self) { result in
+      switch result {
+      case .success:
+        print("프로필 업데이트 성공")
+        completion(.success(()))
+      case .failure(let error):
+        print("프로필 업데이트 실패: \(error)")
+        completion(.failure(error))
+      }
+    }
   }
 }
 
@@ -432,7 +461,10 @@ extension ProfileViewController: BookmarkDelegate {
       type: .bookmarked,
       cursorId: cursorId
     )
-    self.navigationController?.pushViewController(videoFeedViewController, animated: true)
+    self.navigationController?.pushViewController(
+      videoFeedViewController,
+      animated: true
+    )
   }
 }
 
@@ -446,31 +478,42 @@ extension ProfileViewController: UserRecordDelegate {
       cursorId: cursorId,
       userId: feed.uploaderId
     )
-    self.navigationController?.pushViewController(videoFeedViewController, animated: true)
+    self.navigationController?.pushViewController(
+      videoFeedViewController,
+      animated: true
+    )
   }
   
   func uploadFeedTapped() {
     let uploadViewController = UploadVideoViewController()
     let navigationController = BaseNavigationController(rootViewController: uploadViewController)
     navigationController.modalPresentationStyle = .fullScreen
-    present(navigationController, animated: true)
+    present(
+      navigationController,
+      animated: true
+    )
   }
 }
 
 @available(iOS 16.0, *)
 extension ProfileViewController: ProfileEditViewControllerDelegate {
   func didUpdateProfile(nickname: String, profileImageUrl: String) {
-    self.profileInfoView.userName.text = nickname
     
-    UserDefaults.standard.set(nickname, forKey: "nickname")
-    
-    if let url = URL(string: profileImageUrl) {
-      self.profileInfoView.profileImage.kf.setImage(with: url)
+    DispatchQueue.main.async {
+      self.profileInfoView.userName.text = nickname
+      if let url = URL(string: profileImageUrl) {
+        self.profileInfoView.profileImage.kf.setImage(with: url)
+      }
     }
+    
+    UserDefaults.standard.set(
+      nickname,
+      forKey: "nickname"
+    )
     
     user?.nickname = nickname
     user?.profileImage = profileImageUrl
     
-    print("🔄 Profile UI updated: \(nickname), \(profileImageUrl)")
+    getUserProfile()
   }
 }

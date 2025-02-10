@@ -22,7 +22,7 @@ extension APITarget {
     case follow(DTO.FollowRequest)
     case editProfile(DTO.EditUserInfoRequest)
     case getProfile(DTO.GetProfileRequest)
-    case getProfileImage(DTO.GetPresignedUrlResponse)
+    case getProfileImage(DTO.GetPresignedImageUrlRequest)
     case getFollowingList(DTO.GetFollowingListRequest)
     case getFollowerList(DTO.GetFollowerListRequest)
     case getPresignedUrl(DTO.GetPresignedImageUrlRequest)
@@ -56,7 +56,7 @@ extension APITarget.Users: TargetType {
     case .follow(let followRequest):
       "follow/\(followRequest.followingId)"
     case .editProfile:
-      "users"
+      ""
     case .getProfile(let getProfileRequest):
       "profile/\(getProfileRequest.otherUserId)"
     case .getProfileImage:
@@ -65,7 +65,7 @@ extension APITarget.Users: TargetType {
       "following"
     case .getFollowerList:
       "follower"
-    case .getPresignedUrl(_):
+    case .getPresignedUrl:
       "presigned-url"
     }
   }
@@ -87,7 +87,7 @@ extension APITarget.Users: TargetType {
     case .follow:
       return .post
     case .editProfile:
-      return .post
+      return .patch
     case .getProfile:
       return .get
     case .getProfileImage:
@@ -96,8 +96,8 @@ extension APITarget.Users: TargetType {
       return .get
     case .getFollowerList:
       return .get
-    case .getPresignedUrl(_):
-      return .post
+    case .getPresignedUrl:
+      return .get
     }
   }
   
@@ -142,7 +142,13 @@ extension APITarget.Users: TargetType {
         encoding: URLEncoding.queryString
       )
     case .getPresignedUrl(let request):
-      return .requestJSONEncodable(request)
+      return .requestParameters(
+        parameters: [
+          "fileName": request.fileName,
+          "fileType": request.fileType
+        ],
+        encoding: URLEncoding.queryString
+      )
     default:
       return .requestPlain
     }
