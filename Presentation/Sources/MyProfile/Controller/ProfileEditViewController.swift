@@ -142,20 +142,6 @@ public final class ProfileEditViewController: UIViewController, CustomImagePicke
     guard let newNickname = profileEditView.nicknameEditTextField.text else {
       return
     }
-    //
-    //    let finalProfileImageUrl = isProfileImageChanged ? "https://yourimageuploadservice.com/uploaded_profile.jpg" : currentProfileImage
-    //
-    //    delegate?.didUpdateProfile(nickname: newNickname, profileImageUrl: finalProfileImageUrl)
-    //
-    //    updateUserProfile(newNickname, finalProfileImageUrl) { result in
-    //      switch result {
-    //      case .success:
-    //        NotificationCenter.default.post(name: .updateDidComplete, object: nil, userInfo: ["nickname": newNickname, "profileImageUrl": finalProfileImageUrl])
-    //      case .failure(let error):
-    //        print("프로필 업데이트 실패: \(error)")
-    //      }
-    //    }
-    //
     navigationController?.popViewController(animated: true)
   }
   

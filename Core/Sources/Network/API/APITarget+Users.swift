@@ -25,6 +25,7 @@ extension APITarget {
     case getProfileImage(DTO.GetPresignedUrlResponse)
     case getFollowingList(DTO.GetFollowingListRequest)
     case getFollowerList(DTO.GetFollowerListRequest)
+    case getPresignedUrl(DTO.GetPresignedImageUrlRequest)
   }
 }
 
@@ -64,7 +65,8 @@ extension APITarget.Users: TargetType {
       "following"
     case .getFollowerList:
       "follower"
-      
+    case .getPresignedUrl(_):
+      "presigned-url"
     }
   }
   
@@ -94,6 +96,8 @@ extension APITarget.Users: TargetType {
       return .get
     case .getFollowerList:
       return .get
+    case .getPresignedUrl(_):
+      return .post
     }
   }
   
@@ -137,6 +141,8 @@ extension APITarget.Users: TargetType {
         parameters: parameters,
         encoding: URLEncoding.queryString
       )
+    case .getPresignedUrl(let request):
+      return .requestJSONEncodable(request)
     default:
       return .requestPlain
     }
@@ -149,6 +155,8 @@ extension APITarget.Users: TargetType {
         "Content-Type": "application/json",
         "Authorization": "Bearer \(signInRequest.authorization)"
       ]
+    case .getPresignedUrl:
+      return ["Content-Type": "application/json"]
     default: return .none
     }
   }
