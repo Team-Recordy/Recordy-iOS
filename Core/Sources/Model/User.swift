@@ -10,11 +10,11 @@ import Foundation
 public struct User {
   public let isMine: Bool?
   public let id: Int
-  public let nickname: String
+  public var nickname: String
   public let follower: [Follow]?
   public let following: [Follow]?
   public var isFollowing: Bool
-  public let profileImage: String
+  public var profileImage: String
   public var feeds: [Feed]?
   public var bookmarkedFeeds: [Feed]?
   public let loginState: LoginState?

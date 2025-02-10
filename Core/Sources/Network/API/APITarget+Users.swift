@@ -22,14 +22,15 @@ extension APITarget {
     case follow(DTO.FollowRequest)
     case editProfile(DTO.EditUserInfoRequest)
     case getProfile(DTO.GetProfileRequest)
-    case getProfileImage(DTO.GetPresignedUrlResponse)
+    case getProfileImage(DTO.GetPresignedImageUrlRequest)
     case getFollowingList(DTO.GetFollowingListRequest)
     case getFollowerList(DTO.GetFollowerListRequest)
+    case getPresignedUrl(DTO.GetPresignedImageUrlRequest)
   }
 }
 
 extension APITarget.Users: TargetType {
-
+  
   public var validationType: ValidationType {
     .successCodes
   }
@@ -37,7 +38,7 @@ extension APITarget.Users: TargetType {
   public var baseURL: URL {
     return URL(string: BaseURL.string + "/users")!
   }
-
+  
   public var path: String {
     switch self {
     case .refreshToken:
@@ -55,7 +56,7 @@ extension APITarget.Users: TargetType {
     case .follow(let followRequest):
       "follow/\(followRequest.followingId)"
     case .editProfile:
-      "users"
+      ""
     case .getProfile(let getProfileRequest):
       "profile/\(getProfileRequest.otherUserId)"
     case .getProfileImage:
@@ -64,10 +65,11 @@ extension APITarget.Users: TargetType {
       "following"
     case .getFollowerList:
       "follower"
-
+    case .getPresignedUrl:
+      "presigned-url"
     }
   }
-
+  
   public var method: Moya.Method {
     switch self {
     case .refreshToken:
@@ -85,7 +87,7 @@ extension APITarget.Users: TargetType {
     case .follow:
       return .post
     case .editProfile:
-      return .post
+      return .patch
     case .getProfile:
       return .get
     case .getProfileImage:
@@ -94,9 +96,11 @@ extension APITarget.Users: TargetType {
       return .get
     case .getFollowerList:
       return .get
+    case .getPresignedUrl:
+      return .get
     }
   }
-
+  
   public var task: Moya.Task {
     switch self {
     case .signUp(let signUpRequest):
@@ -120,18 +124,28 @@ extension APITarget.Users: TargetType {
         encoding: JSONEncoding.default
       )
     case .getFollowingList(let getFollowingListRequest):
+      var parameters: [String: Any] = ["size": getFollowingListRequest.size]
+      if let cursorId = getFollowingListRequest.cursorId {
+        parameters["cursorId"] = cursorId
+      }
       return .requestParameters(
-        parameters: [
-          "cursorId": getFollowingListRequest.cursorId,
-          "size": getFollowingListRequest.size
-        ],
+        parameters: parameters,
         encoding: URLEncoding.queryString
       )
     case .getFollowerList(let getFollowerListRequest):
+      var parameters: [String: Any] = ["size": getFollowerListRequest.size]
+      if let cursorId = getFollowerListRequest.cursorId {
+        parameters["cursorId"] = cursorId
+      }
+      return .requestParameters(
+        parameters: parameters,
+        encoding: URLEncoding.queryString
+      )
+    case .getPresignedUrl(let request):
       return .requestParameters(
         parameters: [
-          "cursorId": getFollowerListRequest.cursorId,
-          "size": getFollowerListRequest.size
+          "fileName": request.fileName,
+          "fileType": request.fileType
         ],
         encoding: URLEncoding.queryString
       )
@@ -139,7 +153,7 @@ extension APITarget.Users: TargetType {
       return .requestPlain
     }
   }
-
+  
   public var headers: [String : String]? {
     switch self {
     case .signIn(let signInRequest):
@@ -147,6 +161,8 @@ extension APITarget.Users: TargetType {
         "Content-Type": "application/json",
         "Authorization": "Bearer \(signInRequest.authorization)"
       ]
+    case .getPresignedUrl:
+      return ["Content-Type": "application/json"]
     default: return .none
     }
   }

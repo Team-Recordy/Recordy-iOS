@@ -14,12 +14,20 @@ protocol UserRecordDelegate: AnyObject {
 public class MyRecordView: UIView {
   private let emptyView = MyRecordEmptyView()
   private let countLabel = UILabel()
-  private lazy var collectionView: UICollectionView = {
+  public lazy var collectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
-    layout.itemSize = CGSize(width: 170, height: 288)
+    layout.itemSize = CGSize(
+      width: 170,
+      height: 288
+    )
     layout.minimumLineSpacing = 10
     layout.minimumInteritemSpacing = 10
-    layout.sectionInset = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
+    layout.sectionInset = UIEdgeInsets(
+      top: 20,
+      left: 20,
+      bottom: 20,
+      right: 20
+    )
     
     let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
     cv.backgroundColor = .clear
@@ -96,7 +104,7 @@ public class MyRecordView: UIView {
     
     if !isEmpty {
       setCountLabelText()
-      collectionView.reloadData()
+      self.collectionView.reloadData()
     }
   }
   
@@ -104,7 +112,12 @@ public class MyRecordView: UIView {
     let whiteText = "• \(feeds.count)"
     let greyText = " 개의 기록"
     let attributedText = NSMutableAttributedString(string: whiteText, attributes: [.foregroundColor: UIColor.white])
-    attributedText.append(NSAttributedString(string: greyText, attributes: [.foregroundColor: CommonAsset.viskitGray03.color]))
+    attributedText.append(
+      NSAttributedString(
+        string: greyText,
+        attributes: [.foregroundColor: CommonAsset.viskitGray03.color]
+      )
+    )
     countLabel.attributedText = attributedText
   }
   
@@ -115,7 +128,10 @@ public class MyRecordView: UIView {
 
 @available(iOS 16.0, *)
 extension MyRecordView: UICollectionViewDataSource, UICollectionViewDelegate {
-  public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+  public func collectionView(
+    _ collectionView: UICollectionView,
+    numberOfItemsInSection section: Int
+  ) -> Int {
     return feeds.count
   }
   

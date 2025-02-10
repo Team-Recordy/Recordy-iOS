@@ -11,15 +11,15 @@ import Foundation
 extension DTO {
   public struct GetBookmarkedListRequest: BaseRequest {
     /// 페이지네이션을 위함
-//    public let cursorId: Int?
+    public let cursorId: Int?
     /// 페이지당 항목 수
     public let size: Int
     
     public init(
-//      cursorId: Int? = nil,
+      cursorId: Int? = nil,
       size: Int
     ) {
-//      self.cursorId = cursorId
+      self.cursorId = cursorId
       self.size = size
     }
   }

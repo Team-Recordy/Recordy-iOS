@@ -5,8 +5,10 @@
 //  Created by 송여경 on 7/13/24.
 //  Copyright © 2024 com.recordy. All rights reserved.
 //
+
 import Foundation
 import Common
+
 import Core
 
 class FollowViewModel {
@@ -19,28 +21,35 @@ class FollowViewModel {
     }
   }
   var cursorId: Int? = nil
-  
-  let apiProvider = APIProvider<APITarget.Users>()
+  var hasNext: Bool = true
   
   var followersDidChange: (([Follow]) -> Void)?
   var isEmptyDidChange: ((Bool) -> Void)?
+  let apiProvider = APIProvider<APITarget.Users>()
   
   init(followType: FollowType) {
     self.followType = followType
-    fetchUsers()
   }
   
   func fetchUsers() {
-    switch followType {
-    case .follower:
-      getFollowerList()
-    case .following:
-      getFollowingList()
+    if hasNext {
+      switch followType {
+      case .follower:
+        getFollowerList()
+      case .following:
+        getFollowingList()
+      }
     }
   }
   
+  
   private func getFollowerList() {
-    let request = DTO.GetFollowerListRequest(cursorId: cursorId, size: 100)
+    let requestCursorId = (cursorId == -1) ? nil : cursorId
+    let request = DTO.GetFollowerListRequest(
+      cursorId: requestCursorId,
+      size: 100
+    )
+    
     apiProvider.requestResponsable(
       .getFollowerList(request),
       DTO.GetFollowerListResponse.self
@@ -50,21 +59,27 @@ class FollowViewModel {
       case .success(let response):
         self.handleFollowerResponse(response: response)
       case .failure(let failure):
-        print(failure)
+        print("실패 \(failure)")
       }
     }
   }
   
-  func getFollowingList() {
-    let request = DTO.GetFollowingListRequest(cursorId: cursorId, size: 10)
-    
-    apiProvider.requestResponsable(.getFollowingList(request), DTO.GetFollowingListResponse.self) { [weak self] result in
+  private func getFollowingList() {
+    let requestCursorId = (cursorId == -1) ? nil : cursorId
+    let request = DTO.GetFollowingListRequest(
+      cursorId: requestCursorId,
+      size: 100
+    )
+    apiProvider.requestResponsable(
+      .getFollowingList(request),
+      DTO.GetFollowingListResponse.self
+    ) { [weak self] result in
       guard let self = self else { return }
       switch result {
       case .success(let response):
         self.handleFollowingResponse(response: response)
       case .failure(let failure):
-        print("Decoding failed: \(failure)")
+        print("getFollowingList 실패 \(failure)")
       }
     }
   }
@@ -73,13 +88,16 @@ class FollowViewModel {
     let followerList = response.content.map {
       Follow(
         followState: .follower,
-        userId: String($0.userInfo.id),
-        profileImage: $0.userInfo.profileImageUrl,
-        nickname: $0.userInfo.nickname,
-        isFollowing: $0.following
+        userId: String($0.id),
+        profileImage: $0.profileImageUrl,
+        nickname: $0.nickname,
+        isFollowing: $0.isFollowing
       )
     }
-    self.followers = followerList
+    
+    self.followers.append(contentsOf: followerList)
+    self.cursorId = response.nextCursor
+    self.hasNext = response.hasNext
   }
   
   private func handleFollowingResponse(response: DTO.GetFollowingListResponse) {
@@ -89,16 +107,13 @@ class FollowViewModel {
         userId: String($0.id),
         profileImage: $0.profileImageUrl,
         nickname: $0.nickname,
-        isFollowing: true
+        isFollowing: $0.nickname != "비스킷"
       )
     }
-    self.followers = followList.reversed()
-  }
-  
-  func toggleFollow(at index: Int) {
-    guard index < followers.count else { return }
-    followers[index].isFollowing.toggle()
-    followersDidChange?(followers)
+    
+    self.followers.append(contentsOf: followList)
+    self.cursorId = response.nextCursor
+    self.hasNext = response.hasNext
   }
   
   func postFollowRequest(at index: Int) {
@@ -112,11 +127,17 @@ class FollowViewModel {
       guard let self = self else { return }
       switch result {
       case .success(_):
-        print("Follow request successful")
+        print("Follow request 성공")
       case .failure(let failure):
-        print("Follow request failed: \(failure)")
+        print("Follow request 실패")
         self.toggleFollow(at: index)
       }
     }
+  }
+  
+  func toggleFollow(at index: Int) {
+    guard index < followers.count else { return }
+    followers[index].isFollowing.toggle()
+    followersDidChange?(followers)
   }
 }

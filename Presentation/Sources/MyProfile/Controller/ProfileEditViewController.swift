@@ -8,19 +8,46 @@
 
 import UIKit
 import Common
+import Core
 
 import Photos
 import PhotosUI
 
+protocol ProfileEditViewControllerDelegate: AnyObject {
+  func didUpdateProfile(
+    nickname: String,
+    profileImageUrl: String
+  )
+}
+
 @available(iOS 16.0, *)
 public final class ProfileEditViewController: UIViewController, CustomImagePickerDelegate {
   
+  weak var delegate: ProfileEditViewControllerDelegate?
+  
   private let profileEditView = ProfileEditView()
-  private let currentNickname: String = "레코디"
+  private let currentNickname: String
   private let maxNicknameLength: Int = 10
+  private let currentProfileImage: String
   
   private var isNicknameChanged = false
   private var isProfileImageChanged = false
+  private let id: Int
+  
+  init(
+    id: Int,
+    currentNickname: String,
+    currentProfileImage: String
+  ) {
+    self.id = id
+    self.currentNickname = currentNickname
+    self.currentProfileImage = currentProfileImage
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
   
   public override func loadView() {
     self.view = profileEditView
@@ -29,8 +56,22 @@ public final class ProfileEditViewController: UIViewController, CustomImagePicke
   public override func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = CommonAsset.viskitBG.color
-    profileEditView.setNickname(currentNickname)
+    profileEditView.nicknameEditTextField.text = currentNickname
+    
+    if let imageUrl = URL(string: currentProfileImage) {
+      profileEditView.profileImageView.kf.setImage(
+        with: imageUrl,
+        placeholder: CommonAsset.profileEdit.image
+      )
+    }
+    
+    profileEditView.baseSetting()
+    textFieldDidChange(profileEditView.nicknameEditTextField)
     setUI()
+    
+    hideKeyboard()
+    
+    
   }
   
   private func setUI() {
@@ -82,34 +123,161 @@ public final class ProfileEditViewController: UIViewController, CustomImagePicke
       profileEditView.nicknameCountLabel.text = "\(maxNicknameLength) / \(maxNicknameLength)"
     }
     
-    if text.isEmpty {
+    if text.isEmpty || text == currentNickname {
       profileEditView.baseSetting()
       isNicknameChanged = false
     } else if !text.isNicknamePatternValid(text) {
       profileEditView.showErrorLabel(withMessage: "ⓘ 한글, 숫자, 밑줄 및 마침표만 사용할 수 있어요.")
+      profileEditView.nicknameEditTextField.textColor = CommonAsset.recordyWhite.color
       isNicknameChanged = false
-    } else if text == currentNickname {
-      profileEditView.showErrorLabel(withMessage: "ⓘ 이미 사용 중인 닉네임이에요.")
-      isNicknameChanged = false
-    } else {
+    } else { // TODO: 이미 사용중 인 것 추가하기
       profileEditView.showSuccessLabel()
+      profileEditView.nicknameEditTextField.textColor = CommonAsset.recordyWhite.color
       isNicknameChanged = true
     }
     updateCompleteButtonState()
   }
   
   private func updateCompleteButtonState() {
-    let isEnabled = isNicknameChanged || isProfileImageChanged
+    guard let newNickname = profileEditView.nicknameEditTextField.text else {
+      return
+    }
+    let isEnabled = (isNicknameChanged && !newNickname.isEmpty &&
+                     newNickname != currentNickname) || isProfileImageChanged
     profileEditView.updateButtonState(isEnabled: isEnabled)
+  }
+  
+  func requestPresignedUrl(fileName: String, fileType: String, accessToken: String, completion: @escaping (Result<String, RecordyNetworkError>) -> Void) {
+    let apiProvider = APIProvider<APITarget.Users>()
+    let request = DTO.GetPresignedImageUrlRequest(
+      fileName: fileName,
+      fileType: fileType
+    )
+    
+    apiProvider.request(.getPresignedUrl(request)) { result in
+      switch result {
+      case .success(let response):
+        if let urlString = String(
+          data: response.data,
+          encoding: .utf8
+        ) {
+          completion(.success(urlString))
+        } else {
+          completion(.failure(.decodingFailed("Failed to convert data to string")))
+        }
+      case .failure(let error):
+        completion(.failure(.decodingFailed("url 실패")))
+      }
+    }
+  }
+  
+  func uploadImageToPresignedUrl(image: UIImage, presignedUrl: String, completion: @escaping (Result<String, Error>) -> Void) {
+    guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+      completion(.failure(NSError(domain: "Image conversion failed", code: 0, userInfo: nil)))
+      return
+    }
+    
+    var request = URLRequest(url: URL(string: presignedUrl)!)
+    request.httpMethod = "PUT"
+    request.setValue("image/jpeg", forHTTPHeaderField: "Content-Type")
+    
+    let task = URLSession.shared.uploadTask(with: request, from: imageData) { _, response, error in
+      if let error = error {
+        completion(.failure(error))
+      } else if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+        
+        if let cleanUrl = URL(string: presignedUrl)?.deletingQuery() {
+          completion(.success(cleanUrl))
+        } else {
+          completion(.failure(NSError(domain: "Invalid URL processing", code: 0, userInfo: nil)))
+        }
+      } else {
+        completion(.failure(NSError(domain: "Upload failed", code: 0, userInfo: nil)))
+      }
+    }
+    task.resume()
   }
   
   @available(iOS 16.0, *)
   @objc private func nextButtonDidTap() {
-    let profileViewController = ProfileViewController()
-    navigationController?.pushViewController(
-      profileViewController,
-      animated: true
+    guard let newNickname = profileEditView.nicknameEditTextField.text else { return }
+    
+    if isProfileImageChanged, let newImage = profileEditView.profileImageView.image {
+      let fileName = "profile-\(id)-\(UUID().uuidString).jpg"
+      let fileType = "image/jpeg"
+          
+      requestPresignedUrl(fileName: fileName, fileType: fileType, accessToken: "your_access_token") { result in
+        switch result {
+        case .success(let presignedUrl):
+          self.uploadImageToPresignedUrl(image: newImage, presignedUrl: presignedUrl) { uploadResult in
+            switch uploadResult {
+            case .success(let finalProfileUrl):
+              self.updateUserProfile(
+                nickname: newNickname,
+                profileImageUrl: finalProfileUrl
+              ) { updateResult in
+                switch updateResult {
+                case .success:
+                  self.navigateToProfileView()
+                case .failure(let error):
+                  print("프로필 업데이트 실패: \(error)")
+                }
+              }
+            case .failure(let error):
+              print("이미지 업로드 실패: \(error)")
+            }
+          }
+        case .failure(let error):
+          print("Presigned URL 요청 실패: \(error)")
+        }
+      }
+    } else {
+      self.updateUserProfile(nickname: newNickname, profileImageUrl: currentProfileImage) { updateResult in
+        switch updateResult {
+        case .success:
+          print("프로필 업데이트 성공")
+          self.navigateToProfileView()
+        case .failure(let error):
+          print("프로필 업데이트 실패: \(error)")
+        }
+      }
+    }
+  }
+  
+  private func navigateToProfileView() {
+    if let navigationController = navigationController {
+      for viewController in navigationController.viewControllers {
+        if let profileVC = viewController as? ProfileViewController {
+          navigationController.popToViewController(
+            profileVC,
+            animated: true
+          )
+          return
+        }
+      }
+    }
+    navigationController?.popViewController(animated: true)
+  }
+  
+  func updateUserProfile(
+    nickname: String,
+    profileImageUrl: String,
+    completion: @escaping (Result<Void, Error>) -> Void
+  ) {
+    let apiProvider = APIProvider<APITarget.Users>()
+    let request = DTO.EditUserInfoRequest(
+      nickname: nickname,
+      profileImageUrl: profileImageUrl
     )
+    
+    apiProvider.justRequest(.editProfile(request)) { result in
+      switch result {
+      case .success:
+        completion(.success(()))
+      case .failure(let error):
+        completion(.failure(error))
+      }
+    }
   }
   
   @objc private func profileImageViewDidTap() {

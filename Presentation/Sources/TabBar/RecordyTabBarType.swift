@@ -60,15 +60,16 @@ enum RecordyTabBarType: CaseIterable {
   var viewController: UIViewController {
     switch self {
     case .home:
-      BaseNavigationController(rootViewController: OverviewViewController(viewModel: OverviewViewModel()))
+      return BaseNavigationController(rootViewController: OverviewViewController(viewModel: OverviewViewModel()))
     case .search:
-      BaseNavigationController(rootViewController: SearchViewController(viewModel: SearchViewModel()))
+      return BaseNavigationController(rootViewController: SearchViewController(viewModel: SearchViewModel()))
     case .upload:
-      BaseNavigationController(rootViewController: UploadVideoViewController())
+      return BaseNavigationController(rootViewController: UploadVideoViewController())
     case .video:
-      BaseNavigationController(rootViewController: VideoFeedViewController(type: .all))
+      return BaseNavigationController(rootViewController: VideoFeedViewController(type: .all))
     case .profile:
-      BaseNavigationController(rootViewController: ProfileViewController())
+      let userId = UserDefaults.standard.integer(forKey: "userId")
+      return BaseNavigationController(rootViewController: ProfileViewController(id: userId))
     }
   }
 }

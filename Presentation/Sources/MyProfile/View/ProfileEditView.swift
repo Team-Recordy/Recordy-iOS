@@ -58,7 +58,7 @@ public final class ProfileEditView: UIView {
     }
     
     nicknameEditTextField.do {
-      $0.placeholder = "닉네임 입력"
+      $0.placeholder = "닉네임 (한글, 숫자, 밑줄 및 마침표만 사용 가능)"
       $0.font = ViskitFont.body2.font
       $0.borderStyle = .roundedRect
       $0.clearButtonMode = .whileEditing
@@ -150,7 +150,7 @@ public final class ProfileEditView: UIView {
     }
     
     nextButton.snp.makeConstraints {
-      $0.bottom.equalTo(safeAreaLayoutGuide).inset(14)
+      $0.bottom.equalTo(keyboardLayoutGuide.snp.top).offset(-14)
       $0.centerX.equalToSuperview()
       $0.width.equalTo(335.adaptiveWidth)
       $0.height.equalTo(54.adaptiveHeight)
@@ -163,10 +163,6 @@ extension ProfileEditView {
     nextButton.isEnabled = isEnabled
     nextButton.backgroundColor = isEnabled ? CommonAsset.viskitYellow400.color : CommonAsset.viskitGray11.color
     nextButton.titleLabel?.textColor = isEnabled ? CommonAsset.recordyBG.color : CommonAsset.viskitGray08.color
-  }
-  
-  public func setNickname(_ nickname: String) {
-    nicknameEditTextField.placeholder = nickname
   }
   
   public func updateTextFieldBorderColor(to color: UIColor?) {
@@ -196,6 +192,7 @@ extension ProfileEditView {
     errorLabel.isHidden = true
     successLabel.isHidden = true
     updateTextFieldBorderColor(to: nil)
+    nicknameEditTextField.textColor = CommonAsset.viskitGray06.color
   }
 }
 

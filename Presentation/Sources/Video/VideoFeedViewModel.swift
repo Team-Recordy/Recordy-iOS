@@ -102,7 +102,7 @@ class VideoFeedViewModel {
       getPlaceRecordList(
         endPoint: .getBookmarkedRecordList(
           DTO.GetBookmarkedListRequest(
-            //            cursorId: 0,
+            cursorId: cursorId ?? 0,
             size: 100
           )
         ),
@@ -209,27 +209,33 @@ class VideoFeedViewModel {
       updateFeedList(feeds)
     }
     else if let bookmarkedRecordListResponse = response as? DTO.GetBookmarkedListResponse {
-      /// 유저 북마크 레코드 조회
       guard hasNext else { return }
-      if let index = bookmarkedRecordListResponse.content.firstIndex(where: { $0.id == exhibitionId }) {
-        let newFeeds: [Feed] = Array(bookmarkedRecordListResponse.content[index...]).map { content in
-          Feed(
-            id: content.id,
-            videoLink: content.fileUrl.videoUrl,
-            thumbnailLink: content.fileUrl.thumbnailUrl,
-            description: content.content,
-            exhibitionName: content.exhibitionName,
-            placeId: content.placeId,
-            placeName: content.placeName,
-            uploaderId: content.uploaderId,
-            uploaderNickname: content.uploaderNickname,
-            bookmarkCount: content.bookmarkCount,
-            isMine: content.isMine,
-            isBookmarked: content.isBookmarked
-          )
-        }
-        self.hasNext = bookmarkedRecordListResponse.hasNext
-        updateFeedList(newFeeds)
+      
+      let allFeeds: [Feed] = bookmarkedRecordListResponse.content.map { content in
+        Feed(
+          id: content.id,
+          videoLink: content.fileUrl.videoUrl,
+          thumbnailLink: content.fileUrl.thumbnailUrl,
+          description: content.content,
+          exhibitionName: content.exhibitionName,
+          placeId: content.placeId,
+          placeName: content.placeName,
+          uploaderId: content.uploaderId,
+          uploaderNickname: content.uploaderNickname,
+          bookmarkCount: content.bookmarkCount,
+          isMine: content.isMine,
+          isBookmarked: content.isBookmarked
+        )
+      }
+      if let selectedFeedId = self.exhibitionId,
+         let selectedFeedIndex = allFeeds.firstIndex(where: { $0.id == selectedFeedId }) {
+        let selectedFeed = allFeeds[selectedFeedIndex]
+        var sortedFeeds = allFeeds
+        sortedFeeds.remove(at: selectedFeedIndex)
+        sortedFeeds.insert(selectedFeed, at: 0)
+        updateFeedList(sortedFeeds)
+      } else {
+        updateFeedList(allFeeds)
       }
     }
     else if let overviewPlaceRecordListResponse = response as? DTO.GetPlaceRecordListResponse {

@@ -360,6 +360,10 @@ public class UploadVideoViewController: UIViewController {
 
   @objc func uploadButtonTapped() {
     viewModel.uploadButtonTapped()
+    NotificationCenter.default.post(
+      name: NSNotification.Name("VideoUploadCompleted"),
+      object: nil
+    )
     self.dismiss(animated: true)
   }
 
