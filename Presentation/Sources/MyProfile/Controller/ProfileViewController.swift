@@ -233,7 +233,7 @@ public class ProfileViewController: UIViewController, ProfileEditViewControllerD
       
       switch result {
       case .success(let response):
-
+        
         self.user = User(
           id: response.id,
           nickname: response.nickname,
@@ -498,22 +498,15 @@ extension ProfileViewController: UserRecordDelegate {
 @available(iOS 16.0, *)
 extension ProfileViewController: ProfileEditViewControllerDelegate {
   func didUpdateProfile(nickname: String, profileImageUrl: String) {
-    
-    DispatchQueue.main.async {
-      self.profileInfoView.userName.text = nickname
-      if let url = URL(string: profileImageUrl) {
-        self.profileInfoView.profileImage.kf.setImage(with: url)
+    if var updatedUser = user {
+      updatedUser.nickname = nickname
+      updatedUser.profileImage = profileImageUrl
+      self.user = updatedUser
+      
+      DispatchQueue.main.async {
+        self.setUserProfile()
       }
     }
-    
-    UserDefaults.standard.set(
-      nickname,
-      forKey: "nickname"
-    )
-    
-    user?.nickname = nickname
-    user?.profileImage = profileImageUrl
-    
-    getUserProfile()
+    UserDefaults.standard.set(nickname, forKey: "nickname")
   }
 }
