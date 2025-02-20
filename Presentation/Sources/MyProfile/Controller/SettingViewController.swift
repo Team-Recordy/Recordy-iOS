@@ -74,7 +74,7 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
       $0.backgroundColor = .clear
       $0.textColor = CommonAsset.viskitGray01.color
       $0.font = ViskitFont.caption2Medium.font
-      $0.text = "앱 버전 1.1.1"
+      $0.text = "앱 버전 1.0.0"
     }
     let footerView = UIView()
     footerView.backgroundColor = .clear
@@ -250,14 +250,23 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
 extension SettingViewController: SignOutDelegate {
   func signOut() {
     self.showPopUp(type: .signOut) {
-      KeychainManager.shared.delete(token: .AccessToken)
-      KeychainManager.shared.delete(token: .RefreshToken)
-      UserDefaults.standard.removeObject(forKey: "PlatformType")
+      let apiProvider = APIProvider<APITarget.Users>()
       
-      self.dismiss(animated: false)
-      let loginViewController = SplashScreenViewController()
-      loginViewController.modalPresentationStyle = .fullScreen
-      self.present(loginViewController, animated: false)
+      apiProvider.justRequest(.signOut) { result in
+        switch result {
+        case .success:
+          KeychainManager.shared.delete(token: .AccessToken)
+          KeychainManager.shared.delete(token: .RefreshToken)
+          UserDefaults.standard.removeObject(forKey: "PlatformType")
+          
+          self.dismiss(animated: false)
+          let loginViewController = SplashScreenViewController()
+          loginViewController.modalPresentationStyle = .fullScreen
+          self.present(loginViewController, animated: false)
+        case .failure(let error):
+          print("\(error)")
+        }
+      }
     }
   }
 }
@@ -266,14 +275,23 @@ extension SettingViewController: SignOutDelegate {
 extension SettingViewController: WithDrawDelegate {
   func withDraw() {
     self.showPopUp(type: .withdraw) {
-      KeychainManager.shared.delete(token: .AccessToken)
-      KeychainManager.shared.delete(token: .RefreshToken)
-      UserDefaults.standard.removeObject(forKey: "PlatformType")
+      let apiProvider = APIProvider<APITarget.Users>()
       
-      self.dismiss(animated: false)
-      let loginViewController = SplashScreenViewController()
-      loginViewController.modalPresentationStyle = .fullScreen
-      self.present(loginViewController, animated: false)
+      apiProvider.justRequest(.withdraw) { result in
+        switch result {
+        case .success:
+          KeychainManager.shared.delete(token: .AccessToken)
+          KeychainManager.shared.delete(token: .RefreshToken)
+          UserDefaults.standard.removeObject(forKey: "PlatformType")
+          
+          self.dismiss(animated: false)
+          let loginViewController = SplashScreenViewController()
+          loginViewController.modalPresentationStyle = .fullScreen
+          self.present(loginViewController, animated: false)
+        case .failure(let error):
+          print("\(error)")
+        }
+      }
     }
   }
 }

@@ -111,6 +111,7 @@ public class SearchCompleteCollectionViewCell: UICollectionViewCell {
       frame: .zero,
       collectionViewLayout: layout
     )
+    self.completeEventCollectionView.backgroundColor = CommonAsset.viskitBG.color
     self.completeEventCollectionView.showsHorizontalScrollIndicator = false
     self.completeEventCollectionView.register(
       CompleteEventCollectionViewCell.self,

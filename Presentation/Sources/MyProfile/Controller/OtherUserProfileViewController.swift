@@ -171,6 +171,9 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
     attributedText.append(NSAttributedString(string: " 명의 팔로워", attributes: [.font: RecordyFont.body2.font, .foregroundColor: CommonAsset.recordyGrey03.color]))
     self.followerButton.setAttributedTitle(attributedText, for: .normal)
     self.userName.text = user.nickname
+    if self.userName.text == "비스킷" {
+      self.followingButton.isHidden = true
+    }
     let url = URL(string: user.profileImage)!
     self.profileImage.kf.setImage(with: url)
     self.followingButton.mediumState = user.isFollowing ? .active : .inactive
