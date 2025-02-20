@@ -16,7 +16,7 @@ import SnapKit
 
 class VideoCell: UICollectionViewCell {
   private let previewImageView = UIImageView().then {
-    $0.contentMode = .scaleToFill
+    $0.contentMode = .scaleAspectFit
   }
   private let playtimeLabel = UILabel().then {
     $0.font = ViskitFont.caption2Medium.font

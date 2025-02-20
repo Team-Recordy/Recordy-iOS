@@ -16,6 +16,7 @@ extension UIViewController {
         UIViewController.dismissKeyboard
       )
     )
+    tap.cancelsTouchesInView = false
     view.addGestureRecognizer(tap)
   }
 

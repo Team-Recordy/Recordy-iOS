@@ -32,6 +32,7 @@ final class RegisterPlaceSearchViewController: UIViewController {
     setUI()
     setAutolayout()
     bindViewModel()
+    setupCustomBackButton()
   }
 
   private func bindViewModel() {

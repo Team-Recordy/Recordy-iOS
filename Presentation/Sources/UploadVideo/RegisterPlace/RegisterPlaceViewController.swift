@@ -43,6 +43,7 @@ class RegisterPlaceViewController: UIViewController {
     setStyle()
     setUI()
     setAutolayout()
+    setupCustomBackButton()
   }
 
   private func setStyle() {
@@ -130,6 +131,7 @@ class RegisterPlaceViewController: UIViewController {
       guard let self else { return }
       self.dismiss(animated: false)
       self.placeRegistered?.send(self.placeToRegister)
+      print("🚨\(self.placeToRegister)🚨")
       apiProvider.justRequest(.createPlace(request)) { _ in
         self.navigationController?.popViewController(animated: true)
         self.navigationController?.popViewController(animated: true)

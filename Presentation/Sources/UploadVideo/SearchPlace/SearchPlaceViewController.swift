@@ -38,6 +38,7 @@ final class SearchPlaceViewController: UIViewController {
     setAutolayout()
     bindViewModel()
     hideKeyboard()
+    setupCustomBackButton()
   }
 
   override func viewWillDisappear(_ animated: Bool) {

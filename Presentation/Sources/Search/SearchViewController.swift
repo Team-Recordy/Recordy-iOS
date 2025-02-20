@@ -54,6 +54,10 @@ public class SearchViewController: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
   
+  public override func viewWillAppear(_ animated: Bool) {
+    navigationController?.isNavigationBarHidden = true
+  }
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -68,6 +72,7 @@ public class SearchViewController: UIViewController {
     bind()
     bindSearchSubject()
     observeTextChanges()
+    hideKeyboard()
     
     currentState = .initial
   }
@@ -228,7 +233,9 @@ public class SearchViewController: UIViewController {
       frame: .zero,
       collectionViewLayout: layout
     )
+    self.searchLoadingCollectionView.backgroundColor = CommonAsset.viskitBG.color
     self.searchLoadingCollectionView.showsHorizontalScrollIndicator = false
+    self.searchLoadingCollectionView.keyboardDismissMode = .onDrag
     self.searchLoadingCollectionView.register(
       SearchLoadingCollectionViewCell.self,
       forCellWithReuseIdentifier: SearchLoadingCollectionViewCell.cellIdentifier
@@ -245,7 +252,9 @@ public class SearchViewController: UIViewController {
       frame: .zero,
       collectionViewLayout: layout
     )
+    self.searchCompleteCollectionView.backgroundColor = CommonAsset.viskitBG.color
     self.searchCompleteCollectionView.showsHorizontalScrollIndicator = false
+//    self.searchCompleteCollectionView.keyboardDismissMode = .onDrag
     self.searchCompleteCollectionView.register(
       SearchCompleteCollectionViewCell.self,
       forCellWithReuseIdentifier: SearchCompleteCollectionViewCell.cellIdentifier
