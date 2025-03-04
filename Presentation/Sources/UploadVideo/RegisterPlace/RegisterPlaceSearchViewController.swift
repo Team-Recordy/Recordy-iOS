@@ -21,6 +21,8 @@ final class RegisterPlaceSearchViewController: UIViewController {
   private let searchTextField = UITextField()
   private let tableView = UITableView()
   private let registerImageView = UIImageView()
+  private let emptyImage = UIImageView()
+  private let emptyLabel = UILabel()
 
   private let viewModel = RegisterPlaceSearchViewModel()
   private var cancellables = Set<AnyCancellable>()
@@ -34,16 +36,32 @@ final class RegisterPlaceSearchViewController: UIViewController {
     bindViewModel()
     setupCustomBackButton()
   }
-
+  
   private func bindViewModel() {
     searchTextField.textPublisher
       .assign(to: \.searchText, on: viewModel)
       .store(in: &cancellables)
-
+    
+    Publishers.CombineLatest(
+      viewModel.$searchText,
+      viewModel.$searchedPlace
+    )
+    .receive(on: DispatchQueue.main)
+    .sink { [weak self] searchText, searchedPlace in
+      guard let self else { return }
+      let isTextEmpty = searchText.isEmpty
+      let isEmptyResult = !isTextEmpty && searchedPlace.isEmpty
+      let hasResults = !searchedPlace.isEmpty
+      
+      self.registerImageView.isHidden = hasResults || isEmptyResult
+      self.emptyImage.isHidden = !isEmptyResult
+      self.emptyLabel.isHidden = !isEmptyResult
+    }
+    .store(in: &cancellables)
+    
     viewModel.$searchedPlace
       .receive(on: RunLoop.main)
-      .sink { [weak self] places in
-        self?.registerImageView.isHidden = !places.isEmpty
+      .sink { [weak self] _ in
         self?.tableView.reloadData()
       }
       .store(in: &cancellables)
@@ -83,6 +101,20 @@ final class RegisterPlaceSearchViewController: UIViewController {
     registerImageView.do {
       $0.image = CommonAsset.registerPlace.image
     }
+    
+    emptyImage.do {
+      $0.image = CommonAsset.ledyEmpty2.image
+      $0.contentMode = .scaleAspectFit
+    }
+    
+    emptyLabel.do {
+      $0.text = "검색 결과가 없어요\n검색어가 정확한지 확인해주세요!"
+      $0.font = ViskitFont.title2.font
+      $0.textColor = CommonAsset.viskitGray02.color
+      $0.setLineSpacing(lineHeightMultiple: 1.3)
+      $0.textAlignment = .center
+      $0.numberOfLines = 2
+    }
   }
   private func setUI() {
     searchBackgroundView.addSubviews(
@@ -92,7 +124,9 @@ final class RegisterPlaceSearchViewController: UIViewController {
     view.addSubviews(
       searchBackgroundView,
       registerImageView,
-      tableView
+      tableView,
+      emptyImage,
+      emptyLabel
     )
     view.bringSubviewToFront(registerImageView)
   }
@@ -124,8 +158,19 @@ final class RegisterPlaceSearchViewController: UIViewController {
       $0.top.equalTo(searchBackgroundView.snp.bottom).offset(28.adaptiveHeight)
       $0.leading.equalToSuperview().offset(24.adaptiveWidth)
     }
+    
+    emptyImage.snp.makeConstraints {
+      $0.top.equalToSuperview().offset(320)
+      $0.centerX.equalToSuperview()
+      $0.width.equalTo(122.adaptiveWidth)
+      $0.height.equalTo(107.adaptiveHeight)
+    }
+    
+    emptyLabel.snp.makeConstraints {
+      $0.top.equalTo(emptyImage.snp.bottom).offset(14)
+      $0.centerX.equalToSuperview()
+    }
   }
-
 }
 
 extension RegisterPlaceSearchViewController: UITableViewDelegate, UITableViewDataSource {
