@@ -29,6 +29,7 @@ final class RegisterPlaceSearchViewModel {
   private let apiProvider = APIProvider<APITarget.Platform>()
   @Published var searchText: String = ""
   @Published var searchedPlace: [Place] = []
+  @Published var isNotFoundError: Bool = false
   private var cancellables = Set<AnyCancellable>()
 
   init() {
@@ -40,6 +41,7 @@ final class RegisterPlaceSearchViewModel {
       .sink { [weak self] text in
         guard !text.isEmpty else {
           self?.searchedPlace = []
+          self?.isNotFoundError = false
           return
         }
         self?.fetchSearchedPlace()
@@ -65,6 +67,7 @@ final class RegisterPlaceSearchViewModel {
           )
         }
         self.searchedPlace = responseData
+        self.isNotFoundError = false
       case .failure(let failure):
         self.searchedPlace = []
       }
