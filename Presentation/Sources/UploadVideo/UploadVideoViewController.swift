@@ -350,7 +350,7 @@ public class UploadVideoViewController: UIViewController {
         }
       } else {
         DispatchQueue.main.async {
-          self.showPopUp(type: .permission) {
+          self.showPopUp(type: .uploadPermission) {
             UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
           }
         }
