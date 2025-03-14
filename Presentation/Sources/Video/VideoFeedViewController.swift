@@ -57,6 +57,12 @@ public class VideoFeedViewController: UIViewController {
     setUpCollectionView()
     setUI()
     setAutolayout()
+    NotificationCenter.default.addObserver(
+        self,
+        selector: #selector(handleReportCompletion),
+        name: .reportDidComplete,
+        object: nil
+    )
   }
 
   public override func viewWillAppear(_ animated: Bool) {
@@ -195,5 +201,13 @@ public class VideoFeedViewController: UIViewController {
     sheet.animateChanges {
       sheet.detents = [.custom { _ in return height.adaptiveHeight }]
     }
+  }
+  
+  @objc private func handleReportCompletion() {
+    viewModel.toggle(from: type == .all ? .follow : .all)
+  }
+
+  deinit {
+    NotificationCenter.default.removeObserver(self, name: .reportDidComplete, object: nil)
   }
 }
