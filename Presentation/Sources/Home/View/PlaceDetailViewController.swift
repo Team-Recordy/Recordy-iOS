@@ -222,11 +222,15 @@ final public class PlaceDetailViewController: UIViewController{
     let googleAction = UIAlertAction(title: "구글 지도", style: .default) { [weak self] _ in
       self?.viewModel.openMap(type: .google)
     }
+    let appleAction = UIAlertAction(title: "지도", style: .default) { [weak self] _ in
+      self?.viewModel.openMap(type: .apple)
+    }
     let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
     
     alert.addAction(kakaoAction)
     alert.addAction(naverAction)
     alert.addAction(googleAction)
+    alert.addAction(appleAction)
     alert.addAction(cancelAction)
     
     present(alert, animated: true)
