@@ -79,7 +79,7 @@ public class OverviewViewModel {
       size: 100,
       latitude: latitude,
       longitude: longitude,
-      distance: 100000
+      distance: 10000000
     )
     
     apiProvider.requestResponsable(.getNearPlaceList(request), DTO.GetNearPlaceListResponse.self) { [weak self] result in

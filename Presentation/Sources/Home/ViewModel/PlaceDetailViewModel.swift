@@ -22,6 +22,7 @@ public enum MapType {
   case kakao
   case naver
   case google
+  case apple
 }
 
 public enum PlaceDetailControlType: String {
@@ -153,7 +154,7 @@ public class PlaceDetailViewModel {
         }
         
         if let index = self.selectedPlace.firstIndex(where: { $0.id == placeId }) {
-            self.selectedPlace[index].recordList = fetchedFeeds
+          self.selectedPlace[index].recordList = fetchedFeeds
         }
         
         self.reviewFeedList = fetchedFeeds
@@ -183,7 +184,7 @@ public class PlaceDetailViewModel {
       }
     }
   }
-    
+  
   func updateControlType(to type: PlaceDetailControlType) {
     currentControlType = type
   }
@@ -243,11 +244,21 @@ public class PlaceDetailViewModel {
     case .google:
       guard let url = URL(string: "comgooglemaps://?saddr=\(userLat),\(userLong)&daddr=\(placeLat),\(placeLong)&directionsmode=transit") else { return }
       guard let appStoreURL = URL(string: "https://apps.apple.com/app/id585027354") else { return }
-
+      
       if UIApplication.shared.canOpenURL(URL(string:"comgooglemaps://")!) {
         UIApplication.shared.open(url)
       } else {
-          UIApplication.shared.open(appStoreURL)
+        UIApplication.shared.open(appStoreURL)
+      }
+      
+    case .apple:
+      guard let url = URL(string: "maps://?saddr=\(userLat),\(userLong)&daddr=\(placeLat),\(placeLong)&dirflg=r") else { return }
+      guard let appStoreURL = URL(string: "https://apps.apple.com/app/apple-maps/id915056765") else { return }
+      
+      if UIApplication.shared.canOpenURL(url) {
+        UIApplication.shared.open(url)
+      } else {
+        UIApplication.shared.open(appStoreURL)
       }
     }
   }

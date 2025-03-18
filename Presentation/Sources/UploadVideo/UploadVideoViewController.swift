@@ -377,6 +377,7 @@ public class UploadVideoViewController: UIViewController {
 
   @objc func placeButtonTapped() {
     let nextViewController = SearchPlaceViewController()
+    nextViewController.placeRegistered = self.placeRegistered
     nextViewController.delegate = self
     navigationController?.pushViewController(nextViewController, animated: true)
   }
