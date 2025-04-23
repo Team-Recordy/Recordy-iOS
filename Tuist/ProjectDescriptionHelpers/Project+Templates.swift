@@ -27,7 +27,7 @@ extension Project {
 
     let target = Target.target(
       name: name,
-      destinations: destinations,
+      destinations: [.iPhone],
       product: product,
       bundleId: organizationName + bundleId,
       deploymentTargets: .iOS(deploymentTarget),
