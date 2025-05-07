@@ -55,6 +55,7 @@ public class ProfileViewController: UIViewController, ProfileEditViewControllerD
     setDelegate()
     controlTypeChanged()
     getUserProfile()
+//    actionButtonHandler()
     
     NotificationCenter.default.addObserver(
       self,

@@ -186,6 +186,8 @@ final public class PlaceDetailViewController: UIViewController{
     exhibitionListView.allFilterButton.addTarget(self, action: #selector(onFilterButtonTapped), for: .touchUpInside)
     exhibitionListView.freeFilterButton.addTarget(self, action: #selector(onFilterButtonTapped(_:)), for: .touchUpInside)
     exhibitionListView.endSoonFilterButton.addTarget(self, action: #selector(onFilterButtonTapped(_:)), for: .touchUpInside)
+    
+    reviewFeedView.recordUploadButton.addTarget(self, action: #selector(onRecordUploadButtonTapped), for: .touchUpInside)
   }
   
   @objc private func onFilterButtonTapped(_ sender: UIButton) {
@@ -211,6 +213,17 @@ final public class PlaceDetailViewController: UIViewController{
   }
   
   @objc private func onFindRouteButtonTapped() {
+    
+    guard
+      let latitude = LocationManager.shared.currentLatitude,
+      let longitude = LocationManager.shared.currentLongitude
+    else {
+      self.showPopUp(type: .permission) {
+        UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+      }
+      return
+    }
+    
     let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
     
     let kakaoAction = UIAlertAction(title: "카카오맵", style: .default) { [weak self] _ in
@@ -234,6 +247,16 @@ final public class PlaceDetailViewController: UIViewController{
     alert.addAction(cancelAction)
     
     present(alert, animated: true)
+  }
+  
+  @objc private func onRecordUploadButtonTapped() {
+    let uploadViewController = UploadVideoViewController()
+    let navigationController = BaseNavigationController(rootViewController: uploadViewController)
+    navigationController.modalPresentationStyle = .fullScreen
+    present(
+      navigationController,
+      animated: true
+    )
   }
   
   private func bind() {

@@ -52,9 +52,9 @@ class BookmarkView: UIView {
       collectionView
     )
     
-    bookmarkEmptyView.setActionButtonHandler { [weak self] in
-      print("영상 둘러보기 눌림")
-    }
+//    bookmarkEmptyView.setActionButtonHandler { [weak self] in
+//      print("영상 둘러보기 눌림")
+//    }
   }
   
   private func setStyle() {

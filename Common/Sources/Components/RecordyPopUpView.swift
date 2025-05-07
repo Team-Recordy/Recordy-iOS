@@ -18,6 +18,7 @@ public class RecordyPopUpView: UIView {
   private let subtitleLabel = UILabel()
   let leftButton = UIButton()
   let rightButton = UIButton()
+  private let buttonStackView = UIStackView()
 
   public init(type: RecordyPopUpType) {
     self.popUpType = type
@@ -68,10 +69,19 @@ public class RecordyPopUpView: UIView {
       $0.cornerRadius(8)
     }
 
+    buttonStackView.do {
+      $0.axis = .horizontal
+      $0.spacing = 8
+      $0.alignment = .fill
+      $0.distribution = .fillEqually
+    }
   }
 
   private func setUI() {
     self.addSubviews(image, titleLabel, subtitleLabel, leftButton, rightButton)
+    buttonStackView.addArrangedSubview(leftButton)
+    buttonStackView.addArrangedSubview(rightButton)
+    addSubview(buttonStackView)
   }
 
   private func setAutoLayout() {
@@ -107,20 +117,11 @@ public class RecordyPopUpView: UIView {
       $0.centerX.equalToSuperview()
     }
 
-    leftButton.snp.makeConstraints {
-      $0.bottom.equalToSuperview().inset(20.adaptiveHeight)
-      $0.leading.equalToSuperview().offset(20)
-      $0.trailing.equalToSuperview().inset(153)
+    buttonStackView.snp.makeConstraints {
+      $0.top.equalTo(subtitleLabel.snp.bottom).offset(10)
+      $0.centerX.equalToSuperview()
       $0.height.equalTo(44.adaptiveHeight)
-      $0.width.equalTo(125.adaptiveWidth)
-    }
-
-    rightButton.snp.makeConstraints {
-      $0.bottom.equalToSuperview().inset(20.adaptiveHeight)
-      $0.leading.equalTo(leftButton.snp.trailing).offset(8)
-      $0.trailing.equalToSuperview().offset(-20)
-      $0.height.equalTo(44.adaptiveHeight)
-      $0.width.equalTo(125.adaptiveWidth)
+      $0.width.equalTo(266.adaptiveWidth)
     }
   }
 

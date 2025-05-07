@@ -61,6 +61,7 @@ class BookMarkEmptyView: UIView {
     
     goAroundButton.do {
       $0.setTitle("영상 둘러보기", for: .normal)
+      $0.addTarget(self, action: #selector(actionButtonTapped), for: .touchUpInside)
     }
   }
   
@@ -86,19 +87,18 @@ class BookMarkEmptyView: UIView {
       $0.leading.trailing.equalToSuperview().inset(65)
     }
     
-    goAroundButton.snp.makeConstraints {
-      $0.top.equalTo(titleLabel.snp.bottom).offset(24)
-      $0.centerX.equalToSuperview()
-      $0.width.equalTo(113.adaptiveWidth)
-      $0.height.equalTo(44.adaptiveHeight)
-    }
+//    goAroundButton.snp.makeConstraints {
+//      $0.top.equalTo(titleLabel.snp.bottom).offset(24)
+//      $0.centerX.equalToSuperview()
+//      $0.width.equalTo(113.adaptiveWidth)
+//      $0.height.equalTo(44.adaptiveHeight)
+//    }
   }
   
   func setActionButtonHandler(_ handler: @escaping () -> Void) {
-    goAroundButton.addTarget(self, action: #selector(actionButtonTapped), for: .touchUpInside)
     self.actionButtonHandler = handler
   }
-  
+
   @objc private func actionButtonTapped() {
     actionButtonHandler?()
   }
