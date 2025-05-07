@@ -53,7 +53,7 @@ public enum RecordyPopUpType {
     case .permission:
       "내 위치 기반 공간 추천을 위해\n사용자의 위치에 접근하도록 허용해주세요."
     case .uploadPermission:
-      "프로필 사진 업로드를 위해\n사진 라이브러리에 접근하도록 허용해주세요."
+      "전시회 관련 영상과 프로필 사진 업로드를 위해\n사진 라이브러리에 접근하도록 허용해주세요."
     case .exit:
       "지금까지 작성하신 내용이 모두 사라져요."
     case .signOut:

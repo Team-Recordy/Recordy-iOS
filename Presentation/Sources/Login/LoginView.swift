@@ -102,9 +102,11 @@ final class LoginView: UIView {
     )
     kakaoStackView.addArrangedSubview(kakaoLogo)
     kakaoStackView.addArrangedSubview(kakaoButtonText)
+    kakaoStackView.isUserInteractionEnabled = false
     kakaoLoginButton.addSubview(kakaoStackView)
     appleStackView.addArrangedSubview(appleLogo)
     appleStackView.addArrangedSubview(appleButtonText)
+    appleStackView.isUserInteractionEnabled = false
     appleLoginButton.addSubview(appleStackView)
     
     kakaoLoginButton.isUserInteractionEnabled = true

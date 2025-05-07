@@ -115,6 +115,9 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
     setUI()
     setAutoLayout()
     setDelegate()
+      
+    accountTableView.reloadAndUpdateHeight()
+    helpTableView.reloadAndUpdateHeight()
     
     NotificationCenter.default.addObserver(
       self,
@@ -144,7 +147,6 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
     accountTableView.snp.makeConstraints {
       $0.top.equalTo(view.safeAreaLayoutGuide)
       $0.leading.trailing.equalToSuperview()
-      $0.height.equalTo(160.adaptiveHeight)
     }
     
     firstDivider.snp.makeConstraints {
@@ -156,11 +158,10 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
     helpTableView.snp.makeConstraints {
       $0.top.equalTo(firstDivider.snp.bottom)
       $0.leading.trailing.equalToSuperview()
-      $0.height.equalTo(265.adaptiveHeight)
     }
     
     secondDivider.snp.makeConstraints {
-      $0.top.equalTo(helpTableView.snp.bottom).inset(10)
+      $0.top.equalTo(helpTableView.snp.bottom).offset(10)
       $0.horizontalEdges.equalToSuperview()
       $0.height.equalTo(4.adaptiveHeight)
     }

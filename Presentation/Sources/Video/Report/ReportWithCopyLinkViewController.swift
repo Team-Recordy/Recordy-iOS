@@ -41,6 +41,7 @@ class ReportWithCopyLinkViewController: UIViewController {
     setStyle()
     setUI()
     setAutolayout()
+    updatePreferredContentSize()
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -97,6 +98,8 @@ class ReportWithCopyLinkViewController: UIViewController {
       )
       $0.configuration = config
       $0.contentHorizontalAlignment = .left
+      $0.isUserInteractionEnabled = true
+      $0.configuration?.baseForegroundColor = CommonAsset.viskitAlert02.color
       $0.addTarget(
           self,
           action: #selector(reportButtonTapped),
@@ -124,6 +127,8 @@ class ReportWithCopyLinkViewController: UIViewController {
       )
       $0.configuration = config
       $0.contentHorizontalAlignment = .left
+      $0.isUserInteractionEnabled = true
+      $0.configuration?.baseForegroundColor = CommonAsset.viskitAlert02.color
       $0.addTarget(
           self,
           action: #selector(deleteButtonTapped),
@@ -150,16 +155,24 @@ class ReportWithCopyLinkViewController: UIViewController {
 //      $0.horizontalEdges.equalToSuperview()
 //      $0.height.equalTo(52.adaptiveHeight)
 //    }
+      
     reportButton.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(36.adaptiveHeight)
+      $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
       $0.horizontalEdges.equalToSuperview()
       $0.height.equalTo(52.adaptiveHeight)
     }
+      
     deleteButton.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(36.adaptiveHeight)
+      $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
       $0.horizontalEdges.equalToSuperview()
       $0.height.equalTo(52.adaptiveHeight)
     }
+  }
+
+  private func updatePreferredContentSize() {
+    let visibleButtons = [reportButton, deleteButton].filter { !$0.isHidden }
+    let totalHeight = CGFloat(visibleButtons.count) * 52.adaptiveHeight + 36.adaptiveHeight
+    preferredContentSize = CGSize(width: UIScreen.main.bounds.width, height: totalHeight)
   }
 
   @objc

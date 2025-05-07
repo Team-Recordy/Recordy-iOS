@@ -23,7 +23,7 @@ final class ReviewFeedView: UIView {
   private let reviewFeedCount = UILabel()
   private let emptyFirstLineLabel = UILabel()
   private let emptySecondLineLabel = UILabel()
-  private let recordUploadButton = UIButton()
+  public let recordUploadButton = UIButton()
   public var reviewFeedCollectionView: UICollectionView?
   
   public override init(frame: CGRect) {
