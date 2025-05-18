@@ -58,6 +58,16 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
     title = "프로필"
     view.backgroundColor = CommonAsset.viskitBG.color
     setupCustomBackButton()
+      
+    let rightButton = UIButton(type: .system)
+    rightButton.setImage(CommonAsset.moreOptions.image, for: .normal)
+    rightButton.addTarget(
+        self,
+        action: #selector(moreOptionsTapped),
+        for: .touchUpInside
+    )
+    let rightBarButtonItem = UIBarButtonItem(customView: rightButton)
+    self.navigationItem.rightBarButtonItem = rightBarButtonItem
     
     profileImage.do {
       $0.image = CommonAsset.profileImage.image
@@ -272,6 +282,30 @@ public class OtherUserProfileViewController: UIViewController, UICollectionViewD
   }
   
   @objc private func showOtherFollowers() {
+  }
+    
+  @objc private func moreOptionsTapped() {
+    guard let user = user else { return }
+      
+    let nextViewController = BlockUserViewController(
+      userId: user.id,
+      userNickname: user.nickname
+    )
+    nextViewController.onBlocked = { [weak self] in
+      self?.navigationController?.popViewController(animated: true)
+    }
+    let navigationController = BaseNavigationController(rootViewController: nextViewController)
+
+    if let sheet = navigationController.sheetPresentationController {
+      configureSheet(sheet, height: 150)
+    }
+
+    present(navigationController, animated: true)
+  }
+    
+  private func configureSheet(_ sheet: UISheetPresentationController, height: CGFloat) {
+    sheet.detents = [.custom { _ in return height.adaptiveHeight }]
+    sheet.prefersGrabberVisible = true
   }
   
   public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
