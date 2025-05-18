@@ -7,12 +7,9 @@
 //
 
 import UIKit
-import Common
 
-struct UserInfo: Codable {
-    let id: Int
-    let nickname: String
-}
+import Core
+import Common
 
 public class BlockUserViewController: UIViewController {
   private lazy var blockButton = UIButton()
@@ -84,13 +81,9 @@ public class BlockUserViewController: UIViewController {
   }
   
   private func blockButtonRightAction() {
-    let blockUser = UserInfo(id: self.userId, nickname: self.userNickname)
+    let blockUser = UserInfoForBlock(id: self.userId, nickname: self.userNickname)
 
-    if let savedData = UserDefaults.standard.data(forKey: "userInfo"),
-       let decoded = try? JSONDecoder().decode(UserInfo.self, from: savedData) {
-      print(decoded.nickname)
-      print(decoded.id)
-    }
+    BlockedUserManager.addBlockedUser(blockUser)
     
     self.dismiss(animated: true) {
       self.presentingViewController?.dismiss(animated: true) {

@@ -53,6 +53,16 @@ public struct User {
   }
 }
 
+public struct UserInfoForBlock: Codable, Equatable {
+  public let id: Int
+  public let nickname: String
+  
+  public init(id: Int, nickname: String) {
+    self.id = id
+    self.nickname = nickname
+  }
+}
+
 public enum LoginState {
   case apple
   case kakao
