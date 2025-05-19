@@ -5,6 +5,7 @@ import Then
 public enum MediumState {
   case active
   case inactive
+  case unblock
 }
 
 public class MediumButton: UIButton {
@@ -40,6 +41,10 @@ public class MediumButton: UIButton {
       backgroundColor = CommonAsset.recordyWhite.color
       setTitleColor(CommonAsset.recordyGrey09.color, for: .normal)
       setTitle("팔로우", for: .normal)
+    case .unblock:
+      backgroundColor = CommonAsset.recordyGrey08.color
+      setTitleColor(CommonAsset.recordyGrey01.color, for: .normal)
+      setTitle("차단 해제", for: .normal)
     }
   }
 }

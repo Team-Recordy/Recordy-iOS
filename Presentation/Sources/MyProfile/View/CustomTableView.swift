@@ -18,6 +18,10 @@ protocol WithDrawDelegate: AnyObject {
     func withDraw()
 }
 
+protocol BlockedUserDelegate: AnyObject {
+    func didTapBlockedUser()
+}
+
 enum SettingType: String {
     case community = "커뮤니티 가이드라인"
     case service = "서비스 이용약관"
@@ -55,6 +59,7 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
     weak var signOutDelegate: SignOutDelegate?
     weak var withDrawDelegate: WithDrawDelegate?
     weak var accountActionDelegate: AccountActionDelegate?
+    weak var blockedUserDelegate: BlockedUserDelegate?
     
     init(
         type: SettingSection,
@@ -208,6 +213,8 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
             switch list[indexPath.row] {
             case "프로필 수정":
                 accountActionDelegate?.didTapProfileEdit()
+            case "차단된 계정":
+              blockedUserDelegate?.didTapBlockedUser()
             default:
                 break
             }

@@ -290,6 +290,7 @@ class VideoFeedViewModel {
   
   func updateFeedList(_ newFeeds: [Feed]) {
     feedList += newFeeds
+    feedList = BlockedUserManager.filterBlockedFeeds(feedList)
     feedUpdated = true
     onFeedListUpdate?(newFeeds.count)
     
