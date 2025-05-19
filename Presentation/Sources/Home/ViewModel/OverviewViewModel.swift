@@ -123,7 +123,7 @@ public class OverviewViewModel {
       switch result {
       case .success(let response):
         if let index = self.nearPlaces.firstIndex(where: { $0.id == placeId }) {
-          self.nearPlaces[index].recordList = response.content.map { content in
+          let feeds = response.content.map { content in
             Feed(
               id: content.id,
               videoLink: content.fileUrl.videoUrl,
@@ -139,6 +139,7 @@ public class OverviewViewModel {
               isBookmarked: content.isBookmarked
             )
           }
+          self.nearPlaces[index].recordList = BlockedUserManager.filterBlockedFeeds(feeds)
         }
         
       case .failure(let error):

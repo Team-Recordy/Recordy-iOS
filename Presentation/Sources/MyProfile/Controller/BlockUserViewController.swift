@@ -95,7 +95,9 @@ public class BlockUserViewController: UIViewController {
   @objc private func blockButtonTapped() {
     showPopUp(
       type: .block(user: self.userNickname),
-      rightButtonAction: blockButtonRightAction
+      rightButtonAction: { [weak self] in
+        self?.blockButtonRightAction()
+      }
     )
   }
 }

@@ -28,6 +28,14 @@ public struct BlockedUserManager {
     }
   }
   
+  public static func removeBlockedUser(withId id: Int) {
+    var users = getBlockedUsers()
+    users.removeAll { $0.id == id }
+    if let encoded = try? JSONEncoder().encode(users) {
+      UserDefaults.standard.set(encoded, forKey: blockedKey)
+    }
+  }
+  
   public static func isBlocked(userId: Int) -> Bool {
     return getBlockedUsers().contains(where: { $0.id == userId })
   }

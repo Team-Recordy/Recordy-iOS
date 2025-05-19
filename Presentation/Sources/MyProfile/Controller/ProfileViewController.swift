@@ -334,9 +334,12 @@ public class ProfileViewController: UIViewController, ProfileEditViewControllerD
             isBookmarked: content.isBookmarked
           )
         }
+        
+        let filteredFeeds = BlockedUserManager.filterBlockedFeeds(feeds)
+        
         DispatchQueue.main.async {
-          self.user?.bookmarkedFeeds = feeds
-          self.bookmarkView.getBookmarkList(feeds: feeds)
+          self.user?.bookmarkedFeeds = filteredFeeds
+          self.bookmarkView.getBookmarkList(feeds: filteredFeeds)
         }
       case .failure(let failure):
         print(failure)

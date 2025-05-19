@@ -17,6 +17,7 @@ public enum RecordyPopUpType {
   case delete
   case register(place: String)
   case block(user: String)
+  case unblock(user: String)
 
   public var image: UIImage {
     return CommonAsset.alertImage.image
@@ -44,6 +45,8 @@ public enum RecordyPopUpType {
       "'\(place)'를\n등록할까요?"
     case .block(let user):
       "\(user)님을 차단하시겠어요?"
+    case .unblock(let user):
+      "\(user)님을 차단 해제하시겠어요?"
     }
   }
   
@@ -69,6 +72,8 @@ public enum RecordyPopUpType {
       "등록할까요?"
     case .block:
       "앞으로 해당 사용자의 영상은 더 이상 표시되지않아요.\n차단 된 계정은 [설정]-[차단된 계정]에서 확인할 수 있어요."
+    case .unblock:
+      "해당 사용자의 영상을 다시 확인할 수 있어요"
     }
   }
   
@@ -94,6 +99,8 @@ public enum RecordyPopUpType {
       "등록"
     case .block:
       "차단하기"
+    case .unblock:
+      "차단 해제"
     }
   }
   

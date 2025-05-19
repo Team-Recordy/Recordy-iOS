@@ -37,13 +37,15 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
       type: .account,
       list: [
         "프로필 수정",
-        "로그인 연동"
+        "로그인 연동",
+        "차단된 계정"
       ],
       headerTitle: "계정",
       footerView: nil,
       cellArrowImages: [
         CommonAsset.indicator.image,
-        loginType == "KAKAO" ? CommonAsset.kakao.image : CommonAsset.apple.image
+        loginType == "KAKAO" ? CommonAsset.kakao.image : CommonAsset.apple.image,
+        CommonAsset.indicator.image
       ]
     )
   }()
@@ -203,6 +205,7 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
     extraTableView.signOutDelegate = self
     extraTableView.withDrawDelegate = self
     accountTableView.accountActionDelegate = self
+    accountTableView.blockedUserDelegate = self
   }
   
   private func createDivider() -> UIView {
@@ -308,6 +311,17 @@ extension SettingViewController: AccountActionDelegate {
     profileEditVC.delegate = self
     navigationController?.pushViewController(
       profileEditVC,
+      animated: true
+    )
+  }
+}
+
+@available(iOS 16.0, *)
+extension SettingViewController: BlockedUserDelegate {
+  func didTapBlockedUser() {
+    let editBlockedVC = EditBlockedViewController()
+    navigationController?.pushViewController(
+      editBlockedVC,
       animated: true
     )
   }

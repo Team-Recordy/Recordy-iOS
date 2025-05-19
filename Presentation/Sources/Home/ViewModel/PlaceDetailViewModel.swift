@@ -136,7 +136,7 @@ public class PlaceDetailViewModel {
       self.isFetching = false
       switch result {
       case .success(let response):
-        let fetchedFeeds = response.content.map { content in
+        let feeds = response.content.map { content in
           Feed(
             id: content.id,
             videoLink: content.fileUrl.videoUrl,
@@ -153,11 +153,13 @@ public class PlaceDetailViewModel {
           )
         }
         
+        let filteredFeeds = BlockedUserManager.filterBlockedFeeds(feeds)
+        
         if let index = self.selectedPlace.firstIndex(where: { $0.id == placeId }) {
-          self.selectedPlace[index].recordList = fetchedFeeds
+          self.selectedPlace[index].recordList = filteredFeeds
         }
         
-        self.reviewFeedList = fetchedFeeds
+        self.reviewFeedList = filteredFeeds
         self.onFeedsUpdated?()
         
       case .failure(let error):
