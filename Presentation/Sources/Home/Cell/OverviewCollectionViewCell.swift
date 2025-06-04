@@ -110,7 +110,7 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
       $0.top.equalToSuperview()
       $0.leading.equalToSuperview().offset(20)
       $0.trailing.equalToSuperview().offset(-20)
-      $0.height.equalTo(102.adaptiveHeight)
+      $0.height.equalTo(112.adaptiveHeight)
     }
     
     placeExhibitionCollectionView!.snp.makeConstraints {
@@ -191,7 +191,8 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
     if place.recordSize == 0 {
       placeExhibitionCollectionView?.isHidden = true
     } else {
-      placeExhibitionCollectionView?.isHidden = false
+        //TODO: 서버 수정 후 false로 바뀌어야 합니다
+        placeExhibitionCollectionView?.isHidden = true
     }
     placeExhibitionCollectionView?.reloadData()
     onUpdateHeight?()

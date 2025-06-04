@@ -20,6 +20,10 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
   private var loginType: String = "APPLE"
   private var user: User
   
+  // MARK: - ScrollView & StackView for scrolling content
+  private let scrollView = UIScrollView()
+  private let contentStackView = UIStackView()
+  
   init(user: User) {
     self.user = user
     super.init(
@@ -56,13 +60,11 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
       list: [
         "커뮤니티 가이드라인",
         "서비스 이용약관",
-        "개인정보 취급방침",
-        "문의"
+        "개인정보 취급방침"
       ],
       headerTitle: "도움말",
       footerView: nil,
       cellArrowImages: [
-        CommonAsset.indicator.image,
         CommonAsset.indicator.image,
         CommonAsset.indicator.image,
         CommonAsset.indicator.image
@@ -83,8 +85,9 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
     
     footerView.addSubview(footerLabel)
     footerLabel.snp.makeConstraints {
-      $0.top.equalTo(footerView.snp.top).offset(4)
+      $0.top.equalToSuperview().offset(4)
       $0.leading.equalToSuperview().inset(20)
+      $0.bottom.equalToSuperview().inset(4)
     }
     
     return CustomTableView(
@@ -120,6 +123,7 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
       
     accountTableView.reloadAndUpdateHeight()
     helpTableView.reloadAndUpdateHeight()
+    extraTableView.reloadAndUpdateHeight()
     
     NotificationCenter.default.addObserver(
       self,
@@ -136,41 +140,33 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
   }
   
   private func setUI() {
-    view.addSubviews(
-      accountTableView,
-      helpTableView,
-      firstDivider,
-      secondDivider,
-      extraTableView
-    )
+    view.addSubview(scrollView)
+    scrollView.addSubview(contentStackView)
+
+    contentStackView.axis = .vertical
+    contentStackView.spacing = 0
+    contentStackView.alignment = .fill
+    contentStackView.distribution = .fill
+
+    [accountTableView, firstDivider, helpTableView, secondDivider, extraTableView].forEach {
+      contentStackView.addArrangedSubview($0)
+    }
+    
+    let bottomSpacer = UIView()
+    bottomSpacer.snp.makeConstraints {
+      $0.height.equalTo(20)
+    }
+    contentStackView.addArrangedSubview(bottomSpacer)
   }
   
   private func setAutoLayout() {
-    accountTableView.snp.makeConstraints {
-      $0.top.equalTo(view.safeAreaLayoutGuide)
-      $0.leading.trailing.equalToSuperview()
+    scrollView.snp.makeConstraints {
+      $0.edges.equalTo(view.safeAreaLayoutGuide)
     }
-    
-    firstDivider.snp.makeConstraints {
-      $0.top.equalTo(accountTableView.snp.bottom)
-      $0.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(4.adaptiveHeight)
-    }
-    
-    helpTableView.snp.makeConstraints {
-      $0.top.equalTo(firstDivider.snp.bottom)
-      $0.leading.trailing.equalToSuperview()
-    }
-    
-    secondDivider.snp.makeConstraints {
-      $0.top.equalTo(helpTableView.snp.bottom).offset(10)
-      $0.horizontalEdges.equalToSuperview()
-      $0.height.equalTo(4.adaptiveHeight)
-    }
-    
-    extraTableView.snp.makeConstraints {
-      $0.top.equalTo(secondDivider.snp.bottom)
-      $0.leading.trailing.bottom.equalToSuperview()
+
+    contentStackView.snp.makeConstraints {
+      $0.edges.equalTo(scrollView.contentLayoutGuide)
+      $0.width.equalTo(scrollView.frameLayoutGuide)
     }
   }
   

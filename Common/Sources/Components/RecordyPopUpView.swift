@@ -85,15 +85,6 @@ public class RecordyPopUpView: UIView {
   }
 
   private func setAutoLayout() {
-    self.snp.makeConstraints {
-      $0.width.equalTo(298.adaptiveWidth)
-      if case .register(_) = popUpType {
-        $0.height.equalTo(200.adaptiveHeight)  // 이미지 높이만큼 줄임
-      } else {
-        $0.height.equalTo(252.adaptiveHeight)
-      }
-    }
-
     if case .register(_) = popUpType {
       titleLabel.snp.makeConstraints {
         $0.top.equalToSuperview().offset(30.adaptiveHeight)
@@ -122,6 +113,7 @@ public class RecordyPopUpView: UIView {
       $0.centerX.equalToSuperview()
       $0.height.equalTo(44.adaptiveHeight)
       $0.width.equalTo(266.adaptiveWidth)
+      $0.bottom.equalToSuperview().inset(20.adaptiveHeight)
     }
   }
 

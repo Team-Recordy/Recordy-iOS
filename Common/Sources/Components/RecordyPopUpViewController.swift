@@ -59,11 +59,6 @@ public class RecordyPopUpViewController: UIViewController {
   private func setAutoLayout() {
     self.popUpView.snp.makeConstraints {
       $0.width.equalTo(290.adaptiveWidth)
-      if case .register(_) = popUpType {
-        $0.height.equalTo(160.adaptiveHeight)
-      } else {
-        $0.height.equalTo(256.adaptiveHeight)
-      }
       $0.center.equalToSuperview()
     }
   }
