@@ -104,10 +104,15 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
     }
     
     public func reloadAndUpdateHeight() {
-      settingTableView.reloadData()
-      DispatchQueue.main.async { [weak self] in
-        self?.updateTableViewHeight()
-      }
+        settingTableView.reloadData()
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.settingTableView.layoutIfNeeded()
+            let height = self.settingTableView.contentSize.height
+            self.snp.updateConstraints {
+                $0.height.equalTo(height)
+            }
+        }
     }
     
     required init?(coder: NSCoder) {

@@ -146,22 +146,33 @@ final class OverviewViewController: UIViewController {
     }
   }
   
-  @objc private func locationButtonTapped() {
-    let status = locationManager.currentAuthorizationStatus
-    
-    if status == .authorizedWhenInUse || status == .authorizedAlways {
-      self.viewModel.getNearPlaceList()
-      self.showToast(status: .complete, message: "위치를 업데이트 했어요!", height: 70)
-    } else if status == .denied || status == .restricted {
-      DispatchQueue.main.async {
-        self.showPopUp(type: .permission) {
-          UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+    @objc private func locationButtonTapped() {
+        let status = locationManager.currentAuthorizationStatus
+
+        switch status {
+        case .authorizedWhenInUse, .authorizedAlways:
+            self.viewModel.getNearPlaceList()
+            self.showToast(status: .complete, message: "위치를 업데이트 했어요!", height: 70)
+
+        case .notDetermined:
+            // 위치 권한 요청
+            locationManager.requestAuthorization()
+
+        case .denied, .restricted:
+            // 설정으로 이동 유도
+            DispatchQueue.main.async {
+                self.showPopUp(type: .permission) {
+                    if let settingsURL = URL(string: UIApplication.openSettingsURLString),
+                       UIApplication.shared.canOpenURL(settingsURL) {
+                        UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+                    }
+                }
+            }
+
+        @unknown default:
+            break
         }
-      }
-    } else if status == .notDetermined {
-      locationManager.requestAuthorization()
     }
-  }
 }
 
 @available(iOS 16.0, *)

@@ -65,7 +65,7 @@ final class ReviewFeedView: UIView {
       $0.setTitle("영상 업로드하기", for: .normal)
       $0.setTitleColor(CommonAsset.viskitBlack.color, for: .normal)
       $0.titleLabel?.font = ViskitFont.body2Bold.font
-      $0.cornerRadius(22)
+      $0.cornerRadius(22.adaptiveHeight)
     }
   }
   
