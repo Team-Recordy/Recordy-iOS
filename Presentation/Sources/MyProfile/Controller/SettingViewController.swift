@@ -60,11 +60,13 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
       list: [
         "커뮤니티 가이드라인",
         "서비스 이용약관",
-        "개인정보 취급방침"
+        "개인정보 취급방침",
+        "문의"
       ],
       headerTitle: "도움말",
       footerView: nil,
       cellArrowImages: [
+        
         CommonAsset.indicator.image,
         CommonAsset.indicator.image,
         CommonAsset.indicator.image
@@ -121,9 +123,17 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
     setAutoLayout()
     setDelegate()
       
-    accountTableView.reloadAndUpdateHeight()
-    helpTableView.reloadAndUpdateHeight()
-    extraTableView.reloadAndUpdateHeight()
+    DispatchQueue.main.async { [weak self] in
+      guard let self else { return }
+      self.accountTableView.reloadAndUpdateHeight()
+      self.helpTableView.reloadAndUpdateHeight()
+      self.extraTableView.reloadAndUpdateHeight()
+      
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        self.contentStackView.layoutIfNeeded()
+        self.scrollView.layoutIfNeeded()
+      }
+    }
     
     NotificationCenter.default.addObserver(
       self,
@@ -207,6 +217,9 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
   private func createDivider() -> UIView {
     let divider = UIView()
     divider.backgroundColor = CommonAsset.viskitGray11.color
+    divider.snp.makeConstraints {
+      $0.height.equalTo(4)
+     }
     return divider
   }
   
@@ -250,22 +263,17 @@ public class SettingViewController: UIViewController, ProfileEditViewControllerD
 extension SettingViewController: SignOutDelegate {
   func signOut() {
     self.showPopUp(type: .signOut) {
+        KeychainManager.shared.delete(token: .AccessToken)
+        KeychainManager.shared.delete(token: .RefreshToken)
+        UserDefaults.standard.removeObject(forKey: "PlatformType")
+        self.dismiss(animated: false)
+        let loginViewController = SplashScreenViewController()
+        loginViewController.modalPresentationStyle = .fullScreen
+        self.present(loginViewController, animated: false)
       let apiProvider = APIProvider<APITarget.Users>()
       
       apiProvider.justRequest(.signOut) { result in
-        switch result {
-        case .success:
-          KeychainManager.shared.delete(token: .AccessToken)
-          KeychainManager.shared.delete(token: .RefreshToken)
-          UserDefaults.standard.removeObject(forKey: "PlatformType")
-          
-          self.dismiss(animated: false)
-          let loginViewController = SplashScreenViewController()
-          loginViewController.modalPresentationStyle = .fullScreen
-          self.present(loginViewController, animated: false)
-        case .failure(let error):
-          print("\(error)")
-        }
+          print("@Log - \(result)")
       }
     }
   }
@@ -273,27 +281,24 @@ extension SettingViewController: SignOutDelegate {
 
 @available(iOS 16.0, *)
 extension SettingViewController: WithDrawDelegate {
-  func withDraw() {
-    self.showPopUp(type: .withdraw) {
-      let apiProvider = APIProvider<APITarget.Users>()
-      
-      apiProvider.justRequest(.withdraw) { result in
-        switch result {
-        case .success:
-          KeychainManager.shared.delete(token: .AccessToken)
-          KeychainManager.shared.delete(token: .RefreshToken)
-          UserDefaults.standard.removeObject(forKey: "PlatformType")
-          
-          self.dismiss(animated: false)
-          let loginViewController = SplashScreenViewController()
-          loginViewController.modalPresentationStyle = .fullScreen
-          self.present(loginViewController, animated: false)
-        case .failure(let error):
-          print("\(error)")
+    func withDraw() {
+        self.showPopUp(type: .withdraw) {
+            KeychainManager.shared.delete(token: .AccessToken)
+            KeychainManager.shared.delete(token: .RefreshToken)
+            UserDefaults.standard.removeObject(forKey: "PlatformType")
+            
+            self.dismiss(animated: false)
+            let loginViewController = SplashScreenViewController()
+            loginViewController.modalPresentationStyle = .fullScreen
+            self.present(loginViewController, animated: false)
+            
+            let apiProvider = APIProvider<APITarget.Users>()
+            
+            apiProvider.justRequest(.withdraw) { result in
+                print("@Log withdraw - \(result)")
+            }
         }
-      }
     }
-  }
 }
 
 @available(iOS 16.0, *)

@@ -140,9 +140,10 @@ public final class APIProvider<T: TargetType>: MoyaProvider<T> {
 }
 
 struct APIError: Error, Decodable {
-  let detail: String
+  let errorCode: String
+  let errorMessage: String
 }
 
 extension APIError {
-  static let unknown = APIError(detail: "unknown error")
+  static let unknown = APIError(errorCode: "UNKNOWN", errorMessage: "unknown error")
 }

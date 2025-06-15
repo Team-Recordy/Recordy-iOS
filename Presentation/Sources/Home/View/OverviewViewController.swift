@@ -97,9 +97,9 @@ final class OverviewViewController: UIViewController {
   
   private func setOverviewCollectionView() {
     let layout = UICollectionViewFlowLayout()
-    
-    layout.minimumInteritemSpacing = 16
+          
     layout.scrollDirection = .vertical
+    layout.minimumLineSpacing = 16
     layout.sectionInset = UIEdgeInsets(
       top: 0,
       left: 0,
