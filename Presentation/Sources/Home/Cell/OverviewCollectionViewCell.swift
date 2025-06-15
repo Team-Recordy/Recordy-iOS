@@ -28,7 +28,7 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
   private let eventCountLabelYellow = UILabel()
   private let eventCountLabel = UILabel()
   private let rightChevronIcon = UIImageView()
-  private let placeDetailButton = UIButton()
+  private let placeDetailContainer = UIControl()
   private var placeExhibitionCollectionView: UICollectionView?
   
   public var contentHeight: CGFloat {
@@ -54,7 +54,7 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
   }
   
   private func setStyle() {
-    placeDetailButton.do {
+    placeDetailContainer.do {
       $0.backgroundColor = CommonAsset.viskitGray10.color
       $0.cornerRadius(8)
       $0.addTarget(self, action: #selector(placeDetailButtonTapped), for: .touchUpInside)
@@ -92,11 +92,11 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
   
   private func setUI() {
     contentView.addSubviews(
-      placeDetailButton,
+      placeDetailContainer,
       placeExhibitionCollectionView!
     )
     
-    placeDetailButton.addSubviews(
+    placeDetailContainer.addSubviews(
       locationLabel,
       placeNameLabel,
       eventCountLabelYellow,
@@ -106,15 +106,15 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
   }
   
   private func setAutolayout() {
-    placeDetailButton.snp.makeConstraints {
+    placeDetailContainer.snp.makeConstraints {
       $0.top.equalToSuperview()
       $0.leading.equalToSuperview().offset(20)
       $0.trailing.equalToSuperview().offset(-20)
-      $0.height.equalTo(112.adaptiveHeight)
+      $0.bottom.equalTo(eventCountLabel.snp.bottom).offset(16)
     }
     
     placeExhibitionCollectionView!.snp.makeConstraints {
-      $0.top.equalTo(placeDetailButton.snp.bottom)
+      $0.top.equalTo(placeDetailContainer.snp.bottom)
       $0.horizontalEdges.equalToSuperview()
       $0.height.equalTo(277.adaptiveHeight)
     }
@@ -138,6 +138,7 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
       $0.centerY.equalTo(eventCountLabelYellow.snp.centerY)
       $0.leading.equalTo(eventCountLabelYellow.snp.trailing)
       $0.height.equalTo(20.adaptiveHeight)
+      $0.bottom.equalToSuperview().offset(-16)
     }
     
     rightChevronIcon.snp.makeConstraints {
@@ -186,13 +187,13 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
     locationLabel.text = formattedAddress
     placeNameLabel.text = place.name
     eventCountLabelYellow.text = "\(place.exhibitionSize)개"
-    placeDetailButton.tag = index ?? -1
+    placeDetailContainer.tag = index ?? -1
     
     if place.recordSize == 0 {
       placeExhibitionCollectionView?.isHidden = true
     } else {
         //TODO: 서버 수정 후 false로 바뀌어야 합니다
-        placeExhibitionCollectionView?.isHidden = true
+        placeExhibitionCollectionView?.isHidden = false
     }
     placeExhibitionCollectionView?.reloadData()
     onUpdateHeight?()
@@ -212,7 +213,7 @@ public class OverviewCollectionViewCell: UICollectionViewCell {
     }
   }
   
-  @objc private func placeDetailButtonTapped(_ sender: UIButton) {
+  @objc private func placeDetailButtonTapped(_ sender: UIControl) {
     onPlaceDetailButtonTapped?(sender.tag)
   }
 }

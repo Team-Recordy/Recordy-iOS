@@ -105,14 +105,38 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
     
     public func reloadAndUpdateHeight() {
         settingTableView.reloadData()
+        settingTableView.layoutIfNeeded()
+        
+        let totalHeight = calculateTotalHeight()
+        
+        self.snp.remakeConstraints {
+            $0.height.equalTo(totalHeight)
+        }
+        
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.settingTableView.layoutIfNeeded()
-            let height = self.settingTableView.contentSize.height
-            self.snp.updateConstraints {
-                $0.height.equalTo(height)
+            if let stackView = self.superview as? UIStackView {
+                stackView.setNeedsLayout()
+                stackView.layoutIfNeeded()
             }
         }
+    }
+    
+    private func calculateTotalHeight() -> CGFloat {
+        let headerHeight: CGFloat = 60
+        let rowHeight: CGFloat = 48
+        let numberOfRows = CGFloat(list.count)
+        
+        var footerHeight: CGFloat = 0
+        if let footerView = footerView {
+            if let heightConstraint = footerView.constraints.first(where: { $0.firstAttribute == .height }) {
+                footerHeight = heightConstraint.constant
+            } else {
+                footerHeight = 8
+            }
+        }
+        
+        return headerHeight + (rowHeight * numberOfRows) + footerHeight
     }
     
     required init?(coder: NSCoder) {
@@ -138,8 +162,7 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
     
     private func setAutoLayout() {
         settingTableView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-            $0.height.greaterThanOrEqualTo(0)
+            $0.top.leading.trailing.bottom.equalToSuperview()
         }
     }
     
@@ -158,8 +181,8 @@ public class CustomTableView: UIView, UITableViewDelegate, UITableViewDataSource
         }
         headerView.addSubview(headerLabel)
         headerLabel.snp.makeConstraints {
-            $0.top.equalTo(headerView.snp.top).inset(28)
-            $0.leading.equalToSuperview().inset(20)
+            $0.top.equalTo(headerView.snp.top).offset(28)
+            $0.leading.equalToSuperview().offset(20)
         }
         return headerView
     }
