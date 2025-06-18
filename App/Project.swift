@@ -9,8 +9,8 @@ import ProjectDescription
 import ProjectDescriptionHelpers
 
 let infoPlist: [String: Plist.Value] = [
-  "CFBundleShortVersionString": "1.0.0",
-  "CFBundleVersion": "2",
+  "CFBundleShortVersionString": "1.0.2",
+  "CFBundleVersion": "1",
   "CFBundleDisplayName": "Viskit",
   "CFBundleURLTypes": [
     [
